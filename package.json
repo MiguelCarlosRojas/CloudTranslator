@@ -20,9 +20,11 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.2",
-    "google-translate-api-x": "^10.7.2"
+    "google-translate-api-x": "^10.7.2",
+    "joi": "^17.13.3",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.0.1"
   }
 }

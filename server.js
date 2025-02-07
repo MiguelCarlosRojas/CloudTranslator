@@ -1,38 +1,26 @@
 const express = require("express");
 const path = require("path");
-const cors = require("cors");
-const translate = require("google-translate-api-x");
+const cors = require("./config/cors");
+const errorHandler = require("./middlewares/errorHandler");
+const translateRoutes = require("./routes/translateRoutes");
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Middleware para parsear JSON
 app.use(express.json());
 
-// Configurar CORS para permitir solicitudes desde cualquier origen
-app.use(
-  cors({
-    origin: "*",
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type"],
-  })
-);
+// Configurar CORS
+app.use(cors);
 
-// Servir archivos estáticos (HTML, CSS, JS)
-app.use(express.static(path.join(__dirname)));
+// Servir archivos estáticos
+app.use(express.static(path.join(__dirname, "public")));
 
-// Endpoint para traducir texto
-app.post("/translate", async (req, res) => {
-  const { text, targetLanguage } = req.body;
+// Rutas
+app.use("/api", translateRoutes);
 
-  try {
-    const result = await translate(text, { to: targetLanguage });
-    res.json({ translatedText: result.text });
-  } catch (error) {
-    console.error(`Error durante la traducción: ${error.message}`);
-    res.status(500).json({ error: "No se pudo completar la traducción." });
-  }
-});
+// Middleware para manejo de errores
+app.use(errorHandler);
 
 // Iniciar el servidor
 app.listen(port, () => {
