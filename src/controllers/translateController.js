@@ -7,6 +7,6 @@ exports.translateText = async (req, res, next) => {
     const result = await translate(text, { to: targetLanguage });
     res.status(200).json({ translatedText: result.text });
   } catch (error) {
-    next(error); // Pasar el error al middleware de manejo de errores
+    next(error);
   }
 };

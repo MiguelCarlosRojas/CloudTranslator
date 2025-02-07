@@ -1,8 +1,8 @@
 const express = require("express");
 const path = require("path");
-const cors = require("./config/cors");
-const errorHandler = require("./middlewares/errorHandler");
-const translateRoutes = require("./routes/translateRoutes");
+const cors = require("./src/config/cors");
+const errorHandler = require("./src/middlewares/errorHandler");
+const translateRoutes = require("./src/routes/translateRoutes");
 
 const app = express();
 const port = process.env.PORT || 3000;
