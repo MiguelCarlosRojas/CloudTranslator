@@ -4,7 +4,7 @@ module.exports = cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
       "http://localhost:3000",
-      "https://your-production-domain.com",
+      "https://portfolio-miguel-carloss-projects.vercel.app",
     ];
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
