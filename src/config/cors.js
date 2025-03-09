@@ -3,8 +3,8 @@ const cors = require("cors");
 module.exports = cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
-      "http://localhost:3000",
-      "https://portfolio-miguel-carloss-projects.vercel.app",
+      "http://localhost:5173",
+      "https://arcami.vercel.app",
     ];
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
