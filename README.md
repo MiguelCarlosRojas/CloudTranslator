@@ -196,7 +196,3 @@ Licencia **ISC**. Consulta `package.json` para detalles. ⚖️
 **Autor**: Miguel Angel Carlos Rojas  
 **Fecha**: Marzo 2025  
 *¡Traduce el mundo con Cloud Translator! 🌍✨*
-
----
-
-Este README usa emojis para hacerlo más visual y atractivo, con secciones bien definidas y un diseño limpio. Puedes copiarlo directamente en tu archivo `README.md`. Si quieres más personalización o ajustes, ¡dímelo! 😊
