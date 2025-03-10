@@ -15,7 +15,7 @@
     "express",
     "cors"
   ],
-  "author": "Tu Nombre <isakiangel6@gmail.com>",
+  "author": "Miguel Angel Carlos Rojas",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
