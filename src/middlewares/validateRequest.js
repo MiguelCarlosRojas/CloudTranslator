@@ -1,27 +1,19 @@
 const Joi = require("joi");
 
-const translateSchema = Joi.object({
-  text: Joi.string().trim().required().messages({
-    "string.empty": "Text is required",
-    "any.required": "Text is required"
-  }),
-  targetLanguage: Joi.string().trim().required().messages({
-    "string.empty": "Target language is required",
-    "any.required": "Target language is required"
-  })
+const schema = Joi.object({
+  text: Joi.string().required(),
+  targetLanguage: Joi.string().required()
 });
 
-const validateRequest = (req, res, next) => {
-  const { error } = translateSchema.validate(req.body);
-  
+module.exports = (req, res, next) => {
+  const { error } = schema.validate(req.body);
+
   if (error) {
     return res.status(400).json({
       success: false,
       error: error.details[0].message
     });
   }
-  
+
   next();
 };
-
-module.exports = validateRequest;
