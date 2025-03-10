@@ -1,28 +1,26 @@
+require("dotenv").config();
 const express = require("express");
 const path = require("path");
-const cors = require("./config/cors");
-const errorHandler = require("./middlewares/errorHandler");
-const translateRoutes = require("./routes/translateRoutes");
+const cors = require("./src/config/cors");
+const errorHandler = require("./src/middlewares/errorHandler");
+const translateRoutes = require("./src/routes/translateRoutes");
+const logger = require("./src/utils/logger");
 
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
-// Middleware para parsear JSON
+// Middleware
 app.use(express.json());
-
-// Configurar CORS
 app.use(cors);
+app.use(express.static(path.join(__dirname, "src/public")));
 
-// Servir archivos estáticos
-app.use(express.static(path.join(__dirname, "public")));
-
-// Rutas
+// Routes
 app.use("/api", translateRoutes);
 
-// Middleware para manejo de errores
+// Error Handler
 app.use(errorHandler);
 
-// Iniciar el servidor
-app.listen(port, () => {
-  console.log(`Servidor escuchando en http://localhost:${port}`);
+// Start server
+app.listen(PORT, () => {
+  logger.info(`Server running on http://localhost:${PORT}`);
 });

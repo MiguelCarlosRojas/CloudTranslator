@@ -1,8 +1,7 @@
 const express = require("express");
+const router = express.Router();
 const validateRequest = require("../middlewares/validateRequest");
 const { translateText } = require("../controllers/translateController");
-
-const router = express.Router();
 
 router.post("/translate", validateRequest, translateText);
 
