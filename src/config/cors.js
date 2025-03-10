@@ -1,6 +1,6 @@
 const cors = require("cors");
 
-// Divide la string de orígenes permitidos desde el .env en un array
+// Convertir la string de ALLOWED_ORIGINS en array
 const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
 
 module.exports = cors({

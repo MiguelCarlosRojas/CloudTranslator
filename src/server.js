@@ -1,9 +1,11 @@
-require('dotenv').config();
 const express = require("express");
 const path = require("path");
 const cors = require("./config/cors");
 const errorHandler = require("./middlewares/errorHandler");
 const translateRoutes = require("./routes/translateRoutes");
+
+// Cargar variables de entorno
+require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
