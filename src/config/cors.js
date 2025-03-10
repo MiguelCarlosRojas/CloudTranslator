@@ -1,10 +1,11 @@
 const cors = require("cors");
 
-// Convertir la string de ALLOWED_ORIGINS en array
-const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
-
 module.exports = cors({
   origin: (origin, callback) => {
+    const allowedOrigins = [
+      "http://localhost:5173",
+      "https://arcami.vercel.app",
+    ];
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
