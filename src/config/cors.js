@@ -1,10 +1,10 @@
 const cors = require("cors");
 
-// Configuración de CORS simple permitiendo todo con GET y POST
 const corsOptions = {
-  origin: "*",
-  methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type"]
+  origin: "*", // Allow all origins
+  methods: ["GET", "POST"], // Only allow GET and POST
+  allowedHeaders: ["Content-Type"],
+  optionsSuccessStatus: 200
 };
 
 module.exports = cors(corsOptions);

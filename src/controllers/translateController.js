@@ -7,7 +7,7 @@ const translateText = async (req, res, next) => {
     const result = await translate(text, { to: targetLanguage });
     return res.status(200).json({
       success: true,
-      translatedText: result.text
+      data: { translatedText: result.text }
     });
   } catch (error) {
     next(error);

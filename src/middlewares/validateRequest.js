@@ -1,12 +1,11 @@
 const Joi = require("joi");
 
-// Esquema de validación
 const translateSchema = Joi.object({
-  text: Joi.string().required().messages({
+  text: Joi.string().trim().required().messages({
     "string.empty": "Text is required",
     "any.required": "Text is required"
   }),
-  targetLanguage: Joi.string().required().messages({
+  targetLanguage: Joi.string().trim().required().messages({
     "string.empty": "Target language is required",
     "any.required": "Target language is required"
   })

@@ -8,18 +8,12 @@ const logger = require("./utils/logger");
 const app = express();
 const PORT = 3000;
 
-// Middlewares
 app.use(express.json());
 app.use(cors);
 app.use(express.static(path.join(__dirname, "public")));
-
-// Rutas
 app.use("/api", translateRoutes);
-
-// Manejo de errores
 app.use(errorHandler);
 
-// Iniciar servidor
 app.listen(PORT, () => {
-  logger.info(`Server running at http://localhost:${PORT}`);
+  logger.info(`Server running on http://localhost:${PORT}`);
 });

@@ -6,8 +6,10 @@ const errorHandler = (err, req, res, next) => {
 
   return res.status(statusCode).json({
     success: false,
-    error: message,
-    timestamp: new Date().toISOString()
+    error: {
+      message,
+      timestamp: new Date().toISOString()
+    }
   });
 };
 
