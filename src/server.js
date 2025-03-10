@@ -1,26 +1,25 @@
-require("dotenv").config();
 const express = require("express");
 const path = require("path");
-const cors = require("./src/config/cors");
-const errorHandler = require("./src/middlewares/errorHandler");
-const translateRoutes = require("./src/routes/translateRoutes");
-const logger = require("./src/utils/logger");
+const cors = require("./config/cors");
+const errorHandler = require("./middlewares/errorHandler");
+const translateRoutes = require("./routes/translateRoutes");
+const logger = require("./utils/logger");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
-// Middleware
+// Middlewares
 app.use(express.json());
 app.use(cors);
-app.use(express.static(path.join(__dirname, "src/public")));
+app.use(express.static(path.join(__dirname, "public")));
 
-// Routes
+// Rutas
 app.use("/api", translateRoutes);
 
-// Error Handler
+// Manejo de errores
 app.use(errorHandler);
 
-// Start server
+// Iniciar servidor
 app.listen(PORT, () => {
-  logger.info(`Server running on http://localhost:${PORT}`);
+  logger.info(`Server running at http://localhost:${PORT}`);
 });
