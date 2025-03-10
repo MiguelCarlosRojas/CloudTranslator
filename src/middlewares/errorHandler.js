@@ -1,8 +1,11 @@
+const logger = require("../utils/logger");
+const { STATUS_CODES } = require("../config/config");
+
 module.exports = (err, req, res, next) => {
-  console.error(err.message);
-  
-  const statusCode = err.statusCode || 500;
+  const statusCode = err.statusCode || STATUS_CODES.SERVER_ERROR;
   const message = err.message || "Internal Server Error";
+
+  logger.error(`Error ${statusCode}: ${message}`);
   
   res.status(statusCode).json({
     success: false,
