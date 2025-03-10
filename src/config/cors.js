@@ -1,12 +1,10 @@
 const cors = require("cors");
-require("dotenv").config();
+
+// Divide la string de orígenes permitidos desde el .env en un array
+const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
 
 module.exports = cors({
   origin: (origin, callback) => {
-    const allowedOrigins = [
-      process.env.ALLOWED_ORIGIN_LOCAL,
-      process.env.ALLOWED_ORIGIN_PROD,
-    ];
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
