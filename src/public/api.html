@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Referencia de la API REST - CloudTranslator</title>
+  <title>Referencia Técnica de API REST - CloudTranslator</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="shortcut icon" type="image/png" href="favicon.png">
   <link rel="stylesheet" href="css/style.css">
@@ -11,7 +11,8 @@
 </head>
 <body>
 
-  <header class="top-nav">
+  <!-- Barra Superior -->
+  <header class="top-nav" id="main-header">
     <div class="nav-container">
       <a href="index.html" class="brand-wrapper">
         <span class="brand-logo">
@@ -62,186 +63,432 @@
     </div>
   </header>
 
-  <main class="full-container">
-    <div class="hero-full">
-      <span class="hero-tag-glow">[ ESPECIFICACIÓN TÉCNICA DE ENDPOINTS ]</span>
-      <h1>Referencia de la API REST</h1>
-      <p class="lead">
-        Documentación técnica de los endpoints HTTP alojados en <code>https://cloudtranslator.onrender.com</code>. Para tutoriales paso a paso consulta <a href="learn.html" style="color: #60a5fa; text-decoration: underline;">Aprender</a>.
-      </p>
-    </div>
+  <!-- CONTENEDOR DE DOS COLUMNAS CON BARRA LATERAL PARA LA API -->
+  <div class="docs-layout-container">
 
-    <!-- Gateway Info -->
-    <article class="content-box-card">
-      <span class="tech-card-tag">[ BASE_URL & HEADERS ]</span>
-      <h2>Servidor de Producción y Encabezados</h2>
-      <p>Base URL global: <code>https://cloudtranslator.onrender.com</code></p>
-      <div class="table-responsive" style="margin-top: 14px;">
-        <table class="docs-table">
-          <thead>
-            <tr>
-              <th>Encabezado</th>
-              <th>Valor Requerido</th>
-              <th>Descripción</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>Content-Type</code></td>
-              <td><code>application/json</code></td>
-              <td>Obligatorio en peticiones con cuerpo (POST).</td>
-            </tr>
-            <tr>
-              <td><code>Accept</code></td>
-              <td><code>application/json</code></td>
-              <td>Indica al servidor que devuelva la respuesta en formato JSON.</td>
-            </tr>
-            <tr>
-              <td><code>Origin / CORS</code></td>
-              <td>Cualquiera (<code>*</code>)</td>
-              <td>Habilitado para consumo directo desde navegadores o servidores.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </article>
-
-    <!-- POST /api/translate -->
-    <article class="content-box-card">
-      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-        <span class="tech-card-tag"><span class="badge-post">POST</span> /api/translate</span>
-        <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">Traducción individual o por lotes</span>
-      </div>
-      <h2>Traducción de Texto (POST)</h2>
-      <p>Envía un texto individual o una lista de textos mediante un payload JSON para traducir al idioma destino.</p>
-
-      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 16px;">Parámetros del Payload (JSON)</h3>
-      <div class="table-responsive" style="margin-top: 10px;">
-        <table class="docs-table">
-          <thead>
-            <tr>
-              <th>Campo</th>
-              <th>Tipo</th>
-              <th>Obligatorio</th>
-              <th>Descripción</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>text</code></td>
-              <td>string</td>
-              <td>Condicional</td>
-              <td>Cadena individual a traducir (1 a 5,000 caracteres). Obligatorio si no se usa <code>texts</code>.</td>
-            </tr>
-            <tr>
-              <td><code>texts</code></td>
-              <td>array[string]</td>
-              <td>Condicional</td>
-              <td>Lista de textos a traducir en una sola petición (1 a 1,000 elementos).</td>
-            </tr>
-            <tr>
-              <td><code>targetLanguage</code></td>
-              <td>string</td>
-              <td>Sí</td>
-              <td>Código ISO de 2 letras del idioma de destino (ej: <code>"en"</code>, <code>"fr"</code>, <code>"de"</code>).</td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- BARRA LATERAL DEDICADA A LA API -->
+    <aside class="docs-sidebar" id="api-sidebar" aria-label="Navegación lateral de endpoints">
+      <div class="docs-sidebar-header">
+        <span class="docs-sidebar-tag">[ API REFERENCE ]</span>
+        <h3 class="docs-sidebar-title">Índice de Endpoints</h3>
       </div>
 
-      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px;">Ejemplo de Petición (cURL)</h3>
-      <div class="json-code-block">
-        <pre><code>curl -X POST "https://cloudtranslator.onrender.com/api/translate" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "text": "Hola mundo desde CloudTranslator",
-    "targetLanguage": "en"
-  }'</code></pre>
-      </div>
+      <nav class="docs-sidebar-nav">
+        <!-- Grupo 1: Gateway y Configuración -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">01 / Gateway &amp; Protocolo</span>
+          <a href="#api-gateway" class="docs-sidebar-session active" data-target="api-gateway">
+            <span class="session-badge">G.01</span> Gateway &amp; Host
+          </a>
+          <div class="docs-sidebar-subsessions">
+            <a href="#sub-base-url" class="docs-sidebar-sublink" data-target="sub-base-url">
+              <span class="sub-num">1.1</span> Base URL &amp; HTTPS
+            </a>
+            <a href="#sub-headers" class="docs-sidebar-sublink" data-target="sub-headers">
+              <span class="sub-num">1.2</span> Encabezados Requeridos
+            </a>
+            <a href="#sub-errors" class="docs-sidebar-sublink" data-target="sub-errors">
+              <span class="sub-num">1.3</span> Estructura de Errores
+            </a>
+          </div>
+        </div>
 
-      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px;">Ejemplo de Respuesta (HTTP 200 OK)</h3>
-      <div class="json-code-block">
-        <pre><code>{
-  "translatedText": "Hello world from CloudTranslator"
+        <!-- Grupo 2: Endpoints de Traducción -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">02 / Servicio de Traducción</span>
+          <a href="#api-post-translate" class="docs-sidebar-session" data-target="api-post-translate">
+            <span class="session-badge">T.01</span> POST /api/translate
+          </a>
+          <div class="docs-sidebar-subsessions">
+            <a href="#sub-post-single" class="docs-sidebar-sublink" data-target="sub-post-single">
+              <span class="sub-num">2.1</span> Texto Simple (JSON)
+            </a>
+            <a href="#sub-post-batch" class="docs-sidebar-sublink" data-target="sub-post-batch">
+              <span class="sub-num">2.2</span> Lotes / Micro-batch
+            </a>
+          </div>
+          <a href="#api-get-translate" class="docs-sidebar-session" data-target="api-get-translate">
+            <span class="session-badge">T.02</span> GET /api/translate
+          </a>
+        </div>
+
+        <!-- Grupo 3: Utilidades del Sistema -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">03 / Metadata &amp; Diagnóstico</span>
+          <a href="#api-get-languages" class="docs-sidebar-session" data-target="api-get-languages">
+            <span class="session-badge">S.01</span> GET /api/languages
+          </a>
+          <a href="#api-get-health" class="docs-sidebar-session" data-target="api-get-health">
+            <span class="session-badge">S.02</span> GET /api/health
+          </a>
+        </div>
+
+        <!-- Grupo 4: Consola Interactiva -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">04 / Pruebas en Vivo</span>
+          <a href="#api-live-console" class="docs-sidebar-session" data-target="api-live-console">
+            <span class="session-badge">P.01</span> Consola Interactiva
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL DE LA API -->
+    <main class="docs-main-content">
+
+      <!-- Encabezado de la API -->
+      <section class="docs-section" style="padding-top: 10px;">
+        <span class="hero-tag-glow">[ ESPECIFICACIÓN TÉCNICA FORMAL ]</span>
+        <h1 style="font-size: clamp(1.8rem, 3.2vw, 2.5rem); margin: 12px 0 16px 0; color: #ffffff;">
+          Especificación de Endpoints REST
+        </h1>
+        <p class="lead">
+          Referencia exhaustiva de esquemas JSON, parámetros de consulta y códigos de respuesta HTTP devueltos por el gateway <code>https://cloudtranslator.onrender.com</code>. Para guías de integración paso a paso consulta <a href="learn.html" style="color: #60a5fa; text-decoration: underline;">Aprender</a>.
+        </p>
+      </section>
+
+      <!-- SECCIÓN 01: GATEWAY & PROTOCOLO -->
+      <section id="api-gateway" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ G.01 // GATEWAY ]</span>
+          <h2>Protocolo de Conexión &amp; Encabezados</h2>
+          <p>Condiciones y formatos requeridos para interactuar con la API REST.</p>
+        </div>
+
+        <!-- Sub 1.1: Base URL -->
+        <article id="sub-base-url" class="docs-subsection content-box-card">
+          <span class="tech-card-tag">[ 1.1 // BASE_URL ]</span>
+          <h3>URL Base del Servidor</h3>
+          <p>Todas las rutas son relativas a la dirección canónica en producción:</p>
+          <div class="json-code-block">
+            <pre><code>https://cloudtranslator.onrender.com/api</code></pre>
+          </div>
+          <p style="margin-top: 12px; font-size: 0.88rem; color: var(--text-muted);">
+            Se requiere comunicación estricta mediante <strong>HTTPS con TLS 1.3</strong>. Las solicitudes HTTP no cifradas se redirigen automáticamente a HTTPS.
+          </p>
+        </article>
+
+        <!-- Sub 1.2: Headers -->
+        <article id="sub-headers" class="docs-subsection content-box-card">
+          <span class="tech-card-tag">[ 1.2 // HEADERS ]</span>
+          <h3>Encabezados HTTP Requeridos</h3>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Encabezado</th>
+                  <th>Valor</th>
+                  <th>Requerido</th>
+                  <th>Detalle</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>Content-Type</code></td>
+                  <td><code>application/json</code></td>
+                  <td>Obligatorio (POST)</td>
+                  <td>Define que el cuerpo de la solicitud viaja en JSON estricto.</td>
+                </tr>
+                <tr>
+                  <td><code>Accept</code></td>
+                  <td><code>application/json</code></td>
+                  <td>Opcional</td>
+                  <td>Garantiza que la respuesta se devuelva estructurada en JSON.</td>
+                </tr>
+                <tr>
+                  <td><code>Access-Control-Allow-Origin</code></td>
+                  <td><code>*</code></td>
+                  <td>Automático</td>
+                  <td>Habilitado en todos los endpoints para clientes web frontend.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <!-- Sub 1.3: Errores -->
+        <article id="sub-errors" class="docs-subsection content-box-card">
+          <span class="tech-card-tag">[ 1.3 // ERROR_SCHEMA ]</span>
+          <h3>Esquema Estándar de Respuestas de Error</h3>
+          <p>Cuando una solicitud falla por validación de parámetros (HTTP 400) o error interno (HTTP 500), el servidor responde con el siguiente formato JSON:</p>
+          <div class="json-code-block">
+            <pre><code>{
+  "success": false,
+  "error": "El idioma objetivo es requerido"
 }</code></pre>
-      </div>
+          </div>
+        </article>
+      </section>
 
-      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px;">Ejemplo con Lista de Textos (Batch)</h3>
-      <div class="json-code-block">
-        <pre><code>curl -X POST "https://cloudtranslator.onrender.com/api/translate" \
+      <!-- SECCIÓN 02: ENDPOINTS DE TRADUCCIÓN -->
+      <section id="api-post-translate" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ T.01 // POST_TRANSLATE ]</span>
+          <h2>POST /api/translate</h2>
+          <p>Endpoint principal para traducción de cadenas de texto y micro-lotes en una sola solicitud.</p>
+        </div>
+
+        <!-- Sub 2.1: Simple text -->
+        <article id="sub-post-single" class="docs-subsection content-box-card">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <span class="tech-card-tag"><span class="badge-post">POST</span> /api/translate</span>
+            <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">Payload: texto individual</span>
+          </div>
+          <h3>2.1 Traducción de Texto Simple</h3>
+          
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 14px;">Cuerpo de la Petición (Request Body)</h4>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Propiedad</th>
+                  <th>Tipo</th>
+                  <th>Restricción</th>
+                  <th>Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>text</code></td>
+                  <td>string</td>
+                  <td>1 a 5,000 caracteres</td>
+                  <td>Texto en lenguaje natural a traducir.</td>
+                </tr>
+                <tr>
+                  <td><code>targetLanguage</code></td>
+                  <td>string</td>
+                  <td>Código ISO (ej. "en")</td>
+                  <td>Idioma de destino requerido.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Ejemplo de Solicitud (cURL)</h4>
+          <div class="json-code-block">
+            <pre><code>curl -X POST "https://cloudtranslator.onrender.com/api/translate" \
   -H "Content-Type: application/json" \
   -d '{
-    "texts": ["Inicio", "Servicios", "Contacto"],
+    "text": "Infraestructura de microservicios en la nube",
     "targetLanguage": "en"
   }'</code></pre>
-      </div>
-      <div class="json-code-block">
-        <pre><code>{
+          </div>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
+          <div class="json-code-block">
+            <pre><code>{
+  "translatedText": "Cloud microservices infrastructure"
+}</code></pre>
+          </div>
+        </article>
+
+        <!-- Sub 2.2: Batch text -->
+        <article id="sub-post-batch" class="docs-subsection content-box-card">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <span class="tech-card-tag"><span class="badge-post">POST</span> /api/translate</span>
+            <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">Payload: arreglo de textos</span>
+          </div>
+          <h3>2.2 Traducción por Micro-lotes (Batch)</h3>
+          <p>
+            Permite enviar hasta <strong>1,000 cadenas de texto</strong> en una sola conexión HTTP. Garantiza el orden idéntico de los elementos de entrada en la respuesta.
+          </p>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 14px;">Cuerpo de la Petición (Request Body)</h4>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Propiedad</th>
+                  <th>Tipo</th>
+                  <th>Restricción</th>
+                  <th>Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>texts</code></td>
+                  <td>Array&lt;string&gt;</td>
+                  <td>1 a 1,000 elementos</td>
+                  <td>Lista de cadenas a traducir de forma simultánea.</td>
+                </tr>
+                <tr>
+                  <td><code>targetLanguage</code></td>
+                  <td>string</td>
+                  <td>Código ISO (ej. "en")</td>
+                  <td>Idioma de destino requerido.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Ejemplo de Solicitud (cURL)</h4>
+          <div class="json-code-block">
+            <pre><code>curl -X POST "https://cloudtranslator.onrender.com/api/translate" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "texts": ["Configuración", "Seguridad", "Facturación"],
+    "targetLanguage": "en"
+  }'</code></pre>
+          </div>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
+          <div class="json-code-block">
+            <pre><code>{
   "translatedTexts": [
-    "Start",
-    "Services",
-    "Contact"
+    "Settings",
+    "Security",
+    "Billing"
   ]
 }</code></pre>
-      </div>
-    </article>
+          </div>
+        </article>
+      </section>
 
-    <!-- GET /api/translate -->
-    <article class="content-box-card">
-      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-        <span class="tech-card-tag"><span class="badge-get">GET</span> /api/translate</span>
-        <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">Traducción rápida por Query Params</span>
-      </div>
-      <h2>Traducción vía Query Params (GET)</h2>
-      <p>Permite consultas directas mediante parámetros en la URL. Recomendado para pruebas rápidas en navegador.</p>
-      <div class="json-code-block">
-        <pre><code>curl -X GET "https://cloudtranslator.onrender.com/api/translate?text=Bienvenido&targetLanguage=en"</code></pre>
-      </div>
-    </article>
+      <!-- SECCIÓN GET /api/translate -->
+      <section id="api-get-translate" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ T.02 // GET_TRANSLATE ]</span>
+          <h2>GET /api/translate</h2>
+          <p>Consulta directa por cadena de consulta (Query String) para exploradores o clientes sin soporte de cuerpo en solicitudes.</p>
+        </div>
 
-    <!-- GET /api/languages -->
-    <article class="content-box-card">
-      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-        <span class="tech-card-tag"><span class="badge-get">GET</span> /api/languages</span>
-        <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">Catálogo de idiomas soportados</span>
-      </div>
-      <h2>Idiomas Disponibles</h2>
-      <p>Devuelve el catálogo de códigos ISO soportados por el motor de traducción.</p>
-      <div class="json-code-block">
-        <pre><code>curl -X GET "https://cloudtranslator.onrender.com/api/languages"</code></pre>
-      </div>
-      <div class="json-code-block">
-        <pre><code>{
+        <article class="content-box-card">
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Parámetro</th>
+                  <th>Ubicación</th>
+                  <th>Requerido</th>
+                  <th>Ejemplo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>text</code></td>
+                  <td>Query param</td>
+                  <td>Sí</td>
+                  <td><code>?text=Hola</code></td>
+                </tr>
+                <tr>
+                  <td><code>targetLanguage</code></td>
+                  <td>Query param</td>
+                  <td>Sí</td>
+                  <td><code>&amp;targetLanguage=en</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Ejemplo de Solicitud</h4>
+          <div class="json-code-block">
+            <pre><code>curl -X GET "https://cloudtranslator.onrender.com/api/translate?text=Servicio&targetLanguage=en"</code></pre>
+          </div>
+          <div class="json-code-block">
+            <pre><code>{
+  "translatedText": "Service"
+}</code></pre>
+          </div>
+        </article>
+      </section>
+
+      <!-- SECCIÓN 03: METADATA & HEALTH -->
+      <section id="api-get-languages" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ S.01 // LANGUAGES ]</span>
+          <h2>GET /api/languages</h2>
+          <p>Devuelve la matriz de idiomas activos en el motor de traducción.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div class="json-code-block">
+            <pre><code>curl -X GET "https://cloudtranslator.onrender.com/api/languages"</code></pre>
+          </div>
+          <div class="json-code-block">
+            <pre><code>{
   "success": true,
   "languages": [
     "en", "es", "fr", "de", "it", "pt", "ru", "ja", "zh-CN", "ar", "ko"
   ]
 }</code></pre>
-      </div>
-    </article>
+          </div>
+        </article>
+      </section>
 
-    <!-- GET /api/health -->
-    <article class="content-box-card">
-      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-        <span class="tech-card-tag"><span class="badge-get">GET</span> /api/health</span>
-        <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">Monitor de disponibilidad</span>
-      </div>
-      <h2>Estado de Salud (Healthcheck)</h2>
-      <p>Utilizado por monitores de infraestructura para comprobar disponibilidad y tiempo de actividad.</p>
-      <div class="json-code-block">
-        <pre><code>curl -X GET "https://cloudtranslator.onrender.com/api/health"</code></pre>
-      </div>
-      <div class="json-code-block">
-        <pre><code>{
+      <section id="api-get-health" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ S.02 // HEALTHCHECK ]</span>
+          <h2>GET /api/health</h2>
+          <p>Comprobación de operatividad y tiempo activo (uptime) para balanceadores y monitores de infraestructura.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div class="json-code-block">
+            <pre><code>curl -X GET "https://cloudtranslator.onrender.com/api/health"</code></pre>
+          </div>
+          <div class="json-code-block">
+            <pre><code>{
   "success": true,
   "status": "ok",
-  "uptime": 4520,
-  "timestamp": "2026-09-28T22:00:00.000Z"
+  "uptime": 5120,
+  "timestamp": "2026-09-28T22:15:00.000Z"
 }</code></pre>
-      </div>
-    </article>
-  </main>
+          </div>
+        </article>
+      </section>
 
+      <!-- SECCIÓN 04: CONSOLA INTERACTIVA EN VIVO -->
+      <section id="api-live-console" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ P.01 // API_PLAYGROUND ]</span>
+          <h2>Consola Interactiva de Pruebas</h2>
+          <p>Envía solicitudes reales a <code>https://cloudtranslator.onrender.com/api/translate</code> y examina la respuesta JSON devuelta en vivo.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div style="display: grid; grid-template-columns: 1fr; gap: 14px;">
+            <div>
+              <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 6px;">
+                Texto a traducir (campo <code>text</code>):
+              </label>
+              <input type="text" id="live-api-text" value="Arquitectura moderna en la nube" style="width: 100%; padding: 10px 14px; background: #000000; border: 1px solid var(--border-line); border-radius: var(--radius-sm); color: #ffffff; font-family: var(--font-mono); font-size: 0.9rem;">
+            </div>
+
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <div>
+                <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 6px;">
+                  Idioma destino (<code>targetLanguage</code>):
+                </label>
+                <select id="live-api-lang" style="padding: 10px 14px; background: #000000; border: 1px solid var(--border-line); border-radius: var(--radius-sm); color: #ffffff; font-family: var(--font-mono); font-size: 0.9rem;">
+                  <option value="en">Inglés (en)</option>
+                  <option value="fr">Francés (fr)</option>
+                  <option value="de">Alemán (de)</option>
+                  <option value="it">Italiano (it)</option>
+                  <option value="pt">Portugués (pt)</option>
+                </select>
+              </div>
+
+              <button id="btn-run-live-api" class="btn btn-primary" style="margin-top: 22px;">
+                Ejecutar Petición POST
+              </button>
+            </div>
+
+            <div>
+              <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 6px;">
+                Respuesta del Servidor (JSON en tiempo real):
+              </label>
+              <div class="json-code-block" style="min-height: 120px;">
+                <pre><code id="live-api-output">Pulsa "Ejecutar Petición POST" para probar el endpoint en vivo...</code></pre>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- PIE DE PÁGINA LIMPIO (SIN PLATAFORMA NI DOCUMENTACIÓN) -->
   <footer>
     <div class="footer-inner-full">
       <div class="footer-col">
@@ -283,6 +530,87 @@
   <script src="js/cloud-translator.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      // 1. ScrollSpy para el sidebar de la API
+      const sessionLinks = document.querySelectorAll(".docs-sidebar-session");
+      const subLinks = document.querySelectorAll(".docs-sidebar-sublink");
+      const observedElements = document.querySelectorAll(".docs-section, .docs-subsection");
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute("id");
+
+            if (entry.target.classList.contains("docs-subsection")) {
+              subLinks.forEach(sub => {
+                if (sub.getAttribute("data-target") === id || sub.getAttribute("href") === "#" + id) {
+                  sub.classList.add("active");
+                  const parentGroup = sub.closest(".docs-sidebar-group");
+                  if (parentGroup) {
+                    sessionLinks.forEach(s => s.classList.remove("active"));
+                    parentGroup.querySelector(".docs-sidebar-session")?.classList.add("active");
+                  }
+                } else {
+                  sub.classList.remove("active");
+                }
+              });
+            } else if (entry.target.classList.contains("docs-section")) {
+              sessionLinks.forEach(link => {
+                if (link.getAttribute("data-target") === id || link.getAttribute("href") === "#" + id) {
+                  link.classList.add("active");
+                }
+              });
+            }
+          }
+        });
+      }, {
+        rootMargin: "-90px 0px -50% 0px",
+        threshold: 0.1
+      });
+
+      observedElements.forEach(el => observer.observe(el));
+
+      // 2. Consola Interactiva de API en Vivo
+      const btnRun = document.getElementById("btn-run-live-api");
+      const textInput = document.getElementById("live-api-text");
+      const langSelect = document.getElementById("live-api-lang");
+      const outputEl = document.getElementById("live-api-output");
+
+      btnRun.addEventListener("click", async () => {
+        const textVal = textInput.value.trim();
+        const langVal = langSelect.value;
+        if (!textVal) return;
+
+        outputEl.textContent = "Enviando solicitud a https://cloudtranslator.onrender.com/api/translate...";
+        const t0 = performance.now();
+
+        try {
+          const resp = await fetch("https://cloudtranslator.onrender.com/api/translate", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              text: textVal,
+              targetLanguage: langVal
+            })
+          });
+
+          const latency = Math.round(performance.now() - t0);
+          const data = await resp.json();
+
+          const result = {
+            httpStatus: resp.status + " " + resp.statusText,
+            latencyMs: latency,
+            responseBody: data
+          };
+
+          outputEl.textContent = JSON.stringify(result, null, 2);
+        } catch (err) {
+          outputEl.textContent = "Error al conectar con la API: " + err.message;
+        }
+      });
+
+      // 3. Inicialización del SDK de traducción de página
       const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";
       window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
       document.getElementById("btn-english").onclick = () => window.translator.translateToEnglish();
