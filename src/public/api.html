@@ -160,9 +160,11 @@
           <span class="tech-card-tag">[ 1.1 // BASE_URL ]</span>
           <h3>URL Base del Servidor</h3>
           <p>Todas las rutas son relativas a la dirección canónica en producción:</p>
-          <div class="json-code-block">
-            <pre><code>https://cloudtranslator.onrender.com/api</code></pre>
+          <div class="code-box-header">
+            <span>Base URL de Producción</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-base-url')">Copiar</button>
           </div>
+          <pre class="code-panel" id="code-base-url">https://cloudtranslator.onrender.com/api</pre>
           <p style="margin-top: 12px; font-size: 0.88rem; color: var(--text-muted);">
             Se requiere comunicación estricta mediante <strong>HTTPS con TLS 1.3</strong>. Las solicitudes HTTP no cifradas se redirigen automáticamente a HTTPS.
           </p>
@@ -211,12 +213,14 @@
           <span class="tech-card-tag">[ 1.3 // ERROR_SCHEMA ]</span>
           <h3>Esquema Estándar de Respuestas de Error</h3>
           <p>Cuando una solicitud falla por validación de parámetros (HTTP 400) o error interno (HTTP 500), el servidor responde con el siguiente formato JSON:</p>
-          <div class="json-code-block">
-            <pre><code>{
+          <div class="code-box-header">
+            <span>Esquema de Error JSON (HTTP 400 / 500)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-error-schema')">Copiar</button>
+          </div>
+          <pre class="code-panel" id="code-error-schema">{
   "success": false,
   "error": "El idioma objetivo es requerido"
-}</code></pre>
-          </div>
+}</pre>
         </article>
       </section>
 
@@ -265,21 +269,25 @@
           </div>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Ejemplo de Solicitud (cURL)</h4>
-          <div class="json-code-block">
-            <pre><code>curl -X POST "https://cloudtranslator.onrender.com/api/translate" \
+          <div class="code-box-header">
+            <span>Comando cURL (POST Texto Simple)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-single')">Copiar cURL</button>
+          </div>
+          <pre class="code-panel" id="curl-post-single">curl -X POST "https://cloudtranslator.onrender.com/api/translate" \
   -H "Content-Type: application/json" \
   -d '{
     "text": "Infraestructura de microservicios en la nube",
     "targetLanguage": "en"
-  }'</code></pre>
-          </div>
+  }'</pre>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
-          <div class="json-code-block">
-            <pre><code>{
-  "translatedText": "Cloud microservices infrastructure"
-}</code></pre>
+          <div class="code-box-header">
+            <span>Respuesta JSON (HTTP 200 OK)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-post-single')">Copiar JSON</button>
           </div>
+          <pre class="code-panel" id="res-post-single">{
+  "translatedText": "Cloud microservices infrastructure"
+}</pre>
         </article>
 
         <!-- Sub 2.2: Batch text -->
@@ -322,25 +330,29 @@
           </div>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Ejemplo de Solicitud (cURL)</h4>
-          <div class="json-code-block">
-            <pre><code>curl -X POST "https://cloudtranslator.onrender.com/api/translate" \
+          <div class="code-box-header">
+            <span>Comando cURL (POST Lote de Textos)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-batch')">Copiar cURL</button>
+          </div>
+          <pre class="code-panel" id="curl-post-batch">curl -X POST "https://cloudtranslator.onrender.com/api/translate" \
   -H "Content-Type: application/json" \
   -d '{
     "texts": ["Configuración", "Seguridad", "Facturación"],
     "targetLanguage": "en"
-  }'</code></pre>
-          </div>
+  }'</pre>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
-          <div class="json-code-block">
-            <pre><code>{
+          <div class="code-box-header">
+            <span>Respuesta JSON (HTTP 200 OK)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-post-batch')">Copiar JSON</button>
+          </div>
+          <pre class="code-panel" id="res-post-batch">{
   "translatedTexts": [
     "Settings",
     "Security",
     "Billing"
   ]
-}</code></pre>
-          </div>
+}</pre>
         </article>
       </section>
 
@@ -380,15 +392,21 @@
             </table>
           </div>
 
-          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Ejemplo de Solicitud</h4>
-          <div class="json-code-block">
-            <pre><code>curl -X GET "https://cloudtranslator.onrender.com/api/translate?text=Servicio&targetLanguage=en"</code></pre>
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Ejemplo de Solicitud (cURL)</h4>
+          <div class="code-box-header">
+            <span>Comando cURL (GET Query Params)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-translate')">Copiar cURL</button>
           </div>
-          <div class="json-code-block">
-            <pre><code>{
+          <pre class="code-panel" id="curl-get-translate">curl -X GET "https://cloudtranslator.onrender.com/api/translate?text=Servicio&targetLanguage=en"</pre>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
+          <div class="code-box-header">
+            <span>Respuesta JSON (HTTP 200 OK)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-get-translate')">Copiar JSON</button>
+          </div>
+          <pre class="code-panel" id="res-get-translate">{
   "translatedText": "Service"
-}</code></pre>
-          </div>
+}</pre>
         </article>
       </section>
 
@@ -401,17 +419,23 @@
         </div>
 
         <article class="content-box-card">
-          <div class="json-code-block">
-            <pre><code>curl -X GET "https://cloudtranslator.onrender.com/api/languages"</code></pre>
+          <div class="code-box-header">
+            <span>Comando cURL (GET /api/languages)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-languages')">Copiar cURL</button>
           </div>
-          <div class="json-code-block">
-            <pre><code>{
+          <pre class="code-panel" id="curl-get-languages">curl -X GET "https://cloudtranslator.onrender.com/api/languages"</pre>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
+          <div class="code-box-header">
+            <span>Respuesta JSON (HTTP 200 OK)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-get-languages')">Copiar JSON</button>
+          </div>
+          <pre class="code-panel" id="res-get-languages">{
   "success": true,
   "languages": [
     "en", "es", "fr", "de", "it", "pt", "ru", "ja", "zh-CN", "ar", "ko"
   ]
-}</code></pre>
-          </div>
+}</pre>
         </article>
       </section>
 
@@ -423,17 +447,23 @@
         </div>
 
         <article class="content-box-card">
-          <div class="json-code-block">
-            <pre><code>curl -X GET "https://cloudtranslator.onrender.com/api/health"</code></pre>
+          <div class="code-box-header">
+            <span>Comando cURL (GET /api/health)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-health')">Copiar cURL</button>
           </div>
-          <div class="json-code-block">
-            <pre><code>{
+          <pre class="code-panel" id="curl-get-health">curl -X GET "https://cloudtranslator.onrender.com/api/health"</pre>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
+          <div class="code-box-header">
+            <span>Respuesta JSON (HTTP 200 OK)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-get-health')">Copiar JSON</button>
+          </div>
+          <pre class="code-panel" id="res-get-health">{
   "success": true,
   "status": "ok",
   "uptime": 5120,
   "timestamp": "2026-09-28T22:15:00.000Z"
-}</code></pre>
-          </div>
+}</pre>
         </article>
       </section>
 
@@ -474,12 +504,11 @@
             </div>
 
             <div>
-              <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 6px;">
-                Respuesta del Servidor (JSON en tiempo real):
-              </label>
-              <div class="json-code-block" style="min-height: 120px;">
-                <pre><code id="live-api-output">Pulsa "Ejecutar Petición POST" para probar el endpoint en vivo...</code></pre>
+              <div class="code-box-header">
+                <span>Respuesta del Servidor (JSON en tiempo real)</span>
+                <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'live-api-output')">Copiar Respuesta</button>
               </div>
+              <pre class="code-panel" id="live-api-output" style="min-height: 120px;">Pulsa "Ejecutar Petición POST" para probar el endpoint en vivo...</pre>
             </div>
           </div>
         </article>
@@ -529,6 +558,26 @@
 
   <script src="js/cloud-translator.js"></script>
   <script>
+    // Función global para copiar al portapapeles con feedback visual monocromático
+    function copiarAlPortapapeles(btn, elementId) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      const texto = el.innerText || el.textContent;
+      navigator.clipboard.writeText(texto.trim()).then(() => {
+        const originalText = btn.textContent;
+        btn.textContent = "COPIADO";
+        btn.style.background = "#ffffff";
+        btn.style.color = "#000000";
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.style.background = "";
+          btn.style.color = "";
+        }, 1500);
+      }).catch(err => {
+        console.error("Error al copiar:", err);
+      });
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       // 1. ScrollSpy para el sidebar de la API
       const sessionLinks = document.querySelectorAll(".docs-sidebar-session");
