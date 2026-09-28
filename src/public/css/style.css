@@ -941,9 +941,15 @@ footer {
 .footer-inner-full {
   width: 100%;
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: clamp(20px, 4vw, 40px);
+  grid-template-columns: 1fr 1fr 1.5fr;
+  gap: clamp(24px, 4vw, 48px);
   margin-bottom: 28px;
+  align-items: start;
+}
+
+.footer-col-brand {
+  justify-self: end;
+  max-width: 460px;
 }
 
 .footer-col h4 {
@@ -1006,6 +1012,11 @@ footer {
   .footer-inner-full {
     grid-template-columns: 1fr 1fr;
   }
+  .footer-col-brand {
+    grid-column: 1 / -1;
+    justify-self: start;
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1027,6 +1038,9 @@ footer {
   .footer-inner-full {
     grid-template-columns: 1fr;
     gap: 24px;
+  }
+  .footer-col-brand {
+    justify-self: start;
   }
 }
 
