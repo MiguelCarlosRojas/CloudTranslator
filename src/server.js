@@ -33,5 +33,5 @@ app.get("/", (req, res) => {
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  logger.info(`Servidor escuchando en http://localhost:${PORT}`);
+  logger.info(`Servidor CloudTranslator escuchando en puerto ${PORT}`);
 });

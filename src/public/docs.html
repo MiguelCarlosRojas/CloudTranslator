@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Documentación API REST y Conexión al Sistema - CloudTranslator</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -885,8 +886,7 @@ print_r($traducciones);
       observedElements.forEach(el => observer.observe(el));
 
       // 3. Inicialización del traductor
-      const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-      const apiEndpoint = isLocal ? "/api/translate" : "https://cloudtranslator.onrender.com/api/translate";
+      const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";
       window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
       document.getElementById("btn-english").onclick = () => window.translator.translateToEnglish();
       document.getElementById("btn-restore").onclick = () => window.translator.restoreOriginal();

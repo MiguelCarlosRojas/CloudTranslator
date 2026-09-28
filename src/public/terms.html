@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Términos del Servicio - CloudTranslator</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -143,8 +144,7 @@
   <script src="js/cloud-translator.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-      const apiEndpoint = isLocal ? "/api/translate" : "https://cloudtranslator.onrender.com/api/translate";
+      const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";
       window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
       document.getElementById("btn-english").onclick = () => window.translator.translateToEnglish();
       document.getElementById("btn-restore").onclick = () => window.translator.restoreOriginal();
