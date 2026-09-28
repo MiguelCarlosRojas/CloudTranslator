@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estado del Servicio - CloudTranslator API</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="top-nav">
+    <div class="nav-container">
+      <a href="index.html" class="brand-wrapper">
+        <span class="brand-logo">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+          CloudTranslator
+        </span>
+        <span class="brand-badge">Status</span>
+      </a>
+
+      <nav>
+        <ul class="main-menu">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="docs.html">Documentación</a></li>
+          <li><a href="status.html" class="active">Estado del Servicio</a></li>
+          <li><a href="support.html">Soporte</a></li>
+        </ul>
+      </nav>
+
+      <div class="toolbar-controls">
+        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+          English
+        </button>
+
+        <div class="selector-box">
+          <select id="select-lang">
+            <option value="en">Inglés (en)</option>
+            <option value="fr">Francés (fr)</option>
+            <option value="de">Alemán (de)</option>
+            <option value="it">Italiano (it)</option>
+            <option value="pt">Portugués (pt)</option>
+            <option value="es">Español (es)</option>
+          </select>
+          <input type="text" id="input-custom-lang" placeholder="cód." maxlength="5">
+          <button id="btn-translate-custom" class="btn btn-primary">Traducir</button>
+        </div>
+
+        <button id="btn-restore" class="btn btn-outline">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+          Original
+        </button>
+
+        <div id="status-pill" class="status-pill">
+          <span class="spinner"></span>
+          <span id="status-text">Listo</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="full-container">
+    
+    <section class="hero-full">
+      <span class="hero-tag-glow">
+        <span class="pulse-dot"></span>
+        Monitor de Red en Tiempo Real
+      </span>
+      <h1>Estado del Microservicio en Producción</h1>
+      <p class="lead">
+        Comprobación en vivo del estado de conectividad, latencia de red y respuestas del servidor en <strong>https://cloudtranslator.onrender.com</strong>.
+      </p>
+      <div class="hero-actions">
+        <button id="btn-check-live" class="btn btn-primary">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Comprobar Conectividad Ahora
+        </button>
+      </div>
+    </section>
+
+    <!-- Telemetría en Vivo -->
+    <div class="telemetry-board">
+      <div id="main-status-banner" class="status-indicator-banner">
+        <div class="status-headline">
+          <span class="pulse-dot" id="live-pulse"></span>
+          <div>
+            <h3 id="live-status-title">Evaluando endpoint remoto...</h3>
+            <span id="live-status-subtitle" style="font-size: 0.88rem; color: var(--text-muted);">
+              Destino: https://cloudtranslator.onrender.com
+            </span>
+          </div>
+        </div>
+        <div style="font-size: 0.82rem; color: var(--text-muted); text-align: right;">
+          <div>Último chequeo: <strong id="last-check-time">Calculando...</strong></div>
+          <div>Cifrado: <strong style="color: #ffffff;">TLS 1.3 / HTTPS</strong></div>
+        </div>
+      </div>
+
+      <div class="metrics-row">
+        <div class="metric-box">
+          <div class="metric-label">Latencia Medida</div>
+          <div class="metric-val green" id="metric-latency">-- ms</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">Tiempo Activo del Proceso</div>
+          <div class="metric-val" id="metric-uptime">--</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">Código HTTP / Respuesta</div>
+          <div class="metric-val green" id="metric-http">--</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">Motor de Traducción</div>
+          <div class="metric-val green" id="metric-engine">Verificando</div>
+        </div>
+      </div>
+
+      <h3 style="font-size: 1.15rem; margin-bottom: 14px; color: #ffffff;">Disponibilidad por Endpoint</h3>
+      <div class="table-responsive-wrapper">
+        <table class="endpoints-table">
+          <thead>
+            <tr>
+              <th>Método</th>
+              <th>Ruta Endpoint</th>
+              <th>Propósito</th>
+              <th>Latencia</th>
+              <th>Estado Real</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge-method badge-post">POST</span></td>
+              <td><code>/api/translate</code></td>
+              <td>Traducción de textos por lotes y unitarios</td>
+              <td id="ping-translate">-- ms</td>
+              <td><strong id="status-translate" style="color: #ffffff;">Operacional</strong></td>
+            </tr>
+            <tr>
+              <td><span class="badge-method badge-get">GET</span></td>
+              <td><code>/api/health</code></td>
+              <td>Verificación de salud del microservicio</td>
+              <td id="ping-health">-- ms</td>
+              <td><strong id="status-health" style="color: #ffffff;">Operacional</strong></td>
+            </tr>
+            <tr>
+              <td><span class="badge-method badge-get">GET</span></td>
+              <td><code>/api/languages</code></td>
+              <td>Catálogo de idiomas soportados</td>
+              <td id="ping-languages">-- ms</td>
+              <td><strong id="status-languages" style="color: #ffffff;">Operacional</strong></td>
+            </tr>
+            <tr>
+              <td><span class="badge-method badge-get">GET</span></td>
+              <td><code>/</code></td>
+              <td>Ruta raíz informativa</td>
+              <td id="ping-root">-- ms</td>
+              <td><strong id="status-root" style="color: #ffffff;">Operacional</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <div class="footer-inner-full">
+      <div class="footer-col">
+        <h4>
+          <svg class="icon" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+          CloudTranslator
+        </h4>
+        <p>Servicio de traducción en la nube con API REST para integración directa.</p>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+          Endpoint: <code>https://cloudtranslator.onrender.com</code>
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Start</a></li>
+          <li><a href="docs.html">Documentation</a></li>
+          <li><a href="status.html">Estado del Servicio</a></li>
+          <li><a href="support.html">Technical Support</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Supported Languages</h4>
+        <ul>
+          <li><a href="languages/en.html">English (en)</a></li>
+          <li><a href="languages/fr.html">French (fr)</a></li>
+          <li><a href="languages/de.html">German (de)</a></li>
+          <li><a href="languages/it.html">Italian (it)</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Legal Information</h4>
+        <ul>
+          <li><a href="terms.html">Terms of Service</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="security.html">Security and Data</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom-full">
+      <span>© 2026 CloudTranslator. Autor: Miguel Angel Carlos Rojas</span>
+    </div>
+  </footer>
+
+  <script src="js/cloud-translator.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      const apiEndpoint = isLocal ? "/api/translate" : "https://cloudtranslator.onrender.com/api/translate";
+
+      window.translator = new CloudTranslator({
+        endpoint: apiEndpoint,
+        useCookies: true,
+        batchSize: 500
+      });
+
+      document.getElementById("btn-english").onclick = () => window.translator.translateToEnglish();
+      document.getElementById("btn-restore").onclick = () => window.translator.restoreOriginal();
+      document.getElementById("select-lang").onchange = (e) => window.translator.translatePage(e.target.value);
+      document.getElementById("btn-translate-custom").onclick = () => {
+        const val = document.getElementById("input-custom-lang").value.trim().toLowerCase();
+        if (val) window.translator.translatePage(val);
+      };
+
+      const targetBase = isLocal ? "http://localhost:3000" : "https://cloudtranslator.onrender.com";
+
+      async function checkLiveStatus() {
+        const titleEl = document.getElementById("live-status-title");
+        const subEl = document.getElementById("live-status-subtitle");
+        const lastCheckEl = document.getElementById("last-check-time");
+        const metricLatency = document.getElementById("metric-latency");
+        const metricUptime = document.getElementById("metric-uptime");
+        const metricHttp = document.getElementById("metric-http");
+        const metricEngine = document.getElementById("metric-engine");
+        const banner = document.getElementById("main-status-banner");
+
+        titleEl.textContent = "Conectando con " + targetBase + "...";
+        lastCheckEl.textContent = new Date().toLocaleTimeString();
+
+        try {
+          const t0 = performance.now();
+          const resp = await fetch(targetBase + "/api/health", { cache: "no-store" });
+          const latency = Math.round(performance.now() - t0);
+          const data = await resp.json();
+
+          if (resp.ok) {
+            titleEl.textContent = "Servicio Activo y Operacional";
+            titleEl.style.color = "#ffffff";
+            subEl.textContent = `Conexión verificada con ${targetBase} (Respuesta en ${latency}ms)`;
+            metricLatency.textContent = latency + " ms";
+            metricHttp.textContent = resp.status + " OK";
+            metricHttp.style.color = "#ffffff";
+            if (data && data.uptime) {
+              const u = data.uptime;
+              metricUptime.textContent = u > 3600 ? Math.floor(u / 3600) + "h " + Math.floor((u % 3600) / 60) + "m" : u + " seg";
+            } else {
+              metricUptime.textContent = "Activo";
+            }
+            document.getElementById("ping-health").textContent = latency + " ms";
+            banner.style.borderColor = "#333333";
+            banner.style.background = "#080808";
+          } else {
+            throw new Error("HTTP " + resp.status);
+          }
+        } catch (err) {
+          titleEl.textContent = "Instancia en Reposo o No Disponible";
+          titleEl.style.color = "#888888";
+          subEl.textContent = "En Render la instancia duerme si no recibe tráfico. Puede tardar ~25s en iniciar.";
+          metricLatency.textContent = "Timeout";
+          metricHttp.textContent = "503 / Err";
+          metricHttp.style.color = "#888888";
+          banner.style.borderColor = "#222222";
+          banner.style.background = "#050505";
+        }
+
+        try {
+          const t1 = performance.now();
+          const trResp = await fetch(targetBase + "/api/translate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: "test", targetLanguage: "en" })
+          });
+          const trLatency = Math.round(performance.now() - t1);
+          if (trResp.ok) {
+            document.getElementById("ping-translate").textContent = trLatency + " ms";
+            metricEngine.textContent = "Operacional";
+            metricEngine.style.color = "#ffffff";
+          }
+        } catch (e) {
+          document.getElementById("ping-translate").textContent = "Reintentando";
+        }
+
+        try {
+          const t2 = performance.now();
+          const lResp = await fetch(targetBase + "/api/languages");
+          document.getElementById("ping-languages").textContent = Math.round(performance.now() - t2) + " ms";
+        } catch (e) {}
+
+        try {
+          const t3 = performance.now();
+          const rResp = await fetch(targetBase + "/");
+          document.getElementById("ping-root").textContent = Math.round(performance.now() - t3) + " ms";
+        } catch (e) {}
+      }
+
+      document.getElementById("btn-check-live").onclick = checkLiveStatus;
+      checkLiveStatus();
+    });
+  </script>
+</body>
+</html>

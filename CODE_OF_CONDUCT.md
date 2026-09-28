@@ -1,58 +1,43 @@
-# 🌟 Código de Conducta de Cloud Translator
+# Contributor Covenant Code of Conduct - CloudTranslator
 
-¡Bienvenido a la comunidad de *Cloud Translator*! 🚀 Este proyecto busca ser un espacio inclusivo, respetuoso y colaborativo para todos. Este Código de Conducta establece las normas que esperamos que todos los participantes sigan. 🙌
+## Our Pledge
 
----
+We as members, contributors, and leaders pledge to make participation in our community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, caste, color, religion, or sexual identity and orientation.
 
-## 🤝 Nuestro Compromiso
-Nos comprometemos a crear un entorno:
-- **Inclusivo**: 🌍 Abierto a personas de todas las culturas, experiencias y habilidades.
-- **Respetuoso**: 🤝 Donde las ideas se debatan con cortesía.
-- **Seguro**: 🛡️ Libre de acoso o discriminación.
+We pledge to act and interact in ways that contribute to an open, welcoming, diverse, inclusive, and healthy community.
 
----
+## Our Standards
 
-## ✅ Comportamiento Esperado
-Esperamos que todos:
-- **Seamos amables**: Usa un lenguaje positivo y constructivo. 😊
-- **Respetemos las diferencias**: Valora las perspectivas diversas. 🌈
-- **Colaboremos**: Ayuda a otros y acepta ayuda cuando la necesites. 🤲
-- **Seamos responsables**: Reconoce errores y corrígelos. 🔧
+Examples of behavior that contributes to a positive environment for our community include:
+* Demonstrating empathy and kindness toward other people
+* Being respectful of differing opinions, viewpoints, and experiences
+* Giving and gracefully accepting constructive feedback
+* Accepting responsibility and apologizing to those affected by our mistakes, and learning from the experience
+* Focusing on what is best not just for us as individuals, but for the overall community
 
-Ejemplos:
-- Dar retroalimentación constructiva: "¡Gran idea! ¿Qué tal si añadimos X?"
-- Aceptar críticas con gracia: "Gracias por señalarlo, lo ajustaré."
+Examples of unacceptable behavior include:
+* The use of sexualized language or imagery, and sexual attention or advances of any kind
+* Trolling, insulting or derogatory comments, and personal or political attacks
+* Public or private harassment
+* Publishing others' private information, such as a physical or email address, without their explicit permission
+* Other conduct which could reasonably be considered inappropriate in a professional setting
 
----
+## Enforcement Responsibilities
 
-## 🚫 Comportamiento Inaceptable
-No toleraremos:
-- **Acoso**: Comentarios ofensivos, insultos o intimidación. 😡
-- **Discriminación**: Basada en género, raza, religión, orientación sexual, etc. 🚷
-- **Spam**: Publicaciones irrelevantes o promocionales. 📧
-- **Conducta disruptiva**: Interrumpir el flujo de trabajo de otros. ⛔
+Community leaders are responsible for clarifying and enforcing our standards of acceptable behavior and will take appropriate and fair corrective action in response to any behavior that they deem inappropriate, threatening, offensive, or harmful.
 
----
+Community leaders have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that are not aligned to this Code of Conduct, and will communicate reasons for moderation decisions when appropriate.
 
-## ⚖️ Consecuencias
-Si alguien incumple este código:
-1. **Advertencia**: Se notificará el problema en privado. 📩
-2. **Expulsión**: En casos graves o repetidos, se prohibirá la participación. 🚪
-   - Decisión tomada por los mantenedores del proyecto.
+## Scope
 
----
+This Code of Conduct applies within all community spaces (including GitHub repositories, issues, pull requests, and discussions), and also applies when an individual is officially representing the community in public spaces.
 
-## 📢 Reportar Problemas
-¿Viste algo que no está bien? ¡Habla!  
-- Contacta a [isakiangel6@gmail.com](mailto:isakiangel6@gmail.com).  
-- Describe el incidente y proporciona evidencia si es posible. 📜
+## Reporting & Enforcement
 
----
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project maintainer:
 
-## 🌟 Agradecimientos
-Este Código de Conducta está inspirado en el [Contributor Covenant](https://www.contributor-covenant.org/). ¡Gracias por hacer de *Cloud Translator* un lugar increíble! ✨
+* **Maintainer**: Miguel Angel Carlos Rojas
+* **Email**: isakiangel6@gmail.com
+* **Repository**: https://github.com/MiguelCarlosRojas/CloudTranslator
 
----
-
-**Última actualización**: Marzo 2025  
-**Autor**: Miguel Angel Carlos Rojas
+All complaints will be reviewed and investigated promptly and fairly. All community leaders are obligated to respect the privacy and security of the reporter of any incident.

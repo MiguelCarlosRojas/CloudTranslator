@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CloudTranslator - API de Traducción en la Nube</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Barra Superior -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <a href="index.html" class="brand-wrapper">
+        <span class="brand-logo">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+          CloudTranslator
+        </span>
+        <span class="brand-badge">v1.0.0</span>
+      </a>
+
+      <nav>
+        <ul class="main-menu">
+          <li><a href="index.html" class="active">Inicio</a></li>
+          <li><a href="docs.html">Documentación</a></li>
+          <li><a href="status.html">Estado del Servicio</a></li>
+          <li><a href="support.html">Soporte</a></li>
+        </ul>
+      </nav>
+
+      <!-- Barra de Traducción Activa -->
+      <div class="toolbar-controls">
+        <button id="btn-english" class="btn btn-english" title="Traducir toda la página a Inglés">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+          English
+        </button>
+
+        <div class="selector-box">
+          <select id="select-lang" aria-label="Seleccionar idioma">
+            <option value="en">Inglés (en)</option>
+            <option value="fr">Francés (fr)</option>
+            <option value="de">Alemán (de)</option>
+            <option value="it">Italiano (it)</option>
+            <option value="pt">Portugués (pt)</option>
+            <option value="es">Español (es)</option>
+          </select>
+          <input type="text" id="input-custom-lang" placeholder="cód." maxlength="5" title="Código de idioma de destino">
+          <button id="btn-translate-custom" class="btn btn-primary">Traducir</button>
+        </div>
+
+        <button id="btn-restore" class="btn btn-outline" title="Restaurar idioma original">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+          Original
+        </button>
+
+        <div id="status-pill" class="status-pill">
+          <span class="spinner"></span>
+          <span id="status-text">Listo</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="full-container">
+    
+    <!-- Hero Principal con Información Real -->
+    <section class="hero-full">
+      <span class="hero-tag-glow">API REST y SDK Cliente</span>
+      <h1>Servicio de Traducción en la Nube para Sistemas Web</h1>
+      <p class="lead">
+        API pública alojada en <strong>https://cloudtranslator.onrender.com</strong> para traducir cadenas individuales, listas de texto o páginas web completas en segundo plano, con soporte de micro-lotes en una sola consulta HTTP y persistencia en cookies.
+      </p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="document.getElementById('btn-english').click();">
+          Ejecutar Traducción a Inglés en Vivo
+        </button>
+        <a href="docs.html" class="btn btn-outline">Consultar Documentación JSON</a>
+        <a href="status.html" class="btn btn-outline">Verificar Estado del Servidor</a>
+      </div>
+    </section>
+
+    <!-- Especificaciones Técnicas Reales -->
+    <section>
+      <div class="section-full-title">
+        <h2>Especificaciones de Arquitectura y Rendimiento</h2>
+        <p>Detalles técnicos sobre el funcionamiento del microservicio en producción.</p>
+      </div>
+
+      <div class="cards-full-grid">
+        <div class="tech-card">
+          <span class="tech-card-tag">[ 01 // SINGLE_REQUEST ]</span>
+          <div class="tech-card-icon">
+            <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <h3>Una Sola Petición HTTP</h3>
+          <p>El cliente extrae los nodos de texto únicos del DOM y los envía juntos en un único arreglo <code>texts: [...]</code> hacia <code>/api/translate</code>, evitando múltiples llamadas dispersas en el navegador.</p>
+        </div>
+
+        <div class="tech-card">
+          <span class="tech-card-tag">[ 02 // COOKIE_PERSISTENCE ]</span>
+          <div class="tech-card-icon">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.8 1.04 6.44 2.73L21 8M9 9h.01M15 9h.01M9 15h.01M13 14h.01M15 16h.01"/></svg>
+          </div>
+          <h3>Persistencia por Cookies</h3>
+          <p>Al seleccionar un idioma, se registra la cookie técnica <code>cloud_translator_lang</code>. Al recargar la página, el cliente lee la cookie y aplica la traducción inmediatamente desde memoria local en 0 milisegundos.</p>
+        </div>
+
+        <div class="tech-card">
+          <span class="tech-card-tag">[ 03 // SCHEMA_VALIDATION ]</span>
+          <div class="tech-card-icon">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Validación Estricta con Joi</h3>
+          <p>Cada consulta entrante es verificada por el middleware de validación con Joi. Se controlan los límites de longitud (hasta 1000 textos por lote) y la validez de los códigos de idioma.</p>
+        </div>
+
+        <div class="tech-card">
+          <span class="tech-card-tag">[ 04 // TARGET_LANGUAGES ]</span>
+          <div class="tech-card-icon">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+          </div>
+          <h3>Idiomas Oficiales Soportados</h3>
+          <p>Soporte configurado para <code>en</code> (Inglés), <code>es</code> (Español), <code>fr</code> (Francés), <code>de</code> (Alemán), <code>it</code> (Italiano) y <code>pt</code> (Portugués) a través de Google Translate API.</p>
+        </div>
+
+        <div class="tech-card">
+          <span class="tech-card-tag">[ 05 // ASYNC_EVENT_LOOP ]</span>
+          <div class="tech-card-icon">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg>
+          </div>
+          <h3>Cero Bloqueo de Renderizado</h3>
+          <p>El cliente utiliza pausas asíncronas para ceder el ciclo de eventos del navegador. La interfaz no se congela y el usuario puede seguir navegando fluidamente.</p>
+        </div>
+
+        <div class="tech-card">
+          <span class="tech-card-tag">[ 06 // CORS_SECURITY ]</span>
+          <div class="tech-card-icon">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v6M9 2v4M15 2v4M6 8h12a2 2 0 0 1 2 2v2a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6v-2a2 2 0 0 1 2-2zM12 18v4"/></svg>
+          </div>
+          <h3>Soporte CORS Universal</h3>
+          <p>Configurado con encabezados <code>Access-Control-Allow-Origin: *</code> para admitir llamadas directas desde aplicaciones frontend sin requerir proxies intermediarios.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Información de Infraestructura Real en Render -->
+    <section class="content-box-card">
+      <span class="tech-card-tag">[ INFRASTRUCTURE // RENDER ]</span>
+      <h2>Comportamiento Operativo en Render</h2>
+      <p>
+        La instancia en la nube opera en la infraestructura gratuita de Render. Tras 15 minutos sin peticiones entrantes, la máquina pasa a estado de suspensión automática.
+      </p>
+      <div class="callout">
+        <strong>Arranque en Frío:</strong> La primera consulta después de un periodo de inactividad tarda aproximadamente 25 a 35 segundos mientras el servidor inicia. Las peticiones subsecuentes responden con latencia promedio de 200 a 400 milisegundos.
+      </div>
+      <p>
+        Puedes consultar la disponibilidad actual del servidor en la página de <a href="status.html">Estado del Servicio</a>.
+      </p>
+    </section>
+
+  </main>
+
+  <!-- Pie de Página -->
+  <footer>
+    <div class="footer-inner-full">
+      <div class="footer-col">
+        <h4>
+          <svg class="icon" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+          CloudTranslator
+        </h4>
+        <p>Servicio de traducción en la nube con API REST para integración en sistemas web.</p>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+          Endpoint: <code>https://cloudtranslator.onrender.com</code>
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Start</a></li>
+          <li><a href="docs.html">Documentation</a></li>
+          <li><a href="status.html">Estado del Servicio</a></li>
+          <li><a href="support.html">Technical Support</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Supported Languages</h4>
+        <ul>
+          <li><a href="languages/en.html">English (en)</a></li>
+          <li><a href="languages/fr.html">French (fr)</a></li>
+          <li><a href="languages/de.html">German (de)</a></li>
+          <li><a href="languages/it.html">Italian (it)</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Legal Information</h4>
+        <ul>
+          <li><a href="terms.html">Terms of Service</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="security.html">Security and Data</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom-full">
+      <span>© 2026 CloudTranslator. Autor: Miguel Angel Carlos Rojas</span>
+      <span>Repositorio: github.com/MiguelCarlosRojas/CloudTranslator</span>
+    </div>
+  </footer>
+
+  <script src="js/cloud-translator.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      const apiEndpoint = isLocal ? "/api/translate" : "https://cloudtranslator.onrender.com/api/translate";
+
+      const selectLang = document.getElementById("select-lang");
+      const inputCustomLang = document.getElementById("input-custom-lang");
+      const btnEnglish = document.getElementById("btn-english");
+      const btnTranslateCustom = document.getElementById("btn-translate-custom");
+      const btnRestore = document.getElementById("btn-restore");
+      const statusPill = document.getElementById("status-pill");
+      const statusText = document.getElementById("status-text");
+
+      window.translator = new CloudTranslator({
+        endpoint: apiEndpoint,
+        defaultLanguage: "en",
+        batchSize: 500,
+        useCookies: true,
+        onStart: (info) => {
+          statusPill.className = "status-pill translating";
+          statusText.textContent = `Traduciendo (${info.targetLanguage.toUpperCase()})...`;
+        },
+        onProgress: (p) => {
+          if (p.cached) statusText.textContent = "Desde caché (0ms)";
+          else statusText.textContent = "1 consulta enviada";
+        },
+        onComplete: (stats) => {
+          statusPill.className = "status-pill completed";
+          if (stats.restored) {
+            statusText.textContent = "Original restaurado";
+            selectLang.value = "es";
+            inputCustomLang.value = "es";
+          } else {
+            statusText.textContent = `Listo: ${stats.language.toUpperCase()}`;
+          }
+        },
+        onError: (err) => {
+          statusPill.className = "status-pill";
+          statusText.textContent = "Error de conexión";
+        }
+      });
+
+      const saved = window.translator.getSavedLanguage();
+      if (saved && saved !== "original") {
+        selectLang.value = saved;
+        inputCustomLang.value = saved;
+      }
+
+      btnEnglish.addEventListener("click", () => {
+        selectLang.value = "en";
+        inputCustomLang.value = "en";
+        window.translator.translateToEnglish();
+      });
+
+      selectLang.addEventListener("change", (e) => {
+        const val = e.target.value;
+        inputCustomLang.value = val;
+        if (val === "es") window.translator.restoreOriginal();
+        else window.translator.translatePage(val);
+      });
+
+      btnTranslateCustom.addEventListener("click", () => {
+        const val = (inputCustomLang.value || selectLang.value || "").trim().toLowerCase();
+        if (val === "es") window.translator.restoreOriginal();
+        else if (val) window.translator.translatePage(val);
+      });
+
+      btnRestore.addEventListener("click", () => {
+        window.translator.restoreOriginal();
+      });
+    });
+  </script>
+</body>
+</html>

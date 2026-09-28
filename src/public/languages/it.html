@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Italiano (it) - CloudTranslator API</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+  <header class="top-nav">
+    <div class="nav-container">
+      <a href="../index.html" class="brand-wrapper">
+        <span class="brand-logo">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+          CloudTranslator
+        </span>
+        <span class="brand-badge">Italian (it)</span>
+      </a>
+
+      <nav>
+        <ul class="main-menu">
+          <li><a href="../index.html">Inicio</a></li>
+          <li><a href="../docs.html">Documentación</a></li>
+          <li><a href="../status.html">Estado del Servicio</a></li>
+          <li><a href="../support.html">Soporte</a></li>
+        </ul>
+      </nav>
+
+      <div class="toolbar-controls">
+        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+          English
+        </button>
+        <div class="selector-box">
+          <select id="select-lang">
+            <option value="en">Inglés (en)</option>
+            <option value="fr">Francés (fr)</option>
+            <option value="de">Alemán (de)</option>
+            <option value="it" selected>Italiano (it)</option>
+            <option value="pt">Portugués (pt)</option>
+            <option value="es">Español (es)</option>
+          </select>
+          <input type="text" id="input-custom-lang" placeholder="cód." maxlength="5" value="it">
+          <button id="btn-translate-custom" class="btn btn-primary">Traducir</button>
+        </div>
+        <button id="btn-restore" class="btn btn-outline">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+          Original
+        </button>
+        <div id="status-pill" class="status-pill">
+          <span class="spinner"></span>
+          <span id="status-text">Listo</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="full-container">
+    <div class="hero-full">
+      <span class="hero-tag-glow">[ TARGET_LOCALE // ISO_639_1: IT ]</span>
+      <h1>Traducción a Italiano (Código: it)</h1>
+      <p class="lead">
+        Configura la traducción directa al italiano en tus aplicaciones web con el microservicio <code>https://cloudtranslator.onrender.com</code>.
+      </p>
+    </div>
+
+    <article class="content-box-card">
+      <span class="tech-card-tag">[ 01 // JAVASCRIPT_METHOD ]</span>
+      <h2>Uso del Código "it"</h2>
+      <p>
+        Para traducir el contenido de la interfaz a italiano:
+      </p>
+      <div class="code-box-wrapper">
+        <div class="code-box-header"><span>JavaScript</span></div>
+        <pre class="code-panel">translator.translatePage("it");</pre>
+      </div>
+      <p>
+        La selección queda registrada en la cookie <code>cloud_translator_lang=it</code> y se aplica automáticamente en recargas futuras.
+      </p>
+    </article>
+
+    <article class="content-box-card">
+      <span class="tech-card-tag">[ 02 // JSON_PAYLOAD_EXAMPLE ]</span>
+      <h2>Ejemplo con JSON / REST</h2>
+      <div class="code-box-wrapper">
+        <div class="code-box-header"><span>POST /api/translate</span></div>
+        <pre class="code-panel">POST https://cloudtranslator.onrender.com/api/translate
+Content-Type: application/json
+
+{
+  "texts": ["Gracias por su preferencia", "Bienvenido de nuevo"],
+  "targetLanguage": "it"
+}</pre>
+      </div>
+      <p style="margin-top: 12px;"><strong>Respuesta JSON:</strong></p>
+      <div class="code-box-wrapper">
+        <div class="code-box-header"><span>JSON 200 OK</span></div>
+        <pre class="code-panel">{
+  "translatedTexts": ["Grazie per la tua preferenza", "Bentornato"]
+}</pre>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <div class="footer-inner-full">
+      <div class="footer-col">
+        <h4>
+          <svg class="icon" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+          CloudTranslator
+        </h4>
+        <p>Servicio de traducción en la nube con API REST para integración directa en sistemas web corporativos.</p>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+          Endpoint: <code>https://cloudtranslator.onrender.com</code>
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="../index.html">Start</a></li>
+          <li><a href="../docs.html">Documentation</a></li>
+          <li><a href="../status.html">Estado del Servicio</a></li>
+          <li><a href="../support.html">Technical Support</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Supported Languages</h4>
+        <ul>
+          <li><a href="en.html">English (en)</a></li>
+          <li><a href="fr.html">French (fr)</a></li>
+          <li><a href="de.html">German (de)</a></li>
+          <li><a href="it.html">Italian (it)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal Information</h4>
+        <ul>
+          <li><a href="../terms.html">Terms of Service</a></li>
+          <li><a href="../privacy.html">Privacy Policy</a></li>
+          <li><a href="../security.html">Security and Data</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom-full">
+      <span>© 2026 CloudTranslator. Todos los derechos reservados.</span>
+      <span>Autor: Miguel Angel Carlos Rojas</span>
+    </div>
+  </footer>
+
+  <script src="../js/cloud-translator.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      const apiEndpoint = isLocal ? "/api/translate" : "https://cloudtranslator.onrender.com/api/translate";
+      window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
+      document.getElementById("btn-english").onclick = () => window.translator.translateToEnglish();
+      document.getElementById("btn-restore").onclick = () => window.translator.restoreOriginal();
+      document.getElementById("select-lang").onchange = (e) => window.translator.translatePage(e.target.value);
+      document.getElementById("btn-translate-custom").onclick = () => {
+        const val = document.getElementById("input-custom-lang").value.trim().toLowerCase();
+        if (val) window.translator.translatePage(val);
+      };
+    });
+  </script>
+</body>
+</html>

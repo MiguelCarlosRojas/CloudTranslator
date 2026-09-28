@@ -1,8 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const validateRequest = require("../middlewares/validateRequest");
-const { translateText } = require("../controllers/translateController");
+const { translateText, getLanguages, getHealth } = require("../controllers/translateController");
 
-router.post("/translate", validateRequest, translateText);
+router.get("/health", getHealth);
+router.get("/languages", getLanguages);
+router.route("/translate")
+  .get(validateRequest, translateText)
+  .post(validateRequest, translateText);
 
 module.exports = router;

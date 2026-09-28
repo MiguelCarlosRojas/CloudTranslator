@@ -27,3 +27,11 @@ coverage/
 
 # Ignorar logs
 *.log
+logs/
+
+# Ignorar colecciones de pruebas de Postman
+CloudTranslator.postman_collection.json
+*.postman_collection.json
+
+# Ignorar directorio temporal raíz public
+/public/

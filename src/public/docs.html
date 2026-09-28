@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentación API REST y Conexión al Sistema - CloudTranslator</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Barra Superior Principal -->
+  <header class="top-nav" id="main-header">
+    <div class="nav-container">
+      <a href="index.html" class="brand-wrapper">
+        <span class="brand-logo">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+          CloudTranslator
+        </span>
+        <span class="brand-badge">Docs API</span>
+      </a>
+
+      <nav>
+        <ul class="main-menu">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="docs.html" class="active">Documentación</a></li>
+          <li><a href="status.html">Estado del Servicio</a></li>
+          <li><a href="support.html">Soporte</a></li>
+        </ul>
+      </nav>
+
+      <div class="toolbar-controls">
+        <button id="btn-english" class="btn btn-english" title="Traducir toda la página a Inglés">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+          English
+        </button>
+        <div class="selector-box">
+          <select id="select-lang">
+            <option value="en">Inglés (en)</option>
+            <option value="fr">Francés (fr)</option>
+            <option value="de">Alemán (de)</option>
+            <option value="it">Italiano (it)</option>
+            <option value="pt">Portugués (pt)</option>
+            <option value="es">Español (es)</option>
+          </select>
+          <input type="text" id="input-custom-lang" placeholder="cód." maxlength="5">
+          <button id="btn-translate-custom" class="btn btn-primary">Traducir</button>
+        </div>
+        <button id="btn-restore" class="btn btn-outline">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+          Original
+        </button>
+        <div id="status-pill" class="status-pill">
+          <span class="spinner"></span>
+          <span id="status-text">Listo</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR DE DOS COLUMNAS CON BARRA LATERAL (SIDEBAR CON SESIONES Y SUBSESIONES) -->
+  <div class="docs-layout-container">
+
+    <!-- BARRA DE NAVEGACIÓN LATERAL (SIDEBAR) -->
+    <aside class="docs-sidebar" id="docs-sidebar" aria-label="Navegación lateral de sesiones y subsesiones">
+      <div class="docs-sidebar-header">
+        <span class="docs-sidebar-tag">[ SESSIONS &amp; SUBSESSIONS ]</span>
+        <h3 class="docs-sidebar-title">Índice del Sistema</h3>
+      </div>
+
+      <nav class="docs-sidebar-nav">
+        
+        <!-- Sesión 01 -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">01 / Inicio &amp; Configuración</span>
+          <a href="#session-overview" class="docs-sidebar-session active" data-target="session-overview">
+            <span class="session-badge">S.01</span> Overview &amp; Endpoint
+          </a>
+          <div class="docs-sidebar-subsessions">
+            <a href="#sub-canonical-url" class="docs-sidebar-sublink" data-target="sub-canonical-url">
+              <span class="sub-num">1.1</span> URL Canónica
+            </a>
+            <a href="#sub-network-rules" class="docs-sidebar-sublink" data-target="sub-network-rules">
+              <span class="sub-num">1.2</span> Regla de Red &amp; CORS
+            </a>
+          </div>
+        </div>
+
+        <!-- Sesión 02 -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">02 / Conexión Frontend</span>
+          <a href="#session-frontend" class="docs-sidebar-session" data-target="session-frontend">
+            <span class="session-badge">S.02</span> Integración Frontend
+          </a>
+          <div class="docs-sidebar-subsessions">
+            <a href="#sub-frontend-html" class="docs-sidebar-sublink" data-target="sub-frontend-html">
+              <span class="sub-num">2.1</span> Estructura HTML
+            </a>
+            <a href="#sub-frontend-js" class="docs-sidebar-sublink" data-target="sub-frontend-js">
+              <span class="sub-num">2.2</span> Script JS 1 Petición
+            </a>
+          </div>
+        </div>
+
+        <!-- Sesión 03 -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">03 / Conexión Backend</span>
+          <a href="#session-backend" class="docs-sidebar-session" data-target="session-backend">
+            <span class="session-badge">S.03</span> Servidor a Servidor
+          </a>
+          <div class="docs-sidebar-subsessions">
+            <a href="#sub-backend-node" class="docs-sidebar-sublink" data-target="sub-backend-node">
+              <span class="sub-num">3.1</span> Node.js / Express
+            </a>
+            <a href="#sub-backend-python" class="docs-sidebar-sublink" data-target="sub-backend-python">
+              <span class="sub-num">3.2</span> Python Requests
+            </a>
+            <a href="#sub-backend-php" class="docs-sidebar-sublink" data-target="sub-backend-php">
+              <span class="sub-num">3.3</span> PHP cURL
+            </a>
+          </div>
+        </div>
+
+        <!-- Sesión 04 -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">04 / Especificación REST</span>
+          <a href="#session-endpoints" class="docs-sidebar-session" data-target="session-endpoints">
+            <span class="session-badge">S.04</span> Endpoints &amp; JSON
+          </a>
+          <div class="docs-sidebar-subsessions">
+            <a href="#sub-post-batch" class="docs-sidebar-sublink" data-target="sub-post-batch">
+              <span class="sub-num">4.1</span> POST Lotes (texts)
+            </a>
+            <a href="#sub-post-single" class="docs-sidebar-sublink" data-target="sub-post-single">
+              <span class="sub-num">4.2</span> POST Unitario (text)
+            </a>
+            <a href="#sub-get-languages" class="docs-sidebar-sublink" data-target="sub-get-languages">
+              <span class="sub-num">4.3</span> GET /languages
+            </a>
+            <a href="#sub-get-health" class="docs-sidebar-sublink" data-target="sub-get-health">
+              <span class="sub-num">4.4</span> GET /health
+            </a>
+          </div>
+        </div>
+
+        <!-- Sesión 05 -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">05 / Clientes &amp; cURL</span>
+          <a href="#session-curl" class="docs-sidebar-session" data-target="session-curl">
+            <span class="session-badge">S.05</span> Postman &amp; CLI
+          </a>
+          <div class="docs-sidebar-subsessions">
+            <a href="#sub-curl-import" class="docs-sidebar-sublink" data-target="sub-curl-import">
+              <span class="sub-num">5.1</span> Importar cURL
+            </a>
+          </div>
+        </div>
+
+        <!-- Sesión 06 -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">06 / Rendimiento &amp; Cookies</span>
+          <a href="#session-cookies" class="docs-sidebar-session" data-target="session-cookies">
+            <span class="session-badge">S.06</span> Cookies &amp; Render
+          </a>
+          <div class="docs-sidebar-subsessions">
+            <a href="#sub-cookies-spec" class="docs-sidebar-sublink" data-target="sub-cookies-spec">
+              <span class="sub-num">6.1</span> Cookie Técnica
+            </a>
+            <a href="#sub-render-coldstart" class="docs-sidebar-sublink" data-target="sub-render-coldstart">
+              <span class="sub-num">6.2</span> Arranque en Frío
+            </a>
+          </div>
+        </div>
+
+      </nav>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL DE CONTENIDO DE LA DOCUMENTACIÓN -->
+    <main class="docs-main-content">
+    
+      <!-- SESIÓN 1: OVERVIEW / INTRODUCCIÓN TÉCNICA -->
+      <section id="session-overview" class="docs-section">
+        <div class="hero-full">
+          <span class="hero-tag-glow">[ SPECIFICATION // REST_API &amp; SYSTEM_INTEGRATION ]</span>
+          <h1>Guía de Conexión al Endpoint y Documentación Técnica</h1>
+          <p class="lead">
+            Aprende a conectar cualquier sistema externo (React, Vue, frontend HTML/JS, Node.js, Python o PHP) con el microservicio en la nube <strong>https://cloudtranslator.onrender.com</strong>, optimizando la red para traducir en una sola petición asíncrona y persistiendo el idioma mediante cookies.
+          </p>
+          <div class="hero-actions">
+            <a href="#session-frontend" class="btn btn-primary">Conectar Frontend (Botón + Cookies)</a>
+            <a href="#session-backend" class="btn btn-outline">Conectar Backend (Node / Python / PHP)</a>
+            <a href="#session-endpoints" class="btn btn-outline">Cargas JSON para Postman</a>
+          </div>
+        </div>
+
+        <!-- Subsesión 1.1 -->
+        <article class="content-box-card docs-subsection" id="sub-canonical-url">
+          <span class="tech-card-tag">[ SUBSESIÓN 1.1 // CANONICAL_ENDPOINT ]</span>
+          <h2>1.1 URL Canónica del Endpoint</h2>
+          <p>
+            Cualquier aplicación web o móvil debe apuntar sus consultas HTTP hacia la ruta canónica en Render:
+          </p>
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>Endpoint de Traducción</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'url-endpoint')">Copiar URL</button>
+            </div>
+            <pre class="code-panel" id="url-endpoint">https://cloudtranslator.onrender.com/api/translate</pre>
+          </div>
+        </article>
+
+        <!-- Subsesión 1.2 -->
+        <article class="content-box-card docs-subsection" id="sub-network-rules">
+          <span class="tech-card-tag">[ SUBSESIÓN 1.2 // NETWORK_RULES_CORS ]</span>
+          <h2>1.2 Regla de Red Obligatoria y CORS</h2>
+          <p>
+            El método siempre debe ser <code>POST</code> con cabecera <code>Content-Type: application/json</code>. Soporta CORS universal (<code>Access-Control-Allow-Origin: *</code>), por lo que puedes llamarlo directamente desde el navegador de tus usuarios sin proxies intermediarios.
+          </p>
+          <div class="callout">
+            <strong>Optimización Crítica:</strong> No envíes peticiones individuales por cada párrafo. Agrupa todos los textos en el arreglo <code>texts: [...]</code> para que el navegador solo haga <strong>1 sola llamada de red</strong>.
+          </div>
+        </article>
+      </section>
+
+      <!-- SESIÓN 2: CONEXIÓN FRONTEND (BOTÓN EN INGLÉS, SELECTOR DINÁMICO Y COOKIES) -->
+      <section id="session-frontend" class="docs-section" style="margin-bottom: 48px;">
+        <div class="section-full-title">
+          <h2>Sesión 02: Conexión Frontend (Botón Inglés, Selector y Cookies)</h2>
+          <p>Integra el botón para traducir en segundo plano en 1 sola consulta sin spam en la pestaña Network.</p>
+        </div>
+
+        <!-- Subsesión 2.1 -->
+        <article class="content-box-card docs-subsection" id="sub-frontend-html">
+          <span class="tech-card-tag">[ SUBSESIÓN 2.1 // FRONTEND_HTML_STRUCTURE ]</span>
+          <h2>2.1 Estructura HTML en tu Interfaz</h2>
+          <p>
+            Inserta el botón directo en inglés y el selector con input de texto para códigos de idioma:
+          </p>
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>HTML en tu Proyecto</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'html-integration')">Copiar HTML</button>
+            </div>
+            <pre class="code-panel" id="html-integration">&lt;!-- 1. Botón directo para traducir toda la página a inglés --&gt;
+&lt;button id="btn-english"&gt;English&lt;/button&gt;
+
+&lt;!-- 2. Selector dinámico por carácter o código de idioma (es, fr, de, it, pt) --&gt;
+&lt;input type="text" id="lang-code" placeholder="cód." maxlength="5" style="width: 70px;"&gt;
+&lt;button id="btn-translate-lang"&gt;Traducir&lt;/button&gt;
+
+&lt;!-- 3. Botón para volver al idioma original --&gt;
+&lt;button id="btn-restore"&gt;Original&lt;/button&gt;
+
+&lt;!-- 4. Indicador de estado asíncrono en segundo plano --&gt;
+&lt;span id="status-indicator"&gt;Listo&lt;/span&gt;</pre>
+          </div>
+        </article>
+
+        <!-- Subsesión 2.2 -->
+        <article class="content-box-card docs-subsection" id="sub-frontend-js">
+          <span class="tech-card-tag">[ SUBSESIÓN 2.2 // FRONTEND_JAVASCRIPT_SCRIPT ]</span>
+          <h2>2.2 Script JavaScript Completo de Integración</h2>
+          <p>
+            Copia y pega este script en tu sistema. Consolida los textos en <strong>1 sola petición HTTP</strong>, guarda la cookie <code>cloud_translator_lang</code> y recuerda el idioma al recargar la página:
+          </p>
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>Script JavaScript (Listo para Producción)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'js-integration')">Copiar Código JS</button>
+            </div>
+            <pre class="code-panel" id="js-integration">// Configuración del Endpoint oficial de CloudTranslator
+const API_TRANSLATE_URL = "https://cloudtranslator.onrender.com/api/translate";
+
+// Mapas en memoria para restaurar y evitar consultas repetidas
+const originalDomTexts = new Map();
+const localCache = {}; // { 'en': { 'Hola': 'Hello' } }
+
+// Helper para cookies de 365 días
+function setLanguageCookie(lang) {
+  document.cookie = `cloud_translator_lang=${lang}; path=/; max-age=31536000; SameSite=Lax`;
+}
+
+function getLanguageCookie() {
+  const match = document.cookie.match(new RegExp('(^| )cloud_translator_lang=([^;]+)'));
+  return match ? match[2] : null;
+}
+
+// 1. Escanear textos visibles ignorando scripts, estilos e inputs
+function scanPageTexts() {
+  if (originalDomTexts.size > 0) return;
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode: (node) => {
+      const parent = node.parentElement;
+      if (!parent) return NodeFilter.FILTER_REJECT;
+      const tag = parent.tagName.toLowerCase();
+      if (['script', 'style', 'noscript', 'textarea', 'code', 'pre'].includes(tag)) {
+        return NodeFilter.FILTER_REJECT;
+      }
+      return node.nodeValue.trim().length > 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    }
+  });
+
+  let currentNode;
+  while ((currentNode = walker.nextNode())) {
+    originalDomTexts.set(currentNode, currentNode.nodeValue);
+  }
+}
+
+// 2. Traduce toda la página en 1 SOLA petición HTTP en segundo plano
+async function translateSystemPage(targetLang) {
+  const statusEl = document.getElementById("status-indicator");
+  if (statusEl) statusEl.textContent = `Traduciendo (${targetLang.toUpperCase()})...`;
+
+  scanPageTexts();
+  setLanguageCookie(targetLang);
+
+  if (!localCache[targetLang]) localCache[targetLang] = {};
+
+  // Extraer cadenas únicas no cacheadas
+  const uniqueStrings = [];
+  originalDomTexts.forEach((originalText) => {
+    const trimmed = originalText.trim();
+    if (trimmed && !localCache[targetLang][trimmed] && !uniqueStrings.includes(trimmed)) {
+      uniqueStrings.push(trimmed);
+    }
+  });
+
+  // Si todas ya están en caché local, aplicar de inmediato (0ms de red)
+  if (uniqueStrings.length === 0) {
+    applyTranslationsFromCache(targetLang);
+    if (statusEl) statusEl.textContent = `Listo (${targetLang.toUpperCase()})`;
+    return;
+  }
+
+  try {
+    // 1 SOLA PETICIÓN HTTP con todos los textos consolidados
+    const response = await fetch(API_TRANSLATE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        texts: uniqueStrings,
+        targetLanguage: targetLang
+      })
+    });
+
+    if (!response.ok) throw new Error("Error en el microservicio: HTTP " + response.status);
+
+    const data = await response.json();
+    const translatedList = data.translatedTexts || [];
+
+    // Guardar en la caché local
+    uniqueStrings.forEach((originalStr, index) => {
+      localCache[targetLang][originalStr] = translatedList[index] || originalStr;
+    });
+
+    // Reemplazar textos en el DOM
+    applyTranslationsFromCache(targetLang);
+    if (statusEl) statusEl.textContent = `Listo (${targetLang.toUpperCase()})`;
+  } catch (error) {
+    console.error("Fallo al conectar con CloudTranslator:", error);
+    if (statusEl) statusEl.textContent = "Error de conexión";
+  }
+}
+
+// 3. Aplicar textos reemplazando nodos sin romper la estructura HTML
+function applyTranslationsFromCache(targetLang) {
+  originalDomTexts.forEach((originalText, textNode) => {
+    const trimmed = originalText.trim();
+    const translated = localCache[targetLang] ? localCache[targetLang][trimmed] : null;
+    if (translated) {
+      textNode.nodeValue = originalText.replace(trimmed, translated);
+    }
+  });
+}
+
+// 4. Restaurar al idioma original de la página
+function restoreOriginalLanguage() {
+  originalDomTexts.forEach((originalText, textNode) => {
+    textNode.nodeValue = originalText;
+  });
+  setLanguageCookie("original");
+  const statusEl = document.getElementById("status-indicator");
+  if (statusEl) statusEl.textContent = "Original restaurado";
+}
+
+// 5. Asignación de Eventos y Carga Automática por Cookie
+document.addEventListener("DOMContentLoaded", () => {
+  // Botón directo a inglés
+  const btnEn = document.getElementById("btn-english");
+  if (btnEn) btnEn.addEventListener("click", () => translateSystemPage("en"));
+
+  // Botón con código dinámico
+  const btnCustom = document.getElementById("btn-translate-lang");
+  if (btnCustom) {
+    btnCustom.addEventListener("click", () => {
+      const code = (document.getElementById("lang-code").value || "").trim().toLowerCase();
+      if (code) translateSystemPage(code);
+    });
+  }
+
+  // Botón restaurar
+  const btnRestore = document.getElementById("btn-restore");
+  if (btnRestore) btnRestore.addEventListener("click", restoreOriginalLanguage);
+
+  // Auto-traducción en 0ms leyendo la Cookie al entrar o recargar
+  const savedLang = getLanguageCookie();
+  if (savedLang && savedLang !== "original") {
+    translateSystemPage(savedLang);
+  }
+});</pre>
+          </div>
+        </article>
+      </section>
+
+      <!-- SESIÓN 3: CONEXIÓN BACKEND (SERVIDOR A SERVIDOR) -->
+      <section id="session-backend" class="docs-section" style="margin-bottom: 48px;">
+        <div class="section-full-title">
+          <h2>Sesión 03: Conexión Backend (Servidor a Servidor)</h2>
+          <p>Llama al microservicio desde tus controladores o servicios en Node.js, Python o PHP.</p>
+        </div>
+
+        <!-- Subsesión 3.1 -->
+        <article class="content-box-card docs-subsection" id="sub-backend-node">
+          <span class="tech-card-tag">[ SUBSESIÓN 3.1 // BACKEND_NODEJS ]</span>
+          <h2>3.1 Conectar con Node.js / Express (Fetch o Axios)</h2>
+          <p>Envía un arreglo de textos a traducir directamente desde tu servidor Node.js:</p>
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>JavaScript (Node.js 18+)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'node-example')">Copiar Código</button>
+            </div>
+            <pre class="code-panel" id="node-example">async function traducirTextos(textosArray, idiomaDestino = "en") {
+  const url = "https://cloudtranslator.onrender.com/api/translate";
+  
+  const respuesta = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      texts: textosArray,
+      targetLanguage: idiomaDestino
+    })
+  });
+
+  if (!respuesta.ok) {
+    throw new Error(`Fallo HTTP: ${respuesta.status}`);
+  }
+
+  const datos = await respuesta.json();
+  return datos.translatedTexts; // Retorna array de strings traducidos
+}
+
+// Ejemplo de uso:
+traducirTextos(["Iniciar sesión", "Cerrar sesión"], "en")
+  .then(resultado => console.log(resultado)) // ["Log in", "Sign out"]
+  .catch(err => console.error(err));</pre>
+          </div>
+        </article>
+
+        <!-- Subsesión 3.2 -->
+        <article class="content-box-card docs-subsection" id="sub-backend-python">
+          <span class="tech-card-tag">[ SUBSESIÓN 3.2 // BACKEND_PYTHON ]</span>
+          <h2>3.2 Conectar con Python (Requests / HTTPX)</h2>
+          <p>Integra CloudTranslator en scripts de Python, Django o FastAPI:</p>
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>Python 3 (requests)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'python-example')">Copiar Código</button>
+            </div>
+            <pre class="code-panel" id="python-example">import requests
+
+def traducir_textos(textos, target_lang="en"):
+    url = "https://cloudtranslator.onrender.com/api/translate"
+    payload = {
+        "texts": textos,
+        "targetLanguage": target_lang
+    }
+    
+    response = requests.post(url, json=payload, headers={"Content-Type": "application/json"})
+    response.raise_for_status()
+    
+    data = response.json()
+    return data.get("translatedTexts", [])
+
+# Ejemplo de uso:
+resultado = traducir_textos(["Panel de control", "Configuración de cuenta"], target_lang="en")
+print(resultado)  # ['Dashboard', 'Account Settings']</pre>
+          </div>
+        </article>
+
+        <!-- Subsesión 3.3 -->
+        <article class="content-box-card docs-subsection" id="sub-backend-php">
+          <span class="tech-card-tag">[ SUBSESIÓN 3.3 // BACKEND_PHP ]</span>
+          <h2>3.3 Conectar con PHP (cURL nativo)</h2>
+          <p>Consúmelo en aplicaciones PHP tradicionales, Laravel o WordPress:</p>
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>PHP (cURL)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'php-example')">Copiar Código</button>
+            </div>
+            <pre class="code-panel" id="php-example">&lt;?php
+function traducirTextos(array $textos, string $idioma = "en"): array {
+    $url = "https://cloudtranslator.onrender.com/api/translate";
+    $payload = json_encode([
+        "texts" => $textos,
+        "targetLanguage" => $idioma
+    ]);
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Content-Type: application/json"
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode !== 200) {
+        throw new Exception("Error en CloudTranslator con código HTTP: " . $httpCode);
+    }
+
+    $data = json_decode($response, true);
+    return $data["translatedTexts"] ?? [];
+}
+
+// Ejemplo de uso:
+$traducciones = traducirTextos(["Bienvenido a nuestra tienda", "Ver catálogo"], "en");
+print_r($traducciones);
+?&gt;</pre>
+          </div>
+        </article>
+      </section>
+
+      <!-- SESIÓN 4: ESPECIFICACIÓN DE ENDPOINTS Y CARGAS JSON (POSTMAN) -->
+      <section id="session-endpoints" class="docs-section" style="margin-bottom: 48px;">
+        <div class="section-full-title">
+          <h2>Sesión 04: Especificación de Endpoints y Cargas JSON</h2>
+          <p>Estructuras exactas de solicitud y respuesta para realizar pruebas en Postman o Thunder Client.</p>
+        </div>
+
+        <!-- Subsesión 4.1 -->
+        <article class="content-box-card docs-subsection" id="sub-post-batch">
+          <span class="tech-card-tag">[ SUBSESIÓN 4.1 // POST_BATCH_TRANSLATE ]</span>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+            <h2 style="font-size: 1.35rem; color: #ffffff;">
+              <span class="badge-method badge-post">POST</span> /api/translate (Múltiples Textos - Recomendado)
+            </h2>
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">URL: https://cloudtranslator.onrender.com/api/translate</span>
+          </div>
+          <p style="font-size: 0.92rem; margin-bottom: 14px;">
+            Envía un array de textos en una sola petición HTTP. Reduce el tráfico del navegador a una única consulta para traducir una página entera.
+          </p>
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>Payload JSON (Body en Postman: raw -&gt; JSON)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'json-batch-req')">Copiar JSON</button>
+            </div>
+            <pre class="code-panel" id="json-batch-req">{
+  "texts": [
+    "Iniciar sesión en la plataforma",
+    "Bienvenido al panel de control",
+    "Configuración de la cuenta de usuario",
+    "Guardar los cambios realizados",
+    "Cerrar sesión"
+  ],
+  "targetLanguage": "en"
+}</pre>
+          </div>
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>Respuesta Exitosa JSON (Status 200 OK)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'json-batch-res')">Copiar JSON</button>
+            </div>
+            <pre class="code-panel" id="json-batch-res">{
+  "translatedTexts": [
+    "Log in to the platform",
+    "Welcome to the control panel",
+    "User account settings",
+    "Save changes made",
+    "Sign out"
+  ]
+}</pre>
+          </div>
+        </article>
+
+        <!-- Subsesión 4.2 -->
+        <article class="content-box-card docs-subsection" id="sub-post-single">
+          <span class="tech-card-tag">[ SUBSESIÓN 4.2 // POST_SINGLE_TRANSLATE ]</span>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+            <h2 style="font-size: 1.35rem; color: #ffffff;">
+              <span class="badge-method badge-post">POST</span> /api/translate (Cadena de Texto Única)
+            </h2>
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">URL: https://cloudtranslator.onrender.com/api/translate</span>
+          </div>
+          <p style="font-size: 0.92rem; margin-bottom: 14px;">
+            Traduce una sola cadena de texto al idioma objetivo especificado.
+          </p>
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>Payload JSON (Body en Postman: raw -&gt; JSON)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'json-single-req')">Copiar JSON</button>
+            </div>
+            <pre class="code-panel" id="json-single-req">{
+  "text": "Bienvenido al servicio de traducción en la nube",
+  "targetLanguage": "en"
+}</pre>
+          </div>
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>Respuesta Exitosa JSON (Status 200 OK)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'json-single-res')">Copiar JSON</button>
+            </div>
+            <pre class="code-panel" id="json-single-res">{
+  "translatedText": "Welcome to the cloud translation service"
+}</pre>
+          </div>
+        </article>
+
+        <!-- Subsesión 4.3 -->
+        <article class="content-box-card docs-subsection" id="sub-get-languages">
+          <span class="tech-card-tag">[ SUBSESIÓN 4.3 // GET_LANGUAGES ]</span>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+            <h2 style="font-size: 1.35rem; color: #ffffff;">
+              <span class="badge-method badge-get">GET</span> /api/languages (Idiomas Soportados)
+            </h2>
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">URL: https://cloudtranslator.onrender.com/api/languages</span>
+          </div>
+          <p style="font-size: 0.92rem; margin-bottom: 14px;">
+            Devuelve el array oficial de códigos de idioma admitidos por el validador Joi.
+          </p>
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>Respuesta Exitosa JSON (Status 200 OK)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'json-langs-res')">Copiar JSON</button>
+            </div>
+            <pre class="code-panel" id="json-langs-res">{
+  "success": true,
+  "languages": [
+    "en",
+    "es",
+    "fr",
+    "de",
+    "it",
+    "pt"
+  ]
+}</pre>
+          </div>
+        </article>
+
+        <!-- Subsesión 4.4 -->
+        <article class="content-box-card docs-subsection" id="sub-get-health">
+          <span class="tech-card-tag">[ SUBSESIÓN 4.4 // GET_HEALTH ]</span>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+            <h2 style="font-size: 1.35rem; color: #ffffff;">
+              <span class="badge-method badge-get">GET</span> /api/health (Diagnóstico y Salud)
+            </h2>
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">URL: https://cloudtranslator.onrender.com/api/health</span>
+          </div>
+          <p style="font-size: 0.92rem; margin-bottom: 14px;">
+            Permite a monitores de uptime y pruebas de integración comprobar si la instancia de Render está despierta y respondiendo.
+          </p>
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>Respuesta Exitosa JSON (Status 200 OK)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'json-health-res')">Copiar JSON</button>
+            </div>
+            <pre class="code-panel" id="json-health-res">{
+  "success": true,
+  "status": "ok",
+  "uptime": 120,
+  "timestamp": "2026-09-28T18:00:00.000Z"
+}</pre>
+          </div>
+        </article>
+      </section>
+
+      <!-- SESIÓN 5: CURL Y POSTMAN -->
+      <section id="session-curl" class="docs-section" style="margin-bottom: 48px;">
+        <div class="section-full-title">
+          <h2>Sesión 05: Importación cURL en Postman o Thunder Client</h2>
+          <p>Comando listo para importar mediante "Import -&gt; Raw Text" en clientes REST.</p>
+        </div>
+
+        <!-- Subsesión 5.1 -->
+        <article class="content-box-card docs-subsection" id="sub-curl-import">
+          <span class="tech-card-tag">[ SUBSESIÓN 5.1 // CURL_POSTMAN_IMPORT ]</span>
+          <h2 style="font-size: 1.35rem; color: #ffffff; margin-bottom: 12px;">Comando cURL Importable en Postman</h2>
+          <p style="font-size: 0.92rem; margin-bottom: 14px;">
+            En Postman presiona <strong>Import -&gt; Raw Text</strong> y pega este comando para generar la petición automáticamente:
+          </p>
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>Comando cURL</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-command')">Copiar cURL</button>
+            </div>
+            <pre class="code-panel" id="curl-command">curl -X POST https://cloudtranslator.onrender.com/api/translate \
+  -H "Content-Type: application/json" \
+  -d '{"texts": ["Hola mundo", "Bienvenido a nuestro sistema"], "targetLanguage": "en"}'</pre>
+          </div>
+        </article>
+      </section>
+
+      <!-- SESIÓN 6: COOKIES Y RENDIMIENTO DE RED -->
+      <section id="session-cookies" class="docs-section" style="margin-bottom: 48px;">
+        <div class="section-full-title">
+          <h2>Sesión 06: Persistencia por Cookies y Rendimiento de Red</h2>
+          <p>Cómo funciona la cookie técnica y el comportamiento de la infraestructura en Render.</p>
+        </div>
+
+        <!-- Subsesión 6.1 -->
+        <article class="content-box-card docs-subsection" id="sub-cookies-spec">
+          <span class="tech-card-tag">[ SUBSESIÓN 6.1 // COOKIE_SPECIFICATION ]</span>
+          <h2>6.1 Cookie Técnica `cloud_translator_lang`</h2>
+          <p>
+            Al seleccionar un idioma o presionar el botón de inglés, el cliente establece la cookie técnica:
+          </p>
+          <div class="code-box-wrapper">
+            <div class="code-box-header"><span>Encabezado Set-Cookie</span></div>
+            <pre class="code-panel">Set-Cookie: cloud_translator_lang=en; Path=/; Max-Age=31536000; SameSite=Lax</pre>
+          </div>
+          <ul style="margin-left: 20px; line-height: 2;">
+            <li>Guarda estrictamente el código del idioma deseado (ej: <code>"en"</code>, <code>"fr"</code>, <code>"de"</code>).</li>
+            <li>Tiene vigencia de 365 días para no requerir configuración repetida en cada visita.</li>
+            <li>Permite que el navegador restaure el idioma inmediatamente en 0ms tras recargar la página.</li>
+          </ul>
+        </article>
+
+        <!-- Subsesión 6.2 -->
+        <article class="content-box-card docs-subsection" id="sub-render-coldstart">
+          <span class="tech-card-tag">[ SUBSESIÓN 6.2 // RENDER_COLD_START ]</span>
+          <h2>6.2 Comportamiento de la Capa Gratuita de Render</h2>
+          <p>
+            El microservicio se ejecuta en el clúster gratuito de Render:
+          </p>
+          <div class="callout">
+            <strong>Arranque en Frío:</strong> Si no hay tráfico entrante durante 15 minutos, el contenedor entra en modo de reposo. La primera consulta reactiva el servidor en aproximadamente 25 a 35 segundos. Las peticiones subsecuentes responden con latencia promedio de 150 a 350 milisegundos.
+          </div>
+        </article>
+      </section>
+
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-inner-full">
+      <div class="footer-col">
+        <h4>
+          <svg class="icon" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+          CloudTranslator
+        </h4>
+        <p>Servicio de traducción en la nube con API REST para integración directa en sistemas web corporativos.</p>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+          Endpoint: <code>https://cloudtranslator.onrender.com</code>
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Start</a></li>
+          <li><a href="docs.html">Documentation</a></li>
+          <li><a href="status.html">Estado del Servicio</a></li>
+          <li><a href="support.html">Technical Support</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Supported Languages</h4>
+        <ul>
+          <li><a href="languages/en.html">English (en)</a></li>
+          <li><a href="languages/fr.html">French (fr)</a></li>
+          <li><a href="languages/de.html">German (de)</a></li>
+          <li><a href="languages/it.html">Italian (it)</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Legal Information</h4>
+        <ul>
+          <li><a href="terms.html">Terms of Service</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="security.html">Security and Data</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom-full">
+      <span>© 2026 CloudTranslator. Todos los derechos reservados.</span>
+      <span>Autor: Miguel Angel Carlos Rojas</span>
+    </div>
+  </footer>
+
+  <script src="js/cloud-translator.js"></script>
+  <script>
+    // Función global para copiar al portapapeles con feedback visual monocromático
+    function copiarAlPortapapeles(btn, elementId) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      const texto = el.innerText || el.textContent;
+      navigator.clipboard.writeText(texto).then(() => {
+        const originalText = btn.textContent;
+        btn.textContent = "COPIADO";
+        btn.style.background = "#ffffff";
+        btn.style.color = "#000000";
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.style.background = "";
+          btn.style.color = "";
+        }, 1500);
+      }).catch(err => {
+        console.error("Error al copiar:", err);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Sincronización de posición Sticky de la barra lateral (Sidebar)
+      const mainHeader = document.getElementById("main-header");
+      const docsSidebar = document.getElementById("docs-sidebar");
+
+      function syncSidebarPosition() {
+        if (mainHeader && docsSidebar) {
+          const headerHeight = mainHeader.offsetHeight;
+          docsSidebar.style.top = headerHeight + "px";
+          docsSidebar.style.height = `calc(100vh - ${headerHeight}px)`;
+        }
+      }
+      syncSidebarPosition();
+      window.addEventListener("resize", syncSidebarPosition);
+
+      // 2. ScrollSpy automático para Sesiones y Subsesiones
+      const sessionLinks = document.querySelectorAll(".docs-sidebar-session");
+      const subLinks = document.querySelectorAll(".docs-sidebar-sublink");
+      const observedElements = document.querySelectorAll(".docs-section, .docs-subsection");
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute("id");
+
+            // Si es una subsesión
+            if (entry.target.classList.contains("docs-subsection")) {
+              subLinks.forEach(sub => {
+                if (sub.getAttribute("data-target") === id || sub.getAttribute("href") === "#" + id) {
+                  sub.classList.add("active");
+                  // Activar sesión padre correspondiente
+                  const parentGroup = sub.closest(".docs-sidebar-group");
+                  if (parentGroup) {
+                    sessionLinks.forEach(s => s.classList.remove("active"));
+                    parentGroup.querySelector(".docs-sidebar-session")?.classList.add("active");
+                  }
+                  if (window.innerWidth <= 900) {
+                    sub.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+                  }
+                } else {
+                  sub.classList.remove("active");
+                }
+              });
+            } else if (entry.target.classList.contains("docs-section")) {
+              // Si es una sección principal
+              sessionLinks.forEach(link => {
+                if (link.getAttribute("data-target") === id || link.getAttribute("href") === "#" + id) {
+                  link.classList.add("active");
+                  if (window.innerWidth <= 900) {
+                    link.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+                  }
+                }
+              });
+            }
+          }
+        });
+      }, {
+        rootMargin: "-90px 0px -50% 0px",
+        threshold: 0.1
+      });
+
+      observedElements.forEach(el => observer.observe(el));
+
+      // 3. Inicialización del traductor
+      const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      const apiEndpoint = isLocal ? "/api/translate" : "https://cloudtranslator.onrender.com/api/translate";
+      window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
+      document.getElementById("btn-english").onclick = () => window.translator.translateToEnglish();
+      document.getElementById("btn-restore").onclick = () => window.translator.restoreOriginal();
+      document.getElementById("select-lang").onchange = (e) => window.translator.translatePage(e.target.value);
+      document.getElementById("btn-translate-custom").onclick = () => {
+        const val = document.getElementById("input-custom-lang").value.trim().toLowerCase();
+        if (val) window.translator.translatePage(val);
+      };
+    });
+  </script>
+</body>
+</html>
