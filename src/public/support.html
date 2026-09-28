@@ -25,9 +25,10 @@
         <ul class="main-menu">
           <li><a href="index.html">Inicio</a></li>
           <li><a href="docs.html">Documentación</a></li>
-          <li><a href="docs.html#s02">API</a></li>
-          <li><a href="docs.html#s04">Aprender</a></li>
-          <li><a href="support.html" class="active">Ayuda</a></li>
+          <li><a href="api.html">API</a></li>
+          <li><a href="learn.html">Aprender</a></li>
+          <li><a href="help.html">Ayuda</a></li>
+          <li><a href="support.html" class="active">Soporte</a></li>
           <li><a href="status.html">Estado</a></li>
         </ul>
       </nav>
@@ -63,40 +64,44 @@
 
   <main class="full-container">
     <div class="hero-full">
-      <span class="hero-tag-glow">[ CANALES DE ATENCIÓN Y DIAGNÓSTICO ]</span>
+      <span class="hero-tag-glow">[ CANALES DE INGENIERÍA E INCIDENCIAS ]</span>
       <h1>Soporte Técnico de CloudTranslator</h1>
       <p class="lead">
-        Asistencia directa y resolución de consultas operativas sobre el microservicio en la nube <code>https://cloudtranslator.onrender.com</code>.
+        Mesa de ayuda técnica para desarrolladores y administradores de sistemas. Para preguntas frecuentes o guías rápidas de autoservicio, consulta el <a href="help.html" style="color: #60a5fa; text-decoration: underline;">Centro de Ayuda</a>.
       </p>
     </div>
 
     <article class="content-box-card">
       <span class="tech-card-tag">[ 01 // CONTACT_CHANNELS ]</span>
-      <h2>Canales de Contacto Directo</h2>
-      <ul style="margin-left: 20px; line-height: 2;">
-        <li><strong>Correo electrónico de contacto:</strong> <a href="mailto:isakiangel6@gmail.com">isakiangel6@gmail.com</a></li>
-        <li><strong>Repositorio GitHub oficial:</strong> <a href="https://github.com/MiguelCarlosRojas/CloudTranslator" target="_blank">github.com/MiguelCarlosRojas/CloudTranslator</a></li>
-        <li><strong>Monitor de salud en tiempo real:</strong> <a href="status.html">Ver estado operativo en vivo</a></li>
+      <h2>Canales de Contacto Directo con Ingeniería</h2>
+      <ul style="margin-left: 20px; line-height: 2.2;">
+        <li><strong>Correo directo de ingeniería:</strong> <a href="mailto:isakiangel6@gmail.com">isakiangel6@gmail.com</a></li>
+        <li><strong>Seguimiento de incidencias (GitHub Issues):</strong> <a href="https://github.com/MiguelCarlosRojas/CloudTranslator/issues" target="_blank">github.com/MiguelCarlosRojas/CloudTranslator/issues</a></li>
+        <li><strong>Repositorio oficial del proyecto:</strong> <a href="https://github.com/MiguelCarlosRojas/CloudTranslator" target="_blank">github.com/MiguelCarlosRojas/CloudTranslator</a></li>
+        <li><strong>Monitor operativo en tiempo real:</strong> <a href="status.html">Consultar métricas y latencia de CloudTranslator</a></li>
       </ul>
     </article>
 
     <article class="content-box-card">
-      <span class="tech-card-tag">[ 02 // FREQUENTLY_ASKED_QUESTIONS ]</span>
-      <h2>Preguntas Frecuentes (FAQ)</h2>
-      
-      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">¿Por qué la primera llamada puede demorar unos segundos?</h3>
+      <span class="tech-card-tag">[ 02 // REPORTE_DE_INCIDENCIAS ]</span>
+      <h2>Protocolo para Reporte de Fallos</h2>
       <p>
-        En la capa libre de Render, si no hay tráfico durante 15 minutos, el contenedor entra en modo de reposo. La primera consulta activa el servidor en unos 25 segundos, y las siguientes peticiones responden con latencia ultrarrápida (menos de 300ms).
+        Para agilizar la resolución de incidencias en producción, incluye la siguiente información al enviar un reporte técnico:
       </p>
+      <ul style="margin-left: 20px; line-height: 2;">
+        <li><strong>Timestamp:</strong> Fecha y hora exacta de la solicitud (formato ISO 8601 o UTC).</li>
+        <li><strong>Endpoint consultado:</strong> Por ejemplo <code>POST /api/translate</code>.</li>
+        <li><strong>Payload enviado:</strong> Cuerpo JSON de la petición (omitiendo información confidencial).</li>
+        <li><strong>Código HTTP y mensaje de error:</strong> Respuesta devuelta por el servidor (ej. 400 Bad Request, 500 Internal Error).</li>
+        <li><strong>Entorno de ejecución:</strong> Node.js, navegador (Chrome/Firefox/Safari), Python o cURL.</li>
+      </ul>
+    </article>
 
-      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">¿Cómo evitar múltiples consultas al Network?</h3>
+    <article class="content-box-card">
+      <span class="tech-card-tag">[ 03 // SLA_Y_DISPONIBILIDAD ]</span>
+      <h2>Niveles de Servicio (SLA)</h2>
       <p>
-        Nuestra librería consolida automáticamente todos los nodos de texto en un solo arreglo <code>texts: [...]</code> y lo despacha en una única petición HTTP hacia <code>https://cloudtranslator.onrender.com/api/translate</code>.
-      </p>
-
-      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">¿Cómo persiste el idioma al recargar?</h3>
-      <p>
-        Mediante la cookie <code>cloud_translator_lang</code>. El navegador o servidor lee esta cookie al iniciar y aplica la traducción de inmediato sin necesidad de volver a consultar a la red.
+        CloudTranslator se encuentra desplegado en la infraestructura en la nube de Render en la región US-East. La tasa de disponibilidad objetivo es del 99.5% con monitoreo constante de salud en el endpoint <code>/api/health</code>.
       </p>
     </article>
   </main>
@@ -127,9 +132,9 @@
         <h4>Documentación</h4>
         <ul>
           <li><a href="docs.html">Documentación</a></li>
-          <li><a href="docs.html#s02">API</a></li>
-          <li><a href="docs.html#s04">Aprender</a></li>
-          <li><a href="support.html">Ayuda</a></li>
+          <li><a href="api.html">API</a></li>
+          <li><a href="learn.html">Aprender</a></li>
+          <li><a href="help.html">Ayuda</a></li>
         </ul>
       </div>
 

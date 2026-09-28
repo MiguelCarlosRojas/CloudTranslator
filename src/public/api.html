@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Referencia de la API REST - CloudTranslator</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="shortcut icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/spa-router.js" defer></script>
+</head>
+<body>
+
+  <header class="top-nav">
+    <div class="nav-container">
+      <a href="index.html" class="brand-wrapper">
+        <span class="brand-logo">
+          <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+          CloudTranslator
+        </span>
+        <span class="brand-badge">REST API</span>
+      </a>
+
+      <nav>
+        <ul class="main-menu">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="docs.html">Documentación</a></li>
+          <li><a href="api.html" class="active">API</a></li>
+          <li><a href="learn.html">Aprender</a></li>
+          <li><a href="help.html">Ayuda</a></li>
+          <li><a href="support.html">Soporte</a></li>
+          <li><a href="status.html">Estado</a></li>
+        </ul>
+      </nav>
+
+      <div class="toolbar-controls">
+        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+          English
+        </button>
+        <div class="selector-box">
+          <select id="select-lang">
+            <option value="en">Inglés (en)</option>
+            <option value="fr">Francés (fr)</option>
+            <option value="de">Alemán (de)</option>
+            <option value="it">Italiano (it)</option>
+            <option value="pt">Portugués (pt)</option>
+            <option value="es">Español (es)</option>
+          </select>
+          <input type="text" id="input-custom-lang" placeholder="cód." maxlength="5">
+          <button id="btn-translate-custom" class="btn btn-primary">Traducir</button>
+        </div>
+        <button id="btn-restore" class="btn btn-outline">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+          Original
+        </button>
+        <div id="status-pill" class="status-pill">
+          <span class="spinner"></span>
+          <span id="status-text">Listo</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="full-container">
+    <div class="hero-full">
+      <span class="hero-tag-glow">[ ESPECIFICACIÓN TÉCNICA DE ENDPOINTS ]</span>
+      <h1>Referencia de la API REST</h1>
+      <p class="lead">
+        Documentación técnica de los endpoints HTTP alojados en <code>https://cloudtranslator.onrender.com</code>. Para tutoriales paso a paso consulta <a href="learn.html" style="color: #60a5fa; text-decoration: underline;">Aprender</a>.
+      </p>
+    </div>
+
+    <!-- Gateway Info -->
+    <article class="content-box-card">
+      <span class="tech-card-tag">[ BASE_URL & HEADERS ]</span>
+      <h2>Servidor de Producción y Encabezados</h2>
+      <p>Base URL global: <code>https://cloudtranslator.onrender.com</code></p>
+      <div class="table-responsive" style="margin-top: 14px;">
+        <table class="docs-table">
+          <thead>
+            <tr>
+              <th>Encabezado</th>
+              <th>Valor Requerido</th>
+              <th>Descripción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Content-Type</code></td>
+              <td><code>application/json</code></td>
+              <td>Obligatorio en peticiones con cuerpo (POST).</td>
+            </tr>
+            <tr>
+              <td><code>Accept</code></td>
+              <td><code>application/json</code></td>
+              <td>Indica al servidor que devuelva la respuesta en formato JSON.</td>
+            </tr>
+            <tr>
+              <td><code>Origin / CORS</code></td>
+              <td>Cualquiera (<code>*</code>)</td>
+              <td>Habilitado para consumo directo desde navegadores o servidores.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- POST /api/translate -->
+    <article class="content-box-card">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+        <span class="tech-card-tag"><span class="badge-post">POST</span> /api/translate</span>
+        <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">Traducción individual o por lotes</span>
+      </div>
+      <h2>Traducción de Texto (POST)</h2>
+      <p>Envía un texto individual o una lista de textos mediante un payload JSON para traducir al idioma destino.</p>
+
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 16px;">Parámetros del Payload (JSON)</h3>
+      <div class="table-responsive" style="margin-top: 10px;">
+        <table class="docs-table">
+          <thead>
+            <tr>
+              <th>Campo</th>
+              <th>Tipo</th>
+              <th>Obligatorio</th>
+              <th>Descripción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>text</code></td>
+              <td>string</td>
+              <td>Condicional</td>
+              <td>Cadena individual a traducir (1 a 5,000 caracteres). Obligatorio si no se usa <code>texts</code>.</td>
+            </tr>
+            <tr>
+              <td><code>texts</code></td>
+              <td>array[string]</td>
+              <td>Condicional</td>
+              <td>Lista de textos a traducir en una sola petición (1 a 1,000 elementos).</td>
+            </tr>
+            <tr>
+              <td><code>targetLanguage</code></td>
+              <td>string</td>
+              <td>Sí</td>
+              <td>Código ISO de 2 letras del idioma de destino (ej: <code>"en"</code>, <code>"fr"</code>, <code>"de"</code>).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px;">Ejemplo de Petición (cURL)</h3>
+      <div class="json-code-block">
+        <pre><code>curl -X POST "https://cloudtranslator.onrender.com/api/translate" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Hola mundo desde CloudTranslator",
+    "targetLanguage": "en"
+  }'</code></pre>
+      </div>
+
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px;">Ejemplo de Respuesta (HTTP 200 OK)</h3>
+      <div class="json-code-block">
+        <pre><code>{
+  "translatedText": "Hello world from CloudTranslator"
+}</code></pre>
+      </div>
+
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px;">Ejemplo con Lista de Textos (Batch)</h3>
+      <div class="json-code-block">
+        <pre><code>curl -X POST "https://cloudtranslator.onrender.com/api/translate" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "texts": ["Inicio", "Servicios", "Contacto"],
+    "targetLanguage": "en"
+  }'</code></pre>
+      </div>
+      <div class="json-code-block">
+        <pre><code>{
+  "translatedTexts": [
+    "Start",
+    "Services",
+    "Contact"
+  ]
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- GET /api/translate -->
+    <article class="content-box-card">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+        <span class="tech-card-tag"><span class="badge-get">GET</span> /api/translate</span>
+        <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">Traducción rápida por Query Params</span>
+      </div>
+      <h2>Traducción vía Query Params (GET)</h2>
+      <p>Permite consultas directas mediante parámetros en la URL. Recomendado para pruebas rápidas en navegador.</p>
+      <div class="json-code-block">
+        <pre><code>curl -X GET "https://cloudtranslator.onrender.com/api/translate?text=Bienvenido&targetLanguage=en"</code></pre>
+      </div>
+    </article>
+
+    <!-- GET /api/languages -->
+    <article class="content-box-card">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+        <span class="tech-card-tag"><span class="badge-get">GET</span> /api/languages</span>
+        <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">Catálogo de idiomas soportados</span>
+      </div>
+      <h2>Idiomas Disponibles</h2>
+      <p>Devuelve el catálogo de códigos ISO soportados por el motor de traducción.</p>
+      <div class="json-code-block">
+        <pre><code>curl -X GET "https://cloudtranslator.onrender.com/api/languages"</code></pre>
+      </div>
+      <div class="json-code-block">
+        <pre><code>{
+  "success": true,
+  "languages": [
+    "en", "es", "fr", "de", "it", "pt", "ru", "ja", "zh-CN", "ar", "ko"
+  ]
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- GET /api/health -->
+    <article class="content-box-card">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+        <span class="tech-card-tag"><span class="badge-get">GET</span> /api/health</span>
+        <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">Monitor de disponibilidad</span>
+      </div>
+      <h2>Estado de Salud (Healthcheck)</h2>
+      <p>Utilizado por monitores de infraestructura para comprobar disponibilidad y tiempo de actividad.</p>
+      <div class="json-code-block">
+        <pre><code>curl -X GET "https://cloudtranslator.onrender.com/api/health"</code></pre>
+      </div>
+      <div class="json-code-block">
+        <pre><code>{
+  "success": true,
+  "status": "ok",
+  "uptime": 4520,
+  "timestamp": "2026-09-28T22:00:00.000Z"
+}</code></pre>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <div class="footer-inner-full">
+      <div class="footer-col">
+        <h4>
+          <svg class="icon" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+          CloudTranslator
+        </h4>
+        <p>Servicio de traducción en la nube con API REST para integración directa en sistemas web corporativos.</p>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+          Endpoint: <code>https://cloudtranslator.onrender.com</code>
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Plataforma</h4>
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="status.html">Estado del Servicio</a></li>
+          <li><a href="support.html">Soporte Técnico</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Documentación</h4>
+        <ul>
+          <li><a href="docs.html">Documentación</a></li>
+          <li><a href="api.html">API</a></li>
+          <li><a href="learn.html">Aprender</a></li>
+          <li><a href="help.html">Ayuda</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Información Legal</h4>
+        <ul>
+          <li><a href="terms.html">Términos del Servicio</a></li>
+          <li><a href="privacy.html">Política de Privacidad</a></li>
+          <li><a href="security.html">Seguridad y Datos</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom-full">
+      <span>© 2026 CloudTranslator. Todos los derechos reservados.</span>
+      <span>Autor: Miguel Angel Carlos Rojas</span>
+    </div>
+  </footer>
+
+  <script src="js/cloud-translator.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";
+      window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
+      document.getElementById("btn-english").onclick = () => window.translator.translateToEnglish();
+      document.getElementById("btn-restore").onclick = () => window.translator.restoreOriginal();
+      document.getElementById("select-lang").onchange = (e) => window.translator.translatePage(e.target.value);
+      document.getElementById("btn-translate-custom").onclick = () => {
+        const val = document.getElementById("input-custom-lang").value.trim().toLowerCase();
+        if (val) window.translator.translatePage(val);
+      };
+    });
+  </script>
+</body>
+</html>

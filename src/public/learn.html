@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Términos del Servicio - CloudTranslator</title>
+  <title>Aprender e Integrar - CloudTranslator</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="shortcut icon" type="image/png" href="favicon.png">
   <link rel="stylesheet" href="css/style.css">
@@ -18,7 +18,7 @@
           <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
           CloudTranslator
         </span>
-        <span class="brand-badge">Legal</span>
+        <span class="brand-badge">Aprender</span>
       </a>
 
       <nav>
@@ -26,7 +26,7 @@
           <li><a href="index.html">Inicio</a></li>
           <li><a href="docs.html">Documentación</a></li>
           <li><a href="api.html">API</a></li>
-          <li><a href="learn.html">Aprender</a></li>
+          <li><a href="learn.html" class="active">Aprender</a></li>
           <li><a href="help.html">Ayuda</a></li>
           <li><a href="support.html">Soporte</a></li>
           <li><a href="status.html">Estado</a></li>
@@ -64,36 +64,128 @@
 
   <main class="full-container">
     <div class="hero-full">
-      <span class="hero-tag-glow">[ CONDICIONES DE ACCESO Y POLÍTICA DE USO ]</span>
-      <h1>Términos del Servicio</h1>
+      <span class="hero-tag-glow">[ GUÍAS DE INTEGRACIÓN Y TUTORIALES ]</span>
+      <h1>Aprende a Integrar CloudTranslator</h1>
       <p class="lead">
-        Condiciones de uso y políticas de acceso para la API pública de <code>https://cloudtranslator.onrender.com</code>.
+        Tutoriales prácticos paso a paso para añadir traducción multilingüe automática en frontend y backend sin recargas de página. Para especificaciones de endpoints revisa <a href="api.html" style="color: #60a5fa; text-decoration: underline;">Referencia de API</a>.
       </p>
     </div>
 
+    <!-- Lección 1: Frontend SDK -->
     <article class="content-box-card">
-      <span class="tech-card-tag">[ 01 // ACCEPTANCE ]</span>
-      <h2>1. Aceptación de los Términos</h2>
+      <span class="tech-card-tag">[ 01 // FRONTEND_INTEGRATION ]</span>
+      <h2>1. Integración en Frontend con el SDK JavaScript</h2>
       <p>
-        Al acceder o utilizar la API de CloudTranslator a través de <code>https://cloudtranslator.onrender.com</code>, aceptas someterte a estos Términos de Servicio y a todas las directrices técnicas descritas en este portal.
+        El SDK para navegadores traduce el DOM de manera eficiente: agrupa las etiquetas de texto visibles y las envía en una sola consulta HTTP para no saturar la red.
       </p>
 
-      <span class="tech-card-tag" style="margin-top: 24px;">[ 02 // FAIR_USE ]</span>
-      <h2>2. Uso Responsable y Fair Use</h2>
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 16px;">Paso 1: Incluir el script</h3>
+      <div class="json-code-block">
+        <pre><code>&lt;script src="https://cloudtranslator.onrender.com/js/cloud-translator.js"&gt;&lt;/script&gt;</code></pre>
+      </div>
+
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 16px;">Paso 2: Inicializar el traductor</h3>
+      <div class="json-code-block">
+        <pre><code>const translator = new CloudTranslator({
+  endpoint: "https://cloudtranslator.onrender.com/api/translate",
+  useCookies: true,        // Guarda el idioma en la cookie cloud_translator_lang
+  batchSize: 500,          // Límite de nodos de texto por consulta
+  onStart: () => console.log("Traduciendo página..."),
+  onComplete: () => console.log("Traducción completada")
+});
+
+// Traducir a inglés al pulsar un botón
+document.getElementById("btn-en").onclick = () => {
+  translator.translateToEnglish();
+};
+
+// Traducir a cualquier idioma por código ISO
+document.getElementById("btn-fr").onclick = () => {
+  translator.translatePage("fr");
+};
+
+// Restaurar al texto original
+document.getElementById("btn-original").onclick = () => {
+  translator.restoreOriginal();
+};</code></pre>
+      </div>
+    </article>
+
+    <!-- Lección 2: Backend Node.js -->
+    <article class="content-box-card">
+      <span class="tech-card-tag">[ 02 // BACKEND_NODEJS ]</span>
+      <h2>2. Consumo desde Backend (Node.js)</h2>
       <p>
-        El servicio está provisto para la internacionalización de sistemas web y aplicaciones corporativas:
+        Puedes invocar la API desde cualquier servicio Node.js utilizando el estándar <code>fetch</code> nativo o <code>axios</code>:
       </p>
+
+      <div class="json-code-block">
+        <pre><code>async function traducirTexto(texto, idiomaDestino) {
+  const response = await fetch("https://cloudtranslator.onrender.com/api/translate", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      text: texto,
+      targetLanguage: idiomaDestino
+    })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Fallo en la traducción");
+  }
+
+  const data = await response.json();
+  return data.translatedText;
+}
+
+// Ejemplo de uso:
+traducirTexto("Hola mundo", "en")
+  .then(res => console.log("Resultado:", res)) // "Hello world"
+  .catch(err => console.error(err));</code></pre>
+      </div>
+    </article>
+
+    <!-- Lección 3: Python -->
+    <article class="content-box-card">
+      <span class="tech-card-tag">[ 03 // BACKEND_PYTHON ]</span>
+      <h2>3. Consumo desde Python</h2>
+      <p>
+        Integración sencilla en scripts o APIs desarrolladas con FastAPI, Flask o Django:
+      </p>
+
+      <div class="json-code-block">
+        <pre><code>import requests
+
+def traducir(texto: str, idioma_destino: str) -> str:
+    url = "https://cloudtranslator.onrender.com/api/translate"
+    payload = {
+        "text": texto,
+        "targetLanguage": idioma_destino
+    }
+    headers = {"Content-Type": "application/json"}
+
+    response = requests.post(url, json=payload, headers=headers)
+    response.raise_for_status()
+    return response.json().get("translatedText")
+
+# Ejecución
+print(traducir("Servicio de traducción en la nube", "en"))
+# Salida: "Cloud translation service"</code></pre>
+      </div>
+    </article>
+
+    <!-- Lección 4: Buenas Prácticas -->
+    <article class="content-box-card">
+      <span class="tech-card-tag">[ 04 // BEST_PRACTICES ]</span>
+      <h2>4. Buenas Prácticas de Arquitectura</h2>
       <ul style="margin-left: 20px; line-height: 2;">
-        <li>No está permitido utilizar la API para actividades fraudulentas, ataques de denegación de servicio o saturación deliberada de la infraestructura.</li>
-        <li>Se recomienda el uso del atributo <code>texts: [...]</code> para enviar páginas web completas en una sola consulta de red.</li>
-        <li>Los desarrolladores deben respetar las cuotas razonables de tráfico del servidor en la nube.</li>
+        <li><strong>Usa el modo Batch:</strong> Si tienes que traducir una lista de elementos (menús, productos, alertas), envíalos en el arreglo <code>texts: [...]</code> en vez de hacer 20 llamadas separadas.</li>
+        <li><strong>Manejo del Cold Start:</strong> En caso de que la instancia esté en reposo, implementa un reintento con backoff exponencial o una alerta visual de carga.</li>
+        <li><strong>Exclusión de elementos:</strong> Para evitar que se traduzcan nombres de marca, códigos o fórmulas, añade la clase <code>notranslate</code> o el atributo <code>translate="no"</code> al elemento HTML.</li>
       </ul>
-
-      <span class="tech-card-tag" style="margin-top: 24px;">[ 03 // AVAILABILITY ]</span>
-      <h2>3. Disponibilidad del Servicio</h2>
-      <p>
-        El servicio se proporciona según disponibilidad técnica. Puedes verificar el estado en tiempo real en nuestra página de <a href="status.html">Estado del Servicio</a>.
-      </p>
     </article>
   </main>
 

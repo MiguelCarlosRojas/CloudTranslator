@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Términos del Servicio - CloudTranslator</title>
+  <title>Centro de Ayuda y Preguntas Frecuentes - CloudTranslator</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="shortcut icon" type="image/png" href="favicon.png">
   <link rel="stylesheet" href="css/style.css">
@@ -18,7 +18,7 @@
           <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
           CloudTranslator
         </span>
-        <span class="brand-badge">Legal</span>
+        <span class="brand-badge">Ayuda</span>
       </a>
 
       <nav>
@@ -27,7 +27,7 @@
           <li><a href="docs.html">Documentación</a></li>
           <li><a href="api.html">API</a></li>
           <li><a href="learn.html">Aprender</a></li>
-          <li><a href="help.html">Ayuda</a></li>
+          <li><a href="help.html" class="active">Ayuda</a></li>
           <li><a href="support.html">Soporte</a></li>
           <li><a href="status.html">Estado</a></li>
         </ul>
@@ -64,36 +64,68 @@
 
   <main class="full-container">
     <div class="hero-full">
-      <span class="hero-tag-glow">[ CONDICIONES DE ACCESO Y POLÍTICA DE USO ]</span>
-      <h1>Términos del Servicio</h1>
+      <span class="hero-tag-glow">[ CENTRO DE ASISTENCIA Y GUÍAS DE AUTOAYUDA ]</span>
+      <h1>Centro de Ayuda</h1>
       <p class="lead">
-        Condiciones de uso y políticas de acceso para la API pública de <code>https://cloudtranslator.onrender.com</code>.
+        Respuestas inmediatas a dudas habituales sobre funcionamiento, latencias, cookies y configuración de CloudTranslator. Si requieres asistencia técnica personalizada, visita nuestro portal de <a href="support.html" style="color: #60a5fa; text-decoration: underline;">Soporte Técnico</a>.
       </p>
     </div>
 
     <article class="content-box-card">
-      <span class="tech-card-tag">[ 01 // ACCEPTANCE ]</span>
-      <h2>1. Aceptación de los Términos</h2>
+      <span class="tech-card-tag">[ 01 // PREGUNTAS_FRECUENTES ]</span>
+      <h2>Preguntas Frecuentes (FAQ)</h2>
+
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">¿Por qué la primera petición demora unos 25 segundos?</h3>
       <p>
-        Al acceder o utilizar la API de CloudTranslator a través de <code>https://cloudtranslator.onrender.com</code>, aceptas someterte a estos Términos de Servicio y a todas las directrices técnicas descritas en este portal.
+        El microservicio opera en la capa en la nube de Render. Cuando no recibe tráfico continuo durante 15 minutos, el servidor entra en modo reposo para optimizar recursos. La primera petición activa el contenedor ("cold start") en aproximadamente 25 segundos, y a partir de ese momento todas las consultas responden de inmediato en menos de 300 ms.
       </p>
 
-      <span class="tech-card-tag" style="margin-top: 24px;">[ 02 // FAIR_USE ]</span>
-      <h2>2. Uso Responsable y Fair Use</h2>
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">¿Cómo optimiza CloudTranslator el consumo de red en mi navegador?</h3>
       <p>
-        El servicio está provisto para la internacionalización de sistemas web y aplicaciones corporativas:
+        A diferencia de plugins tradicionales que disparan cientos de peticiones HTTP por cada párrafo, el cliente de CloudTranslator recopila todos los textos del DOM, los empaqueta en un arreglo JSON (<code>texts: [...]</code>) y realiza <strong>una única solicitud HTTP</strong> hacia el gateway en la nube.
       </p>
-      <ul style="margin-left: 20px; line-height: 2;">
-        <li>No está permitido utilizar la API para actividades fraudulentas, ataques de denegación de servicio o saturación deliberada de la infraestructura.</li>
-        <li>Se recomienda el uso del atributo <code>texts: [...]</code> para enviar páginas web completas en una sola consulta de red.</li>
-        <li>Los desarrolladores deben respetar las cuotas razonables de tráfico del servidor en la nube.</li>
-      </ul>
 
-      <span class="tech-card-tag" style="margin-top: 24px;">[ 03 // AVAILABILITY ]</span>
-      <h2>3. Disponibilidad del Servicio</h2>
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">¿Cómo funciona la memoria de traducción en caché?</h3>
       <p>
-        El servicio se proporciona según disponibilidad técnica. Puedes verificar el estado en tiempo real en nuestra página de <a href="status.html">Estado del Servicio</a>.
+        Las frases traducidas se almacenan en la memoria local del cliente (<code>localStorage</code>) con un hash criptográfico. Si el usuario vuelve a cambiar al mismo idioma, los textos se leen instantáneamente en 0 ms sin generar tráfico hacia el servidor.
       </p>
+
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">¿Cómo persiste la preferencia del usuario entre sesiones?</h3>
+      <p>
+        Al seleccionar un idioma, se registra la cookie <code>cloud_translator_lang</code> con vigencia de 365 días. Cualquier página del dominio que cargue el SDK restaurará automáticamente el idioma guardado sin intervención manual.
+      </p>
+    </article>
+
+    <article class="content-box-card">
+      <span class="tech-card-tag">[ 02 // DIAGNÓSTICO_Y_RESOLUCIÓN ]</span>
+      <h2>Resolución de Problemas (Troubleshooting)</h2>
+
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">Error HTTP 400: "El idioma objetivo es requerido"</h3>
+      <p>
+        Verifica que el cuerpo JSON de tu petición incluya el campo <code>targetLanguage</code> con un código ISO válido (por ejemplo <code>"targetLanguage": "en"</code> o <code>"fr"</code>). No utilices claves obsoletas como <code>to</code>.
+      </p>
+
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">Error HTTP 400: "El texto no puede estar vacío"</h3>
+      <p>
+        Debes enviar una cadena no vacía en el parámetro <code>text</code> o una lista con al menos un elemento en <code>texts</code>.
+      </p>
+
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">Error de CORS al consumir desde localhost u otro dominio</h3>
+      <p>
+        CloudTranslator tiene habilitado CORS universal (<code>Access-Control-Allow-Origin: *</code>) y métodos <code>GET, POST, OPTIONS</code>. Asegúrate de incluir el header <code>Content-Type: application/json</code> en solicitudes POST.
+      </p>
+    </article>
+
+    <article class="content-box-card">
+      <span class="tech-card-tag">[ 03 // CONTACTO_ADICIONAL ]</span>
+      <h2>¿Aún necesitas ayuda personalizada?</h2>
+      <p>
+        Si tu consulta no queda resuelta con estas guías o deseas reportar una anomalía técnica en producción, accede a nuestro canal especializado:
+      </p>
+      <div style="margin-top: 16px;">
+        <a href="support.html" class="btn btn-primary">Ir a Soporte Técnico</a>
+        <a href="status.html" class="btn btn-outline">Comprobar Monitor en Vivo</a>
+      </div>
     </article>
   </main>
 
