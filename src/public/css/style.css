@@ -878,43 +878,68 @@ body {
   font-family: var(--font-mono);
 }
 
+.table-responsive,
 .table-responsive-wrapper {
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 16px 0 20px;
   border: 1px solid var(--border-line);
+  background: #030303;
 }
 
+.docs-table,
 .endpoints-table {
   width: 100%;
   border-collapse: collapse;
+  text-align: left;
   min-width: 580px;
 }
 
+.docs-table th,
 .endpoints-table th,
+.docs-table td,
 .endpoints-table td {
   padding: 12px 16px;
   text-align: left;
   border-bottom: 1px solid var(--border-line);
 }
 
+.docs-table th,
 .endpoints-table th {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--text-dim);
-  background: #060606;
+  color: var(--text-white);
+  background: #0a0a0a;
   font-family: var(--font-mono);
+  font-weight: 600;
 }
 
+.docs-table td,
 .endpoints-table td {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-light);
+  line-height: 1.5;
+  background: transparent;
 }
 
+.docs-table tr:hover td,
 .endpoints-table tr:hover td {
   background: #080808;
   color: var(--text-white);
+}
+
+.docs-table code,
+.endpoints-table code {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  background: #0d0d0d;
+  border: 1px solid #222222;
+  padding: 2px 6px;
+  border-radius: 2px;
+  color: #ffffff;
+  display: inline-block;
 }
 
 .badge-method {

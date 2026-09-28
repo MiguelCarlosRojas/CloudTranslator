@@ -25,9 +25,6 @@
         <ul class="main-menu">
           <li><a href="index.html">Inicio</a></li>
           <li><a href="docs.html">Documentación</a></li>
-          <li><a href="api.html">API</a></li>
-          <li><a href="learn.html" class="active">Aprender</a></li>
-          <li><a href="help.html">Ayuda</a></li>
           <li><a href="support.html">Soporte</a></li>
           <li><a href="status.html">Estado</a></li>
         </ul>
@@ -67,68 +64,206 @@
       <span class="hero-tag-glow">[ GUÍAS DE INTEGRACIÓN Y TUTORIALES ]</span>
       <h1>Aprende a Integrar CloudTranslator</h1>
       <p class="lead">
-        Tutoriales prácticos paso a paso para añadir traducción multilingüe automática en frontend y backend sin recargas de página. Para especificaciones de endpoints revisa <a href="api.html" style="color: #60a5fa; text-decoration: underline;">Referencia de API</a>.
+        Guía técnica integral paso a paso. Aprende los fundamentos arquitectónicos, la integración en el navegador con el SDK JavaScript y el consumo directo en servidores (Node.js, Python, cURL) con micro-lotes y tolerancia a fallos.
       </p>
     </div>
 
-    <!-- Lección 1: Frontend SDK -->
+    <!-- Módulo 0: Arquitectura y Toma de Decisiones -->
+    <article class="content-box-card">
+      <span class="tech-card-tag">[ 00 // ARCHITECTURE_OVERVIEW ]</span>
+      <h2>0. ¿Cómo Funciona la Integración?</h2>
+      <p>
+        CloudTranslator opera bajo una arquitectura desacoplada y orientada a microservicios. Puedes integrarlo según el escenario de tu aplicación:
+      </p>
+
+      <div class="table-responsive">
+        <table class="docs-table">
+          <thead>
+            <tr>
+              <th>Enfoque</th>
+              <th>Mecanismo</th>
+              <th>Casos de Uso Ideales</th>
+              <th>Ventajas Clave</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Frontend (SDK JS)</strong></td>
+              <td>Inclusión directa de <code>cloud-translator.js</code> en el HTML del cliente.</td>
+              <td>Sitios web estáticos, landings, blogs, paneles SPA donde se requiere traducir la interfaz completa en vivo.</td>
+              <td>Cero backend propio requerido, traduce el DOM sin recargas, maneja cookies automáticamente.</td>
+            </tr>
+            <tr>
+              <td><strong>Backend (REST API)</strong></td>
+              <td>Invocación vía HTTP POST a <code>/api/translate</code> desde tu servidor.</td>
+              <td>APIs, generación de correos electrónicos, catálogos en base de datos, tareas asíncronas o microservicios.</td>
+              <td>Control total del flujo de datos, ocultamiento de lógica de negocio, soporte para lotes masivos.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- Módulo 1: Frontend SDK -->
     <article class="content-box-card">
       <span class="tech-card-tag">[ 01 // FRONTEND_INTEGRATION ]</span>
       <h2>1. Integración en Frontend con el SDK JavaScript</h2>
       <p>
-        El SDK para navegadores traduce el DOM de manera eficiente: agrupa las etiquetas de texto visibles y las envía en una sola consulta HTTP para no saturar la red.
+        El SDK para navegadores examina el árbol DOM, recolecta de manera transparente todos los nodos de texto visibles respetando elementos interactivos (botones, enlaces, inputs) y envía las cadenas agrupadas en un solo paquete HTTP para optimizar el consumo de red y no bloquear la interfaz.
       </p>
 
-      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 16px;">Paso 1: Incluir el script</h3>
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 20px;">Paso 1: Incluir el Script en tu HTML</h3>
+      <p>Añade la etiqueta <code>&lt;script&gt;</code> al final del <code>&lt;body&gt;</code> o dentro de <code>&lt;head&gt;</code>:</p>
       <div class="code-box-header">
-        <span>HTML / SCRIPT TAG</span>
+        <span>HTML / ETIQUETA SCRIPT CDN</span>
         <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-1')">Copiar</button>
       </div>
-      <pre class="code-panel" id="code-learn-1"><code>&lt;script src="https://cloudtranslator.onrender.com/js/cloud-translator.js"&gt;&lt;/script&gt;</code></pre>
+      <pre class="code-panel" id="code-learn-1">&lt;script src="https://cloudtranslator.onrender.com/js/cloud-translator.js"&gt;&lt;/script&gt;</pre>
 
-      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 16px;">Paso 2: Inicializar el traductor</h3>
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 24px;">Paso 2: Opciones de Inicialización</h3>
+      <p>Al instanciar <code>new CloudTranslator(options)</code>, dispones de los siguientes parámetros configurables:</p>
+      
+      <div class="table-responsive">
+        <table class="docs-table">
+          <thead>
+            <tr>
+              <th>Parámetro</th>
+              <th>Tipo</th>
+              <th>Valor por Defecto</th>
+              <th>Descripción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>endpoint</code></td>
+              <td>string</td>
+              <td><code>"/api/translate"</code></td>
+              <td>URL absoluta o relativa del servicio de traducción. En producción usa: <code>https://cloudtranslator.onrender.com/api/translate</code>.</td>
+            </tr>
+            <tr>
+              <td><code>useCookies</code></td>
+              <td>boolean</td>
+              <td><code>true</code></td>
+              <td>Si es <code>true</code>, guarda el idioma seleccionado en la cookie del navegador para mantener la preferencia en futuras visitas.</td>
+            </tr>
+            <tr>
+              <td><code>batchSize</code></td>
+              <td>number</td>
+              <td><code>500</code></td>
+              <td>Número máximo de nodos de texto enviados por petición HTTP.</td>
+            </tr>
+            <tr>
+              <td><code>onStart</code></td>
+              <td>function</td>
+              <td><code>null</code></td>
+              <td>Callback invocado al iniciar la traducción (ideal para mostrar spinners o barras de carga).</td>
+            </tr>
+            <tr>
+              <td><code>onComplete</code></td>
+              <td>function</td>
+              <td><code>null</code></td>
+              <td>Callback invocado cuando todos los textos del DOM han sido reemplazados exitosamente.</td>
+            </tr>
+            <tr>
+              <td><code>onError</code></td>
+              <td>function</td>
+              <td><code>null</code></td>
+              <td>Callback que recibe el error en caso de fallo de red o tiempo de espera agotado.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 24px;">Paso 3: Código de Ejemplo Funcional Completo</h3>
+      <p>Copia y pega este archivo HTML en tu computadora para probar la traducción en tiempo real:</p>
       <div class="code-box-header">
-        <span>JAVASCRIPT / CLIENT-SIDE</span>
+        <span>HTML COMPLETO / EJEMPLO CLIENTE MÍNIMO</span>
         <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-2')">Copiar</button>
       </div>
-      <pre class="code-panel" id="code-learn-2"><code>const translator = new CloudTranslator({
-  endpoint: "https://cloudtranslator.onrender.com/api/translate",
-  useCookies: true,        // Guarda el idioma en la cookie cloud_translator_lang
-  batchSize: 500,          // Límite de nodos de texto por consulta
-  onStart: () => console.log("Traduciendo página..."),
-  onComplete: () => console.log("Traducción completada")
-});
+      <pre class="code-panel" id="code-learn-2">&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Mi Sitio Multilingüe&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;!-- Barra de selección de idioma --&gt;
+  &lt;header&gt;
+    &lt;button id="btn-en"&gt;English&lt;/button&gt;
+    &lt;button id="btn-fr"&gt;Français&lt;/button&gt;
+    &lt;button id="btn-de"&gt;Deutsch&lt;/button&gt;
+    &lt;button id="btn-original"&gt;Restaurar Original&lt;/button&gt;
+    &lt;span id="loading-indicator" style="display: none; margin-left: 10px;"&gt;Traduciendo...&lt;/span&gt;
+  &lt;/header&gt;
 
-// Traducir a inglés al pulsar un botón
-document.getElementById("btn-en").onclick = () => {
-  translator.translateToEnglish();
-};
+  &lt;main&gt;
+    &lt;h1&gt;Bienvenido a nuestra plataforma global&lt;/h1&gt;
+    &lt;p&gt;Ofrecemos soluciones avanzadas de software empresarial en la nube.&lt;/p&gt;
+    &lt;p class="notranslate"&gt;Esta marca CloudTranslator no se traduce nunca.&lt;/p&gt;
+  &lt;/main&gt;
 
-// Traducir a cualquier idioma por código ISO
-document.getElementById("btn-fr").onclick = () => {
-  translator.translatePage("fr");
-};
+  &lt;!-- Inclusión del SDK --&gt;
+  &lt;script src="https://cloudtranslator.onrender.com/js/cloud-translator.js"&gt;&lt;/script&gt;
+  &lt;script&gt;
+    // 1. Inicialización del traductor
+    const translator = new CloudTranslator({
+      endpoint: "https://cloudtranslator.onrender.com/api/translate",
+      useCookies: true,
+      batchSize: 500,
+      onStart: () => {
+        document.getElementById("loading-indicator").style.display = "inline";
+      },
+      onComplete: () => {
+        document.getElementById("loading-indicator").style.display = "none";
+      },
+      onError: (err) => {
+        document.getElementById("loading-indicator").style.display = "none";
+        console.error("Error al traducir:", err);
+      }
+    });
 
-// Restaurar al texto original
-document.getElementById("btn-original").onclick = () => {
-  translator.restoreOriginal();
-};</code></pre>
+    // 2. Conectar eventos de botones
+    document.getElementById("btn-en").onclick = () => translator.translateToEnglish();
+    document.getElementById("btn-fr").onclick = () => translator.translatePage("fr");
+    document.getElementById("btn-de").onclick = () => translator.translatePage("de");
+    document.getElementById("btn-original").onclick = () => translator.restoreOriginal();
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 24px;">Paso 4: Exclusión de Elementos y Marcas</h3>
+      <p>
+        Para proteger nombres propios, términos técnicos, marcas comerciales o bloques de código que no deben traducirse, añade la clase <code>notranslate</code> o el atributo HTML estándar <code>translate="no"</code>:
+      </p>
+      <div class="code-box-header">
+        <span>HTML / EXCLUSIÓN DE ELEMENTOS</span>
+        <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-exclude')">Copiar</button>
+      </div>
+      <pre class="code-panel" id="code-learn-exclude">&lt;!-- Opción A: Mediante clase CSS --&gt;
+&lt;span class="notranslate"&gt;CloudTranslator Enterprise&lt;/span&gt;
+
+&lt;!-- Opción B: Mediante atributo estándar HTML5 --&gt;
+&lt;div translate="no"&gt;
+  &lt;p&gt;API_KEY_SECRET = "sk_live_9941a87b"&lt;/p&gt;
+&lt;/div&gt;</pre>
     </article>
 
-    <!-- Lección 2: Backend Node.js -->
+    <!-- Módulo 2: Backend Node.js -->
     <article class="content-box-card">
       <span class="tech-card-tag">[ 02 // BACKEND_NODEJS ]</span>
-      <h2>2. Consumo desde Backend (Node.js)</h2>
+      <h2>2. Consumo desde Backend (Node.js & TypeScript)</h2>
       <p>
-        Puedes invocar la API desde cualquier servicio Node.js utilizando el estándar <code>fetch</code> nativo o <code>axios</code>:
+        Invoca la API desde cualquier servidor Node.js, Express, Next.js, Fastify o NestJS mediante el estándar nativo <code>fetch</code> sin requerir librerías externas.
       </p>
 
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 16px;">2.1 Traducción de Texto Individual</h3>
       <div class="code-box-header">
-        <span>JAVASCRIPT / NODE.JS (FETCH)</span>
+        <span>NODE.JS / TEXTO SIMPLE (FETCH)</span>
         <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-3')">Copiar</button>
       </div>
-      <pre class="code-panel" id="code-learn-3"><code>async function traducirTexto(texto, idiomaDestino) {
-  const response = await fetch("https://cloudtranslator.onrender.com/api/translate", {
+      <pre class="code-panel" id="code-learn-3">async function traducirTexto(texto, idiomaDestino) {
+  const url = "https://cloudtranslator.onrender.com/api/translate";
+  const respuesta = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -139,61 +274,196 @@ document.getElementById("btn-original").onclick = () => {
     })
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Fallo en la traducción");
+  if (!respuesta.ok) {
+    const errorJson = await respuesta.json().catch(() => ({}));
+    throw new Error(errorJson.error || `HTTP Error ${respuesta.status}`);
   }
 
-  const data = await response.json();
-  return data.translatedText;
+  const datos = await respuesta.json();
+  return datos.translatedText; // Cadena traducida
 }
 
 // Ejemplo de uso:
-traducirTexto("Hola mundo", "en")
-  .then(res => console.log("Resultado:", res)) // "Hello world"
-  .catch(err => console.error(err));</code></pre>
+traducirTexto("Servicio de traducción en tiempo real", "en")
+  .then(res => console.log("Resultado:", res)) // "Real-time translation service"
+  .catch(err => console.error("Error:", err.message));</pre>
+
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 24px;">2.2 Traducción de Lotes Masivos (Micro-batch)</h3>
+      <p>
+        Para catálogos, menús o notificaciones compuestas, envía el arreglo <code>texts</code> para procesar hasta 1,000 cadenas en una sola llamada:
+      </p>
+      <div class="code-box-header">
+        <span>NODE.JS / TRADUCCIÓN POR LOTES (BATCH)</span>
+        <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-batch-node')">Copiar</button>
+      </div>
+      <pre class="code-panel" id="code-learn-batch-node">async function traducirLote(listaTextos, idiomaDestino) {
+  const url = "https://cloudtranslator.onrender.com/api/translate";
+  const respuesta = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      texts: listaTextos,
+      targetLanguage: idiomaDestino
+    })
+  });
+
+  const datos = await respuesta.json();
+  if (!datos.success) {
+    throw new Error(datos.error || "Error al procesar lote");
+  }
+
+  return datos.translatedTexts; // Array con orden garantizado
+}
+
+// Ejemplo:
+traducirLote(["Inicio", "Configuración", "Cerrar Sesión"], "en")
+  .then(resultado => console.log(resultado));
+  // Salida: ["Home", "Settings", "Log Out"]</pre>
+
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 24px;">2.3 Manejo Resiliente del "Cold Start" en Render</h3>
+      <p>
+        En la infraestructura gratuita de Render, la máquina entra en suspensión tras 15 minutos de inactividad. El primer contacto tardará entre 30 y 45 segundos mientras el servidor inicia. Implementa un reintento con retardo (backoff):
+      </p>
+      <div class="code-box-header">
+        <span>NODE.JS / CLIENTE RESILIENTE CON RETRY</span>
+        <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-retry')">Copiar</button>
+      </div>
+      <pre class="code-panel" id="code-learn-retry">async function traducirConReintento(texto, idioma, maxIntentos = 3) {
+  const url = "https://cloudtranslator.onrender.com/api/translate";
+
+  for (let intento = 1; intento <= maxIntentos; intento++) {
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: texto, targetLanguage: idioma }),
+        signal: AbortSignal.timeout(50000) // 50s de margen para Cold Start
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        return data.translatedText;
+      }
+    } catch (err) {
+      console.warn(`Intento ${intento} fallido. Esperando reactivación...`);
+      if (intento === maxIntentos) throw err;
+      await new Promise(r => setTimeout(r, 4000 * intento));
+    }
+  }
+}</pre>
     </article>
 
-    <!-- Lección 3: Python -->
+    <!-- Módulo 3: Backend Python -->
     <article class="content-box-card">
       <span class="tech-card-tag">[ 03 // BACKEND_PYTHON ]</span>
       <h2>3. Consumo desde Python</h2>
       <p>
-        Integración sencilla en scripts o APIs desarrolladas con FastAPI, Flask o Django:
+        Integración directa para scripts de datos o APIs construidas con FastAPI, Flask, Django o scripts de procesamiento batch:
       </p>
 
       <div class="code-box-header">
-        <span>PYTHON / REQUESTS</span>
+        <span>PYTHON / MÓDULO REQUESTS (TEXTO Y BATCH)</span>
         <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-4')">Copiar</button>
       </div>
-      <pre class="code-panel" id="code-learn-4"><code>import requests
+      <pre class="code-panel" id="code-learn-4">import requests
+from typing import List, Union
 
-def traducir(texto: str, idioma_destino: str) -> str:
-    url = "https://cloudtranslator.onrender.com/api/translate"
-    payload = {
-        "text": texto,
-        "targetLanguage": idioma_destino
-    }
+API_URL = "https://cloudtranslator.onrender.com/api/translate"
+
+def traducir(contenido: Union[str, List[str]], idioma_destino: str) -> Union[str, List[str]]:
     headers = {"Content-Type": "application/json"}
-
-    response = requests.post(url, json=payload, headers=headers)
+    
+    # Detección automática: texto individual o lote
+    if isinstance(contenido, list):
+        payload = {"texts": contenido, "targetLanguage": idioma_destino}
+    else:
+        payload = {"text": contenido, "targetLanguage": idioma_destino}
+    
+    # Timeout amplio para absorber posibles cold starts
+    response = requests.post(API_URL, json=payload, headers=headers, timeout=60)
     response.raise_for_status()
-    return response.json().get("translatedText")
+    data = response.json()
+    
+    if isinstance(contenido, list):
+        return data.get("translatedTexts", [])
+    return data.get("translatedText", "")
 
-# Ejecución
+# Pruebas de ejecución:
 print(traducir("Servicio de traducción en la nube", "en"))
-# Salida: "Cloud translation service"</code></pre>
+# Salida: "Cloud translation service"
+
+print(traducir(["Facturación", "Inventario", "Reportes"], "fr"))
+# Salida: ["Facturation", "Inventaire", "Rapports"]</pre>
     </article>
 
-    <!-- Lección 4: Buenas Prácticas -->
+    <!-- Módulo 4: Automatización con cURL -->
     <article class="content-box-card">
-      <span class="tech-card-tag">[ 04 // BEST_PRACTICES ]</span>
-      <h2>4. Buenas Prácticas de Arquitectura</h2>
-      <ul style="margin-left: 20px; line-height: 2;">
-        <li><strong>Usa el modo Batch:</strong> Si tienes que traducir una lista de elementos (menús, productos, alertas), envíalos en el arreglo <code>texts: [...]</code> en vez de hacer 20 llamadas separadas.</li>
-        <li><strong>Manejo del Cold Start:</strong> En caso de que la instancia esté en reposo, implementa un reintento con backoff exponencial o una alerta visual de carga.</li>
-        <li><strong>Exclusión de elementos:</strong> Para evitar que se traduzcan nombres de marca, códigos o fórmulas, añade la clase <code>notranslate</code> o el atributo <code>translate="no"</code> al elemento HTML.</li>
-      </ul>
+      <span class="tech-card-tag">[ 04 // CLI_AUTOMATION ]</span>
+      <h2>4. Automatización con cURL y Terminal</h2>
+      <p>
+        Puedes consumir el microservicio directamente desde scripts de terminal Bash, pipelines de GitHub Actions o tareas programadas Cron:
+      </p>
+
+      <div class="code-box-header">
+        <span>TERMINAL / CURL Y JQ</span>
+        <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-curl')">Copiar</button>
+      </div>
+      <pre class="code-panel" id="code-learn-curl"># 1. Traducción directa e impresión limpia del resultado con jq
+curl -s -X POST "https://cloudtranslator.onrender.com/api/translate" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Despliegue completado con éxito", "targetLanguage": "en"}' \
+  | jq -r '.translatedText'
+# Salida: Deployment completed successfully</pre>
+    </article>
+
+    <!-- Módulo 5: Códigos de Respuesta y Diagnóstico -->
+    <article class="content-box-card">
+      <span class="tech-card-tag">[ 05 // STATUS_CODES_TROUBLESHOOTING ]</span>
+      <h2>5. Códigos de Respuesta y Diagnóstico de Errores</h2>
+      <p>
+        El gateway de CloudTranslator emite códigos de estado HTTP estándar acompañados de un mensaje aclaratorio en JSON:
+      </p>
+
+      <div class="table-responsive">
+        <table class="docs-table">
+          <thead>
+            <tr>
+              <th>Código HTTP</th>
+              <th>Estado</th>
+              <th>Causa Frecuente</th>
+              <th>Acción Recomendada</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>200 OK</code></td>
+              <td>Exitoso</td>
+              <td>Petición procesada correctamente.</td>
+              <td>Consumir <code>translatedText</code> o <code>translatedTexts</code>.</td>
+            </tr>
+            <tr>
+              <td><code>400 Bad Request</code></td>
+              <td>Error de Validación</td>
+              <td>Falta <code>targetLanguage</code> o el cuerpo no contiene <code>text</code> ni <code>texts</code>.</td>
+              <td>Revisar el formato JSON y asegurarse de incluir el encabezado <code>Content-Type: application/json</code>.</td>
+            </tr>
+            <tr>
+              <td><code>500 Internal Error</code></td>
+              <td>Fallo del Motor</td>
+              <td>Problema temporal de comunicación con el motor subyacente.</td>
+              <td>Implementar reintento automático tras 2 o 3 segundos.</td>
+            </tr>
+            <tr>
+              <td><code>503 Unavailable</code></td>
+              <td>Instancia Despertando</td>
+              <td>La máquina gratuita de Render está reactivándose tras suspensión.</td>
+              <td>Esperar 30 segundos y reintentar la solicitud.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </article>
   </main>
 
