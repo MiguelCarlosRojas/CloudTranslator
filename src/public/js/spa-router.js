@@ -45,6 +45,9 @@
     }, 150);
   }
 
+  window.startSpaProgress = startProgress;
+  window.finishSpaProgress = finishProgress;
+
   let isNavigatingSpa = false;
   let abortController = null;
 
@@ -93,7 +96,18 @@
         currentFavicon.href = newFavicon.href;
       }
 
-      // Reemplazar contenido de la página
+      // Pre-traducción en memoria antes de pintar en pantalla:
+      // Elimina completamente el parpadeo de texto original en navegación SPA
+      try {
+        const savedLang = window.translator ? window.translator.getSavedLanguage() : null;
+        if (window.translator && savedLang && savedLang !== "original" && savedLang !== "es") {
+          window.translator.preTranslateDomTree(doc.body, savedLang);
+        }
+      } catch (transErr) {
+        console.warn("[SPA Router] Advertencia en pre-traducción:", transErr);
+      }
+
+      // Reemplazar contenido de la página ya con el idioma correspondiente
       document.body.innerHTML = doc.body.innerHTML;
       document.body.classList.remove("spa-transitioning");
 

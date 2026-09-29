@@ -129,14 +129,65 @@
         const savedLang = this.getSavedLanguage();
         if (savedLang && savedLang !== "original" && savedLang !== "es") {
           this.translatePage(savedLang);
+        } else {
+          document.documentElement.classList.remove("ct-pending");
         }
       };
 
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", applyFromCookie, { once: true });
       } else {
-        setTimeout(applyFromCookie, 10);
+        applyFromCookie();
       }
+    }
+
+    /**
+     * Pre-traduce un nodo o fragmento DOM en memoria antes de ser inyectado en pantalla
+     * para eliminar el parpadeo de texto original durante navegación SPA.
+     */
+    preTranslateDomTree(rootElement, targetLanguage) {
+      if (!rootElement || !targetLanguage || targetLanguage === "original" || targetLanguage === "es") return;
+      const lang = targetLanguage.trim().toLowerCase();
+      const langCache = this.cache[lang];
+      if (!langCache) return;
+
+      const walker = document.createTreeWalker(
+        rootElement,
+        NodeFilter.SHOW_TEXT,
+        {
+          acceptNode: (node) => {
+            const parent = node.parentElement;
+            if (!parent) return NodeFilter.FILTER_REJECT;
+            if (this.ignoredTags.has(parent.tagName)) return NodeFilter.FILTER_REJECT;
+            if (parent.closest("[data-no-translate]") || parent.closest(".no-translate")) {
+              return NodeFilter.FILTER_REJECT;
+            }
+            const trimmed = node.nodeValue.trim();
+            if (!trimmed || /^[\d\s\-_.,:;!?()\[\]{}@#$%&*+=/\\|<>'"~`]+$/.test(trimmed)) {
+              return NodeFilter.FILTER_SKIP;
+            }
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        },
+        false
+      );
+
+      let currentNode;
+      while ((currentNode = walker.nextNode())) {
+        const val = currentNode.nodeValue;
+        if (langCache[val]) {
+          currentNode.nodeValue = langCache[val];
+        }
+      }
+
+      const elementsWithAttrs = rootElement.querySelectorAll("input[placeholder], textarea[placeholder]");
+      elementsWithAttrs.forEach((el) => {
+        if (el.closest("[data-no-translate]") || el.closest(".no-translate")) return;
+        const ph = el.getAttribute("placeholder");
+        if (ph && langCache[ph]) {
+          el.setAttribute("placeholder", langCache[ph]);
+        }
+      });
     }
 
     /**
@@ -168,7 +219,10 @@
         setCookie(COOKIE_NAME, "original", 365);
       }
 
-      if (this.currentLanguage === "original") return;
+      if (this.currentLanguage === "original") {
+        document.documentElement.classList.remove("ct-pending");
+        return;
+      }
 
       for (const [node, originalText] of this.nodeMap.entries()) {
         if (node.nodeValue !== originalText) {
@@ -183,6 +237,7 @@
       }
 
       this.currentLanguage = "original";
+      document.documentElement.classList.remove("ct-pending");
       if (typeof this.onComplete === "function") {
         this.onComplete({ language: "original", total: this.nodeMap.size, restored: true });
       }
@@ -205,11 +260,15 @@
       }
 
       if (this.currentLanguage === lang && !this.isTranslating) {
+        document.documentElement.classList.remove("ct-pending");
         return;
       }
 
       if (this.isTranslating) return;
       this.isTranslating = true;
+
+      if (window.startSpaProgress) window.startSpaProgress();
+      document.body.classList.add("ct-translating");
 
       if (!this.cache[lang]) {
         this.cache[lang] = {};
@@ -222,7 +281,10 @@
         this.onStart({ targetLanguage: lang, total: totalNodes });
       }
 
-      // Extraer textos únicos pendientes de traducción
+      // Aplicar de inmediato cualquier texto disponible en caché local (0ms)
+      this._applyCachedTranslations(lang);
+
+      // Extraer textos únicos que faltan por traducir
       const uniqueTextsToTranslate = [];
       const seen = new Set();
 
@@ -242,12 +304,13 @@
         }
       }
 
-      // Aplicar textos ya disponibles en caché (0 peticiones de red)
-      this._applyCachedTranslations(lang);
-
       if (uniqueTextsToTranslate.length === 0) {
         this.currentLanguage = lang;
         this.isTranslating = false;
+        document.body.classList.remove("ct-translating");
+        document.documentElement.classList.remove("ct-pending");
+        if (window.finishSpaProgress) window.finishSpaProgress();
+
         if (typeof this.onProgress === "function") {
           this.onProgress({ processed: totalNodes, total: totalNodes, percent: 100, cached: true });
         }
@@ -257,7 +320,7 @@
         return;
       }
 
-      // Enviar en UNA SOLA consulta HTTP
+      // Enviar en UNA SOLA consulta HTTP por lote
       const batches = [];
       for (let i = 0; i < uniqueTextsToTranslate.length; i += this.batchSize) {
         batches.push(uniqueTextsToTranslate.slice(i, i + this.batchSize));
@@ -282,6 +345,9 @@
         }
       } finally {
         this.isTranslating = false;
+        document.body.classList.remove("ct-translating");
+        document.documentElement.classList.remove("ct-pending");
+        if (window.finishSpaProgress) window.finishSpaProgress();
       }
     }
 
