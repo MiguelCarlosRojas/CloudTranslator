@@ -81,8 +81,16 @@ body {
 }
 
 .icon-lg {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
+}
+
+.brand-logo .icon,
+.brand-logo .icon-lg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
 }
 
 /* ==========================================================================
@@ -436,44 +444,61 @@ body {
   border: 1px solid var(--border-subtle);
   cursor: pointer;
   transition: all 0.15s ease;
-  text-decoration: none;
+  text-decoration: none !important;
   font-family: var(--font-mono);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
-.btn-primary {
-  background: var(--text-white);
-  color: var(--bg-black);
-  border-color: var(--text-white);
+.btn:hover {
+  text-decoration: none !important;
 }
 
-.btn-primary:hover {
-  background: #d0d0d0;
-  border-color: #d0d0d0;
+.btn-primary,
+.content-box-card a.btn-primary {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+  text-decoration: none !important;
+  font-weight: 700;
+}
+
+.btn-primary:hover,
+.content-box-card a.btn-primary:hover {
+  background: #e5e5e5 !important;
+  color: #000000 !important;
+  border-color: #e5e5e5 !important;
+  text-decoration: none !important;
 }
 
 .btn-english {
   background: #0d0d0d;
   color: var(--text-white);
   border-color: var(--border-subtle);
+  text-decoration: none !important;
 }
 
 .btn-english:hover {
   border-color: var(--text-white);
   background: #141414;
+  text-decoration: none !important;
 }
 
-.btn-outline {
-  background: transparent;
-  border-color: var(--border-line);
-  color: var(--text-muted);
+.btn-outline,
+.content-box-card a.btn-outline {
+  background: transparent !important;
+  border-color: var(--border-line) !important;
+  color: var(--text-light) !important;
+  text-decoration: none !important;
 }
 
-.btn-outline:hover {
-  border-color: var(--text-white);
-  color: var(--text-white);
+.btn-outline:hover,
+.content-box-card a.btn-outline:hover {
+  border-color: var(--text-white) !important;
+  color: var(--text-white) !important;
+  background: #111111 !important;
+  text-decoration: none !important;
 }
 
 .selector-box {
@@ -724,14 +749,14 @@ body {
   margin-bottom: 14px;
 }
 
-.content-box-card a {
+.content-box-card a:not(.btn) {
   color: var(--text-white);
   text-decoration: underline;
   text-underline-offset: 3px;
   transition: opacity 0.15s ease;
 }
 
-.content-box-card a:hover {
+.content-box-card a:not(.btn):hover {
   opacity: 0.8;
 }
 

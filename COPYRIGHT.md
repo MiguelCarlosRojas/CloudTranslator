@@ -1,6 +1,6 @@
 # Copyright Notice - CloudTranslator
 
-Copyright (c) 2026 Miguel Angel Carlos Rojas  
+© 2026 CloudTranslator. Todos los derechos reservados. Autor: Miguel Angel Carlos Rojas  
 Repository: https://github.com/MiguelCarlosRojas/CloudTranslator  
 Contact: isakiangel6@gmail.com
 

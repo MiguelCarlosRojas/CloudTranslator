@@ -341,8 +341,21 @@ La instancia en la nube se ejecuta en la capa gratuita de Render:
 
 ---
 
-## Autoría y Licencia
+## Navegación del Portal Web
 
-- **Autor:** Miguel Angel Carlos Rojas
-- **Repositorio:** [github.com/MiguelCarlosRojas/CloudTranslator](https://github.com/MiguelCarlosRojas/CloudTranslator)
-- **Licencia:** ISC
+El portal web de CloudTranslator incluye módulos especializados e independientes:
+- **[Inicio](https://cloudtranslator.onrender.com/)**: Presentación de la plataforma, métricas en tiempo real y selector interactivo con cookies.
+- **[Documentación](https://cloudtranslator.onrender.com/docs.html)**: Arquitectura, flujo de traducción por lotes del DOM y preguntas frecuentes.
+- **[API REST](https://cloudtranslator.onrender.com/api.html)**: Referencia interactiva de endpoints (`/api/translate`, `/api/health`, `/api/languages`), con esquemas JSON, códigos de error y botón de copia con un clic.
+- **[Aprender](https://cloudtranslator.onrender.com/learn.html)**: Guía avanzada de integración paso a paso para SPAs (React, Vue), SSR y optimizaciones de latencia.
+- **[Soporte Técnico](https://cloudtranslator.onrender.com/support.html)**: Canales de contacto oficial y asistencia de implementación.
+- **[Centro de Ayuda](https://cloudtranslator.onrender.com/help.html)**: Solución de problemas comunes y diagnóstico.
+- **[Monitor de Estado](https://cloudtranslator.onrender.com/status.html)**: Verificación en tiempo real del uptime, latencia y memoria del cluster.
+
+---
+
+## Autoría y Derechos
+
+© 2026 CloudTranslator. Todos los derechos reservados. Autor: Miguel Angel Carlos Rojas  
+Repositorio oficial: [github.com/MiguelCarlosRojas/CloudTranslator](https://github.com/MiguelCarlosRojas/CloudTranslator)  
+Licencia: ISC
