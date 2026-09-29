@@ -966,15 +966,14 @@ footer {
 .footer-inner-full {
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr 1.5fr;
+  grid-template-columns: 2fr 1fr 1fr;
   gap: clamp(24px, 4vw, 48px);
   margin-bottom: 28px;
   align-items: start;
 }
 
 .footer-col-brand {
-  justify-self: end;
-  max-width: 460px;
+  max-width: 480px;
 }
 
 .footer-col h4 {
@@ -1099,7 +1098,20 @@ footer {
 }
 
 /* ==========================================================================
-   SPA Seamless Navigation & Top Progress Bar
+   Global Link Color (Strictly Monochrome - No Blue/Cyan)
+   ========================================================================== */
+a {
+  color: var(--text-white);
+  text-decoration: none;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+a:hover {
+  opacity: 0.85;
+}
+
+/* ==========================================================================
+   SPA Seamless Navigation & Top Progress Bar (Monochrome Stark White)
    ========================================================================== */
 #spa-progress-bar {
   position: fixed;
@@ -1107,8 +1119,8 @@ footer {
   left: 0;
   width: 0%;
   height: 2.5px;
-  background: linear-gradient(90deg, #3b82f6, #60a5fa, #93c5fd, #ffffff);
-  box-shadow: 0 0 12px rgba(96, 165, 250, 0.9), 0 0 4px rgba(255, 255, 255, 0.8);
+  background: linear-gradient(90deg, #555555, #aaaaaa, #ffffff);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.75);
   z-index: 999999;
   transition: width 0.2s cubic-bezier(0.1, 0.7, 0.1, 1), opacity 0.25s ease;
   pointer-events: none;

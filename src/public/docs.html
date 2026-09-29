@@ -125,53 +125,26 @@
 
         <!-- Sesión 04 -->
         <div class="docs-sidebar-group">
-          <span class="docs-group-label">04 / Especificación REST</span>
-          <a href="#session-endpoints" class="docs-sidebar-session" data-target="session-endpoints">
-            <span class="session-badge">S.04</span> Endpoints &amp; JSON
-          </a>
-          <div class="docs-sidebar-subsessions">
-            <a href="#sub-post-batch" class="docs-sidebar-sublink" data-target="sub-post-batch">
-              <span class="sub-num">4.1</span> POST Lotes (texts)
-            </a>
-            <a href="#sub-post-single" class="docs-sidebar-sublink" data-target="sub-post-single">
-              <span class="sub-num">4.2</span> POST Unitario (text)
-            </a>
-            <a href="#sub-get-languages" class="docs-sidebar-sublink" data-target="sub-get-languages">
-              <span class="sub-num">4.3</span> GET /languages
-            </a>
-            <a href="#sub-get-health" class="docs-sidebar-sublink" data-target="sub-get-health">
-              <span class="sub-num">4.4</span> GET /health
-            </a>
-          </div>
-        </div>
-
-        <!-- Sesión 05 -->
-        <div class="docs-sidebar-group">
-          <span class="docs-group-label">05 / Clientes &amp; cURL</span>
-          <a href="#session-curl" class="docs-sidebar-session" data-target="session-curl">
-            <span class="session-badge">S.05</span> Postman &amp; CLI
-          </a>
-          <div class="docs-sidebar-subsessions">
-            <a href="#sub-curl-import" class="docs-sidebar-sublink" data-target="sub-curl-import">
-              <span class="sub-num">5.1</span> Importar cURL
-            </a>
-          </div>
-        </div>
-
-        <!-- Sesión 06 -->
-        <div class="docs-sidebar-group">
-          <span class="docs-group-label">06 / Rendimiento &amp; Cookies</span>
+          <span class="docs-group-label">04 / Rendimiento &amp; Cookies</span>
           <a href="#session-cookies" class="docs-sidebar-session" data-target="session-cookies">
-            <span class="session-badge">S.06</span> Cookies &amp; Render
+            <span class="session-badge">S.04</span> Cookies &amp; Render
           </a>
           <div class="docs-sidebar-subsessions">
             <a href="#sub-cookies-spec" class="docs-sidebar-sublink" data-target="sub-cookies-spec">
-              <span class="sub-num">6.1</span> Cookie Técnica
+              <span class="sub-num">4.1</span> Cookie Técnica
             </a>
             <a href="#sub-render-coldstart" class="docs-sidebar-sublink" data-target="sub-render-coldstart">
-              <span class="sub-num">6.2</span> Arranque en Frío
+              <span class="sub-num">4.2</span> Arranque en Frío
             </a>
           </div>
+        </div>
+
+        <!-- Enlace a Referencia de API -->
+        <div class="docs-sidebar-group" style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border-line);">
+          <span class="docs-group-label">Especificación Técnica</span>
+          <a href="api.html" class="docs-sidebar-session" style="color: #ffffff;">
+            <span class="session-badge" style="background: #ffffff; color: #000000;">API</span> Ver Endpoints REST &rarr;
+          </a>
         </div>
 
       </nav>
@@ -536,193 +509,37 @@ print_r($traducciones);
         </article>
       </section>
 
-      <!-- SESIÓN 4: ESPECIFICACIÓN DE ENDPOINTS Y CARGAS JSON (POSTMAN) -->
-      <section id="session-endpoints" class="docs-section" style="margin-bottom: 48px;">
+      <!-- REFERENCIA DE API DEDICADA (SIN DUPLICIDAD) -->
+      <section id="session-api-ref" class="docs-section" style="margin-bottom: 48px;">
         <div class="section-full-title">
-          <h2>Sesión 04: Especificación de Endpoints y Cargas JSON</h2>
-          <p>Estructuras exactas de solicitud y respuesta para realizar pruebas en Postman o Thunder Client.</p>
+          <span class="tech-card-tag">[ ESPECIFICACIÓN REST COMPLETA ]</span>
+          <h2>Referencia de Endpoints y Esquemas JSON</h2>
+          <p>Toda la especificación técnica de endpoints se encuentra organizada de forma exclusiva en la sección dedicada de API.</p>
         </div>
 
-        <!-- Subsesión 4.1 -->
-        <article class="content-box-card docs-subsection" id="sub-post-batch">
-          <span class="tech-card-tag">[ SUBSESIÓN 4.1 // POST_BATCH_TRANSLATE ]</span>
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-            <h2 style="font-size: 1.35rem; color: #ffffff;">
-              <span class="badge-method badge-post">POST</span> /api/translate (Múltiples Textos - Recomendado)
-            </h2>
-            <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">URL: https://cloudtranslator.onrender.com/api/translate</span>
-          </div>
-          <p style="font-size: 0.92rem; margin-bottom: 14px;">
-            Envía un array de textos en una sola petición HTTP. Reduce el tráfico del navegador a una única consulta para traducir una página entera.
+        <article class="content-box-card" style="border-left: 2px solid #ffffff;">
+          <h3 style="color: #ffffff; font-size: 1.15rem; margin-bottom: 10px;">Consulta la Referencia de API en /api.html</h3>
+          <p style="font-size: 0.95rem; line-height: 1.7; color: var(--text-light); margin-bottom: 18px;">
+            Para mantener una separación técnica rigurosa y evitar duplicidad de información en el sistema, la especificación de esquemas JSON, tablas de propiedades, ejemplos cURL para <code>POST /api/translate</code>, <code>GET /api/translate</code>, <code>GET /api/languages</code>, <code>GET /api/health</code> y la <strong>Consola Interactiva de Pruebas en Vivo</strong> están disponibles exclusivamente en la Referencia de API.
           </p>
-
-          <div class="code-box-wrapper">
-            <div class="code-box-header">
-              <span>Payload JSON (Body en Postman: raw -&gt; JSON)</span>
-              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'json-batch-req')">Copiar JSON</button>
-            </div>
-            <pre class="code-panel" id="json-batch-req">{
-  "texts": [
-    "Iniciar sesión en la plataforma",
-    "Bienvenido al panel de control",
-    "Configuración de la cuenta de usuario",
-    "Guardar los cambios realizados",
-    "Cerrar sesión"
-  ],
-  "targetLanguage": "en"
-}</pre>
-          </div>
-
-          <div class="code-box-wrapper">
-            <div class="code-box-header">
-              <span>Respuesta Exitosa JSON (Status 200 OK)</span>
-              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'json-batch-res')">Copiar JSON</button>
-            </div>
-            <pre class="code-panel" id="json-batch-res">{
-  "translatedTexts": [
-    "Log in to the platform",
-    "Welcome to the control panel",
-    "User account settings",
-    "Save changes made",
-    "Sign out"
-  ]
-}</pre>
-          </div>
-        </article>
-
-        <!-- Subsesión 4.2 -->
-        <article class="content-box-card docs-subsection" id="sub-post-single">
-          <span class="tech-card-tag">[ SUBSESIÓN 4.2 // POST_SINGLE_TRANSLATE ]</span>
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-            <h2 style="font-size: 1.35rem; color: #ffffff;">
-              <span class="badge-method badge-post">POST</span> /api/translate (Cadena de Texto Única)
-            </h2>
-            <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">URL: https://cloudtranslator.onrender.com/api/translate</span>
-          </div>
-          <p style="font-size: 0.92rem; margin-bottom: 14px;">
-            Traduce una sola cadena de texto al idioma objetivo especificado.
-          </p>
-
-          <div class="code-box-wrapper">
-            <div class="code-box-header">
-              <span>Payload JSON (Body en Postman: raw -&gt; JSON)</span>
-              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'json-single-req')">Copiar JSON</button>
-            </div>
-            <pre class="code-panel" id="json-single-req">{
-  "text": "Bienvenido al servicio de traducción en la nube",
-  "targetLanguage": "en"
-}</pre>
-          </div>
-
-          <div class="code-box-wrapper">
-            <div class="code-box-header">
-              <span>Respuesta Exitosa JSON (Status 200 OK)</span>
-              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'json-single-res')">Copiar JSON</button>
-            </div>
-            <pre class="code-panel" id="json-single-res">{
-  "translatedText": "Welcome to the cloud translation service"
-}</pre>
-          </div>
-        </article>
-
-        <!-- Subsesión 4.3 -->
-        <article class="content-box-card docs-subsection" id="sub-get-languages">
-          <span class="tech-card-tag">[ SUBSESIÓN 4.3 // GET_LANGUAGES ]</span>
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-            <h2 style="font-size: 1.35rem; color: #ffffff;">
-              <span class="badge-method badge-get">GET</span> /api/languages (Idiomas Soportados)
-            </h2>
-            <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">URL: https://cloudtranslator.onrender.com/api/languages</span>
-          </div>
-          <p style="font-size: 0.92rem; margin-bottom: 14px;">
-            Devuelve el array oficial de códigos de idioma admitidos por el validador Joi.
-          </p>
-
-          <div class="code-box-wrapper">
-            <div class="code-box-header">
-              <span>Respuesta Exitosa JSON (Status 200 OK)</span>
-              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'json-langs-res')">Copiar JSON</button>
-            </div>
-            <pre class="code-panel" id="json-langs-res">{
-  "success": true,
-  "languages": [
-    "en",
-    "es",
-    "fr",
-    "de",
-    "it",
-    "pt"
-  ]
-}</pre>
-          </div>
-        </article>
-
-        <!-- Subsesión 4.4 -->
-        <article class="content-box-card docs-subsection" id="sub-get-health">
-          <span class="tech-card-tag">[ SUBSESIÓN 4.4 // GET_HEALTH ]</span>
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-            <h2 style="font-size: 1.35rem; color: #ffffff;">
-              <span class="badge-method badge-get">GET</span> /api/health (Diagnóstico y Salud)
-            </h2>
-            <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">URL: https://cloudtranslator.onrender.com/api/health</span>
-          </div>
-          <p style="font-size: 0.92rem; margin-bottom: 14px;">
-            Permite a monitores de uptime y pruebas de integración comprobar si la instancia de Render está despierta y respondiendo.
-          </p>
-
-          <div class="code-box-wrapper">
-            <div class="code-box-header">
-              <span>Respuesta Exitosa JSON (Status 200 OK)</span>
-              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'json-health-res')">Copiar JSON</button>
-            </div>
-            <pre class="code-panel" id="json-health-res">{
-  "success": true,
-  "status": "ok",
-  "uptime": 120,
-  "timestamp": "2026-09-28T18:00:00.000Z"
-}</pre>
-          </div>
+          <a href="api.html" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+            Ver Especificación Técnica de Endpoints en API
+            <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
         </article>
       </section>
 
-      <!-- SESIÓN 5: CURL Y POSTMAN -->
-      <section id="session-curl" class="docs-section" style="margin-bottom: 48px;">
-        <div class="section-full-title">
-          <h2>Sesión 05: Importación cURL en Postman o Thunder Client</h2>
-          <p>Comando listo para importar mediante "Import -&gt; Raw Text" en clientes REST.</p>
-        </div>
-
-        <!-- Subsesión 5.1 -->
-        <article class="content-box-card docs-subsection" id="sub-curl-import">
-          <span class="tech-card-tag">[ SUBSESIÓN 5.1 // CURL_POSTMAN_IMPORT ]</span>
-          <h2 style="font-size: 1.35rem; color: #ffffff; margin-bottom: 12px;">Comando cURL Importable en Postman</h2>
-          <p style="font-size: 0.92rem; margin-bottom: 14px;">
-            En Postman presiona <strong>Import -&gt; Raw Text</strong> y pega este comando para generar la petición automáticamente:
-          </p>
-
-          <div class="code-box-wrapper">
-            <div class="code-box-header">
-              <span>Comando cURL</span>
-              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-command')">Copiar cURL</button>
-            </div>
-            <pre class="code-panel" id="curl-command">curl -X POST https://cloudtranslator.onrender.com/api/translate \
-  -H "Content-Type: application/json" \
-  -d '{"texts": ["Hola mundo", "Bienvenido a nuestro sistema"], "targetLanguage": "en"}'</pre>
-          </div>
-        </article>
-      </section>
-
-      <!-- SESIÓN 6: COOKIES Y RENDIMIENTO DE RED -->
+      <!-- SESIÓN 4: COOKIES Y RENDIMIENTO DE RED -->
       <section id="session-cookies" class="docs-section" style="margin-bottom: 48px;">
         <div class="section-full-title">
-          <h2>Sesión 06: Persistencia por Cookies y Rendimiento de Red</h2>
+          <h2>Sesión 04: Persistencia por Cookies y Rendimiento de Red</h2>
           <p>Cómo funciona la cookie técnica y el comportamiento de la infraestructura en Render.</p>
         </div>
 
-        <!-- Subsesión 6.1 -->
+        <!-- Subsesión 4.1 -->
         <article class="content-box-card docs-subsection" id="sub-cookies-spec">
-          <span class="tech-card-tag">[ SUBSESIÓN 6.1 // COOKIE_SPECIFICATION ]</span>
-          <h2>6.1 Cookie Técnica `cloud_translator_lang`</h2>
+          <span class="tech-card-tag">[ SUBSESIÓN 4.1 // COOKIE_SPECIFICATION ]</span>
+          <h2>4.1 Cookie Técnica `cloud_translator_lang`</h2>
           <p>
             Al seleccionar un idioma o presionar el botón de inglés, el cliente establece la cookie técnica:
           </p>
@@ -737,10 +554,10 @@ print_r($traducciones);
           </ul>
         </article>
 
-        <!-- Subsesión 6.2 -->
+        <!-- Subsesión 4.2 -->
         <article class="content-box-card docs-subsection" id="sub-render-coldstart">
-          <span class="tech-card-tag">[ SUBSESIÓN 6.2 // RENDER_COLD_START ]</span>
-          <h2>6.2 Comportamiento de la Capa Gratuita de Render</h2>
+          <span class="tech-card-tag">[ SUBSESIÓN 4.2 // RENDER_COLD_START ]</span>
+          <h2>4.2 Comportamiento de la Capa Gratuita de Render</h2>
           <p>
             El microservicio se ejecuta en el clúster gratuito de Render:
           </p>
@@ -755,6 +572,17 @@ print_r($traducciones);
 
   <footer>
     <div class="footer-inner-full">
+      <div class="footer-col footer-col-brand">
+        <h4>
+          <svg class="icon" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+          CloudTranslator
+        </h4>
+        <p>Servicio de traducción en la nube con API REST para integración directa en sistemas web corporativos.</p>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+          Endpoint: <code>https://cloudtranslator.onrender.com</code>
+        </p>
+      </div>
+
       <div class="footer-col">
         <h4>Recursos</h4>
         <ul>
@@ -771,17 +599,6 @@ print_r($traducciones);
           <li><a href="privacy.html">Política de Privacidad</a></li>
           <li><a href="security.html">Seguridad y Datos</a></li>
         </ul>
-      </div>
-
-      <div class="footer-col footer-col-brand">
-        <h4>
-          <svg class="icon" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
-          CloudTranslator
-        </h4>
-        <p>Servicio de traducción en la nube con API REST para integración directa en sistemas web corporativos.</p>
-        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
-          Endpoint: <code>https://cloudtranslator.onrender.com</code>
-        </p>
       </div>
     </div>
 
