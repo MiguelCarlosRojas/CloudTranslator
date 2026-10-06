@@ -76,7 +76,10 @@
     document.body.classList.add("spa-transitioning");
 
     try {
-      const response = await fetch(url, { signal: abortController.signal });
+      const response = await fetch(url, {
+        signal: abortController.signal,
+        headers: { "Accept": "text/html, */*" }
+      });
       if (!response.ok) {
         window.location.href = url;
         return;
@@ -146,6 +149,21 @@
       } else {
         window.scrollTo(0, 0);
       }
+
+      // Actualizar clase active en los enlaces del menú
+      try {
+        const currentPath = parsedUrl.pathname;
+        document.querySelectorAll(".main-menu a").forEach(link => {
+          const linkHref = link.getAttribute("href");
+          if (!linkHref) return;
+          const linkPath = new URL(linkHref, window.location.href).pathname;
+          if (linkPath === currentPath || (currentPath === "/" && (linkPath === "/" || linkPath === "/index.html"))) {
+            link.classList.add("active");
+          } else {
+            link.classList.remove("active");
+          }
+        });
+      } catch (navErr) {}
 
       finishProgress();
     } catch (err) {

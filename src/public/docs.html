@@ -1,23 +1,23 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Documentación API REST y Conexión al Sistema - CloudTranslator</title>
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="shortcut icon" type="image/png" href="favicon.png">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="shortcut icon" type="image/png" href="/favicon.png">
+  <link rel="stylesheet" href="/css/style.css">
   <script>
     (function(){try{var m=document.cookie.match(/(?:^|; )cloud_translator_lang=([^;]*)/);var l=m?decodeURIComponent(m[1]):null;if(l&&l!=="original"&&l!=="es"){document.documentElement.classList.add("ct-pending");setTimeout(function(){document.documentElement.classList.remove("ct-pending");},800);}}catch(e){}})();
   </script>
-  <script src="js/spa-router.js" defer></script>
+  <script src="/js/spa-router.js" defer></script>
 </head>
 <body>
 
   <!-- Barra Superior Principal -->
   <header class="top-nav" id="main-header">
     <div class="nav-container">
-      <a href="index.html" class="brand-wrapper">
+      <a href="/" class="brand-wrapper">
         <span class="brand-logo">
           <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
           CloudTranslator
@@ -27,10 +27,10 @@
 
       <nav>
         <ul class="main-menu">
-          <li><a href="index.html">Inicio</a></li>
-          <li><a href="docs.html" class="active">Documentación</a></li>
-          <li><a href="support.html">Soporte</a></li>
-          <li><a href="status.html">Estado</a></li>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/docs" class="active">Documentación</a></li>
+          <li><a href="/support">Soporte</a></li>
+          <li><a href="/status">Estado</a></li>
         </ul>
       </nav>
 
@@ -145,7 +145,7 @@
         <!-- Enlace a Referencia de API -->
         <div class="docs-sidebar-group" style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border-line);">
           <span class="docs-group-label">Especificación Técnica</span>
-          <a href="api.html" class="docs-sidebar-session" style="color: #ffffff;">
+          <a href="/api" class="docs-sidebar-session" style="color: #ffffff;">
             <span class="session-badge" style="background: #ffffff; color: #000000;">API</span> Ver Endpoints REST &rarr;
           </a>
         </div>
@@ -521,11 +521,11 @@ print_r($traducciones);
         </div>
 
         <article class="content-box-card" style="border-left: 2px solid #ffffff;">
-          <h3 style="color: #ffffff; font-size: 1.15rem; margin-bottom: 10px;">Consulta la Referencia de API en /api.html</h3>
+          <h3 style="color: #ffffff; font-size: 1.15rem; margin-bottom: 10px;">Consulta la Referencia de API en /api</h3>
           <p style="font-size: 0.95rem; line-height: 1.7; color: var(--text-light); margin-bottom: 18px;">
             Para mantener una separación técnica rigurosa y evitar duplicidad de información en el sistema, la especificación de esquemas JSON, tablas de propiedades, ejemplos cURL para <code>POST /api/translate</code>, <code>GET /api/translate</code>, <code>GET /api/languages</code>, <code>GET /api/health</code> y la <strong>Consola Interactiva de Pruebas en Vivo</strong> están disponibles exclusivamente en la Referencia de API.
           </p>
-          <a href="api.html" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+          <a href="/api" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
             Ver Especificación Técnica de Endpoints en API
             <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
@@ -590,18 +590,18 @@ print_r($traducciones);
         <div class="footer-col">
           <h4>Recursos</h4>
           <ul>
-            <li><a href="api.html">API</a></li>
-            <li><a href="learn.html">Aprender</a></li>
-            <li><a href="help.html">Ayuda</a></li>
+            <li><a href="/api">API</a></li>
+            <li><a href="/learn">Aprender</a></li>
+            <li><a href="/help">Ayuda</a></li>
           </ul>
         </div>
 
         <div class="footer-col">
           <h4>Información Legal</h4>
           <ul>
-            <li><a href="terms.html">Términos del Servicio</a></li>
-            <li><a href="privacy.html">Política de Privacidad</a></li>
-            <li><a href="security.html">Seguridad y Datos</a></li>
+            <li><a href="/terms">Términos del Servicio</a></li>
+            <li><a href="/privacy">Política de Privacidad</a></li>
+            <li><a href="/security">Seguridad y Datos</a></li>
           </ul>
         </div>
       </div>
@@ -613,7 +613,7 @@ print_r($traducciones);
     </div>
   </footer>
 
-  <script src="js/cloud-translator.js"></script>
+  <script src="/js/cloud-translator.js"></script>
   <script>
     // Función global para copiar al portapapeles con feedback visual monocromático
     function copiarAlPortapapeles(btn, elementId) {

@@ -332,13 +332,13 @@ function traducirTextos(array $textos, string $idioma = "en"): array {
 CloudTranslator incluye un portal web interactivo responsive con enrutador SPA:
 
 * **[Inicio / Landing Page](https://cloudtranslator.onrender.com/)**: Demostración en vivo de traducción del DOM, métricas y panel de pruebas.
-* **[Documentación](https://cloudtranslator.onrender.com/docs.html)**: Arquitectura, flujo por lotes del DOM y preguntas frecuentes.
-* **[Referencia de API REST](https://cloudtranslator.onrender.com/api.html)**: Playground de endpoints (`/api/translate`, `/api/health`, `/api/languages`), esquemas JSON y copiado con un clic.
-* **[Aprender (Guías de Integración)](https://cloudtranslator.onrender.com/learn.html)**: Guías para React, Vue, Vanilla JS, microservicios y optimización de latencia.
-* **[Soporte Técnico](https://cloudtranslator.onrender.com/support.html)**: Canales de contacto y asistencia directa.
-* **[Centro de Ayuda](https://cloudtranslator.onrender.com/help.html)**: Solución de problemas comunes y códigos de error.
-* **[Monitor de Estado del Cluster](https://cloudtranslator.onrender.com/status.html)**: Estado del servicio, uptime y salud del servidor.
-* **[Políticas de Privacidad](https://cloudtranslator.onrender.com/privacy.html)**, **[Seguridad](https://cloudtranslator.onrender.com/security.html)** y **[Términos de Servicio](https://cloudtranslator.onrender.com/terms.html)**.
+* **[Documentación](https://cloudtranslator.onrender.com/docs)**: Arquitectura, flujo por lotes del DOM y preguntas frecuentes.
+* **[Referencia de API REST](https://cloudtranslator.onrender.com/api)**: Playground de endpoints (`/api/translate`, `/api/health`, `/api/languages`), esquemas JSON y copiado con un clic.
+* **[Aprender (Guías de Integración)](https://cloudtranslator.onrender.com/learn)**: Guías para React, Vue, Vanilla JS, microservicios y optimización de latencia.
+* **[Soporte Técnico](https://cloudtranslator.onrender.com/support)**: Canales de contacto y asistencia directa.
+* **[Centro de Ayuda](https://cloudtranslator.onrender.com/help)**: Solución de problemas comunes y códigos de error.
+* **[Monitor de Estado del Cluster](https://cloudtranslator.onrender.com/status)**: Estado del servicio, uptime y salud del servidor.
+* **[Políticas de Privacidad](https://cloudtranslator.onrender.com/privacy)**, **[Seguridad](https://cloudtranslator.onrender.com/security)** y **[Términos de Servicio](https://cloudtranslator.onrender.com/terms)**.
 
 ---
 

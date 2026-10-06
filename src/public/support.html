@@ -1,22 +1,22 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Soporte Técnico - CloudTranslator API</title>
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="shortcut icon" type="image/png" href="favicon.png">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="shortcut icon" type="image/png" href="/favicon.png">
+  <link rel="stylesheet" href="/css/style.css">
   <script>
     (function(){try{var m=document.cookie.match(/(?:^|; )cloud_translator_lang=([^;]*)/);var l=m?decodeURIComponent(m[1]):null;if(l&&l!=="original"&&l!=="es"){document.documentElement.classList.add("ct-pending");setTimeout(function(){document.documentElement.classList.remove("ct-pending");},800);}}catch(e){}})();
   </script>
-  <script src="js/spa-router.js" defer></script>
+  <script src="/js/spa-router.js" defer></script>
 </head>
 <body>
 
   <header class="top-nav">
     <div class="nav-container">
-      <a href="index.html" class="brand-wrapper">
+      <a href="/" class="brand-wrapper">
         <span class="brand-logo">
           <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
           CloudTranslator
@@ -26,10 +26,10 @@
 
       <nav>
         <ul class="main-menu">
-          <li><a href="index.html">Inicio</a></li>
-          <li><a href="docs.html">Documentación</a></li>
-          <li><a href="support.html" class="active">Soporte</a></li>
-          <li><a href="status.html">Estado</a></li>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/docs">Documentación</a></li>
+          <li><a href="/support" class="active">Soporte</a></li>
+          <li><a href="/status">Estado</a></li>
         </ul>
       </nav>
 
@@ -67,7 +67,7 @@
       <span class="hero-tag-glow">[ CANALES DE INGENIERÍA E INCIDENCIAS ]</span>
       <h1>Soporte Técnico de CloudTranslator</h1>
       <p class="lead">
-        Mesa de ayuda técnica para desarrolladores y administradores de sistemas. Para preguntas frecuentes o guías rápidas de autoservicio, consulta el <a href="help.html" style="color: #ffffff; text-decoration: underline;">Centro de Ayuda</a>.
+        Mesa de ayuda técnica para desarrolladores y administradores de sistemas. Para preguntas frecuentes o guías rápidas de autoservicio, consulta el <a href="/help" style="color: #ffffff; text-decoration: underline;">Centro de Ayuda</a>.
       </p>
     </div>
 
@@ -78,7 +78,7 @@
         <li><strong>Correo directo de ingeniería:</strong> <a href="mailto:isakiangel6@gmail.com">isakiangel6@gmail.com</a></li>
         <li><strong>Seguimiento de incidencias (GitHub Issues):</strong> <a href="https://github.com/MiguelCarlosRojas/CloudTranslator/issues" target="_blank">github.com/MiguelCarlosRojas/CloudTranslator/issues</a></li>
         <li><strong>Repositorio oficial del proyecto:</strong> <a href="https://github.com/MiguelCarlosRojas/CloudTranslator" target="_blank">github.com/MiguelCarlosRojas/CloudTranslator</a></li>
-        <li><strong>Monitor operativo en tiempo real:</strong> <a href="status.html">Consultar métricas y latencia de CloudTranslator</a></li>
+        <li><strong>Monitor operativo en tiempo real:</strong> <a href="/status">Consultar métricas y latencia de CloudTranslator</a></li>
       </ul>
     </article>
 
@@ -123,18 +123,18 @@
         <div class="footer-col">
           <h4>Recursos</h4>
           <ul>
-            <li><a href="api.html">API</a></li>
-            <li><a href="learn.html">Aprender</a></li>
-            <li><a href="help.html">Ayuda</a></li>
+            <li><a href="/api">API</a></li>
+            <li><a href="/learn">Aprender</a></li>
+            <li><a href="/help">Ayuda</a></li>
           </ul>
         </div>
 
         <div class="footer-col">
           <h4>Información Legal</h4>
           <ul>
-            <li><a href="terms.html">Términos del Servicio</a></li>
-            <li><a href="privacy.html">Política de Privacidad</a></li>
-            <li><a href="security.html">Seguridad y Datos</a></li>
+            <li><a href="/terms">Términos del Servicio</a></li>
+            <li><a href="/privacy">Política de Privacidad</a></li>
+            <li><a href="/security">Seguridad y Datos</a></li>
           </ul>
         </div>
       </div>
@@ -146,7 +146,7 @@
     </div>
   </footer>
 
-  <script src="js/cloud-translator.js"></script>
+  <script src="/js/cloud-translator.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";

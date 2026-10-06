@@ -1,23 +1,23 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CloudTranslator - API de Traducción en la Nube</title>
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="shortcut icon" type="image/png" href="favicon.png">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="shortcut icon" type="image/png" href="/favicon.png">
+  <link rel="stylesheet" href="/css/style.css">
   <script>
     (function(){try{var m=document.cookie.match(/(?:^|; )cloud_translator_lang=([^;]*)/);var l=m?decodeURIComponent(m[1]):null;if(l&&l!=="original"&&l!=="es"){document.documentElement.classList.add("ct-pending");setTimeout(function(){document.documentElement.classList.remove("ct-pending");},800);}}catch(e){}})();
   </script>
-  <script src="js/spa-router.js" defer></script>
+  <script src="/js/spa-router.js" defer></script>
 </head>
 <body>
 
   <!-- Barra Superior -->
   <header class="top-nav">
     <div class="nav-container">
-      <a href="index.html" class="brand-wrapper">
+      <a href="/" class="brand-wrapper">
         <span class="brand-logo">
           <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
           CloudTranslator
@@ -27,10 +27,10 @@
 
       <nav>
         <ul class="main-menu">
-          <li><a href="index.html" class="active">Inicio</a></li>
-          <li><a href="docs.html">Documentación</a></li>
-          <li><a href="support.html">Soporte</a></li>
-          <li><a href="status.html">Estado</a></li>
+          <li><a href="/" class="active">Inicio</a></li>
+          <li><a href="/docs">Documentación</a></li>
+          <li><a href="/support">Soporte</a></li>
+          <li><a href="/status">Estado</a></li>
         </ul>
       </nav>
 
@@ -77,8 +77,8 @@
         API pública alojada en <strong>https://cloudtranslator.onrender.com</strong> para traducir cadenas individuales, listas de texto o páginas web completas en segundo plano, con soporte de micro-lotes en una sola consulta HTTP y persistencia en cookies.
       </p>
       <div class="hero-actions">
-        <a href="docs.html" class="btn btn-primary">Documentación API</a>
-        <a href="status.html" class="btn btn-outline">Estado del Servidor</a>
+        <a href="/docs" class="btn btn-primary">Documentación API</a>
+        <a href="/status" class="btn btn-outline">Estado del Servidor</a>
       </div>
     </section>
 
@@ -157,7 +157,7 @@
         <strong>Arranque en Frío:</strong> La primera consulta después de un periodo de inactividad tarda aproximadamente 25 a 35 segundos mientras el servidor inicia. Las peticiones subsecuentes responden con latencia promedio de 200 a 400 milisegundos.
       </div>
       <p>
-        Puedes consultar la disponibilidad actual del servidor en la página de <a href="status.html">Estado del Servicio</a>.
+        Puedes consultar la disponibilidad actual del servidor en la página de <a href="/status">Estado del Servicio</a>.
       </p>
     </section>
 
@@ -181,18 +181,18 @@
         <div class="footer-col">
           <h4>Recursos</h4>
           <ul>
-            <li><a href="api.html">API</a></li>
-            <li><a href="learn.html">Aprender</a></li>
-            <li><a href="help.html">Ayuda</a></li>
+            <li><a href="/api">API</a></li>
+            <li><a href="/learn">Aprender</a></li>
+            <li><a href="/help">Ayuda</a></li>
           </ul>
         </div>
 
         <div class="footer-col">
           <h4>Información Legal</h4>
           <ul>
-            <li><a href="terms.html">Términos del Servicio</a></li>
-            <li><a href="privacy.html">Política de Privacidad</a></li>
-            <li><a href="security.html">Seguridad y Datos</a></li>
+            <li><a href="/terms">Términos del Servicio</a></li>
+            <li><a href="/privacy">Política de Privacidad</a></li>
+            <li><a href="/security">Seguridad y Datos</a></li>
           </ul>
         </div>
       </div>
@@ -204,7 +204,7 @@
     </div>
   </footer>
 
-  <script src="js/cloud-translator.js"></script>
+  <script src="/js/cloud-translator.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";
