@@ -1,43 +1,53 @@
-# Contributor Covenant Code of Conduct - CloudTranslator
+# Código de Conducta de Contribución - CloudTranslator
+*(Contributor Covenant Code of Conduct v2.1)*
 
-## Our Pledge
+## Nuestro Compromiso
 
-We as members, contributors, and leaders pledge to make participation in our community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, caste, color, religion, or sexual identity and orientation.
+Nosotros, como miembros, contribuyentes y líderes del proyecto **CloudTranslator**, nos comprometemos a hacer que la participación en nuestra comunidad sea una experiencia libre de acoso para todas las personas, independientemente de su edad, tamaño corporal, discapacidad visible o invisible, origen étnico, características sexuales, identidad y expresión de género, nivel de experiencia, educación, nivel socioeconómico, nacionalidad, apariencia personal, raza, casta, color, religión o identidad y orientación sexual.
 
-We pledge to act and interact in ways that contribute to an open, welcoming, diverse, inclusive, and healthy community.
+Nos comprometemos a actuar e interactuar de formas que contribuyan a una comunidad abierta, acogedora, diversa, inclusiva y saludable.
 
-## Our Standards
+---
 
-Examples of behavior that contributes to a positive environment for our community include:
-* Demonstrating empathy and kindness toward other people
-* Being respectful of differing opinions, viewpoints, and experiences
-* Giving and gracefully accepting constructive feedback
-* Accepting responsibility and apologizing to those affected by our mistakes, and learning from the experience
-* Focusing on what is best not just for us as individuals, but for the overall community
+## Nuestros Estándares
 
-Examples of unacceptable behavior include:
-* The use of sexualized language or imagery, and sexual attention or advances of any kind
-* Trolling, insulting or derogatory comments, and personal or political attacks
-* Public or private harassment
-* Publishing others' private information, such as a physical or email address, without their explicit permission
-* Other conduct which could reasonably be considered inappropriate in a professional setting
+Ejemplos de comportamientos que contribuyen a un entorno positivo para nuestra comunidad:
+* Demostrar empatía y amabilidad hacia los demás.
+* Respetar las opiniones, puntos de vista y experiencias contrarias.
+* Dar y recibir retroalimentación constructiva de manera receptiva.
+* Asumir la responsabilidad, disculparse ante los afectados por nuestros errores y aprender de ellos.
+* Centrarse en lo mejor para la comunidad en su conjunto, y no solo en intereses individuales.
 
-## Enforcement Responsibilities
+Ejemplos de comportamientos inaceptables:
+* El uso de lenguaje o imágenes sexualizadas, así como avances o insinuaciones de cualquier tipo.
+* Comentarios ofensivos, despectivos o ataques personales y políticos (*trolling*).
+* El acoso público o privado bajo cualquier forma.
+* Publicar información privada de terceros (como direcciones físicas o correos electrónicos) sin su consentimiento explícito.
+* Cualquier otra conducta que pueda considerarse inapropiada en un entorno profesional.
 
-Community leaders are responsible for clarifying and enforcing our standards of acceptable behavior and will take appropriate and fair corrective action in response to any behavior that they deem inappropriate, threatening, offensive, or harmful.
+---
 
-Community leaders have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that are not aligned to this Code of Conduct, and will communicate reasons for moderation decisions when appropriate.
+## Responsabilidades de Moderación y Cumplimiento
 
-## Scope
+Los líderes de la comunidad son responsables de clarificar y hacer cumplir nuestros estándares de comportamiento y tomarán las medidas correctivas justas y apropiadas en respuesta a cualquier comportamiento que consideren inaceptable, amenazante, ofensivo o dañino.
 
-This Code of Conduct applies within all community spaces (including GitHub repositories, issues, pull requests, and discussions), and also applies when an individual is officially representing the community in public spaces.
+Los mantenedores tienen el derecho y la responsabilidad de eliminar, editar o rechazar comentarios, commits, código, ediciones de wiki, issues y otras contribuciones que no estén alineadas con este Código de Conducta, y comunicarán las razones de las decisiones de moderación cuando sea pertinente.
 
-## Reporting & Enforcement
+---
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project maintainer:
+## Alcance
 
-* **Maintainer**: Miguel Angel Carlos Rojas
-* **Email**: isakiangel6@gmail.com
-* **Repository**: https://github.com/MiguelCarlosRojas/CloudTranslator
+Este Código de Conducta aplica a todos los espacios oficiales del proyecto (repositorio en GitHub, issues, pull requests, discusiones y canales de soporte), así como cuando un individuo representa oficialmente al proyecto en espacios públicos.
 
-All complaints will be reviewed and investigated promptly and fairly. All community leaders are obligated to respect the privacy and security of the reporter of any incident.
+---
+
+## Contacto y Reportes
+
+Cualquier conducta abusiva, de acoso o inaceptable puede ser reportada de forma confidencial directamente al mantenedor oficial del proyecto:
+
+* **Mantenedor Principal:** Miguel Angel Carlos Rojas
+* **Correo Electrónico:** [isakiangel6@gmail.com](mailto:isakiangel6@gmail.com)
+* **Repositorio Oficial:** [https://github.com/MiguelCarlosRojas/CloudTranslator](https://github.com/MiguelCarlosRojas/CloudTranslator)
+* **Servicio Web:** [https://cloudtranslator.onrender.com](https://cloudtranslator.onrender.com)
+
+Todas las quejas serán revisadas e investigadas de manera justa, oportuna y bajo estricta confidencialidad.

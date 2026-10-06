@@ -1,80 +1,85 @@
 # CloudTranslator - Servicio de Traducción en la Nube
 
-> **URL Oficial del Servicio en la Nube:**  
-> `https://cloudtranslator.onrender.com`  
-> **Endpoint de Traducción:**  
-> `https://cloudtranslator.onrender.com/api/translate`
-
-CloudTranslator es un microservicio y API REST de alto rendimiento diseñado para traducir textos individuales, micro-lotes de texto o **páginas web completas en segundo plano** sin congelar ni interrumpir la experiencia del usuario.
-
-Gracias a su arquitectura con soporte CORS universal (`Access-Control-Allow-Origin: *`) y consolidación de peticiones por lotes, puedes conectar cualquier sistema (React, Vue, Angular, sitios HTML tradicionales, Node.js, Python, PHP o aplicaciones móviles) directamente al endpoint `https://cloudtranslator.onrender.com/api/translate`.
+[![Render Deployment](https://img.shields.io/badge/deployment-Render%20Live-22c55e.svg)](https://cloudtranslator.onrender.com)
+[![Node.js Version](https://img.shields.io/badge/node.js-18%2B%20%7C%2020%2B-green.svg)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/express-4.21.2-black.svg)](https://expressjs.com/)
+[![License: ISC](https://img.shields.io/badge/license-ISC-blue.svg)](LICENSE)
+[![API Status](https://img.shields.io/badge/api-online-brightgreen.svg)](https://cloudtranslator.onrender.com/api/health)
 
 ---
 
-## Índice de Contenidos
-1. [Arquitectura y Funcionamiento](#arquitectura-y-funcionamiento)
-2. [Guía de Implementación en tu Sistema (Paso a Paso)](#guía-de-implementación-en-tu-sistema-paso-a-paso)
-   - [Paso 1: Elementos en tu Frontend (Botón Inglés y Selector de Carácter)](#paso-1-elementos-en-tu-frontend-botón-inglés-y-selector-de-carácter)
-   - [Paso 2: Código JavaScript Completo con Cookies y 1 Sola Petición de Red](#paso-2-código-javascript-completo-con-cookies-y-1-sola-petición-de-red)
-3. [Conexión desde el Backend (Servidor a Servidor)](#conexión-desde-el-backend-servidor-a-servidor)
-   - [Node.js (Fetch nativo o Axios)](#nodejs-fetch-nativo-o-axios)
-   - [Python (Requests)](#python-requests)
-   - [PHP (cURL)](#php-curl)
-4. [Especificación de Endpoints y Cargas JSON](#especificación-de-endpoints-y-cargas-json)
-   - [POST /api/translate (Lotes de Texto)](#1-post-apitranslate-lotes-de-texto---recomendado)
-   - [POST /api/translate (Texto Unitario)](#2-post-apitranslate-texto-unitario)
-   - [GET /api/languages (Idiomas Soportados)](#3-get-apilanguages)
-   - [GET /api/health (Diagnóstico y Disponibilidad)](#4-get-apihealth)
-5. [Persistencia por Cookies](#persistencia-por-cookies)
-6. [Comportamiento Operativo en Render](#comportamiento-operativo-en-render)
+## Metadatos del Repositorio de GitHub
+
+> **Description:**  
+> Microservicio y API REST de alto rendimiento en Node.js y Express para traducción en la nube por lotes, con soporte CORS universal y desplegado en Render.
+>
+> **Website:**  
+> `https://cloudtranslator.onrender.com`
+>
+> **Topics:**  
+> `api`, `cloud-translator`, `express`, `google-translate`, `javascript`, `microservice`, `nodejs`, `render`, `rest-api`, `translation`
+
+---
+
+## Despliegue en la Nube 100% Autónomo (Render Web Service)
+
+El microservicio se ejecuta de forma continua y autónoma en **Render**:
+
+* **URL Oficial del Servicio:** [https://cloudtranslator.onrender.com](https://cloudtranslator.onrender.com)
+* **Endpoint de Traducción:** `https://cloudtranslator.onrender.com/api/translate`
+* **Health Check & Monitoreo:** `https://cloudtranslator.onrender.com/api/health`
+* **Idiomas Disponibles:** `https://cloudtranslator.onrender.com/api/languages`
+
+> [!NOTE]
+> **Comportamiento en Capa Gratuita (Free Tier de Render):**  
+> Si el servicio permanece sin recibir solicitudes durante 15 minutos, el contenedor entra en modo de reposo (*sleep*).  
+> * **Arranque en frío (Cold start):** La primera petición tras inactividad toma entre 25 y 35 segundos para reactivarse.  
+> * **Respuestas subsecuentes:** Una vez encendido, las solicitudes responden con latencia ultrarrápida (150 a 350 ms, o 0 ms si provienen del caché en memoria del servidor).
 
 ---
 
 ## Arquitectura y Funcionamiento
 
-1. **Una Sola Petición HTTP:** En lugar de disparar decenas de consultas en cascada al cambiar de idioma, el cliente escanea y consolida todos los textos visibles del DOM en un único arreglo `texts: [...]` despachado en una sola llamada POST.
-2. **Cero Bloqueo de Renderizado:** El procesamiento se delega al ciclo de eventos del navegador para que las animaciones, desplazamientos y clics del usuario continúen con fluidez.
-3. **Persistencia mediante Cookies Técnicas:** La selección del idioma queda guardada en la cookie `cloud_translator_lang` por 365 días. Al recargar la página, el navegador lee la cookie y aplica la traducción de inmediato en 0 milisegundos sin repetir llamadas a la red.
-4. **CORS Habilitado:** Los navegadores web pueden conectarse directamente al microservicio sin necesidad de proxies intermediarios.
+1. **Una Sola Petición HTTP Consolidada:** En lugar de lanzar peticiones HTTP individuales por cada etiqueta o párrafo de un sitio web, el cliente escanea el DOM mediante `TreeWalker` y despacha un solo arreglo `texts: [...]` en un único POST.
+2. **Caché en Memoria en Servidor y Cliente:**  
+   * **Servidor (`translateController.js`):** Mantiene una memoria LRU de hasta 5,000 entradas clave-valor (`targetLanguage:texto`). Las frases previamente traducidas responden en 0 ms sin consultar la API externa.
+   * **Cliente (`cloud-translator.js`):** Cachea localmente las cadenas traducidas para transiciones de idioma instantáneas.
+3. **Cero Bloqueo de Renderizado (UI Fluida):** Las consultas se ejecutan de manera asíncrona en segundo plano sin interrumpir clics, animaciones o la navegación del usuario.
+4. **Persistencia mediante Cookie Técnica:** Guarda la elección del idioma en la cookie `cloud_translator_lang` por 365 días (`SameSite=Lax`). Al refrescar o navegar entre páginas, el idioma seleccionado se aplica de forma automática.
+5. **CORS Universal:** Configurado con cabeceras `Access-Control-Allow-Origin: *`, permitiendo que cualquier frontend (React, Vue, Angular, Svelte, sitios estáticos o móviles) consuma la API directamente sin proxies intermedios.
 
 ---
 
-## Guía de Implementación en tu Sistema (Paso a Paso)
+## Guía de Implementación en tu Frontend (Paso a Paso)
 
-### Paso 1: Elementos en tu Frontend (Botón Inglés y Selector de Carácter)
+### Paso 1: Elementos en tu HTML
 
-Inserta en tu página los botones de acción y el campo de entrada donde el usuario pueda escribir el carácter o código de idioma deseado:
+Inserta los controles de cambio de idioma en tu página:
 
 ```html
-<!-- Botón directo para traducir toda la página a inglés -->
+<!-- Botón directo a inglés -->
 <button id="btn-english">English</button>
 
-<!-- Campo para escribir el carácter o código de idioma (ej: fr, de, it, pt, es) -->
+<!-- Selector / Entrada manual de idioma (ej: fr, de, it, pt, es) -->
 <input type="text" id="lang-code" placeholder="cód." maxlength="5" style="width: 60px;">
 <button id="btn-translate-custom">Traducir</button>
 
-<!-- Botón para restaurar el idioma original -->
+<!-- Botón para restaurar idioma original -->
 <button id="btn-restore">Original</button>
 
 <!-- Indicador de estado -->
 <span id="status-text">Listo</span>
 ```
 
----
-
-### Paso 2: Código JavaScript Completo con Cookies y 1 Sola Petición de Red
-
-Copia y pega este script en tu proyecto. Gestiona automáticamente la extracción de nodos, el micro-lote de red y la cookie:
+### Paso 2: Código JavaScript Completo con Cookies y 1 Sola Llamada
 
 ```javascript
-// URL oficial del endpoint en la nube
 const CLOUD_TRANSLATE_API = "https://cloudtranslator.onrender.com/api/translate";
 
-// Mapas en memoria
 const originalNodesMap = new Map();
 const translationMemoryCache = {}; // { 'en': { 'Inicio': 'Home' } }
 
-// 1. Manejo de Cookie Técnica (cloud_translator_lang)
+// 1. Manejo de cookie técnica (cloud_translator_lang)
 function setLanguageCookie(code) {
   document.cookie = `cloud_translator_lang=${code}; path=/; max-age=31536000; SameSite=Lax`;
 }
@@ -88,7 +93,7 @@ function getLanguageCookie() {
 function extractDomTexts() {
   if (originalNodesMap.size > 0) return;
   const ignoreTags = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "CODE", "PRE", "SVG", "TEXTAREA"]);
-  
+
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
     acceptNode: (node) => {
       const parent = node.parentElement;
@@ -105,7 +110,7 @@ function extractDomTexts() {
   }
 }
 
-// 3. Traducir toda la página en 1 SOLA petición HTTP en segundo plano
+// 3. Traducir toda la página en 1 SOLA petición HTTP
 async function translateFullPage(targetLanguage) {
   const statusEl = document.getElementById("status-text");
   if (statusEl) statusEl.textContent = `Traduciendo (${targetLanguage.toUpperCase()})...`;
@@ -117,7 +122,7 @@ async function translateFullPage(targetLanguage) {
     translationMemoryCache[targetLanguage] = {};
   }
 
-  // Identificar cadenas pendientes
+  // Filtrar solo textos no traducidos previamente
   const pendingStrings = [];
   originalNodesMap.forEach((originalVal) => {
     const trimmed = originalVal.trim();
@@ -133,7 +138,7 @@ async function translateFullPage(targetLanguage) {
     return;
   }
 
-  // 1 SOLA LLAMADA HTTP POST con el array completo
+  // Despacho en 1 sola llamada POST
   try {
     const response = await fetch(CLOUD_TRANSLATE_API, {
       method: "POST",
@@ -161,7 +166,7 @@ async function translateFullPage(targetLanguage) {
   }
 }
 
-// 4. Aplicar traducciones a los nodos del DOM
+// 4. Inyectar traducciones al DOM
 function applyTranslationsToDom(targetLanguage) {
   originalNodesMap.forEach((originalVal, textNode) => {
     const trimmed = originalVal.trim();
@@ -193,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("btn-restore")?.addEventListener("click", restoreOriginalPage);
 
-  // Leer cookie al ingresar o recargar la página
+  // Leer cookie al entrar
   const savedLang = getLanguageCookie();
   if (savedLang && savedLang !== "original") {
     translateFullPage(savedLang);
@@ -228,7 +233,7 @@ def traducir_textos(textos, idioma_destino="en"):
     resp.raise_for_status()
     return resp.json().get("translatedTexts", [])
 
-# Ejemplo:
+# Ejemplo de uso:
 resultado = traducir_textos(["Panel de control", "Cerrar sesión"], "en")
 print(resultado)  # ['Control panel', 'Sign out']
 ```
@@ -258,10 +263,10 @@ function traducirTextos(array $textos, string $idioma = "en"): array {
 ## Especificación de Endpoints y Cargas JSON
 
 ### 1. `POST /api/translate` (Lotes de Texto - Recomendado)
-- **URL:** `https://cloudtranslator.onrender.com/api/translate`
-- **Method:** `POST`
-- **Headers:** `Content-Type: application/json`
-- **Body JSON:**
+* **URL:** `https://cloudtranslator.onrender.com/api/translate`
+* **Method:** `POST`
+* **Headers:** `Content-Type: application/json`
+* **Body:**
   ```json
   {
     "texts": [
@@ -272,7 +277,7 @@ function traducirTextos(array $textos, string $idioma = "en"): array {
     "targetLanguage": "en"
   }
   ```
-- **Respuesta JSON (200 OK):**
+* **Respuesta (200 OK):**
   ```json
   {
     "translatedTexts": [
@@ -283,15 +288,15 @@ function traducirTextos(array $textos, string $idioma = "en"): array {
   }
   ```
 
-### 2. `POST /api/translate` (Texto Unitario)
-- **Body JSON:**
+### 2. `POST /api/translate` o `GET /api/translate` (Texto Unitario)
+* **Body:**
   ```json
   {
     "text": "Bienvenido al servicio de traducción",
     "targetLanguage": "en"
   }
   ```
-- **Respuesta JSON (200 OK):**
+* **Respuesta (200 OK):**
   ```json
   {
     "translatedText": "Welcome to the translation service"
@@ -299,8 +304,8 @@ function traducirTextos(array $textos, string $idioma = "en"): array {
   ```
 
 ### 3. `GET /api/languages`
-- **URL:** `https://cloudtranslator.onrender.com/api/languages`
-- **Respuesta JSON (200 OK):**
+* **URL:** `https://cloudtranslator.onrender.com/api/languages`
+* **Respuesta (200 OK):**
   ```json
   {
     "success": true,
@@ -309,53 +314,61 @@ function traducirTextos(array $textos, string $idioma = "en"): array {
   ```
 
 ### 4. `GET /api/health`
-- **URL:** `https://cloudtranslator.onrender.com/api/health`
-- **Respuesta JSON (200 OK):**
+* **URL:** `https://cloudtranslator.onrender.com/api/health`
+* **Respuesta (200 OK):**
   ```json
   {
     "success": true,
     "status": "ok",
-    "uptime": 1800,
-    "timestamp": "2026-09-28T18:00:00.000Z"
+    "uptime": 1845,
+    "timestamp": "2026-10-06T12:00:00.000Z"
   }
   ```
 
 ---
 
-## Persistencia por Cookies
+## Portal Web y Módulos Públicos
 
-El sistema utiliza la cookie técnica `cloud_translator_lang`:
-- Guarda exclusivamente el código ISO de destino (ej: `en`, `es`, `fr`, `de`, `it`, `pt`).
-- Se almacena con `SameSite=Lax` y una vigencia de 365 días (`max-age=31536000`).
-- No almacena información privada ni cookies de terceros.
-- Permite que tu sistema cargue inmediatamente en el idioma elegido por el usuario sin requerir interacción manual en cada visita.
+CloudTranslator incluye un portal web interactivo responsive con enrutador SPA:
 
----
-
-## Comportamiento Operativo en Render
-
-La instancia en la nube se ejecuta en la capa gratuita de Render:
-- Si el microservicio no recibe solicitudes durante 15 minutos, el contenedor entra en modo de reposo automático.
-- **Arranque en Frío:** La primera consulta tras el periodo de inactividad tarda entre 25 y 35 segundos mientras el contenedor se reactiva.
-- **Consultas Subsecuentes:** Una vez activo, las solicitudes responden con latencia ultrarrápida de 150 a 350 milisegundos.
+* **[Inicio / Landing Page](https://cloudtranslator.onrender.com/)**: Demostración en vivo de traducción del DOM, métricas y panel de pruebas.
+* **[Documentación](https://cloudtranslator.onrender.com/docs.html)**: Arquitectura, flujo por lotes del DOM y preguntas frecuentes.
+* **[Referencia de API REST](https://cloudtranslator.onrender.com/api.html)**: Playground de endpoints (`/api/translate`, `/api/health`, `/api/languages`), esquemas JSON y copiado con un clic.
+* **[Aprender (Guías de Integración)](https://cloudtranslator.onrender.com/learn.html)**: Guías para React, Vue, Vanilla JS, microservicios y optimización de latencia.
+* **[Soporte Técnico](https://cloudtranslator.onrender.com/support.html)**: Canales de contacto y asistencia directa.
+* **[Centro de Ayuda](https://cloudtranslator.onrender.com/help.html)**: Solución de problemas comunes y códigos de error.
+* **[Monitor de Estado del Cluster](https://cloudtranslator.onrender.com/status.html)**: Estado del servicio, uptime y salud del servidor.
+* **[Políticas de Privacidad](https://cloudtranslator.onrender.com/privacy.html)**, **[Seguridad](https://cloudtranslator.onrender.com/security.html)** y **[Términos de Servicio](https://cloudtranslator.onrender.com/terms.html)**.
 
 ---
 
-## Navegación del Portal Web
+## Desarrollo Local
 
-El portal web de CloudTranslator incluye módulos especializados e independientes:
-- **[Inicio](https://cloudtranslator.onrender.com/)**: Presentación de la plataforma, métricas en tiempo real y selector interactivo con cookies.
-- **[Documentación](https://cloudtranslator.onrender.com/docs.html)**: Arquitectura, flujo de traducción por lotes del DOM y preguntas frecuentes.
-- **[API REST](https://cloudtranslator.onrender.com/api.html)**: Referencia interactiva de endpoints (`/api/translate`, `/api/health`, `/api/languages`), con esquemas JSON, códigos de error y botón de copia con un clic.
-- **[Aprender](https://cloudtranslator.onrender.com/learn.html)**: Guía avanzada de integración paso a paso para SPAs (React, Vue), SSR y optimizaciones de latencia.
-- **[Soporte Técnico](https://cloudtranslator.onrender.com/support.html)**: Canales de contacto oficial y asistencia de implementación.
-- **[Centro de Ayuda](https://cloudtranslator.onrender.com/help.html)**: Solución de problemas comunes y diagnóstico.
-- **[Monitor de Estado](https://cloudtranslator.onrender.com/status.html)**: Verificación en tiempo real del uptime, latencia y memoria del cluster.
+Si deseas ejecutar el servicio en tu entorno local:
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/MiguelCarlosRojas/CloudTranslator.git
+cd CloudTranslator
+
+# 2. Instalar dependencias
+npm install
+
+# 3. Iniciar en modo desarrollo con recarga automática
+npm run dev
+
+# 4. Iniciar en modo producción
+npm start
+```
+
+El servidor estará accesible localmente en `http://localhost:3000`.
 
 ---
 
 ## Autoría y Derechos
 
-© 2026 CloudTranslator. Todos los derechos reservados. Autor: Miguel Angel Carlos Rojas  
-Repositorio oficial: [github.com/MiguelCarlosRojas/CloudTranslator](https://github.com/MiguelCarlosRojas/CloudTranslator)  
-Licencia: ISC
+* **Autor:** Miguel Angel Carlos Rojas
+* **Contacto:** [isakiangel6@gmail.com](mailto:isakiangel6@gmail.com)
+* **Repositorio Oficial:** [github.com/MiguelCarlosRojas/CloudTranslator](https://github.com/MiguelCarlosRojas/CloudTranslator)
+* **Licencia:** [ISC License](COPYRIGHT.md)
+* **Código de Conducta:** [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
