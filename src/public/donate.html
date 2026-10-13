@@ -173,21 +173,21 @@
               Dona de forma segura desde cualquier país con tu saldo PayPal o tarjetas Visa, MasterCard y American Express. Selecciona un monto sugerido para donar directamente:
             </p>
 
-            <!-- Sugerencias de Montos Rápidos Interactivos -->
-            <div style="margin-bottom: 24px;">
-              <span style="display: block; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase;">
+            <!-- Sugerencias de Montos Rápidos -->
+            <div style="margin-bottom: 20px;">
+              <span style="display: block; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">
                 MONTOS SUGERIDOS
               </span>
-              <div class="suggested-amounts-group" id="paypal-amounts-group">
-                <button type="button" class="btn-amount" data-amount="5">$5 USD</button>
-                <button type="button" class="btn-amount" data-amount="10">$10 USD</button>
-                <button type="button" class="btn-amount" data-amount="25">$25 USD</button>
-                <button type="button" class="btn-amount" data-amount="50">$50 USD</button>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="paypal-amounts-group">
+                <button type="button" class="btn btn-outline" data-amount="5" style="padding: 7px 14px; font-size: 0.82rem; font-weight: 700; border-color: rgba(0, 112, 186, 0.4); cursor: pointer;">$5 USD</button>
+                <button type="button" class="btn btn-outline" data-amount="10" style="padding: 7px 14px; font-size: 0.82rem; font-weight: 700; border-color: rgba(0, 112, 186, 0.4); cursor: pointer;">$10 USD</button>
+                <button type="button" class="btn btn-outline" data-amount="25" style="padding: 7px 14px; font-size: 0.82rem; font-weight: 700; border-color: rgba(0, 112, 186, 0.4); cursor: pointer;">$25 USD</button>
+                <button type="button" class="btn btn-outline" data-amount="50" style="padding: 7px 14px; font-size: 0.82rem; font-weight: 700; border-color: rgba(0, 112, 186, 0.4); cursor: pointer;">$50 USD</button>
               </div>
             </div>
           </div>
 
-          <a id="btn-paypal-main" href="https://paypal.me/miguelcarlosrojas" target="_blank" rel="noopener noreferrer" class="btn btn-paypal w-full" style="font-size: 0.96rem; margin-top: auto;">
+          <a id="btn-paypal-main" href="https://paypal.me/miguelcarlosrojas" target="_blank" rel="noopener noreferrer" class="btn btn-paypal w-full" style="font-size: 0.96rem;">
             <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             <span id="btn-paypal-text">Donar con PayPal Ahora</span>
           </a>
@@ -315,10 +315,10 @@
   <script>
     // 1. Manejo Interactivo de Montos Sugeridos para PayPal
     document.addEventListener("click", function(e) {
-      const amountBtn = e.target.closest(".btn-amount");
+      const amountBtn = e.target.closest("#paypal-amounts-group .btn-outline");
       if (amountBtn) {
         e.preventDefault();
-        const allAmountBtns = document.querySelectorAll(".btn-amount");
+        const allAmountBtns = document.querySelectorAll("#paypal-amounts-group .btn-outline");
         const wasActive = amountBtn.classList.contains("active");
 
         allAmountBtns.forEach(b => b.classList.remove("active", "is-selected"));
@@ -340,7 +340,7 @@
 
       const paypalMain = e.target.closest("#btn-paypal-main");
       if (paypalMain) {
-        const activeBtn = document.querySelector(".btn-amount.active, .btn-amount.is-selected");
+        const activeBtn = document.querySelector("#paypal-amounts-group .btn-outline.active, #paypal-amounts-group .btn-outline.is-selected");
         const amount = activeBtn ? activeBtn.getAttribute("data-amount") : null;
         if (amount) {
           paypalMain.href = `https://paypal.me/miguelcarlosrojas/${amount}USD`;
