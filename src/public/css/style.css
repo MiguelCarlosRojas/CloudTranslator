@@ -2122,9 +2122,8 @@ footer {
   justify-content: center;
   border: 2px solid rgba(168, 85, 247, 0.35);
   box-shadow: 0 12px 32px rgba(116, 34, 132, 0.2);
-  margin-bottom: 16px;
+  margin-bottom: 0;
   transition: all 0.25s ease;
-  cursor: zoom-in;
 }
 
 .qr-box-full:hover {
@@ -2136,9 +2135,55 @@ footer {
 .qr-box-full img {
   width: 100%;
   height: auto;
-  max-height: 280px;
+  max-height: 290px;
   object-fit: contain;
   display: block;
+}
+
+.suggested-amounts-group {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 500px) {
+  .suggested-amounts-group {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.btn-amount {
+  padding: 10px 12px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  border-radius: var(--radius-md);
+  background: rgba(0, 112, 186, 0.08);
+  border: 1px solid rgba(0, 112, 186, 0.35);
+  color: #38bdf8;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  user-select: none;
+}
+
+.btn-amount:hover {
+  background: rgba(0, 112, 186, 0.2);
+  border-color: #0070ba;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.btn-amount.active,
+.btn-amount.is-selected {
+  background: #0070ba !important;
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(0, 112, 186, 0.6) !important;
+  transform: translateY(-2px);
 }
 
 .btn-paypal {
@@ -2149,12 +2194,13 @@ footer {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 13px 24px;
+  padding: 14px 24px;
   border-radius: var(--radius-md);
   text-decoration: none !important;
   transition: all 0.2s ease;
   border: none;
   cursor: pointer;
+  font-size: 0.98rem;
 }
 
 .btn-paypal:hover {
