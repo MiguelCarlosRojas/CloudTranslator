@@ -1384,7 +1384,9 @@ body.ct-translating {
 
 /* Panel de Telemetría (Cluster Status) */
 .telemetry-board {
-  background: var(--bg-card);
+  background: rgba(13, 17, 23, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--border-card);
   border-radius: var(--radius-lg);
   padding: clamp(20px, 4vw, 32px);
@@ -1396,11 +1398,27 @@ body.ct-translating {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--border-subtle);
+  padding: 22px 26px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(15, 23, 42, 0.5) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  box-shadow: 0 8px 32px -4px rgba(16, 185, 129, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   margin-bottom: 24px;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
+  transition: all 0.3s ease;
+}
+
+.status-indicator-banner.status-online {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(15, 23, 42, 0.6) 100%);
+  border-color: rgba(16, 185, 129, 0.45);
+  box-shadow: 0 8px 32px -4px rgba(16, 185, 129, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.status-indicator-banner.status-sleeping {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%);
+  border-color: rgba(245, 158, 11, 0.35);
+  box-shadow: 0 8px 32px -4px rgba(245, 158, 11, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .status-headline {

@@ -265,6 +265,86 @@
     },
 
     /**
+     * Plantilla HTML del Modal QR Reutilizable
+     */
+    getQrModalHTML() {
+      return `
+<div id="qr-modal" class="qr-modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="qr-modal-dialog">
+    <div class="qr-modal-header">
+      <h3>
+        <svg class="icon" viewBox="0 0 24 24" style="color: #d946ef;"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01M17 7h.01M7 17h.01M17 17h.01"/></svg>
+        Código QR Yape - Escaneo Directo
+      </h3>
+      <button id="qr-modal-close" class="btn-modal-close" aria-label="Cerrar ventana emergente">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="qr-modal-body">
+      <img src="/img/yape-qr.png" alt="Código QR de Yape Ampliado" class="qr-modal-img">
+      <p class="qr-modal-caption">
+        Abre tu aplicación Yape en el teléfono celular, pulsa en el botón <strong>"Escanear QR"</strong> y enfoca este código directamente en tu pantalla.
+      </p>
+      <div style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: var(--radius-sm); padding: 8px 16px; margin-top: 6px;">
+        <span style="font-size: 0.85rem; color: #ffffff; font-weight: 700;">
+          Beneficiario: Miguel Angel Carlos Rojas
+        </span>
+      </div>
+    </div>
+  </div>
+</div>`;
+    },
+
+    openQrModal() {
+      let modal = document.getElementById("qr-modal");
+      if (!modal) {
+        document.body.insertAdjacentHTML("beforeend", this.getQrModalHTML());
+        modal = document.getElementById("qr-modal");
+      }
+      if (modal) {
+        modal.classList.add("open");
+        modal.style.display = "flex";
+        document.body.style.overflow = "hidden";
+      }
+    },
+
+    closeQrModal() {
+      const modal = document.getElementById("qr-modal");
+      if (modal) {
+        modal.classList.remove("open");
+        modal.style.display = "none";
+        document.body.style.overflow = "";
+      }
+    },
+
+    initQrModalEvents() {
+      if (window._qrModalEventsBound) return;
+      window._qrModalEventsBound = true;
+
+      document.addEventListener("click", (e) => {
+        const trigger = e.target.closest("#btn-open-qr-page-modal, [data-open-qr-modal], #qr-box-trigger, .qr-box-full");
+        if (trigger) {
+          e.preventDefault();
+          CloudComponents.openQrModal();
+          return;
+        }
+
+        const closeBtn = e.target.closest("#qr-modal-close, .btn-modal-close");
+        const backdrop = e.target.classList.contains("qr-modal-backdrop") || (e.target.id === "qr-modal");
+        if (closeBtn || backdrop) {
+          e.preventDefault();
+          CloudComponents.closeQrModal();
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          CloudComponents.closeQrModal();
+        }
+      });
+    },
+
+    /**
      * Auto-inyecta encabezado, pie de página y decora controles si existen
      */
     init() {
@@ -285,6 +365,7 @@
 
       this.decorateSelects();
       this.initDrawerEvents();
+      this.initQrModalEvents();
     }
   };
 
@@ -296,9 +377,11 @@
     document.addEventListener("DOMContentLoaded", () => {
       CloudComponents.decorateSelects();
       CloudComponents.initDrawerEvents();
+      CloudComponents.initQrModalEvents();
     });
   } else {
     CloudComponents.decorateSelects();
     CloudComponents.initDrawerEvents();
+    CloudComponents.initQrModalEvents();
   }
 })(window, document);
