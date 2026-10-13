@@ -222,12 +222,12 @@
             </div>
 
             <!-- Cuadro donde la imagen ocupa TODO el ancho del contenedor -->
-            <div class="qr-box-full" id="qr-box-trigger" title="Haz clic sobre el código QR para ampliarlo y escanearlo con comodidad">
+            <div class="qr-box-full" id="qr-box-trigger" data-open-qr-modal="true" onclick="openQrModal()" style="cursor: pointer;" title="Haz clic sobre el código QR para ampliarlo y escanearlo con comodidad">
               <img src="/img/yape-qr.png" alt="Código QR de Yape - Miguel Angel Carlos Rojas" id="yape-qr-page-img">
             </div>
           </div>
 
-          <button id="btn-open-qr-page-modal" class="btn btn-secondary w-full" data-open-qr-modal="true" style="padding: 13px 20px; font-weight: 700; font-size: 0.92rem;">
+          <button id="btn-open-qr-page-modal" class="btn btn-secondary w-full" data-open-qr-modal="true" onclick="openQrModal()" style="padding: 13px 20px; font-weight: 700; font-size: 0.92rem; cursor: pointer;">
             <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             Ampliar Código QR para Escanear
           </button>
@@ -272,30 +272,6 @@
         </div>
       </div>
     </section>
-
-    <!-- Modal para Escanear QR en Pantalla Completa Perfectamente Centrado -->
-    <div id="qr-modal" class="qr-modal-backdrop">
-      <div class="qr-modal-dialog">
-        <div class="qr-modal-header">
-          <h3>
-            <svg class="icon" viewBox="0 0 24 24" style="color: #d946ef;"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01M17 7h.01M7 17h.01M17 17h.01"/></svg>
-            Código QR Yape - Escaneo Directo
-          </h3>
-          <button id="qr-modal-close" class="btn-modal-close" aria-label="Cerrar ventana emergente"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-        </div>
-        <div class="qr-modal-body">
-          <img src="/img/yape-qr.png" alt="Código QR de Yape Ampliado" class="qr-modal-img">
-          <p class="qr-modal-caption">
-            Abre tu aplicación Yape en el teléfono celular, pulsa en el botón <strong>"Escanear QR"</strong> y enfoca este código directamente en tu pantalla.
-          </p>
-          <div style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: var(--radius-sm); padding: 8px 16px; margin-top: 6px;">
-            <span style="font-size: 0.85rem; color: #ffffff; font-weight: 700;">
-              Beneficiario: Miguel Angel Carlos Rojas
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
 
   </main>
 
@@ -412,6 +388,62 @@
         });
       }
     });
+
+    // Control Global e Inmediato del Modal QR
+    function openQrModal() {
+      let m = document.getElementById("qr-modal");
+      if (!m && window.CloudComponents && window.CloudComponents.getQrModalHTML) {
+        document.body.insertAdjacentHTML("beforeend", window.CloudComponents.getQrModalHTML());
+        m = document.getElementById("qr-modal");
+      }
+      if (m) {
+        m.classList.add("open");
+        m.classList.add("active");
+        m.style.setProperty("display", "flex", "important");
+        document.body.style.overflow = "hidden";
+      }
+    }
+
+    function closeQrModal() {
+      let m = document.getElementById("qr-modal");
+      if (m) {
+        m.classList.remove("open");
+        m.classList.remove("active");
+        m.style.setProperty("display", "none", "important");
+        document.body.style.overflow = "";
+      }
+    }
+
+    window.openQrModal = openQrModal;
+    window.closeQrModal = closeQrModal;
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeQrModal();
+    });
   </script>
+
+  <!-- Modal para Escanear QR en Pantalla Completa Reutilizable -->
+  <div id="qr-modal" class="qr-modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" onclick="if(event.target===this) closeQrModal();">
+    <div class="qr-modal-dialog">
+      <div class="qr-modal-header">
+        <h3>
+          <svg class="icon" viewBox="0 0 24 24" style="color: #d946ef;"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01M17 7h.01M7 17h.01M17 17h.01"/></svg>
+          Código QR Yape - Escaneo Directo
+        </h3>
+        <button id="qr-modal-close" class="btn-modal-close" aria-label="Cerrar ventana emergente" onclick="closeQrModal();"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="qr-modal-body">
+        <img src="/img/yape-qr.png" alt="Código QR de Yape Ampliado" class="qr-modal-img">
+        <p class="qr-modal-caption">
+          Abre tu aplicación Yape en el teléfono celular, pulsa en el botón <strong>"Escanear QR"</strong> y enfoca este código directamente en tu pantalla.
+        </p>
+        <div style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: var(--radius-sm); padding: 8px 16px; margin-top: 6px;">
+          <span style="font-size: 0.85rem; color: #ffffff; font-weight: 700;">
+            Beneficiario: Miguel Angel Carlos Rojas
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

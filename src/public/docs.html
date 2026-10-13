@@ -232,6 +232,38 @@
           </div>
         </div>
 
+        <!-- Sesión 05: Pilar 2 - Texto a Voz (TTS) -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">05 / Pilar 2: Texto a Voz (TTS)</span>
+          <a href="#session-tts" class="docs-sidebar-session" data-target="session-tts">
+            <span class="session-badge">S.05</span> Integración TTS
+          </a>
+          <div class="docs-sidebar-subsessions">
+            <a href="#sub-tts-voices" class="docs-sidebar-sublink" data-target="sub-tts-voices">
+              <span class="sub-num">5.1</span> Catálogo de Voces
+            </a>
+            <a href="#sub-tts-generate" class="docs-sidebar-sublink" data-target="sub-tts-generate">
+              <span class="sub-num">5.2</span> Generación de Audio
+            </a>
+          </div>
+        </div>
+
+        <!-- Sesión 06: Pilar 3 - Clonación de Voz (IA) -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">06 / Pilar 3: Clonación IA</span>
+          <a href="#session-voice-clone" class="docs-sidebar-session" data-target="session-voice-clone">
+            <span class="session-badge">S.06</span> Clonación Neuronal
+          </a>
+          <div class="docs-sidebar-subsessions">
+            <a href="#sub-clone-sample" class="docs-sidebar-sublink" data-target="sub-clone-sample">
+              <span class="sub-num">6.1</span> Muestra &amp; F0
+            </a>
+            <a href="#sub-clone-synthesize" class="docs-sidebar-sublink" data-target="sub-clone-synthesize">
+              <span class="sub-num">6.2</span> Síntesis con IA
+            </a>
+          </div>
+        </div>
+
         <!-- Enlace a Referencia de API -->
         <div class="docs-sidebar-group" style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border-line);">
           <span class="docs-group-label">Especificación Técnica</span>
@@ -253,7 +285,7 @@
           Guía de Conexión al Endpoint y Documentación Técnica
         </h1>
         <p class="lead">
-          Aprende a conectar cualquier sistema externo (React, Vue, frontend HTML/JS, Node.js, Python o PHP) con el microservicio en la nube <strong>https://cloudtranslator.onrender.com</strong>, optimizando la red para traducir en una sola petición asíncrona y persistiendo el idioma mediante cookies.
+          Aprende a conectar cualquier sistema externo (React, Vue, frontend HTML/JS, Node.js, Python o PHP) con el microservicio en la nube <strong>https://cloudtranslator.onrender.com</strong>, integrando los 3 ecosistemas: Traducción en 1 sola consulta HTTP, Texto a Voz (TTS) y Clonación de Voz con IA.
         </p>
       </section>
 
@@ -261,7 +293,7 @@
       <div class="docs-mobile-toc-bar">
         <button id="btn-toggle-docs-toc" class="btn btn-outline docs-toc-toggle-btn" aria-label="Abrir Índice de Temas">
           <span><svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg> Índice de Sesiones y Guías</span>
-          <span class="toc-badge">S.01 — S.04</span>
+          <span class="toc-badge">S.01 — S.06</span>
         </button>
         <div id="docs-mobile-toc-content" class="docs-toc-dropdown" style="display: none; margin-top: 10px; background: rgba(15, 17, 24, 0.95); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 16px;">
           <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px;">
@@ -278,6 +310,12 @@
             <li><a href="#session-cookies" style="font-weight: 600;">S.04 // Cookies y Rendimiento</a></li>
             <li><a href="#sub-cookies-spec" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">4.1 Cookie cloud_translator_lang</a></li>
             <li><a href="#sub-render-coldstart" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">4.2 Render Cold Start</a></li>
+            <li><a href="#session-tts" style="font-weight: 600;">S.05 // Pilar 2: Texto a Voz (TTS)</a></li>
+            <li><a href="#sub-tts-voices" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">5.1 Catálogo de Voces</a></li>
+            <li><a href="#sub-tts-generate" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">5.2 Generación de Audio</a></li>
+            <li><a href="#session-voice-clone" style="font-weight: 600;">S.06 // Pilar 3: Clonación IA</a></li>
+            <li><a href="#sub-clone-sample" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">6.1 Muestra de Audio</a></li>
+            <li><a href="#sub-clone-synthesize" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">6.2 Síntesis con IA</a></li>
           </ul>
         </div>
       </div>
@@ -687,6 +725,171 @@ print_r($traducciones);
           <div class="callout">
             <strong>Arranque en Frío:</strong> Si no hay tráfico entrante durante 15 minutos, el contenedor entra en modo de reposo. La primera consulta reactiva el servidor en aproximadamente 25 a 35 segundos. Las peticiones subsecuentes responden con latencia promedio de 150 a 350 milisegundos.
           </div>
+        </article>
+      </section>
+
+      <!-- SESIÓN 5: PILAR 2 - TEXTO A VOZ MULTILINGÜE (TTS) -->
+      <section id="session-tts" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ S.05 // TTS_INTEGRATION ]</span>
+          <h2>Pilar 2: Conexión al Motor de Texto a Voz (TTS)</h2>
+          <p>Generación de locución humana realista en más de 10 idiomas con selección acústica, modulación y streaming.</p>
+        </div>
+
+        <!-- Subsesión 5.1 -->
+        <article class="content-box-card docs-subsection" id="sub-tts-voices">
+          <span class="tech-card-tag">[ 5.1 // VOICES_CATALOG ]</span>
+          <h3>Catálogo de Voces y Selección Dinámica</h3>
+          <p>
+            Antes de sintetizar, puedes consultar la lista de voces disponibles consultando <code>GET /api/tts/voices</code>. Devuelve un catálogo con metadatos de idioma, timbre, género y descripción:
+          </p>
+          <div class="code-box-header">
+            <span>JavaScript Vanilla - Obtener Catálogo</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-js-voices')">Copiar</button>
+          </div>
+          <pre class="code-panel" id="code-js-voices">async function cargarVoces() {
+  const resp = await fetch("https://cloudtranslator.onrender.com/api/tts/voices");
+  const data = await resp.json();
+  console.log(`Voces disponibles: ${data.count}`);
+  return data.voices; // Arreglo de voces disponibles
+}</pre>
+        </article>
+
+        <!-- Subsesión 5.2 -->
+        <article class="content-box-card docs-subsection" id="sub-tts-generate">
+          <span class="tech-card-tag">[ 5.2 // AUDIO_SYNTHESIS ]</span>
+          <h3>Generación y Reproducción Directa en Frontend</h3>
+          <p>
+            Envía el texto a <code>POST /api/tts</code>. El backend responde con el audio en base64 y URLs de streaming para reproducción inmediata:
+          </p>
+          <div class="code-box-header">
+            <span>JavaScript - Síntesis y Reproducción HTML5</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-js-tts-play')">Copiar</button>
+          </div>
+          <pre class="code-panel" id="code-js-tts-play">async function hablar(texto, voiceId = "es-ES-sofia") {
+  const resp = await fetch("https://cloudtranslator.onrender.com/api/tts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      text: texto,
+      voiceId: voiceId,
+      lang: "es-ES",
+      rate: 1.0,
+      pitch: 1.0
+    })
+  });
+
+  const data = await resp.json();
+  // Reproducir directamente el audio base64 devuelto por el servidor
+  const audio = new Audio(data.audioBase64);
+  audio.play();
+}</pre>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 18px;">Ejemplo en Python (Descarga a Archivo WAV)</h4>
+          <div class="code-box-header">
+            <span>Python 3 - Síntesis y Guardado en Disco</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-py-tts')">Copiar</button>
+          </div>
+          <pre class="code-panel" id="code-py-tts">import requests, base64
+
+url = "https://cloudtranslator.onrender.com/api/tts"
+payload = {
+    "text": "Hola, este audio fue sintetizado mediante la API de CloudTranslator",
+    "voiceId": "es-ES-sofia",
+    "lang": "es-ES"
+}
+
+resp = requests.post(url, json=payload)
+data = resp.json()
+
+# Decodificar y guardar el archivo de audio localmente
+audio_data = base64.b64decode(data["audioBase64"].split(",")[1])
+with open("locucion.wav", "wb") as f:
+    f.write(audio_data)
+print("Archivo guardado: locucion.wav")</pre>
+        </article>
+      </section>
+
+      <!-- SESIÓN 6: PILAR 3 - CLONACIÓN DE VOZ POR IA -->
+      <section id="session-voice-clone" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ S.06 // VOICE_CLONE_INTEGRATION ]</span>
+          <h2>Pilar 3: Conexión al Motor de Clonación de Voz (IA)</h2>
+          <p>Síntesis neuronal zero-shot recreando el timbre, formantes y entonación a partir de una muestra de voz.</p>
+        </div>
+
+        <!-- Subsesión 6.1 -->
+        <article class="content-box-card docs-subsection" id="sub-clone-sample">
+          <span class="tech-card-tag">[ 6.1 // SAMPLE_RECORDING ]</span>
+          <h3>Muestra de Audio de Referencia</h3>
+          <p>
+            El sistema requiere una muestra de 4 a 10 segundos de la voz del usuario (formato <code>.wav</code>, <code>.mp3</code>, <code>.ogg</code> o grabada por micrófono). La muestra debe enviarse en formato Base64 con prefijo <code>data:audio/...</code>.
+          </p>
+          <div class="callout">
+            <strong>Recomendación Acústica:</strong> Para una clonación óptima, habla con voz clara a unos 15 cm del micrófono sin música de fondo ni eco ambiental.
+          </div>
+        </article>
+
+        <!-- Subsesión 6.2 -->
+        <article class="content-box-card docs-subsection" id="sub-clone-synthesize">
+          <span class="tech-card-tag">[ 6.2 // ZERO_SHOT_SYNTHESIS ]</span>
+          <h3>Síntesis con Voz Clonada</h3>
+          <p>
+            Envía el guion deseado junto con la muestra base hacia <code>POST /api/voice-clone</code>:
+          </p>
+          <div class="code-box-header">
+            <span>JavaScript - Clonación y Reproducción Inmediata</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-js-vc')">Copiar</button>
+          </div>
+          <pre class="code-panel" id="code-js-vc">async function clonarVoz(muestraBase64, guionTexto) {
+  const resp = await fetch("https://cloudtranslator.onrender.com/api/voice-clone", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      text: guionTexto,
+      audioSampleBase64: muestraBase64,
+      similarity: "high",
+      pitch: 1.0
+    })
+  });
+
+  const data = await resp.json();
+  // Reproducir el audio sintetizado con el timbre del usuario
+  const player = new Audio(data.audioBase64);
+  player.play();
+
+  // Enlace físico de descarga directa
+  console.log("Enlace de descarga:", data.downloadUrl);
+}</pre>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 18px;">Ejemplo en Node.js</h4>
+          <div class="code-box-header">
+            <span>Node.js - Clonación y Guardado de Archivo</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-node-vc')">Copiar</button>
+          </div>
+          <pre class="code-panel" id="code-node-vc">const fs = require("fs");
+
+async function clonarVozEnServidor() {
+  const audioSampleBuffer = fs.readFileSync("./mi-voz-muestra.wav");
+  const audioSampleBase64 = `data:audio/wav;base64,${audioSampleBuffer.toString("base64")}`;
+
+  const response = await fetch("https://cloudtranslator.onrender.com/api/voice-clone", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      text: "Mensaje generado automáticamente con mi timbre de voz.",
+      audioSampleBase64: audioSampleBase64,
+      similarity: "high"
+    })
+  });
+
+  const data = await response.json();
+  const rawWav = Buffer.from(data.audioBase64.split(",")[1], "base64");
+  fs.writeFileSync("./voz-clonada-resultado.wav", rawWav);
+  console.log("Archivo sintetizado con éxito: voz-clonada-resultado.wav");
+}
+
+clonarVozEnServidor();</pre>
         </article>
       </section>
 

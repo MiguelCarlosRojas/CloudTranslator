@@ -183,47 +183,54 @@
           </div>
         </div>
 
-        <!-- Grupo 2: Endpoints de Traducción -->
+        <!-- Grupo 2: Pilar 1 - Traducción -->
         <div class="docs-sidebar-group">
-          <span class="docs-group-label">02 / Servicio de Traducción</span>
+          <span class="docs-group-label">02 / Pilar 1: Traducción</span>
           <a href="#api-post-translate" class="docs-sidebar-session" data-target="api-post-translate">
             <span class="session-badge">T.01</span> POST /api/translate
           </a>
-          <div class="docs-sidebar-subsessions">
-            <a href="#sub-post-single" class="docs-sidebar-sublink" data-target="sub-post-single">
-              <span class="sub-num">2.1</span> Texto Simple (JSON)
-            </a>
-            <a href="#sub-post-batch" class="docs-sidebar-sublink" data-target="sub-post-batch">
-              <span class="sub-num">2.2</span> Lotes / Micro-batch
-            </a>
-          </div>
           <a href="#api-get-translate" class="docs-sidebar-session" data-target="api-get-translate">
             <span class="session-badge">T.02</span> GET /api/translate
           </a>
-        </div>
-
-        <!-- Grupo 3: Utilidades del Sistema -->
-        <div class="docs-sidebar-group">
-          <span class="docs-group-label">03 / Metadata &amp; Diagnóstico</span>
           <a href="#api-get-languages" class="docs-sidebar-session" data-target="api-get-languages">
-            <span class="session-badge">S.01</span> GET /api/languages
+            <span class="session-badge">T.03</span> GET /api/languages
+          </a>
+          <a href="#api-get-ping" class="docs-sidebar-session" data-target="api-get-ping">
+            <span class="session-badge">T.04</span> GET /api/ping
           </a>
           <a href="#api-get-health" class="docs-sidebar-session" data-target="api-get-health">
-            <span class="session-badge">S.02</span> GET /api/health
+            <span class="session-badge">T.05</span> GET /api/health
           </a>
         </div>
 
-        <!-- Grupo 4: Síntesis y Clonación Vocal -->
+        <!-- Grupo 3: Pilar 2 - Texto a Voz (TTS) -->
         <div class="docs-sidebar-group">
-          <span class="docs-group-label">04 / Audio &amp; Voz Neuronal</span>
-          <a href="#api-post-tts" class="docs-sidebar-session" data-target="api-post-tts">
-            <span class="session-badge">V.01</span> POST /api/tts
-          </a>
+          <span class="docs-group-label">03 / Pilar 2: Texto a Voz (TTS)</span>
           <a href="#api-get-voices" class="docs-sidebar-session" data-target="api-get-voices">
-            <span class="session-badge">V.02</span> GET /api/tts/voices
+            <span class="session-badge">V.01</span> GET /api/tts/voices
           </a>
+          <a href="#api-post-tts" class="docs-sidebar-session" data-target="api-post-tts">
+            <span class="session-badge">V.02</span> POST /api/tts
+          </a>
+          <a href="#api-get-tts-stream" class="docs-sidebar-session" data-target="api-get-tts-stream">
+            <span class="session-badge">V.03</span> GET /api/tts/stream
+          </a>
+          <a href="#api-get-tts-download" class="docs-sidebar-session" data-target="api-get-tts-download">
+            <span class="session-badge">V.04</span> GET /api/tts/download
+          </a>
+        </div>
+
+        <!-- Grupo 4: Pilar 3 - Clonación de Voz (IA) -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">04 / Pilar 3: Clonación de Voz IA</span>
           <a href="#api-post-voice-clone" class="docs-sidebar-session" data-target="api-post-voice-clone">
-            <span class="session-badge">V.03</span> POST /api/voice-clone
+            <span class="session-badge">C.01</span> POST /api/voice-clone
+          </a>
+          <a href="#api-get-vc-stream" class="docs-sidebar-session" data-target="api-get-vc-stream">
+            <span class="session-badge">C.02</span> GET /api/voice-clone/stream
+          </a>
+          <a href="#api-get-vc-download" class="docs-sidebar-session" data-target="api-get-vc-download">
+            <span class="session-badge">C.03</span> GET /api/voice-clone/download
           </a>
         </div>
 
@@ -566,9 +573,38 @@
         </article>
       </section>
 
+      <!-- SECCIÓN 02.4: PING O(1) -->
+      <section id="api-get-ping" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ T.04 // ULTRA_LIGHT_PING ]</span>
+          <h2>GET /api/ping</h2>
+          <p>Comprobación de latencia ultrarrápida O(1) resuelta directamente desde memoria RAM con encabezados CORS universales.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div class="code-box-header">
+            <span>Comando cURL (GET /api/ping)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-ping')">Copiar cURL</button>
+          </div>
+          <pre class="code-panel" id="curl-get-ping">curl -X GET "https://cloudtranslator.onrender.com/api/ping"</pre>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
+          <div class="code-box-header">
+            <span>Respuesta JSON (HTTP 200 OK)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-get-ping')">Copiar JSON</button>
+          </div>
+          <pre class="code-panel" id="res-get-ping">{
+  "status": "pong",
+  "service": "CloudTranslator Core",
+  "timestamp": 1727560000000
+}</pre>
+        </article>
+      </section>
+
+      <!-- SECCIÓN 02.5: HEALTHCHECK -->
       <section id="api-get-health" class="docs-section">
         <div class="section-full-title">
-          <span class="tech-card-tag">[ S.02 // HEALTHCHECK ]</span>
+          <span class="tech-card-tag">[ T.05 // HEALTHCHECK ]</span>
           <h2>GET /api/health</h2>
           <p>Comprobación de operatividad y tiempo activo (uptime) para balanceadores y monitores de infraestructura.</p>
         </div>
@@ -594,12 +630,58 @@
         </article>
       </section>
 
-      <!-- SECCIÓN 04: AUDIO Y VOZ NEURONAL -->
+      <!-- SECCIÓN 03: PILAR 2 - TEXTO A VOZ MULTILINGÜE (TTS) -->
+      <section id="api-get-voices" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ V.01 // VOICES_CATALOG ]</span>
+          <h2>GET /api/tts/voices</h2>
+          <p>Devuelve el catálogo de voces humanas reales clasificadas por idioma, acento, género y muestra auditiva.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div class="code-box-header">
+            <span>Comando cURL (GET /api/tts/voices)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-voices')">Copiar cURL</button>
+          </div>
+          <pre class="code-panel" id="curl-get-voices">curl -X GET "https://cloudtranslator.onrender.com/api/tts/voices"</pre>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
+          <div class="code-box-header">
+            <span>Respuesta JSON (HTTP 200 OK)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-get-voices')">Copiar JSON</button>
+          </div>
+          <pre class="code-panel" id="res-get-voices">{
+  "status": "success",
+  "count": 24,
+  "voices": [
+    {
+      "id": "es-ES-sofia",
+      "name": "Sofía",
+      "lang": "es-ES",
+      "gender": "female",
+      "flag": "es",
+      "accent": "España",
+      "desc": "Natural y elocuente"
+    },
+    {
+      "id": "es-MX-mateo",
+      "name": "Mateo",
+      "lang": "es-MX",
+      "gender": "male",
+      "flag": "mx",
+      "accent": "México",
+      "desc": "Cálido y expresivo"
+    }
+  ]
+}</pre>
+        </article>
+      </section>
+
       <section id="api-post-tts" class="docs-section">
         <div class="section-full-title">
-          <span class="tech-card-tag">[ V.01 // TEXT_TO_SPEECH ]</span>
+          <span class="tech-card-tag">[ V.02 // TEXT_TO_SPEECH ]</span>
           <h2>POST /api/tts</h2>
-          <p>Síntesis vocal en tiempo real a partir de texto en más de 10 idiomas con selección de voces humanas reales.</p>
+          <p>Genera locución vocal auditiva natural a partir de un texto plano, con calibración de tono (pitch), velocidad (rate) y entrega en audio base64 o URL de descarga directa.</p>
         </div>
 
         <article class="content-box-card">
@@ -612,7 +694,7 @@
   -d '{
     "text": "Bienvenido al motor acústico de CloudTranslator",
     "voiceId": "es-ES-sofia",
-    "lang": "es",
+    "lang": "es-ES",
     "rate": 1.0,
     "pitch": 1.0
   }'</pre>
@@ -624,42 +706,57 @@
           </div>
           <pre class="code-panel" id="res-post-tts">{
   "status": "success",
-  "service": "CloudTranslator TTS Studio (Backend Neural Engine)",
+  "service": "CloudTranslator TTS Studio",
   "text": "Bienvenido al motor acústico de CloudTranslator",
-  "lang": "es",
-  "voice": "Sofía",
+  "lang": "es-ES",
   "voiceId": "es-ES-sofia",
-  "audioBase64": "data:audio/mpeg;base64,...",
-  "streamUrl": "/api/tts/stream?id=aud_a91f",
-  "downloadUrl": "/api/tts/download?id=aud_a91f",
-  "format": "mp3",
-  "mimeType": "audio/mpeg",
-  "sizeBytes": 42100
+  "audioBase64": "data:audio/wav;base64,UklGRi...",
+  "streamUrl": "/api/tts/stream?text=Bienvenido...&voiceId=es-ES-sofia",
+  "downloadUrl": "/api/tts/download?text=Bienvenido...&voiceId=es-ES-sofia",
+  "format": "wav",
+  "mimeType": "audio/wav"
 }</pre>
         </article>
       </section>
 
-      <section id="api-get-voices" class="docs-section">
+      <section id="api-get-tts-stream" class="docs-section">
         <div class="section-full-title">
-          <span class="tech-card-tag">[ V.02 // VOICES_CATALOG ]</span>
-          <h2>GET /api/tts/voices</h2>
-          <p>Devuelve el catálogo completo de 24 voces humanas reales con información de acento, género y texto de muestra.</p>
+          <span class="tech-card-tag">[ V.03 // TTS_STREAMING ]</span>
+          <h2>GET /api/tts/stream</h2>
+          <p>Transmite el flujo binario de audio de forma continua en tiempo real mediante encabezados <code>Content-Type: audio/wav</code> sin requerir almacenamiento en disco local.</p>
         </div>
 
         <article class="content-box-card">
           <div class="code-box-header">
-            <span>Comando cURL (GET /api/tts/voices)</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-voices')">Copiar cURL</button>
+            <span>Comando cURL (GET /api/tts/stream)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-tts-stream')">Copiar cURL</button>
           </div>
-          <pre class="code-panel" id="curl-get-voices">curl -X GET "https://cloudtranslator.onrender.com/api/tts/voices"</pre>
+          <pre class="code-panel" id="curl-get-tts-stream">curl -X GET "https://cloudtranslator.onrender.com/api/tts/stream?text=Hola%20mundo&voiceId=es-ES-sofia" --output locucion.wav</pre>
         </article>
       </section>
 
+      <section id="api-get-tts-download" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ V.04 // TTS_DOWNLOAD ]</span>
+          <h2>GET /api/tts/download</h2>
+          <p>Descarga directa del archivo de audio con cabecera <code>Content-Disposition: attachment; filename="locucion-tts.wav"</code>.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div class="code-box-header">
+            <span>Comando cURL (GET /api/tts/download)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-tts-download')">Copiar cURL</button>
+          </div>
+          <pre class="code-panel" id="curl-get-tts-download">curl -L -O "https://cloudtranslator.onrender.com/api/tts/download?text=Hola%20mundo&voiceId=es-ES-sofia"</pre>
+        </article>
+      </section>
+
+      <!-- SECCIÓN 04: PILAR 3 - CLONACIÓN DE VOZ (IA) -->
       <section id="api-post-voice-clone" class="docs-section">
         <div class="section-full-title">
-          <span class="tech-card-tag">[ V.03 // VOICE_CLONING ]</span>
+          <span class="tech-card-tag">[ C.01 // VOICE_CLONING_AI ]</span>
           <h2>POST /api/voice-clone</h2>
-          <p>Clonación y síntesis acústica con extracción de huella vocal y modulación armónica.</p>
+          <p>Clonación de voz neuronal zero-shot a partir de una muestra auditiva de referencia (grabada con micrófono o subida en archivo). Extrae la frecuencia fundamental (F0), formantes acústicos y sintetiza el guion manteniendo el timbre original del usuario.</p>
         </div>
 
         <article class="content-box-card">
@@ -670,11 +767,61 @@
           <pre class="code-panel" id="curl-post-clone">curl -X POST "https://cloudtranslator.onrender.com/api/voice-clone" \
   -H "Content-Type: application/json" \
   -d '{
-    "text": "Mensaje personalizado sintetizado con mi timbre vocal",
-    "audioSampleBase64": "data:audio/webm;base64,...",
-    "pitch": 1.0,
-    "similarity": "high"
+    "text": "Esta es mi voz clonada mediante el motor de IA de CloudTranslator.",
+    "audioSampleBase64": "data:audio/wav;base64,UklGRi...",
+    "similarity": "high",
+    "pitch": 1.0
   }'</pre>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
+          <div class="code-box-header">
+            <span>Respuesta JSON (HTTP 200 OK)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-post-clone')">Copiar JSON</button>
+          </div>
+          <pre class="code-panel" id="res-post-clone">{
+  "status": "success",
+  "service": "CloudTranslator Voice Cloning AI",
+  "text": "Esta es mi voz clonada mediante el motor de IA de CloudTranslator.",
+  "similarity": "high",
+  "detectedPitchHz": 142,
+  "audioBase64": "data:audio/wav;base64,UklGRi...",
+  "streamUrl": "/api/voice-clone/stream?sampleId=smp_78ab",
+  "downloadUrl": "/api/voice-clone/download?sampleId=smp_78ab",
+  "format": "wav",
+  "mimeType": "audio/wav"
+}</pre>
+        </article>
+      </section>
+
+      <section id="api-get-vc-stream" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ C.02 // CLONE_STREAM ]</span>
+          <h2>GET /api/voice-clone/stream</h2>
+          <p>Transmite en streaming continuo el audio con el timbre vocal clonado en tiempo real.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div class="code-box-header">
+            <span>Comando cURL (GET /api/voice-clone/stream)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-vc-stream')">Copiar cURL</button>
+          </div>
+          <pre class="code-panel" id="curl-get-vc-stream">curl -X GET "https://cloudtranslator.onrender.com/api/voice-clone/stream?sampleId=smp_78ab" --output voz-clonada.wav</pre>
+        </article>
+      </section>
+
+      <section id="api-get-vc-download" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ C.03 // CLONE_DOWNLOAD ]</span>
+          <h2>GET /api/voice-clone/download</h2>
+          <p>Descarga directa física del archivo WAV sintetizado con la voz clonada por IA.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div class="code-box-header">
+            <span>Comando cURL (GET /api/voice-clone/download)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-vc-download')">Copiar cURL</button>
+          </div>
+          <pre class="code-panel" id="curl-get-vc-download">curl -L -O "https://cloudtranslator.onrender.com/api/voice-clone/download?sampleId=smp_78ab"</pre>
         </article>
       </section>
 

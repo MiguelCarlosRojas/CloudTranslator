@@ -303,7 +303,8 @@
       }
       if (modal) {
         modal.classList.add("open");
-        modal.style.display = "flex";
+        modal.classList.add("active");
+        modal.style.setProperty("display", "flex", "important");
         document.body.style.overflow = "hidden";
       }
     },
@@ -312,7 +313,8 @@
       const modal = document.getElementById("qr-modal");
       if (modal) {
         modal.classList.remove("open");
-        modal.style.display = "none";
+        modal.classList.remove("active");
+        modal.style.setProperty("display", "none", "important");
         document.body.style.overflow = "";
       }
     },
