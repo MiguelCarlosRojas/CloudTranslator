@@ -25,17 +25,18 @@
         <span class="brand-badge">v1.0.0</span>
       </a>
 
-      <nav>
+      <nav class="desktop-nav">
         <ul class="main-menu">
           <li><a href="/" class="active">Inicio</a></li>
           <li><a href="/docs">Documentación</a></li>
+          <li><a href="/api">API REST</a></li>
+          <li><a href="/learn">Aprender</a></li>
           <li><a href="/support">Soporte</a></li>
           <li><a href="/status">Estado</a></li>
         </ul>
       </nav>
 
-      <!-- Barra de Traducción Activa -->
-            <!-- Barra de Herramientas de Traducción Activa (Protegida contra corrupción visual) -->
+      <!-- Barra de Herramientas de Traducción Activa (Protegida contra corrupción visual) -->
       <div class="toolbar-controls no-translate" data-no-translate>
         <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
           <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
@@ -51,6 +52,9 @@
               <option value="de">Deutsch (de)</option>
               <option value="it">Italiano (it)</option>
               <option value="pt">Portugués (pt)</option>
+              <option value="ja">日本語 (ja)</option>
+              <option value="zh-CN">中文 (zh-CN)</option>
+              <option value="ru">Русский (ru)</option>
             </select>
           </div>
           <div class="custom-lang-group">
@@ -67,6 +71,53 @@
         <div id="status-pill" class="status-pill" title="Estado del microservicio">
           <span class="spinner"></span>
           <span id="status-text">LISTO</span>
+        </div>
+      </div>
+
+      <!-- Botón Hamburguesa Móvil -->
+      <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Abrir Menú de Navegación">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+
+    <!-- Cajón de Navegación Móvil -->
+    <div id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
+      <div class="drawer-section">
+        <span class="drawer-title">NAVEGACIÓN DEL PORTAL</span>
+        <ul class="drawer-menu">
+          <li><a href="/"><svg class="icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Inicio</a></li>
+          <li><a href="/docs"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Documentación</a></li>
+          <li><a href="/api"><svg class="icon" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Referencia API</a></li>
+          <li><a href="/learn"><svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Guías</a></li>
+          <li><a href="/support"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Soporte</a></li>
+          <li><a href="/status"><svg class="icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Estado Servidor</a></li>
+        </ul>
+      </div>
+
+      <div class="drawer-section">
+        <span class="drawer-title">CENTRO DE TRADUCCIÓN</span>
+        <div class="drawer-toolbar">
+          <button class="btn btn-english w-full" onclick="window.translator && window.translator.translateToEnglish()">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traducir a English
+          </button>
+          <div class="drawer-select-group">
+            <select class="drawer-select" onchange="if(window.translator){ if(this.value==='es') window.translator.restoreOriginal(); else window.translator.translatePage(this.value); }">
+              <option value="es">Español (es) - Original</option>
+              <option value="en">English (en)</option>
+              <option value="fr">Français (fr)</option>
+              <option value="de">Deutsch (de)</option>
+              <option value="it">Italiano (it)</option>
+              <option value="pt">Portugués (pt)</option>
+              <option value="ja">日本語 (ja)</option>
+              <option value="zh-CN">中文 (zh-CN)</option>
+              <option value="ru">Русский (ru)</option>
+            </select>
+          </div>
+          <button class="btn btn-outline w-full" onclick="window.translator && window.translator.restoreOriginal()">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg> Restaurar Original
+          </button>
         </div>
       </div>
     </div>
@@ -148,6 +199,49 @@
           <h3>Soporte CORS Universal</h3>
           <p>Configurado con encabezados <code>Access-Control-Allow-Origin: *</code> para admitir llamadas directas desde aplicaciones frontend sin requerir proxies intermediarios.</p>
         </div>
+      </div>
+    </section>
+
+    <!-- Consola Interactiva en Vivo para Nuevos Clientes -->
+    <section class="content-box-card" style="position: relative; overflow: hidden; border-color: rgba(56, 189, 248, 0.35); box-shadow: var(--shadow-lg);">
+      <span class="tech-card-tag">[ LIVE_TRY // CLIENT_TEST ]</span>
+      <h2>Prueba la API en Tiempo Real</h2>
+      <p style="margin-bottom: 20px;">
+        Experimenta la velocidad del microservicio directamente desde tu navegador sin instalar nada:
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px;">
+        <div>
+          <label style="display: block; font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 6px;">TEXTO A TRADUCIR</label>
+          <input type="text" id="demo-input-text" value="CloudTranslator es rápido y fácil de integrar." style="width: 100%; padding: 12px 16px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.9rem; outline: none;">
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 6px;">IDIOMA OBJETIVO</label>
+          <div style="display: flex; gap: 8px;">
+            <select id="demo-target-lang" style="flex: 1; padding: 12px 16px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.9rem; outline: none;">
+              <option value="en">English (en)</option>
+              <option value="fr">Français (fr)</option>
+              <option value="de">Deutsch (de)</option>
+              <option value="ja">日本語 (ja)</option>
+              <option value="zh-CN">中文 (zh-CN)</option>
+              <option value="ru">Русский (ru)</option>
+              <option value="it">Italiano (it)</option>
+              <option value="pt">Portugués (pt)</option>
+            </select>
+            <button id="btn-run-demo" class="btn btn-primary" style="padding: 12px 20px; font-weight: 700;">PROBAR AHORA</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-box-wrapper" style="margin-top: 10px;">
+        <div class="code-box-header">
+          <span>Respuesta HTTP JSON de la API</span>
+          <span id="demo-latency-badge" class="brand-badge" style="display: none;">0ms</span>
+        </div>
+        <pre class="code-panel" id="demo-output-json">{
+  "status": "ready",
+  "message": "Haz clic en 'PROBAR AHORA' para ejecutar una petición real a /api/translate"
+}</pre>
       </div>
     </section>
 
@@ -279,6 +373,44 @@
       btnRestore.addEventListener("click", () => {
         window.translator.restoreOriginal();
       });
+
+      // Lógica de Prueba Interactiva en Vivo (Live Demo)
+      const btnRunDemo = document.getElementById("btn-run-demo");
+      const demoInputText = document.getElementById("demo-input-text");
+      const demoTargetLang = document.getElementById("demo-target-lang");
+      const demoOutputJson = document.getElementById("demo-output-json");
+      const demoLatencyBadge = document.getElementById("demo-latency-badge");
+
+      if (btnRunDemo) {
+        btnRunDemo.addEventListener("click", async () => {
+          const txt = (demoInputText.value || "").trim();
+          const target = demoTargetLang.value;
+          if (!txt) return;
+
+          demoOutputJson.textContent = "Conectando con /api/translate...";
+          btnRunDemo.disabled = true;
+          const t0 = performance.now();
+
+          try {
+            const resp = await fetch("/api/translate", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ text: txt, to: target })
+            });
+
+            const latency = Math.round(performance.now() - t0);
+            const data = await resp.json();
+
+            demoLatencyBadge.textContent = "⚡ " + latency + "ms | " + resp.status + " " + resp.statusText;
+            demoLatencyBadge.style.display = "inline-block";
+            demoOutputJson.textContent = JSON.stringify(data, null, 2);
+          } catch (e) {
+            demoOutputJson.textContent = "Error: " + e.message;
+          } finally {
+            btnRunDemo.disabled = false;
+          }
+        });
+      }
     });
   </script>
 </body>

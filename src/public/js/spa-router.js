@@ -252,6 +252,30 @@
     navigate(window.location.href, false);
   });
 
+  // Manejador global para el menú móvil (Hamburger Drawer)
+  document.addEventListener("click", (e) => {
+    const toggleBtn = e.target.closest("#menu-toggle-btn");
+    if (toggleBtn) {
+      const drawer = document.getElementById("mobile-drawer");
+      if (drawer) {
+        const isOpen = drawer.classList.toggle("open");
+        toggleBtn.classList.toggle("active", isOpen);
+        document.body.classList.toggle("drawer-open", isOpen);
+      }
+      return;
+    }
+
+    // Si se hace clic en un enlace del cajón móvil, cerrarlo automáticamente
+    const drawerLink = e.target.closest("#mobile-drawer a");
+    if (drawerLink) {
+      const drawer = document.getElementById("mobile-drawer");
+      const toggleBtn = document.getElementById("menu-toggle-btn");
+      if (drawer) drawer.classList.remove("open");
+      if (toggleBtn) toggleBtn.classList.remove("active");
+      document.body.classList.remove("drawer-open");
+    }
+  });
+
   // Exponer API opcional
   window.SPARouter = {
     navigate: navigate
