@@ -35,23 +35,28 @@
       </nav>
 
       <!-- Barra de Traducción Activa -->
-      <div class="toolbar-controls">
-        <button id="btn-english" class="btn btn-english" title="Traducir toda la página a Inglés">
+            <!-- Barra de Herramientas de Traducción Activa (Protegida contra corrupción visual) -->
+      <div class="toolbar-controls no-translate" data-no-translate>
+        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
           <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
           English
         </button>
 
         <div class="selector-box">
-          <select id="select-lang" aria-label="Seleccionar idioma">
-            <option value="en">Inglés (en)</option>
-            <option value="fr">Francés (fr)</option>
-            <option value="de">Alemán (de)</option>
-            <option value="it">Italiano (it)</option>
-            <option value="pt">Portugués (pt)</option>
-            <option value="es">Español (es)</option>
-          </select>
-          <input type="text" id="input-custom-lang" placeholder="cód." maxlength="5" title="Código de idioma de destino">
-          <button id="btn-translate-custom" class="btn btn-primary">Traducir</button>
+          <div class="selector-dropdown">
+            <select id="select-lang" aria-label="Seleccionar idioma">
+              <option value="en">English (en)</option>
+              <option value="es">Español (es)</option>
+              <option value="fr">Français (fr)</option>
+              <option value="de">Deutsch (de)</option>
+              <option value="it">Italiano (it)</option>
+              <option value="pt">Portugués (pt)</option>
+            </select>
+          </div>
+          <div class="custom-lang-group">
+            <input type="text" id="input-custom-lang" placeholder="ISO" maxlength="5" title="Código ISO personalizado (ej: ja, zh, ru, it)">
+            <button id="btn-translate-custom" class="btn btn-primary" title="Traducir">GO</button>
+          </div>
         </div>
 
         <button id="btn-restore" class="btn btn-outline" title="Restaurar idioma original">
@@ -59,11 +64,12 @@
           Original
         </button>
 
-        <div id="status-pill" class="status-pill">
+        <div id="status-pill" class="status-pill" title="Estado del microservicio">
           <span class="spinner"></span>
-          <span id="status-text">Listo</span>
+          <span id="status-text">LISTO</span>
         </div>
       </div>
+    </div>
     </div>
   </header>
 

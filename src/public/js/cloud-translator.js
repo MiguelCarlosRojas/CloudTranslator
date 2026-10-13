@@ -1,12 +1,12 @@
 /**
- * CloudTranslator Client SDK v1.3.0
+ * CloudTranslator Client SDK v1.4.0
  * 
  * Librería optimizada para traducción web en segundo plano:
- * - Persistencia del idioma elegido mediante COOKIES (cloud_translator_lang).
+ * - Persistencia del idioma elegido EXCLUSIVAMENTE mediante COOKIES (cloud_translator_lang).
+ * - Cero uso de localStorage para máxima privacidad y cumplimiento estricto de cookies.
  * - Envía TODOS los textos en UNA SOLA consulta HTTP (/api/translate con texts: [...])
- *   evitando saturar la pestaña Network con múltiples peticiones repetidas.
- * - Almacena las traducciones en memoria/caché local para cargas instantáneas (0ms).
- * - Soporte para botón directo a Inglés, selector de idiomas y códigos de caracteres personalizados.
+ *   evitando saturar la red con peticiones repetidas.
+ * - Mantiene caché en memoria RAM durante la sesión para cambios instantáneos (0ms).
  */
 
 (function (root, factory) {
@@ -21,10 +21,9 @@
   "use strict";
 
   const COOKIE_NAME = "cloud_translator_lang";
-  const STORAGE_KEY_CACHE_PREFIX = "cloud_translator_cache_";
 
   /**
-   * Utilidades de Cookies
+   * Utilidades de Cookies (Estricto - 365 días, SameSite=Lax, Path=/)
    */
   function setCookie(name, value, days = 365) {
     try {
@@ -52,6 +51,18 @@
     } catch (e) {}
   }
 
+  // Limpieza única de claves heredadas de localStorage para garantizar 100% solo cookies
+  try {
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith("cloud_translator_")) {
+        keysToRemove.push(k);
+      }
+    }
+    keysToRemove.forEach(k => localStorage.removeItem(k));
+  } catch (e) {}
+
   class CloudTranslator {
     /**
      * @param {Object} options
@@ -77,13 +88,12 @@
       this.onComplete = options.onComplete || null;
       this.onError = options.onError || null;
 
-      // Nodos y atributos originales
+      // Nodos y atributos originales en memoria
       this.nodeMap = new Map(); // Node -> originalText
       this.attrMap = new Map(); // Element -> [{ attr, originalText }]
 
-      // Caché global de traducciones: { [langCode]: { [originalText]: translatedText } }
+      // Caché en memoria RAM únicamente durante la sesión activa (Cero localStorage)
       this.cache = {};
-      this._loadCacheFromStorage();
 
       this.currentLanguage = "original";
       this.isTranslating = false;
@@ -98,29 +108,6 @@
       }
     }
 
-    _loadCacheFromStorage() {
-      try {
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key && key.startsWith(STORAGE_KEY_CACHE_PREFIX)) {
-            const lang = key.replace(STORAGE_KEY_CACHE_PREFIX, "");
-            const raw = localStorage.getItem(key);
-            if (raw) {
-              this.cache[lang] = JSON.parse(raw);
-            }
-          }
-        }
-      } catch (e) {}
-    }
-
-    _saveCacheToStorage(lang) {
-      try {
-        if (this.cache[lang]) {
-          localStorage.setItem(STORAGE_KEY_CACHE_PREFIX + lang, JSON.stringify(this.cache[lang]));
-        }
-      } catch (e) {}
-    }
-
     /**
      * Revisa si existe la cookie cloud_translator_lang y traduce automáticamente al cargar
      */
@@ -131,6 +118,7 @@
           this.translatePage(savedLang);
         } else {
           document.documentElement.classList.remove("ct-pending");
+          this._updateStatusUI("ORIGINAL");
         }
       };
 
@@ -191,7 +179,7 @@
     }
 
     /**
-     * Lee el idioma guardado en la cookie
+     * Lee el idioma guardado EXCLUSIVAMENTE desde la cookie
      */
     getSavedLanguage() {
       if (this.useCookies) {
@@ -219,11 +207,6 @@
         setCookie(COOKIE_NAME, "original", 365);
       }
 
-      if (this.currentLanguage === "original") {
-        document.documentElement.classList.remove("ct-pending");
-        return;
-      }
-
       for (const [node, originalText] of this.nodeMap.entries()) {
         if (node.nodeValue !== originalText) {
           node.nodeValue = originalText;
@@ -238,6 +221,12 @@
 
       this.currentLanguage = "original";
       document.documentElement.classList.remove("ct-pending");
+      this._updateStatusUI("ORIGINAL");
+
+      // Sincronizar select si existe
+      const selectEl = document.getElementById("select-lang");
+      if (selectEl) selectEl.value = "es";
+
       if (typeof this.onComplete === "function") {
         this.onComplete({ language: "original", total: this.nodeMap.size, restored: true });
       }
@@ -254,19 +243,28 @@
 
       const lang = targetLanguage.trim().toLowerCase();
 
-      // Guardar en COOKIES para persistencia global
+      // Guardar SIEMPRE en COOKIES para persistencia estricta
       if (this.useCookies) {
         setCookie(COOKIE_NAME, lang, 365);
       }
 
+      // Sincronizar selector visual en barra
+      const selectEl = document.getElementById("select-lang");
+      if (selectEl) {
+        const optionExists = Array.from(selectEl.options).some(o => o.value === lang);
+        if (optionExists) selectEl.value = lang;
+      }
+
       if (this.currentLanguage === lang && !this.isTranslating) {
         document.documentElement.classList.remove("ct-pending");
+        this._updateStatusUI(`LISTO (${lang.toUpperCase()})`);
         return;
       }
 
       if (this.isTranslating) return;
       this.isTranslating = true;
 
+      this._updateStatusUI(`TRADUCIENDO (${lang.toUpperCase()})...`);
       if (window.startSpaProgress) window.startSpaProgress();
       document.body.classList.add("ct-translating");
 
@@ -281,7 +279,7 @@
         this.onStart({ targetLanguage: lang, total: totalNodes });
       }
 
-      // Aplicar de inmediato cualquier texto disponible en caché local (0ms)
+      // Aplicar de inmediato cualquier texto disponible en memoria RAM (0ms)
       this._applyCachedTranslations(lang);
 
       // Extraer textos únicos que faltan por traducir
@@ -309,6 +307,7 @@
         this.isTranslating = false;
         document.body.classList.remove("ct-translating");
         document.documentElement.classList.remove("ct-pending");
+        this._updateStatusUI(`LISTO (${lang.toUpperCase()})`);
         if (window.finishSpaProgress) window.finishSpaProgress();
 
         if (typeof this.onProgress === "function") {
@@ -332,12 +331,14 @@
           this._applyCachedTranslations(lang);
         }
 
-        this._saveCacheToStorage(lang);
         this.currentLanguage = lang;
+        this._updateStatusUI(`LISTO (${lang.toUpperCase()})`);
+
         if (typeof this.onComplete === "function") {
           this.onComplete({ language: lang, total: totalNodes, fromCache: false });
         }
       } catch (err) {
+        this._updateStatusUI("ERROR");
         if (typeof this.onError === "function") {
           this.onError(err);
         } else {
@@ -462,6 +463,23 @@
           }
         }
       });
+    }
+
+    _updateStatusUI(text) {
+      const statusText = document.getElementById("status-text");
+      const statusPill = document.getElementById("status-pill");
+      if (statusText) {
+        statusText.textContent = text;
+      }
+      if (statusPill) {
+        if (text.includes("TRADUCIENDO")) {
+          statusPill.classList.add("translating");
+          statusPill.classList.remove("completed");
+        } else {
+          statusPill.classList.remove("translating");
+          statusPill.classList.add("completed");
+        }
+      }
     }
   }
 

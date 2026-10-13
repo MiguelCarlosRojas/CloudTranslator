@@ -2,28 +2,88 @@ const translate = require("google-translate-api-x");
 const logger = require("../utils/logger");
 const { STATUS_CODES, SUPPORTED_LANGUAGES } = require("../config/config");
 
-// Servidor: Caché en memoria para respuestas ultra-rápidas (0ms)
+// Servidor: Caché LRU de alto rendimiento en memoria RAM para respuestas en 0ms
 const serverTranslationCache = new Map();
-const MAX_SERVER_CACHE_ENTRIES = 5000;
+const MAX_SERVER_CACHE_ENTRIES = 10000;
+let cacheHitsCount = 0;
+let cacheMissesCount = 0;
 
 function getCachedTranslation(targetLanguage, str) {
-  return serverTranslationCache.get(`${targetLanguage}:${str}`);
+  const key = `${targetLanguage}:${str}`;
+  if (serverTranslationCache.has(key)) {
+    const val = serverTranslationCache.get(key);
+    // LRU refresh: mover al final
+    serverTranslationCache.delete(key);
+    serverTranslationCache.set(key, val);
+    cacheHitsCount++;
+    return val;
+  }
+  cacheMissesCount++;
+  return undefined;
 }
 
 function setCachedTranslation(targetLanguage, str, translatedStr) {
-  if (serverTranslationCache.size >= MAX_SERVER_CACHE_ENTRIES) {
+  const key = `${targetLanguage}:${str}`;
+  if (serverTranslationCache.has(key)) {
+    serverTranslationCache.delete(key);
+  } else if (serverTranslationCache.size >= MAX_SERVER_CACHE_ENTRIES) {
+    // Eliminar los 1,000 registros más antiguos
     const iterator = serverTranslationCache.keys();
-    for (let i = 0; i < 500; i++) {
+    for (let i = 0; i < 1000; i++) {
       const nextKey = iterator.next().value;
       if (nextKey) serverTranslationCache.delete(nextKey);
       else break;
     }
   }
-  serverTranslationCache.set(`${targetLanguage}:${str}`, translatedStr);
+  serverTranslationCache.set(key, translatedStr);
+}
+
+// Regex para detectar cadenas que no requieren traducción externa (números, símbolos, espacios)
+const NON_TRANSLATABLE_REGEX = /^[\d\s\-_.,:;!?()\[\]{}@#$%&*+=/\\|<>'"~`]*$/;
+
+/**
+ * Traduce un lote en paralelo dividiéndolo en fragmentos más pequeños (chunks)
+ * para evitar demoras y límites de tasa en la capa gratuita de Render.
+ */
+async function translateInParallelChunks(uniqueTexts, targetLanguage, chunkSize = 35) {
+  const chunks = [];
+  for (let i = 0; i < uniqueTexts.length; i += chunkSize) {
+    chunks.push(uniqueTexts.slice(i, i + chunkSize));
+  }
+
+  const chunkPromises = chunks.map(async (chunk) => {
+    try {
+      const res = await translate(chunk, {
+        to: targetLanguage,
+        rejectOnPartialFail: false,
+        forceBatch: true
+      });
+      return Array.isArray(res)
+        ? res.map((r, idx) => (r && r.text ? r.text : chunk[idx]))
+        : [res && res.text ? res.text : chunk[0]];
+    } catch (chunkError) {
+      logger.warn(`Fallback individual para chunk de ${chunk.length} elementos debido a: ${chunkError.message}`);
+      // Fallback: intentar traducir individualmente si el lote falla
+      const individualResults = await Promise.all(
+        chunk.map(async (text) => {
+          try {
+            const singleRes = await translate(text, { to: targetLanguage });
+            return singleRes && singleRes.text ? singleRes.text : text;
+          } catch {
+            return text; // Preservar texto original si falla
+          }
+        })
+      );
+      return individualResults;
+    }
+  });
+
+  const resolvedChunks = await Promise.all(chunkPromises);
+  return resolvedChunks.flat();
 }
 
 /**
- * @desc Traduce texto o lista de textos a un idioma objetivo
+ * @desc Traduce texto o lista de textos a un idioma objetivo con deduplicación y caché en RAM
  * @param {Object} req - Request con text o texts y targetLanguage
  * @param {Object} res - Response object
  * @param {Function} next - Next middleware
@@ -33,63 +93,88 @@ exports.translateText = async (req, res, next) => {
   const { text, texts, targetLanguage } = data;
 
   try {
+    // 1. Manejo de Lotes de Texto (/api/translate con texts: [...])
     if (texts && Array.isArray(texts)) {
-      const results = new Array(texts.length);
-      const missingTexts = [];
-      const missingIndices = [];
+      const totalCount = texts.length;
+      const results = new Array(totalCount);
 
-      for (let i = 0; i < texts.length; i++) {
+      // Mapa para deduplicar textos faltantes: originalText -> Array de índices en `results`
+      const missingMap = new Map();
+
+      for (let i = 0; i < totalCount; i++) {
         const original = texts[i];
+
+        // Caso A: Texto vacío o solo números/símbolos -> no enviar a red
+        if (!original || NON_TRANSLATABLE_REGEX.test(original.trim())) {
+          results[i] = original;
+          continue;
+        }
+
+        // Caso B: Está en caché del servidor (0ms)
         const cached = getCachedTranslation(targetLanguage, original);
         if (cached !== undefined) {
           results[i] = cached;
+          continue;
+        }
+
+        // Caso C: Faltante para traducir -> agrupar por texto único
+        if (!missingMap.has(original)) {
+          missingMap.set(original, [i]);
         } else {
-          missingTexts.push(original);
-          missingIndices.push(i);
+          missingMap.get(original).push(i);
         }
       }
 
-      // Si todo estaba en caché, responder de inmediato
-      if (missingTexts.length === 0) {
+      // Si todo se resolvió con la caché o filtros de números, responder de inmediato
+      if (missingMap.size === 0) {
         return res.status(STATUS_CODES.OK).json({ translatedTexts: results });
       }
 
-      // Traducir únicamente los textos faltantes con forceBatch: true (alta velocidad)
-      const result = await translate(missingTexts, {
-        to: targetLanguage,
-        rejectOnPartialFail: false,
-        forceBatch: true
-      });
+      // Lista única de textos que realmente necesitan red
+      const uniqueMissingList = Array.from(missingMap.keys());
 
-      const translatedBatch = Array.isArray(result)
-        ? result.map((r, idx) => (r && r.text ? r.text : missingTexts[idx]))
-        : [result.text || missingTexts[0]];
+      // Traducir en paralelo por fragmentos
+      const translatedBatch = await translateInParallelChunks(uniqueMissingList, targetLanguage, 35);
 
-      for (let k = 0; k < missingIndices.length; k++) {
-        const orig = missingTexts[k];
+      // Poblar resultados y almacenar en caché
+      for (let k = 0; k < uniqueMissingList.length; k++) {
+        const orig = uniqueMissingList[k];
         const trans = translatedBatch[k] || orig;
-        const targetIndex = missingIndices[k];
-        results[targetIndex] = trans;
         setCachedTranslation(targetLanguage, orig, trans);
+
+        const indices = missingMap.get(orig);
+        for (let idx = 0; idx < indices.length; idx++) {
+          results[indices[idx]] = trans;
+        }
       }
 
-      logger.info(`Lote: ${texts.length} textos (${missingTexts.length} vía red, ${texts.length - missingTexts.length} en caché servidor) a ${targetLanguage}`);
+      logger.info(`Lote optimizado: ${totalCount} textos procesados (${uniqueMissingList.length} únicos a red) a '${targetLanguage}'`);
       return res.status(STATUS_CODES.OK).json({ translatedTexts: results });
     }
 
-    // Texto unitario
-    const cachedSingle = getCachedTranslation(targetLanguage, text);
-    if (cachedSingle !== undefined) {
-      return res.status(STATUS_CODES.OK).json({ translatedText: cachedSingle });
+    // 2. Manejo de Texto Unitario (/api/translate con text: "...")
+    if (typeof text === "string") {
+      if (!text || NON_TRANSLATABLE_REGEX.test(text.trim())) {
+        return res.status(STATUS_CODES.OK).json({ translatedText: text });
+      }
+
+      const cachedSingle = getCachedTranslation(targetLanguage, text);
+      if (cachedSingle !== undefined) {
+        return res.status(STATUS_CODES.OK).json({ translatedText: cachedSingle });
+      }
+
+      const result = await translate(text, { to: targetLanguage });
+      const translatedText = result && result.text ? result.text : text;
+      setCachedTranslation(targetLanguage, text, translatedText);
+
+      return res.status(STATUS_CODES.OK).json({ translatedText });
     }
 
-    const result = await translate(text, { to: targetLanguage });
-    const translatedText = result.text || text;
-    setCachedTranslation(targetLanguage, text, translatedText);
-    logger.info(`Texto traducido a ${targetLanguage}`);
-    return res.status(STATUS_CODES.OK).json({ translatedText });
+    return res.status(STATUS_CODES.BAD_REQUEST).json({
+      error: "Parámetros inválidos. Debe proporcionar 'text' o 'texts' junto a 'targetLanguage'."
+    });
   } catch (error) {
-    logger.error(`Error al traducir: ${error.message}`);
+    logger.error(`Error en translateText: ${error.message}`);
     next(error);
   }
 };
@@ -98,6 +183,7 @@ exports.translateText = async (req, res, next) => {
  * @desc Lista de idiomas soportados
  */
 exports.getLanguages = (req, res) => {
+  res.setHeader("Cache-Control", "public, max-age=86400"); // Caché de 24 horas
   res.status(STATUS_CODES.OK).json({
     success: true,
     languages: SUPPORTED_LANGUAGES
@@ -105,13 +191,25 @@ exports.getLanguages = (req, res) => {
 };
 
 /**
- * @desc Estado de salud del servicio
+ * @desc Estado de salud del servicio con telemetría de memoria y caché
  */
 exports.getHealth = (req, res) => {
+  const mem = process.memoryUsage();
+  res.setHeader("Cache-Control", "no-cache");
   res.status(STATUS_CODES.OK).json({
     success: true,
     status: "ok",
     uptime: Math.floor(process.uptime()),
+    cache: {
+      entries: serverTranslationCache.size,
+      maxEntries: MAX_SERVER_CACHE_ENTRIES,
+      hits: cacheHitsCount,
+      misses: cacheMissesCount
+    },
+    memory: {
+      rssMb: Math.round(mem.rss / 1024 / 1024),
+      heapUsedMb: Math.round(mem.heapUsed / 1024 / 1024)
+    },
     timestamp: new Date().toISOString()
   });
 };

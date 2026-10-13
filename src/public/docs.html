@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -34,30 +34,38 @@
         </ul>
       </nav>
 
-      <div class="toolbar-controls">
-        <button id="btn-english" class="btn btn-english" title="Traducir toda la página a Inglés">
+      <!-- Barra de Herramientas de Traducción Activa (Protegida contra corrupción visual) -->
+      <div class="toolbar-controls no-translate" data-no-translate>
+        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
           <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
           English
         </button>
+
         <div class="selector-box">
-          <select id="select-lang">
-            <option value="en">Inglés (en)</option>
-            <option value="fr">Francés (fr)</option>
-            <option value="de">Alemán (de)</option>
-            <option value="it">Italiano (it)</option>
-            <option value="pt">Portugués (pt)</option>
-            <option value="es">Español (es)</option>
-          </select>
-          <input type="text" id="input-custom-lang" placeholder="cód." maxlength="5">
-          <button id="btn-translate-custom" class="btn btn-primary">Traducir</button>
+          <div class="selector-dropdown">
+            <select id="select-lang" aria-label="Seleccionar idioma">
+              <option value="en">English (en)</option>
+              <option value="es">Español (es)</option>
+              <option value="fr">Français (fr)</option>
+              <option value="de">Deutsch (de)</option>
+              <option value="it">Italiano (it)</option>
+              <option value="pt">Português (pt)</option>
+            </select>
+          </div>
+          <div class="custom-lang-group">
+            <input type="text" id="input-custom-lang" placeholder="ISO" maxlength="5" title="Código ISO personalizado (ej: ja, zh, ru, it)">
+            <button id="btn-translate-custom" class="btn btn-primary" title="Traducir">GO</button>
+          </div>
         </div>
-        <button id="btn-restore" class="btn btn-outline">
+
+        <button id="btn-restore" class="btn btn-outline" title="Restaurar idioma original">
           <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
           Original
         </button>
-        <div id="status-pill" class="status-pill">
+
+        <div id="status-pill" class="status-pill" title="Estado del microservicio">
           <span class="spinner"></span>
-          <span id="status-text">Listo</span>
+          <span id="status-text">LISTO</span>
         </div>
       </div>
     </div>
@@ -156,41 +164,43 @@
     <!-- ÁREA PRINCIPAL DE CONTENIDO DE LA DOCUMENTACIÓN -->
     <main class="docs-main-content">
     
+      <!-- Encabezado de la Documentación (Alineación Idéntica a API) -->
+      <section class="docs-section" style="padding-top: 10px;">
+        <span class="hero-tag-glow">[ GUÍA DE INTEGRACIÓN Y DOCUMENTACIÓN TÉCNICA ]</span>
+        <h1 style="font-size: clamp(1.8rem, 3.2vw, 2.5rem); margin: 12px 0 16px 0; color: #ffffff;">
+          Guía de Conexión al Endpoint y Documentación Técnica
+        </h1>
+        <p class="lead">
+          Aprende a conectar cualquier sistema externo (React, Vue, frontend HTML/JS, Node.js, Python o PHP) con el microservicio en la nube <strong>https://cloudtranslator.onrender.com</strong>, optimizando la red para traducir en una sola petición asíncrona y persistiendo el idioma mediante cookies.
+        </p>
+      </section>
+
       <!-- SESIÓN 1: OVERVIEW / INTRODUCCIÓN TÉCNICA -->
       <section id="session-overview" class="docs-section">
-        <div class="hero-full">
-          <span class="hero-tag-glow">[ SPECIFICATION // REST_API &amp; SYSTEM_INTEGRATION ]</span>
-          <h1>Guía de Conexión al Endpoint y Documentación Técnica</h1>
-          <p class="lead">
-            Aprende a conectar cualquier sistema externo (React, Vue, frontend HTML/JS, Node.js, Python o PHP) con el microservicio en la nube <strong>https://cloudtranslator.onrender.com</strong>, optimizando la red para traducir en una sola petición asíncrona y persistiendo el idioma mediante cookies.
-          </p>
-          <div class="hero-actions">
-            <a href="#session-frontend" class="btn btn-primary">Conectar Frontend (Botón + Cookies)</a>
-            <a href="#session-backend" class="btn btn-outline">Conectar Backend (Node / Python / PHP)</a>
-            <a href="#session-endpoints" class="btn btn-outline">Cargas JSON para Postman</a>
-          </div>
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ S.01 // OVERVIEW ]</span>
+          <h2>Visión General y Reglas de Conexión</h2>
+          <p>Condiciones y formatos requeridos para interactuar con la API REST.</p>
         </div>
 
         <!-- Subsesión 1.1 -->
         <article class="content-box-card docs-subsection" id="sub-canonical-url">
-          <span class="tech-card-tag">[ SUBSESIÓN 1.1 // CANONICAL_ENDPOINT ]</span>
-          <h2>1.1 URL Canónica del Endpoint</h2>
+          <span class="tech-card-tag">[ 1.1 // CANONICAL_ENDPOINT ]</span>
+          <h3>URL Canónica del Endpoint</h3>
           <p>
             Cualquier aplicación web o móvil debe apuntar sus consultas HTTP hacia la ruta canónica en Render:
           </p>
-          <div class="code-box-wrapper">
-            <div class="code-box-header">
-              <span>Endpoint de Traducción</span>
-              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'url-endpoint')">Copiar URL</button>
-            </div>
-            <pre class="code-panel" id="url-endpoint">https://cloudtranslator.onrender.com/api/translate</pre>
+          <div class="code-box-header">
+            <span>Endpoint de Traducción</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'url-endpoint')">Copiar</button>
           </div>
+          <pre class="code-panel" id="url-endpoint">https://cloudtranslator.onrender.com/api/translate</pre>
         </article>
 
         <!-- Subsesión 1.2 -->
         <article class="content-box-card docs-subsection" id="sub-network-rules">
-          <span class="tech-card-tag">[ SUBSESIÓN 1.2 // NETWORK_RULES_CORS ]</span>
-          <h2>1.2 Regla de Red Obligatoria y CORS</h2>
+          <span class="tech-card-tag">[ 1.2 // NETWORK_RULES_CORS ]</span>
+          <h3>Regla de Red Obligatoria y CORS Universal</h3>
           <p>
             El método siempre debe ser <code>POST</code> con cabecera <code>Content-Type: application/json</code>. Soporta CORS universal (<code>Access-Control-Allow-Origin: *</code>), por lo que puedes llamarlo directamente desde el navegador de tus usuarios sin proxies intermediarios.
           </p>
@@ -203,21 +213,22 @@
       <!-- SESIÓN 2: CONEXIÓN FRONTEND (BOTÓN EN INGLÉS, SELECTOR DINÁMICO Y COOKIES) -->
       <section id="session-frontend" class="docs-section" style="margin-bottom: 48px;">
         <div class="section-full-title">
-          <h2>Sesión 02: Conexión Frontend (Botón Inglés, Selector y Cookies)</h2>
+          <span class="tech-card-tag">[ S.02 // FRONTEND_INTEGRATION ]</span>
+          <h2>Integración en Frontend Web</h2>
           <p>Integra el botón para traducir en segundo plano en 1 sola consulta sin spam en la pestaña Network.</p>
         </div>
 
         <!-- Subsesión 2.1 -->
         <article class="content-box-card docs-subsection" id="sub-frontend-html">
-          <span class="tech-card-tag">[ SUBSESIÓN 2.1 // FRONTEND_HTML_STRUCTURE ]</span>
-          <h2>2.1 Estructura HTML en tu Interfaz</h2>
+          <span class="tech-card-tag">[ 2.1 // HTML_STRUCTURE ]</span>
+          <h3>Estructura HTML en tu Interfaz</h3>
           <p>
             Inserta el botón directo en inglés y el selector con input de texto para códigos de idioma:
           </p>
           <div class="code-box-wrapper">
             <div class="code-box-header">
               <span>HTML en tu Proyecto</span>
-              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'html-integration')">Copiar HTML</button>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'html-integration')">Copiar</button>
             </div>
             <pre class="code-panel" id="html-integration">&lt;!-- 1. Botón directo para traducir toda la página a inglés --&gt;
 &lt;button id="btn-english"&gt;English&lt;/button&gt;
@@ -236,8 +247,8 @@
 
         <!-- Subsesión 2.2 -->
         <article class="content-box-card docs-subsection" id="sub-frontend-js">
-          <span class="tech-card-tag">[ SUBSESIÓN 2.2 // FRONTEND_JAVASCRIPT_SCRIPT ]</span>
-          <h2>2.2 Script JavaScript Completo de Integración</h2>
+          <span class="tech-card-tag">[ 2.2 // JAVASCRIPT_SCRIPT ]</span>
+          <h3>Script JavaScript Completo de Integración</h3>
           <p>
             Copia y pega este script en tu sistema. Consolida los textos en <strong>1 sola petición HTTP</strong>, guarda la cookie <code>cloud_translator_lang</code> y recuerda el idioma al recargar la página:
           </p>
@@ -394,19 +405,20 @@ document.addEventListener("DOMContentLoaded", () => {
       <!-- SESIÓN 3: CONEXIÓN BACKEND (SERVIDOR A SERVIDOR) -->
       <section id="session-backend" class="docs-section" style="margin-bottom: 48px;">
         <div class="section-full-title">
-          <h2>Sesión 03: Conexión Backend (Servidor a Servidor)</h2>
+          <span class="tech-card-tag">[ S.03 // BACKEND_INTEGRATION ]</span>
+          <h2>Conexión Backend (Servidor a Servidor)</h2>
           <p>Llama al microservicio desde tus controladores o servicios en Node.js, Python o PHP.</p>
         </div>
 
         <!-- Subsesión 3.1 -->
         <article class="content-box-card docs-subsection" id="sub-backend-node">
-          <span class="tech-card-tag">[ SUBSESIÓN 3.1 // BACKEND_NODEJS ]</span>
-          <h2>3.1 Conectar con Node.js / Express (Fetch o Axios)</h2>
+          <span class="tech-card-tag">[ 3.1 // BACKEND_NODEJS ]</span>
+          <h3>Conectar con Node.js / Express (Fetch o Axios)</h3>
           <p>Envía un arreglo de textos a traducir directamente desde tu servidor Node.js:</p>
           <div class="code-box-wrapper">
             <div class="code-box-header">
               <span>JavaScript (Node.js 18+)</span>
-              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'node-example')">Copiar Código</button>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'node-example')">Copiar</button>
             </div>
             <pre class="code-panel" id="node-example">async function traducirTextos(textosArray, idiomaDestino = "en") {
   const url = "https://cloudtranslator.onrender.com/api/translate";
@@ -437,13 +449,13 @@ traducirTextos(["Iniciar sesión", "Cerrar sesión"], "en")
 
         <!-- Subsesión 3.2 -->
         <article class="content-box-card docs-subsection" id="sub-backend-python">
-          <span class="tech-card-tag">[ SUBSESIÓN 3.2 // BACKEND_PYTHON ]</span>
-          <h2>3.2 Conectar con Python (Requests / HTTPX)</h2>
+          <span class="tech-card-tag">[ 3.2 // BACKEND_PYTHON ]</span>
+          <h3>Conectar con Python (Requests / HTTPX)</h3>
           <p>Integra CloudTranslator en scripts de Python, Django o FastAPI:</p>
           <div class="code-box-wrapper">
             <div class="code-box-header">
               <span>Python 3 (requests)</span>
-              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'python-example')">Copiar Código</button>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'python-example')">Copiar</button>
             </div>
             <pre class="code-panel" id="python-example">import requests
 
@@ -468,13 +480,13 @@ print(resultado)  # ['Dashboard', 'Account Settings']</pre>
 
         <!-- Subsesión 3.3 -->
         <article class="content-box-card docs-subsection" id="sub-backend-php">
-          <span class="tech-card-tag">[ SUBSESIÓN 3.3 // BACKEND_PHP ]</span>
-          <h2>3.3 Conectar con PHP (cURL nativo)</h2>
+          <span class="tech-card-tag">[ 3.3 // BACKEND_PHP ]</span>
+          <h3>Conectar con PHP (cURL nativo)</h3>
           <p>Consúmelo en aplicaciones PHP tradicionales, Laravel o WordPress:</p>
           <div class="code-box-wrapper">
             <div class="code-box-header">
               <span>PHP (cURL)</span>
-              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'php-example')">Copiar Código</button>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'php-example')">Copiar</button>
             </div>
             <pre class="code-panel" id="php-example">&lt;?php
 function traducirTextos(array $textos, string $idioma = "en"): array {
@@ -535,14 +547,15 @@ print_r($traducciones);
       <!-- SESIÓN 4: COOKIES Y RENDIMIENTO DE RED -->
       <section id="session-cookies" class="docs-section" style="margin-bottom: 48px;">
         <div class="section-full-title">
-          <h2>Sesión 04: Persistencia por Cookies y Rendimiento de Red</h2>
+          <span class="tech-card-tag">[ S.04 // PERFORMANCE_COOKIES ]</span>
+          <h2>Persistencia por Cookies y Rendimiento de Red</h2>
           <p>Cómo funciona la cookie técnica y el comportamiento de la infraestructura en Render.</p>
         </div>
 
         <!-- Subsesión 4.1 -->
         <article class="content-box-card docs-subsection" id="sub-cookies-spec">
-          <span class="tech-card-tag">[ SUBSESIÓN 4.1 // COOKIE_SPECIFICATION ]</span>
-          <h2>4.1 Cookie Técnica `cloud_translator_lang`</h2>
+          <span class="tech-card-tag">[ 4.1 // COOKIE_SPECIFICATION ]</span>
+          <h3>Cookie Técnica cloud_translator_lang</h3>
           <p>
             Al seleccionar un idioma o presionar el botón de inglés, el cliente establece la cookie técnica:
           </p>
@@ -559,8 +572,8 @@ print_r($traducciones);
 
         <!-- Subsesión 4.2 -->
         <article class="content-box-card docs-subsection" id="sub-render-coldstart">
-          <span class="tech-card-tag">[ SUBSESIÓN 4.2 // RENDER_COLD_START ]</span>
-          <h2>4.2 Comportamiento de la Capa Gratuita de Render</h2>
+          <span class="tech-card-tag">[ 4.2 // RENDER_COLD_START ]</span>
+          <h3>Comportamiento de la Capa Gratuita de Render</h3>
           <p>
             El microservicio se ejecuta en el clúster gratuito de Render:
           </p>
@@ -636,21 +649,7 @@ print_r($traducciones);
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      // 1. Sincronización de posición Sticky de la barra lateral (Sidebar)
-      const mainHeader = document.getElementById("main-header");
-      const docsSidebar = document.getElementById("docs-sidebar");
-
-      function syncSidebarPosition() {
-        if (mainHeader && docsSidebar) {
-          const headerHeight = mainHeader.offsetHeight;
-          docsSidebar.style.top = headerHeight + "px";
-          docsSidebar.style.height = `calc(100vh - ${headerHeight}px)`;
-        }
-      }
-      syncSidebarPosition();
-      window.addEventListener("resize", syncSidebarPosition);
-
-      // 2. ScrollSpy automático para Sesiones y Subsesiones
+      // 1. ScrollSpy automático para Sesiones y Subsesiones
       const sessionLinks = document.querySelectorAll(".docs-sidebar-session");
       const subLinks = document.querySelectorAll(".docs-sidebar-sublink");
       const observedElements = document.querySelectorAll(".docs-section, .docs-subsection");

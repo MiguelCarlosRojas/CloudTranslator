@@ -465,19 +465,26 @@ body.ct-translating {
 }
 
 .selector-box {
-  display: flex;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+}
+
+.selector-dropdown {
+  display: inline-flex;
   align-items: center;
   background: var(--bg-input);
   border: 1px solid var(--border-line);
   padding: 2px 4px;
+  transition: border-color 0.15s ease;
 }
 
-.selector-box:focus-within {
+.selector-dropdown:focus-within {
   border-color: var(--border-active);
 }
 
-.selector-box select,
-.selector-box input {
+.selector-dropdown select {
   border: none;
   font-size: 0.75rem;
   padding: 6px 8px;
@@ -485,19 +492,55 @@ body.ct-translating {
   background: transparent;
   color: var(--text-white);
   font-family: var(--font-mono);
+  cursor: pointer;
 }
 
-.selector-box select option {
+.selector-dropdown select option {
   background: #000000;
   color: #ffffff;
 }
 
-.selector-box input {
-  width: 46px;
-  text-transform: lowercase;
-  border-left: 1px solid var(--border-line);
+.custom-lang-group {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border-line);
+  padding: 2px 4px;
+  transition: border-color 0.15s ease;
+}
+
+.custom-lang-group:focus-within {
+  border-color: var(--border-active);
+}
+
+.custom-lang-group input {
+  width: 48px;
+  border: none;
+  font-size: 0.75rem;
+  padding: 6px 6px;
+  outline: none;
+  background: transparent;
   color: var(--text-white);
+  font-family: var(--font-mono);
   font-weight: 700;
+  text-transform: lowercase;
+}
+
+.custom-lang-group button {
+  border: none;
+  background: #111111;
+  color: var(--text-white);
+  font-size: 0.70rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  padding: 5px 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.custom-lang-group button:hover {
+  background: #ffffff;
+  color: #000000;
 }
 
 .status-pill {
@@ -1139,40 +1182,37 @@ footer {
   }
   .btn-english,
   #btn-restore {
-    flex: 1 1 calc(50% - 3px);
+    flex: 1 1 calc(50% - 4px);
     justify-content: center;
     padding: 8px 10px;
     font-size: 0.72rem;
     min-height: 38px;
   }
   .selector-box {
-    flex: 1 1 100%;
     width: 100%;
-    min-height: 38px;
     display: flex;
     align-items: stretch;
+    gap: 6px;
   }
-  .selector-box select {
-    flex: 2;
+  .selector-dropdown {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 38px;
+  }
+  .selector-dropdown select {
+    width: 100%;
     min-width: 0;
     font-size: 0.75rem;
-    padding: 6px 8px;
   }
-  .selector-box input {
-    flex: 1;
-    min-width: 44px;
-    max-width: 60px;
+  .custom-lang-group {
+    flex: 0 0 auto;
+    min-height: 38px;
+  }
+  .custom-lang-group input {
+    width: 50px;
     font-size: 0.75rem;
-    padding: 6px;
-  }
-  .selector-box button {
-    flex: 1;
-    font-size: 0.72rem;
-    padding: 6px 10px;
-    white-space: nowrap;
   }
   .status-pill {
-    flex: 1 1 100%;
     width: 100%;
     justify-content: center;
     padding: 7px 10px;

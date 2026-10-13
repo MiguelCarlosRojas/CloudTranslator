@@ -3,6 +3,7 @@ const router = express.Router();
 const validateRequest = require("../middlewares/validateRequest");
 const { translateText, getLanguages, getHealth } = require("../controllers/translateController");
 
+router.get("/ping", (req, res) => res.status(200).send("pong"));
 router.get("/health", getHealth);
 router.get("/languages", getLanguages);
 router.route("/translate")
