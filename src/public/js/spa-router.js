@@ -184,8 +184,14 @@
       if (activeToggle) activeToggle.classList.remove("active");
       document.body.classList.remove("drawer-open");
 
-      if (window.CloudComponents && window.CloudComponents.decorateSelects) {
-        window.CloudComponents.decorateSelects();
+      // Cerrar modal QR si estaba abierto al cambiar de ruta
+      if (window.closeQrModal) {
+        window.closeQrModal();
+      }
+
+      if (window.CloudComponents) {
+        if (window.CloudComponents.decorateSelects) window.CloudComponents.decorateSelects();
+        if (window.CloudComponents.initQrModalEvents) window.CloudComponents.initQrModalEvents();
       }
 
       finishProgress();

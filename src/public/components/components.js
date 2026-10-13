@@ -269,24 +269,24 @@
      */
     getQrModalHTML() {
       return `
-<div id="qr-modal" class="qr-modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true">
-  <div class="qr-modal-dialog">
-    <div class="qr-modal-header">
-      <h3>
-        <svg class="icon" viewBox="0 0 24 24" style="color: #d946ef;"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01M17 7h.01M7 17h.01M17 17h.01"/></svg>
+<div id="qr-modal" class="custom-modal-overlay qr-modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" onclick="if(event.target===this) window.closeQrModal && window.closeQrModal();">
+  <div class="custom-modal-dialog qr-modal-dialog">
+    <div class="custom-modal-header qr-modal-header">
+      <h3 class="custom-modal-title">
+        <svg class="icon" viewBox="0 0 24 24" style="color: #d946ef; width: 22px; height: 22px;"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01M17 7h.01M7 17h.01M17 17h.01"/></svg>
         Código QR Yape - Escaneo Directo
       </h3>
-      <button id="qr-modal-close" class="btn-modal-close" aria-label="Cerrar ventana emergente">
-        <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <button id="qr-modal-close" class="custom-modal-close-btn btn-modal-close" aria-label="Cerrar ventana emergente" onclick="window.closeQrModal && window.closeQrModal();">
+        <svg class="icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <div class="qr-modal-body">
-      <img src="/img/yape-qr.png" alt="Código QR de Yape Ampliado" class="qr-modal-img">
-      <p class="qr-modal-caption">
+    <div class="custom-modal-body qr-modal-body">
+      <img src="/img/yape-qr.png" alt="Código QR de Yape Ampliado" class="custom-modal-img qr-modal-img">
+      <p class="qr-modal-caption" style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin: 12px 0;">
         Abre tu aplicación Yape en el teléfono celular, pulsa en el botón <strong>"Escanear QR"</strong> y enfoca este código directamente en tu pantalla.
       </p>
-      <div style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: var(--radius-sm); padding: 8px 16px; margin-top: 6px;">
-        <span style="font-size: 0.85rem; color: #ffffff; font-weight: 700;">
+      <div style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 8px; padding: 10px 16px; width: 100%;">
+        <span style="font-size: 0.88rem; color: #ffffff; font-weight: 700;">
           Beneficiario: Miguel Angel Carlos Rojas
         </span>
       </div>
@@ -304,7 +304,8 @@
       if (modal) {
         modal.classList.add("open");
         modal.classList.add("active");
-        modal.style.setProperty("display", "flex", "important");
+        modal.classList.add("is-visible");
+        modal.setAttribute("aria-hidden", "false");
         document.body.style.overflow = "hidden";
       }
     },
@@ -314,7 +315,8 @@
       if (modal) {
         modal.classList.remove("open");
         modal.classList.remove("active");
-        modal.style.setProperty("display", "none", "important");
+        modal.classList.remove("is-visible");
+        modal.setAttribute("aria-hidden", "true");
         document.body.style.overflow = "";
       }
     },
@@ -331,8 +333,8 @@
           return;
         }
 
-        const closeBtn = e.target.closest("#qr-modal-close, .btn-modal-close");
-        const backdrop = e.target.classList.contains("qr-modal-backdrop") || (e.target.id === "qr-modal");
+        const closeBtn = e.target.closest("#qr-modal-close, .btn-modal-close, .custom-modal-close-btn");
+        const backdrop = (e.target.id === "qr-modal") || e.target.classList.contains("qr-modal-backdrop") || e.target.classList.contains("custom-modal-overlay");
         if (closeBtn || backdrop) {
           e.preventDefault();
           CloudComponents.closeQrModal();
@@ -373,6 +375,8 @@
 
   // Exponer a nivel global
   window.CloudComponents = CloudComponents;
+  window.openQrModal = () => CloudComponents.openQrModal();
+  window.closeQrModal = () => CloudComponents.closeQrModal();
 
   // Auto-inicializar cuando el DOM esté listo
   if (document.readyState === "loading") {
