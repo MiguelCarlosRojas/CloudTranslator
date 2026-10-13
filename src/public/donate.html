@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Apoyar y Donar a CloudTranslator | Cada donación es valorada directamente para mejorar la infraestructura, financiar modelos de IA y mantener el servicio gratuito para todos.">
+  <meta property="og:title" content="Donaciones y Apoyo - CloudTranslator">
+  <meta property="og:description" content="Colabora con el desarrollo y mantenimiento de los 3 pilares de CloudTranslator: Traducción, TTS y Clonación de Voz.">
+  <title>Donaciones y Apoyo al Proyecto - CloudTranslator</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="shortcut icon" type="image/png" href="/favicon.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <script>
+    (function(){try{var m=document.cookie.match(/(?:^|; )cloud_translator_lang=([^;]*)/);var l=m?decodeURIComponent(m[1]):null;if(l&&l!=="original"&&l!=="es"){document.documentElement.classList.add("ct-pending");setTimeout(function(){document.documentElement.classList.remove("ct-pending");},800);}}catch(e){}})();
+  </script>
+  <script src="/js/spa-router.js" defer></script>
+</head>
+<body>
+
+  <!-- Barra Superior -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <a href="/" class="brand-wrapper">
+        <span class="brand-logo">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="28" height="28">
+          CloudTranslator
+        </span>
+        <span class="brand-badge">v1.0.0</span>
+      </a>
+
+      <nav class="desktop-nav">
+        <ul class="main-menu">
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/docs">Documentación</a></li>
+          <li><a href="/support">Soporte</a></li>
+          <li><a href="/status">Estado</a></li>
+        </ul>
+      </nav>
+
+      <!-- Barra de Herramientas de Traducción Activa -->
+      <div class="toolbar-controls no-translate" data-no-translate>
+        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+          English
+        </button>
+
+        <div class="selector-box">
+          <div class="selector-dropdown">
+            <select id="select-lang" aria-label="Seleccionar idioma">
+              <option value="en">English (en)</option>
+              <option value="es">Español (es)</option>
+              <option value="fr">Français (fr)</option>
+              <option value="de">Deutsch (de)</option>
+              <option value="it">Italiano (it)</option>
+              <option value="pt">Portugués (pt)</option>
+              <option value="ja">日本語 (ja)</option>
+              <option value="zh-CN">中文 (zh-CN)</option>
+              <option value="ru">Русский (ru)</option>
+            </select>
+          </div>
+          <div class="custom-lang-group">
+            <input type="text" id="input-custom-lang" placeholder="ISO" maxlength="5" title="Código ISO personalizado">
+            <button id="btn-translate-custom" class="btn btn-primary" title="Traducir">GO</button>
+          </div>
+        </div>
+
+        <button id="btn-restore" class="btn btn-outline" title="Restaurar idioma original">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+          Original
+        </button>
+
+        <div id="status-pill" class="status-pill" title="Estado del microservicio">
+          <span class="spinner"></span>
+          <span id="status-text">LISTO</span>
+        </div>
+      </div>
+
+      <!-- Botón Hamburguesa Móvil -->
+      <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Abrir Menú de Navegación">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+
+    <!-- Backdrop para Barra Lateral -->
+    <div id="drawer-backdrop"></div>
+
+    <!-- Barra de Navegación Lateral Móvil -->
+    <aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
+      <div class="drawer-header">
+        <a href="/" class="drawer-brand">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="26" height="26">
+          <span>CloudTranslator</span>
+        </a>
+        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral">✕</button>
+      </div>
+
+      <div class="drawer-body">
+        <div class="drawer-section">
+          <span class="drawer-title">NAVEGACIÓN DEL PORTAL</span>
+          <ul class="drawer-menu">
+            <li><a href="/"><svg class="icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Inicio</a></li>
+            <li><a href="/docs"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Documentación</a></li>
+            <li><a href="/support"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Soporte</a></li>
+            <li><a href="/status"><svg class="icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Estado Servidor</a></li>
+          </ul>
+        </div>
+
+        <div class="drawer-section">
+          <span class="drawer-title">LOS 3 PILARES</span>
+          <ul class="drawer-menu">
+            <li><a href="/translator"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traductor en la Nube</a></li>
+            <li><a href="/tts"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS)</a></li>
+            <li><a href="/voice-clone"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz (IA)</a></li>
+            <li><a href="/donate" class="active"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+  </header>
+
+  <main class="full-container">
+
+    <!-- Hero de Donaciones con Mensaje de Compromiso -->
+    <div class="donate-hero">
+      <span class="hero-tag-glow" style="color: #10b981; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.1);">
+        APOYO A LA COMUNIDAD Y CÓDIGO ABIERTO
+      </span>
+      <h1 style="margin: 18px 0 12px; font-size: clamp(2rem, 4vw, 2.8rem);">
+        Impulsa el Crecimiento de CloudTranslator
+      </h1>
+      <p class="lead" style="max-width: 860px; margin: 0 auto; color: var(--text-secondary); line-height: 1.75;">
+        CloudTranslator es un ecosistema libre y gratuito desarrollado para que cualquier estudiante, programador o empresa pueda traducir la web, sintetizar audio y clonar voces sin barreras de costos. Cada donación que recibimos es inmensamente valorada y se reinvierte íntegramente en la mejora continua de la plataforma.
+      </p>
+    </div>
+
+    <!-- En qué se invierten las donaciones -->
+    <section>
+      <div class="section-full-title">
+        <h2>¿En Qué se Utiliza tu Aporte?</h2>
+        <p>Transparencia y compromiso en el destino de cada contribución.</p>
+      </div>
+
+      <div class="cards-full-grid">
+        <div class="tech-card">
+          <span class="tech-card-tag">[ 01 // SERVERS_LATENCY ]</span>
+          <div class="tech-card-icon" style="color: #10b981;">
+            <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <h3>Servidores Dedicados y Cero Espera</h3>
+          <p>Tu donación permite costear instancias dedicadas en la nube para eliminar los arranques en frío (cold starts) de Render Free Tier, garantizando respuestas inmediatas en 50ms para todos los usuarios.</p>
+        </div>
+
+        <div class="tech-card">
+          <span class="tech-card-tag">[ 02 // AI_COMPUTE ]</span>
+          <div class="tech-card-icon" style="color: var(--secondary);">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+          </div>
+          <h3>Cómputo para Clonación y TTS</h3>
+          <p>La síntesis vocal por IA y la extracción de formantes espectrales requieren cómputo intensivo. Las donaciones financian el procesamiento de redes neuronales acústicas de alta resolución.</p>
+        </div>
+
+        <div class="tech-card">
+          <span class="tech-card-tag">[ 03 // GLOBAL_EXPANSION ]</span>
+          <div class="tech-card-icon" style="color: var(--primary);">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+          </div>
+          <h3>Nuevos Idiomas y Funcionalidades</h3>
+          <p>Añadir soporte para lenguas nativas y dialectos regionales poco representados, así como crear nuevos conectores y plugins para WordPress, React, Shopify y Node.js.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Métodos de Donación: PayPal & Yape QR al 100% de Ancho -->
+    <section>
+      <div class="section-full-title">
+        <h2>Métodos de Donación Disponibles</h2>
+        <p>Elige la alternativa más cómoda para ti. Todas las donaciones son recibidas con profundo agradecimiento.</p>
+      </div>
+
+      <div class="donations-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
+        
+        <!-- Método 1: PayPal Internacional -->
+        <div class="donation-card" style="border-color: rgba(0, 112, 186, 0.4); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="donation-header">
+              <span class="badge badge-paypal">INTERNACIONAL / TARJETAS</span>
+            </div>
+            <h3 style="font-size: 1.35rem; margin-bottom: 8px;">Donar a través de PayPal</h3>
+            <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">
+              Ideal para donaciones desde cualquier país del mundo utilizando saldo PayPal, tarjeta de crédito o débito (Visa, Mastercard, Amex).
+            </p>
+
+            <div style="background: rgba(0, 112, 186, 0.08); border: 1px solid rgba(0, 112, 186, 0.25); border-radius: var(--radius-md); padding: 18px; margin-bottom: 24px;">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                <svg class="icon" viewBox="0 0 24 24" style="color: #38bdf8;"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <strong style="color: var(--text-white); font-size: 0.95rem;">Enlace Oficial Directo</strong>
+              </div>
+              <p style="font-size: 0.82rem; color: var(--text-muted); font-family: var(--font-mono); word-break: break-all;">
+                https://paypal.me/miguelcarlosrojas
+              </p>
+            </div>
+          </div>
+
+          <a href="https://paypal.me/miguelcarlosrojas" target="_blank" rel="noopener noreferrer" class="btn btn-paypal w-full" style="padding: 14px; font-weight: 700; font-size: 0.95rem; text-decoration: none !important;">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Donar con PayPal Ahora
+          </a>
+        </div>
+
+        <!-- Método 2: Yape (QR Grande Ocupando Todo el Ancho del Cuadro) -->
+        <div class="donation-card" style="border-color: rgba(168, 85, 247, 0.4); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="donation-header">
+              <span class="badge badge-yape">PERÚ // YAPE QR</span>
+            </div>
+            <h3 style="font-size: 1.35rem; margin-bottom: 8px;">Donar por Código QR de Yape</h3>
+            <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px;">
+              Escanea el código QR directamente desde la app de Yape en tu teléfono celular para transferencias instantáneas desde Perú.
+            </p>
+
+            <div style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 12px;">
+              Titular: <strong style="color: var(--text-white);">Miguel Angel Carlos Rojas</strong>
+            </div>
+
+            <!-- Cuadro donde la imagen ocupa TODO el ancho del cuadro -->
+            <div class="qr-box-full">
+              <img src="/img/yape-qr.png" alt="Código QR de Yape - Miguel Angel Carlos Rojas" id="yape-qr-page-img" style="cursor: zoom-in;" title="Haz clic para ver en pantalla completa">
+            </div>
+          </div>
+
+          <button id="btn-open-qr-page-modal" class="btn btn-outline w-full" style="padding: 13px; font-size: 0.9rem; border-color: rgba(168, 85, 247, 0.4); color: var(--text-white);">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Ampliar Código QR para Escanear
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Modal para Escanear QR en Pantalla Completa -->
+    <div id="qr-modal" class="qr-modal-backdrop" style="display: none;">
+      <div class="qr-modal-dialog">
+        <div class="qr-modal-header">
+          <h3>Código QR de Yape - Escaneo Directo</h3>
+          <button id="qr-modal-close" class="btn-modal-close" aria-label="Cerrar ventana emergente">✕</button>
+        </div>
+        <div class="qr-modal-body">
+          <img src="/img/yape-qr.png" alt="Código QR de Yape Ampliado" class="qr-modal-img">
+          <p class="qr-modal-caption">
+            Abre tu aplicación Yape en el teléfono móvil, pulsa en "Escanear QR" y enfoca la pantalla.
+          </p>
+          <span style="display: block; font-size: 0.85rem; color: var(--text-white); font-weight: 600; margin-top: 8px;">
+            Beneficiario: Miguel Angel Carlos Rojas
+          </span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Pie de Página Horizontal Alineado -->
+  <footer>
+    <div class="footer-inner-full">
+      <!-- Columna 1: Brand & Misión -->
+      <div class="footer-col footer-col-brand">
+        <h4>
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="22" height="22">
+          CloudTranslator
+        </h4>
+        <p>Ecosistema cloud de procesamiento lingüístico y síntesis vocal de alto rendimiento: traducción neuronal distribuida, Texto a Voz (TTS) y Clonación de Voz por Inteligencia Artificial.</p>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+          Microservicio libre en Render • <span class="badge badge-online">ONLINE</span>
+        </p>
+      </div>
+
+      <!-- Columna 2: Pilares y Herramientas -->
+      <div class="footer-col">
+        <h4>Servicios</h4>
+        <ul>
+          <li><a href="/translator">Traductor en la Nube</a></li>
+          <li><a href="/tts">Texto a Voz (TTS)</a></li>
+          <li><a href="/voice-clone">Clonación de Voz IA</a></li>
+          <li><a href="/api">Playground API REST</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 3: Recursos y Guías -->
+      <div class="footer-col">
+        <h4>Recursos</h4>
+        <ul>
+          <li><a href="/learn">Guías de Integración</a></li>
+          <li><a href="/help">Centro de Ayuda</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 4: Información Legal -->
+      <div class="footer-col">
+        <h4>Información Legal</h4>
+        <ul>
+          <li><a href="/terms">Términos del Servicio</a></li>
+          <li><a href="/privacy">Política de Privacidad</a></li>
+          <li><a href="/security">Seguridad y Cookies</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 5: Donaciones -->
+      <div class="footer-col">
+        <h4>Donaciones</h4>
+        <ul>
+          <li><a href="/donate" class="active">Página de Donaciones</a></li>
+          <li><a href="https://paypal.me/miguelcarlosrojas" target="_blank" rel="noopener noreferrer">Donar con PayPal</a></li>
+          <li><a href="https://github.com/MiguelCarlosRojas/CloudTranslator" target="_blank" rel="noopener noreferrer">Repositorio GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom-full">
+      <span>© 2026 CloudTranslator. Todos los derechos reservados.</span>
+      <span>Desarrollado por Miguel Angel Carlos Rojas</span>
+    </div>
+  </footer>
+
+  <script src="/js/cloud-translator.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";
+      window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
+      document.getElementById("btn-english").onclick = () => window.translator.translateToEnglish();
+      document.getElementById("btn-restore").onclick = () => window.translator.restoreOriginal();
+      document.getElementById("select-lang").onchange = (e) => window.translator.translatePage(e.target.value);
+      document.getElementById("btn-translate-custom").onclick = () => {
+        const val = document.getElementById("input-custom-lang").value.trim().toLowerCase();
+        if (val) window.translator.translatePage(val);
+      };
+
+      // Modal del Código QR
+      const qrModal = document.getElementById("qr-modal");
+      const btnOpenModal = document.getElementById("btn-open-qr-page-modal");
+      const qrImg = document.getElementById("yape-qr-page-img");
+      const btnCloseModal = document.getElementById("qr-modal-close");
+
+      function openModal() {
+        if (qrModal) qrModal.style.display = "flex";
+      }
+      function closeModal() {
+        if (qrModal) qrModal.style.display = "none";
+      }
+
+      if (btnOpenModal) btnOpenModal.addEventListener("click", openModal);
+      if (qrImg) qrImg.addEventListener("click", openModal);
+      if (btnCloseModal) btnCloseModal.addEventListener("click", closeModal);
+
+      if (qrModal) {
+        qrModal.addEventListener("click", (e) => {
+          if (e.target === qrModal) closeModal();
+        });
+      }
+    });
+  </script>
+</body>
+</html>

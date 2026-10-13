@@ -42,20 +42,20 @@ El microservicio se ejecuta de forma continua y autónoma en **Render**:
 
 ## Las 3 Capacidades Principales (Pilares Funcionales)
 
-CloudTranslator integra 3 soluciones lingüísticas de última generación en una única plataforma:
+CloudTranslator integra 3 soluciones lingüísticas de última generación en una arquitectura modular con páginas dedicadas:
 
-1. 🌐 **Traductor en la Nube:**  
+1. 🌐 **[Traductor en la Nube](/translator):**  
    * Traducción por lotes de alta velocidad (+200 idiomas) con una sola petición consolidada.
-   * Extracción inteligente del DOM respetando atributos, tags no traducibles y metadatos (`document.title`, `<meta name="description">`).
+   * Extracción inteligente del DOM con `TreeWalker` respetando atributos, tags no traducibles y metadatos (`document.title`, `<meta name="description">`).
    * Persistencia estricta en cookies (`cloud_translator_lang`).
-2. 🎙️ **Texto a Voz (TTS Studio):**  
-   * Síntesis vocal multilingüe en tiempo real.
+2. 🎙️ **[Texto a Voz (TTS Studio)](/tts):**  
+   * Síntesis vocal multilingüe en tiempo real con descarga física de audio en formato `.wav`.
    * Selección de voces del sistema operativo / navegador, calibración de velocidad (rate) y tono (pitch).
    * Ecualizador visual animado por ondas de frecuencia.
-3. 🧬 **Clonación de Voz con IA (Voice Cloning Studio):**  
+3. 🧬 **[Clonación de Voz con IA (Voice Cloning Studio)](/voice-clone):**  
    * Grabación directa con micrófono del usuario (`getUserMedia`) o carga de muestras de audio (`.wav`, `.mp3`, `.ogg`, `.m4a`).
-   * Análisis espectral y extracción de huella acústica con síntesis sobre textos personalizados.
-   * Reproductor de audio integrado con opción de descarga de muestras sintetizadas.
+   * Extracción de frecuencia fundamental (F0), botón de eliminar muestra grabada con confirmación y reproducción previa.
+   * Generación y descarga real de archivos de audio sintetizado `.wav` en PCM 16-bit.
 
 ---
 
@@ -283,47 +283,61 @@ curl -X POST https://cloudtranslator.onrender.com/api/translate \
 
 ### 6. `POST /api/tts` (Síntesis de Texto a Voz)
 * **URL:** `https://cloudtranslator.onrender.com/api/tts`
+* **Headers:** `Content-Type: application/json`
 * **Body:**
   ```json
   {
     "text": "Hola, bienvenido al asistente vocal inteligente",
     "lang": "es",
-    "speed": 1.0,
-    "pitch": 1.0
+    "rate": 1.0,
+    "pitch": 1.0,
+    "voice": "default-neural"
   }
   ```
 * **Respuesta (200 OK):**
   ```json
   {
-    "success": true,
-    "provider": "browser-speech-synthesis-stream",
+    "status": "success",
+    "service": "CloudTranslator TTS Studio",
     "text": "Hola, bienvenido al asistente vocal inteligente",
     "lang": "es",
-    "speed": 1.0,
+    "rate": 1.0,
     "pitch": 1.0,
-    "chars": 48
+    "voice": "default-neural",
+    "audioBase64": "data:audio/wav;base64,UklGRi...",
+    "mimeType": "audio/wav",
+    "sizeBytes": 28400,
+    "message": "Síntesis vocal generada exitosamente en formato WAV PCM."
   }
   ```
 
 ### 7. `POST /api/voice-clone` (Clonación de Voz IA)
 * **URL:** `https://cloudtranslator.onrender.com/api/voice-clone`
+* **Headers:** `Content-Type: application/json`
 * **Body:**
   ```json
   {
     "text": "Este es un mensaje clonado con mi timbre de voz original",
-    "audioSampleBase64": "data:audio/webm;base64,GkXfo59ChoEBQveBA...",
-    "lang": "es"
+    "audioSampleBase64": "data:audio/wav;base64,UklGR...",
+    "pitch": 1.0,
+    "similarity": "high"
   }
   ```
 * **Respuesta (200 OK):**
   ```json
   {
-    "success": true,
-    "status": "voice_synthesized",
+    "status": "success",
+    "service": "CloudTranslator AI Voice Clone",
     "voiceProfileId": "vp_9fa1b28c",
-    "sampleDurationSec": 5.4,
-    "synthesizedText": "Este es un mensaje clonado con mi timbre de voz original",
-    "synthesizedAudioUrl": "/audio/clone_vp_9fa1b28c.wav"
+    "text": "Este es un mensaje clonado con mi timbre de voz original",
+    "similarity": "high",
+    "hasInputSample": true,
+    "voiceSettings": {},
+    "model": "neural-vocoder-hybrid-dsp",
+    "audioBase64": "data:audio/wav;base64,UklGR...",
+    "mimeType": "audio/wav",
+    "sizeBytes": 32100,
+    "message": "Voz clonada y sintetizada exitosamente con huella acústica personalizada."
   }
   ```
 
@@ -331,11 +345,15 @@ curl -X POST https://cloudtranslator.onrender.com/api/translate \
 
 ## Módulos Públicos del Portal Web
 
-CloudTranslator incluye un portal web interactivo responsive con enrutador SPA:
+CloudTranslator incluye un portal web interactivo responsive estructurado con páginas dedicadas:
 
-* **[Inicio / Landing Page](https://cloudtranslator.onrender.com/)**: Demostración en vivo de traducción del DOM, TTS Studio, Voice Cloning Studio, donaciones y métricas.
-* **[Documentación](https://cloudtranslator.onrender.com/docs)**: Arquitectura, flujo por lotes del DOM y preguntas frecuentes.
-* **[Referencia de API REST](https://cloudtranslator.onrender.com/api)**: Playground interactivo (`/api/translate`, `/api/health`, `/api/languages`, `/api/ping`, `/api/tts`, `/api/voice-clone`), esquemas JSON y copiado con un clic.
+* **[Inicio / Landing Page](https://cloudtranslator.onrender.com/)**: Visión general, métricas del cluster, arquitectura en 6 pilares, demo interactiva y accesos directos.
+* **[Traductor en la Nube](https://cloudtranslator.onrender.com/translator)**: Página dedicada al Pilar 1 con consola en vivo, extracción por lotes del DOM y configuración de cookies.
+* **[Texto a Voz (TTS Studio)](https://cloudtranslator.onrender.com/tts)**: Página dedicada al Pilar 2 con síntesis vocal multilingüe, modulación de tono/velocidad, ecualizador en tiempo real y descarga de audio `.wav`.
+* **[Clonación de Voz IA](https://cloudtranslator.onrender.com/voice-clone)**: Página dedicada al Pilar 3 con grabación directa por micrófono, carga de archivos, análisis de pitch F0, reproductor de muestra con eliminación y descarga real de `.wav`.
+* **[Donaciones](https://cloudtranslator.onrender.com/donate)**: Página dedicada para apoyar el mantenimiento de servidores con PayPal y QR de Yape ampliable.
+* **[Documentación Técnica](https://cloudtranslator.onrender.com/docs)**: Arquitectura, flujo por lotes del DOM y preguntas frecuentes.
+* **[Referencia de API REST](https://cloudtranslator.onrender.com/api)**: Playground interactivo (`/api/translate`, `/api/tts`, `/api/voice-clone`, `/api/health`, `/api/languages`, `/api/ping`).
 * **[Aprender (Guías de Integración)](https://cloudtranslator.onrender.com/learn)**: Guías para React, Vue, Vanilla JS, microservicios y optimización de latencia.
 * **[Soporte Técnico](https://cloudtranslator.onrender.com/support)**: Canales de contacto y asistencia directa.
 * **[Centro de Ayuda](https://cloudtranslator.onrender.com/help)**: Solución de problemas comunes y códigos de error.
@@ -349,7 +367,7 @@ CloudTranslator incluye un portal web interactivo responsive con enrutador SPA:
 CloudTranslator opera como una iniciativa abierta y de libre acceso. Si el servicio te ha sido útil y deseas colaborar con los costos de hosting y desarrollo continuo, puedes realizar una donación a través de:
 
 * 💳 **PayPal:** [https://paypal.me/miguelcarlosrojas](https://paypal.me/miguelcarlosrojas)
-* 📱 **Yape (Perú):** Escanea el código QR disponible en la [sección de Donaciones del portal](https://cloudtranslator.onrender.com/#donations-section) a nombre de Miguel Angel Carlos Rojas.
+* 📱 **Yape (Perú):** Escanea el código QR disponible en la [Página de Donaciones](https://cloudtranslator.onrender.com/donate) a nombre de Miguel Angel Carlos Rojas.
 
 ---
 

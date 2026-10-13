@@ -93,6 +93,10 @@ app.use("/api", translateRoutes);
 
 // 8. Rutas limpias directas para todas las páginas del portal
 const pageRoutes = [
+  { path: "/translator", file: "translator.html" },
+  { path: "/tts", file: "tts.html" },
+  { path: "/voice-clone", file: "voice-clone.html" },
+  { path: "/donate", file: "donate.html" },
   { path: "/docs", file: "docs.html" },
   { path: "/learn", file: "learn.html" },
   { path: "/support", file: "support.html" },

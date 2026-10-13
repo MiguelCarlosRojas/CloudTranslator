@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Estudio de Texto a Voz (TTS Multilingüe) de CloudTranslator | Convierte texto en locución fluida y natural, selecciona voces humanas, calibra tono, velocidad y visualiza ondas sonoras.">
+  <meta property="og:title" content="Texto a Voz (TTS Studio) - CloudTranslator">
+  <meta property="og:description" content="Síntesis vocal en tiempo real con ecualizador animado y API REST de audio PCM.">
+  <title>Texto a Voz (TTS) - CloudTranslator</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="shortcut icon" type="image/png" href="/favicon.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <script>
+    (function(){try{var m=document.cookie.match(/(?:^|; )cloud_translator_lang=([^;]*)/);var l=m?decodeURIComponent(m[1]):null;if(l&&l!=="original"&&l!=="es"){document.documentElement.classList.add("ct-pending");setTimeout(function(){document.documentElement.classList.remove("ct-pending");},800);}}catch(e){}})();
+  </script>
+  <script src="/js/spa-router.js" defer></script>
+</head>
+<body>
+
+  <!-- Barra Superior -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <a href="/" class="brand-wrapper">
+        <span class="brand-logo">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="28" height="28">
+          CloudTranslator
+        </span>
+        <span class="brand-badge">v1.0.0</span>
+      </a>
+
+      <nav class="desktop-nav">
+        <ul class="main-menu">
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/docs">Documentación</a></li>
+          <li><a href="/support">Soporte</a></li>
+          <li><a href="/status">Estado</a></li>
+        </ul>
+      </nav>
+
+      <!-- Barra de Herramientas de Traducción Activa -->
+      <div class="toolbar-controls no-translate" data-no-translate>
+        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+          English
+        </button>
+
+        <div class="selector-box">
+          <div class="selector-dropdown">
+            <select id="select-lang" aria-label="Seleccionar idioma">
+              <option value="en">English (en)</option>
+              <option value="es">Español (es)</option>
+              <option value="fr">Français (fr)</option>
+              <option value="de">Deutsch (de)</option>
+              <option value="it">Italiano (it)</option>
+              <option value="pt">Portugués (pt)</option>
+              <option value="ja">日本語 (ja)</option>
+              <option value="zh-CN">中文 (zh-CN)</option>
+              <option value="ru">Русский (ru)</option>
+            </select>
+          </div>
+          <div class="custom-lang-group">
+            <input type="text" id="input-custom-lang" placeholder="ISO" maxlength="5" title="Código ISO personalizado">
+            <button id="btn-translate-custom" class="btn btn-primary" title="Traducir">GO</button>
+          </div>
+        </div>
+
+        <button id="btn-restore" class="btn btn-outline" title="Restaurar idioma original">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+          Original
+        </button>
+
+        <div id="status-pill" class="status-pill" title="Estado del microservicio">
+          <span class="spinner"></span>
+          <span id="status-text">LISTO</span>
+        </div>
+      </div>
+
+      <!-- Botón Hamburguesa Móvil -->
+      <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Abrir Menú de Navegación">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+
+    <!-- Backdrop para Barra Lateral -->
+    <div id="drawer-backdrop"></div>
+
+    <!-- Barra de Navegación Lateral Móvil -->
+    <aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
+      <div class="drawer-header">
+        <a href="/" class="drawer-brand">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="26" height="26">
+          <span>CloudTranslator</span>
+        </a>
+        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral">✕</button>
+      </div>
+
+      <div class="drawer-body">
+        <div class="drawer-section">
+          <span class="drawer-title">NAVEGACIÓN DEL PORTAL</span>
+          <ul class="drawer-menu">
+            <li><a href="/"><svg class="icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Inicio</a></li>
+            <li><a href="/docs"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Documentación</a></li>
+            <li><a href="/support"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Soporte</a></li>
+            <li><a href="/status"><svg class="icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Estado Servidor</a></li>
+          </ul>
+        </div>
+
+        <div class="drawer-section">
+          <span class="drawer-title">LOS 3 PILARES</span>
+          <ul class="drawer-menu">
+            <li><a href="/translator"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traductor en la Nube</a></li>
+            <li><a href="/tts" class="active"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS)</a></li>
+            <li><a href="/voice-clone"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz (IA)</a></li>
+            <li><a href="/donate"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+  </header>
+
+  <main class="full-container">
+
+    <!-- Hero del Pilar 2 -->
+    <section class="hero-full">
+      <span class="hero-tag-glow">PILAR 02 // SÍNTESIS VOCAL (TTS)</span>
+      <h1>Estudio de Texto a Voz (TTS Multilingüe)</h1>
+      <p class="lead">
+        Convierte cualquier texto o guion en audio natural de alta fidelidad. Personaliza el idioma, selecciona el timbre de voz, ajusta velocidad y tono en tiempo real con reproductor y ecualizador visual.
+      </p>
+    </section>
+
+    <!-- ESTUDIO TTS INTERACTIVO -->
+    <section class="studio-wrapper">
+      <div class="studio-header">
+        <div class="studio-title-box">
+          <h2>
+            <svg class="icon" viewBox="0 0 24 24" style="color: var(--primary);"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            Consola de Síntesis Vocal
+          </h2>
+          <p>Escribe tu mensaje, elige la voz deseada y haz clic en Reproducir para escuchar al instante.</p>
+        </div>
+        <span class="pillar-tag" style="background: rgba(0, 240, 255, 0.1); color: var(--primary); border-color: rgba(0, 240, 255, 0.3);">MOTOR ACTIVO // WEB SPEECH + NEURAL PCM</span>
+      </div>
+
+      <div class="studio-grid">
+        <!-- Editor de Texto -->
+        <div class="studio-panel">
+          <div class="studio-label">
+            <span>TEXTO A SINTETIZAR</span>
+            <span id="tts-char-count">108 caracteres</span>
+          </div>
+          <textarea id="tts-input-text" class="studio-textarea" placeholder="Escribe aquí el texto que deseas escuchar...">¡Hola! Bienvenido a CloudTranslator. Ahora puedes generar audio natural en varios idiomas con solo escribir tu texto.</textarea>
+
+          <div class="studio-controls-row">
+            <div class="studio-control-col">
+              <label class="studio-label" for="tts-lang-select">IDIOMA</label>
+              <select id="tts-lang-select" class="studio-select">
+                <option value="es-ES">Español (España / América)</option>
+                <option value="en-US">English (United States)</option>
+                <option value="en-GB">English (United Kingdom)</option>
+                <option value="fr-FR">Français (France)</option>
+                <option value="de-DE">Deutsch (Deutschland)</option>
+                <option value="it-IT">Italiano (Italia)</option>
+                <option value="pt-BR">Português (Brasil)</option>
+                <option value="ja-JP">日本語 (Japón)</option>
+                <option value="zh-CN">中文 (Mandarín)</option>
+                <option value="ru-RU">Русский (Rusia)</option>
+              </select>
+            </div>
+
+            <div class="studio-control-col">
+              <label class="studio-label" for="tts-voice-select">TIMBRE DE VOZ</label>
+              <select id="tts-voice-select" class="studio-select">
+                <option value="default">Voz Estándar del Sistema</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel de Modulación y Reproductor -->
+        <div class="studio-panel">
+          <div class="studio-label">
+            <span>MODULACIÓN ACÚSTICA</span>
+            <span>PROSODIA</span>
+          </div>
+
+          <div class="range-group">
+            <div class="range-header">
+              <span>Velocidad de Habla (Rate)</span>
+              <span id="tts-rate-val" class="range-val">1.0x</span>
+            </div>
+            <input type="range" id="tts-rate-slider" min="0.5" max="2.0" step="0.1" value="1.0" class="studio-slider">
+          </div>
+
+          <div class="range-group">
+            <div class="range-header">
+              <span>Tono Acústico (Pitch)</span>
+              <span id="tts-pitch-val" class="range-val">1.0</span>
+            </div>
+            <input type="range" id="tts-pitch-slider" min="0.5" max="2.0" step="0.1" value="1.0" class="studio-slider">
+          </div>
+
+          <!-- Ecualizador de Ondas -->
+          <div class="studio-equalizer-box">
+            <div class="eq-status-row">
+              <span id="tts-status-label" class="eq-status-badge">LISTO</span>
+              <span id="tts-time-label" style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);">00:00</span>
+            </div>
+            <div id="tts-bars-container" class="eq-bars-row">
+              <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+              <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+              <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+              <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+              <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+              <div class="eq-bar"></div>
+            </div>
+          </div>
+
+          <!-- Botones de Acción -->
+          <div class="audio-actions-row">
+            <button id="tts-btn-play" class="btn btn-primary" style="flex: 1.5; padding: 12px 18px; font-weight: 700;">
+              <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Reproducir
+            </button>
+            <button id="tts-btn-pause" class="btn btn-outline" style="flex: 1; padding: 12px 14px;">
+              <svg class="icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+              Pausar
+            </button>
+            <button id="tts-btn-stop" class="btn btn-outline" style="flex: 1; padding: 12px 14px;">
+              <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16"/></svg>
+              Detener
+            </button>
+          </div>
+
+          <div style="margin-top: 14px;">
+            <button id="tts-btn-download" class="btn btn-outline w-full" style="padding: 10px 16px; font-size: 0.85rem;">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Descargar Audio Generado (WAV)
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Documentación de Endpoint REST -->
+    <section class="content-box-card">
+      <span class="tech-card-tag">[ API_SPECIFICATION // ENDPOINT_REST ]</span>
+      <h2>Consumo Programático: POST /api/tts</h2>
+      <p>Integra la síntesis vocal directamente en tus aplicaciones o microservicios enviando una consulta JSON:</p>
+
+      <div class="code-box-wrapper" style="margin-top: 16px;">
+        <div class="code-box-header">
+          <span>cURL - Síntesis de Texto a Voz</span>
+          <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.72rem;" onclick="navigator.clipboard.writeText(document.getElementById('code-tts-curl').textContent)">Copiar</button>
+        </div>
+        <pre class="code-panel" id="code-tts-curl">curl -X POST https://cloudtranslator.onrender.com/api/tts \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Hola, este es un mensaje sintetizado con CloudTranslator",
+    "lang": "es",
+    "rate": 1.0,
+    "pitch": 1.0
+  }'</pre>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Pie de Página Horizontal Alineado -->
+  <footer>
+    <div class="footer-inner-full">
+      <!-- Columna 1: Brand & Misión -->
+      <div class="footer-col footer-col-brand">
+        <h4>
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="22" height="22">
+          CloudTranslator
+        </h4>
+        <p>Ecosistema cloud de procesamiento lingüístico y síntesis vocal de alto rendimiento: traducción neuronal distribuida, Texto a Voz (TTS) y Clonación de Voz por Inteligencia Artificial.</p>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+          Microservicio libre en Render • <span class="badge badge-online">ONLINE</span>
+        </p>
+      </div>
+
+      <!-- Columna 2: Pilares y Herramientas -->
+      <div class="footer-col">
+        <h4>Servicios</h4>
+        <ul>
+          <li><a href="/translator">Traductor en la Nube</a></li>
+          <li><a href="/tts" class="active">Texto a Voz (TTS)</a></li>
+          <li><a href="/voice-clone">Clonación de Voz IA</a></li>
+          <li><a href="/api">Playground API REST</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 3: Recursos y Guías -->
+      <div class="footer-col">
+        <h4>Recursos</h4>
+        <ul>
+          <li><a href="/learn">Guías de Integración</a></li>
+          <li><a href="/help">Centro de Ayuda</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 4: Información Legal -->
+      <div class="footer-col">
+        <h4>Información Legal</h4>
+        <ul>
+          <li><a href="/terms">Términos del Servicio</a></li>
+          <li><a href="/privacy">Política de Privacidad</a></li>
+          <li><a href="/security">Seguridad y Cookies</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 5: Donaciones -->
+      <div class="footer-col">
+        <h4>Donaciones</h4>
+        <ul>
+          <li><a href="/donate">Página de Donaciones</a></li>
+          <li><a href="https://paypal.me/miguelcarlosrojas" target="_blank" rel="noopener noreferrer">Donar con PayPal</a></li>
+          <li><a href="https://github.com/MiguelCarlosRojas/CloudTranslator" target="_blank" rel="noopener noreferrer">Repositorio GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom-full">
+      <span>© 2026 CloudTranslator. Todos los derechos reservados.</span>
+      <span>Desarrollado por Miguel Angel Carlos Rojas</span>
+    </div>
+  </footer>
+
+  <script src="/js/cloud-translator.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";
+      window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
+      document.getElementById("btn-english").onclick = () => window.translator.translateToEnglish();
+      document.getElementById("btn-restore").onclick = () => window.translator.restoreOriginal();
+      document.getElementById("select-lang").onchange = (e) => window.translator.translatePage(e.target.value);
+      document.getElementById("btn-translate-custom").onclick = () => {
+        const val = document.getElementById("input-custom-lang").value.trim().toLowerCase();
+        if (val) window.translator.translatePage(val);
+      };
+
+      // LÓGICA COMPLETA DE TTS
+      const ttsInput = document.getElementById("tts-input-text");
+      const ttsCharCount = document.getElementById("tts-char-count");
+      const ttsLang = document.getElementById("tts-lang-select");
+      const ttsVoice = document.getElementById("tts-voice-select");
+      const ttsRate = document.getElementById("tts-rate-slider");
+      const ttsRateVal = document.getElementById("tts-rate-val");
+      const ttsPitch = document.getElementById("tts-pitch-slider");
+      const ttsPitchVal = document.getElementById("tts-pitch-val");
+      const ttsBtnPlay = document.getElementById("tts-btn-play");
+      const ttsBtnPause = document.getElementById("tts-btn-pause");
+      const ttsBtnStop = document.getElementById("tts-btn-stop");
+      const ttsBtnDownload = document.getElementById("tts-btn-download");
+      const ttsStatusLabel = document.getElementById("tts-status-label");
+      const ttsTimeLabel = document.getElementById("tts-time-label");
+      const ttsBars = document.getElementById("tts-bars-container");
+
+      let voicesList = [];
+      let currentUtterance = null;
+      let playStartTime = 0;
+      let timerInterval = null;
+
+      function updateCharCount() {
+        if (ttsInput && ttsCharCount) {
+          ttsCharCount.textContent = `${ttsInput.value.length} caracteres`;
+        }
+      }
+      if (ttsInput) ttsInput.addEventListener("input", updateCharCount);
+
+      if (ttsRate) {
+        ttsRate.addEventListener("input", (e) => {
+          ttsRateVal.textContent = parseFloat(e.target.value).toFixed(1) + "x";
+        });
+      }
+
+      if (ttsPitch) {
+        ttsPitch.addEventListener("input", (e) => {
+          ttsPitchVal.textContent = parseFloat(e.target.value).toFixed(1);
+        });
+      }
+
+      function populateVoices() {
+        if (!("speechSynthesis" in window)) return;
+        voicesList = window.speechSynthesis.getVoices();
+        if (!ttsVoice) return;
+        ttsVoice.innerHTML = "";
+
+        const currentLangPrefix = (ttsLang.value || "es").split("-")[0];
+        const filtered = voicesList.filter(v => v.lang.startsWith(currentLangPrefix));
+        const listToDisplay = filtered.length > 0 ? filtered : voicesList;
+
+        listToDisplay.forEach((v) => {
+          const opt = document.createElement("option");
+          opt.value = v.name;
+          opt.textContent = `${v.name} (${v.lang})${v.default ? " [Predeterminada]" : ""}`;
+          ttsVoice.appendChild(opt);
+        });
+      }
+
+      if ("speechSynthesis" in window) {
+        populateVoices();
+        window.speechSynthesis.onvoiceschanged = populateVoices;
+      }
+      if (ttsLang) ttsLang.addEventListener("change", populateVoices);
+
+      function setStatus(text, isPlaying = false) {
+        if (ttsStatusLabel) {
+          ttsStatusLabel.textContent = text;
+          if (isPlaying) {
+            ttsStatusLabel.className = "eq-status-badge active";
+            if (ttsBars) ttsBars.classList.add("animating");
+          } else {
+            ttsStatusLabel.className = "eq-status-badge";
+            if (ttsBars) ttsBars.classList.remove("animating");
+          }
+        }
+      }
+
+      function startTimer() {
+        playStartTime = Date.now();
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          const elapsed = Math.floor((Date.now() - playStartTime) / 1000);
+          const m = String(Math.floor(elapsed / 60)).padStart(2, "0");
+          const s = String(elapsed % 60).padStart(2, "0");
+          if (ttsTimeLabel) ttsTimeLabel.textContent = `${m}:${s}`;
+        }, 500);
+      }
+
+      function stopTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        if (ttsTimeLabel) ttsTimeLabel.textContent = "00:00";
+      }
+
+      if (ttsBtnPlay) {
+        ttsBtnPlay.addEventListener("click", () => {
+          const text = (ttsInput.value || "").trim();
+          if (!text) return;
+
+          if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+            setStatus("REPRODUCIENDO", true);
+            return;
+          }
+
+          window.speechSynthesis.cancel();
+          currentUtterance = new SpeechSynthesisUtterance(text);
+          currentUtterance.rate = parseFloat(ttsRate.value) || 1.0;
+          currentUtterance.pitch = parseFloat(ttsPitch.value) || 1.0;
+          currentUtterance.lang = ttsLang.value;
+
+          const selectedName = ttsVoice.value;
+          const chosen = voicesList.find(v => v.name === selectedName);
+          if (chosen) currentUtterance.voice = chosen;
+
+          currentUtterance.onstart = () => {
+            setStatus("REPRODUCIENDO", true);
+            startTimer();
+          };
+
+          currentUtterance.onend = () => {
+            setStatus("COMPLETADO", false);
+            stopTimer();
+          };
+
+          currentUtterance.onerror = () => {
+            setStatus("ERROR", false);
+            stopTimer();
+          };
+
+          window.speechSynthesis.speak(currentUtterance);
+        });
+      }
+
+      if (ttsBtnPause) {
+        ttsBtnPause.addEventListener("click", () => {
+          if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+            window.speechSynthesis.pause();
+            setStatus("PAUSADO", false);
+            if (timerInterval) clearInterval(timerInterval);
+          }
+        });
+      }
+
+      if (ttsBtnStop) {
+        ttsBtnStop.addEventListener("click", () => {
+          window.speechSynthesis.cancel();
+          setStatus("DETENIDO", false);
+          stopTimer();
+        });
+      }
+
+      if (ttsBtnDownload) {
+        ttsBtnDownload.addEventListener("click", async () => {
+          const text = (ttsInput.value || "").trim();
+          if (!text) {
+            alert("Escribe un texto antes de descargar el audio.");
+            return;
+          }
+
+          ttsBtnDownload.disabled = true;
+          ttsBtnDownload.textContent = "Generando archivo WAV...";
+
+          try {
+            const resp = await fetch("/api/tts", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                text,
+                lang: ttsLang.value.slice(0, 2),
+                rate: parseFloat(ttsRate.value) || 1.0,
+                pitch: parseFloat(ttsPitch.value) || 1.0
+              })
+            });
+
+            const data = await resp.json();
+            if (data.audioBase64) {
+              const byteCharacters = atob(data.audioBase64.split(",")[1]);
+              const byteNumbers = new Array(byteCharacters.length);
+              for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+              }
+              const byteArray = new Uint8Array(byteNumbers);
+              const blob = new Blob([byteArray], { type: "audio/wav" });
+              const url = URL.createObjectURL(blob);
+
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `tts-cloudtranslator-${Date.now()}.wav`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              setTimeout(() => URL.revokeObjectURL(url), 2000);
+
+              ttsBtnDownload.textContent = "¡Descarga iniciada con éxito!";
+              setTimeout(() => {
+                ttsBtnDownload.textContent = "Descargar Audio Generado (WAV)";
+                ttsBtnDownload.disabled = false;
+              }, 2500);
+            } else {
+              throw new Error("No se pudo obtener el audio");
+            }
+          } catch (e) {
+            alert("Error al generar descarga de audio: " + e.message);
+            ttsBtnDownload.disabled = false;
+            ttsBtnDownload.textContent = "Descargar Audio Generado (WAV)";
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
