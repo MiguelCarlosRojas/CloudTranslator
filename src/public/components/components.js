@@ -159,13 +159,13 @@
       <li><a href="/translator" class="${activePage === "translator" ? "active" : ""}">Traductor en la Nube</a></li>
       <li><a href="/tts" class="${activePage === "tts" ? "active" : ""}">Texto a Voz (TTS)</a></li>
       <li><a href="/voice-clone" class="${activePage === "voice-clone" ? "active" : ""}">Clonación de Voz IA</a></li>
-      <li><a href="/api" class="${activePage === "api" ? "active" : ""}">Playground API REST</a></li>
     </ul>
   </div>
 
   <div class="footer-col">
     <h4>Recursos</h4>
     <ul>
+      <li><a href="/api" class="${activePage === "api" ? "active" : ""}">Playground API REST</a></li>
       <li><a href="/learn" class="${activePage === "learn" ? "active" : ""}">Guías de Integración</a></li>
       <li><a href="/help" class="${activePage === "help" ? "active" : ""}">Centro de Ayuda</a></li>
     </ul>
@@ -177,15 +177,6 @@
       <li><a href="/terms" class="${activePage === "terms" ? "active" : ""}">Términos del Servicio</a></li>
       <li><a href="/privacy" class="${activePage === "privacy" ? "active" : ""}">Política de Privacidad</a></li>
       <li><a href="/security" class="${activePage === "security" ? "active" : ""}">Seguridad y Cookies</a></li>
-    </ul>
-  </div>
-
-  <div class="footer-col">
-    <h4>Donaciones</h4>
-    <ul>
-      <li><a href="/donate" class="${activePage === "donate" ? "active" : ""}">Página de Donaciones</a></li>
-      <li><a href="https://paypal.me/miguelcarlosrojas" target="_blank" rel="noopener noreferrer">Donar con PayPal</a></li>
-      <li><a href="https://github.com/MiguelCarlosRojas/CloudTranslator" target="_blank" rel="noopener noreferrer">Repositorio GitHub</a></li>
     </ul>
   </div>
 </div>
