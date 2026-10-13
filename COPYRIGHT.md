@@ -34,7 +34,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
    Todo el código fuente original, la arquitectura del microservicio, el sistema de caché en memoria del servidor, el script cliente de extracción del DOM con persistencia por cookies, y la documentación incluida en este repositorio son creación intelectual de Miguel Angel Carlos Rojas.
 
 2. **Bibliotecas de Terceros:**  
-   Las dependencias de código abierto utilizadas en este proyecto (`express`, `google-translate-api-x`, `cors`, `winston`, `joi`, `nodemon`) pertenecen a sus respectivos autores y se rigen bajo sus licencias correspondientes (MIT, ISC, Apache-2.0).
+   Las dependencias de código abierto utilizadas en este proyecto (`express`, `google-translate-api-x`, `cors`, `compression`, `winston`, `nodemon`) pertenecen a sus respectivos autores y se rigen bajo sus licencias correspondientes (MIT, ISC, Apache-2.0).
 
 3. **Uso de la API y Servicio en la Nube:**  
    Se permite la libre integración de aplicaciones web, móviles o de backend con el servicio público `https://cloudtranslator.onrender.com/api/translate` bajo políticas de uso justo y sin fines maliciosos.

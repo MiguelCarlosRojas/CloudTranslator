@@ -91,6 +91,7 @@
       // Nodos y atributos originales en memoria
       this.nodeMap = new Map(); // Node -> originalText
       this.attrMap = new Map(); // Element -> [{ attr, originalText }]
+      this.originalTitle = typeof document !== "undefined" && document.title ? document.title : "";
 
       // Caché en memoria RAM únicamente durante la sesión activa (Cero localStorage)
       this.cache = {};
@@ -105,6 +106,32 @@
 
       if (this.useCookies) {
         this._initCookieLanguage();
+      }
+    }
+
+    /**
+     * Define o actualiza el título original para navegación dinámica o SPA
+     * @param {string} title
+     */
+    setOriginalTitle(title) {
+      if (title && typeof title === "string") {
+        this.originalTitle = title.trim();
+      }
+    }
+
+    /**
+     * Pre-traduce un documento completo (cuerpo y título) en memoria
+     * @param {Document} doc
+     * @param {string} targetLanguage
+     */
+    preTranslateDocument(doc, targetLanguage) {
+      if (!doc || !targetLanguage || targetLanguage === "original" || targetLanguage === "es") return;
+      const lang = targetLanguage.trim().toLowerCase();
+      if (doc.body) {
+        this.preTranslateDomTree(doc.body, lang);
+      }
+      if (doc.title && this.cache[lang] && this.cache[lang][doc.title]) {
+        doc.title = this.cache[lang][doc.title];
       }
     }
 
@@ -219,6 +246,10 @@
         }
       }
 
+      if (this.originalTitle && typeof document !== "undefined") {
+        document.title = this.originalTitle;
+      }
+
       this.currentLanguage = "original";
       document.documentElement.classList.remove("ct-pending");
       this._updateStatusUI("ORIGINAL");
@@ -300,6 +331,12 @@
             uniqueTextsToTranslate.push(originalText);
           }
         }
+      }
+
+      // Incluir título de la pestaña del navegador (document.title) para traducción simultánea
+      if (this.originalTitle && !this.cache[lang][this.originalTitle] && !seen.has(this.originalTitle)) {
+        seen.add(this.originalTitle);
+        uniqueTextsToTranslate.push(this.originalTitle);
       }
 
       if (uniqueTextsToTranslate.length === 0) {
@@ -412,9 +449,18 @@
           }
         }
       }
+
+      // Actualizar título de la pestaña con la traducción
+      if (this.originalTitle && langCache[this.originalTitle] && typeof document !== "undefined") {
+        document.title = langCache[this.originalTitle];
+      }
     }
 
     _scanDOM() {
+      if (typeof document !== "undefined" && document.title && !this.originalTitle) {
+        this.originalTitle = document.title;
+      }
+
       const root = document.querySelector(this.rootSelector) || document.body;
 
       const walker = document.createTreeWalker(

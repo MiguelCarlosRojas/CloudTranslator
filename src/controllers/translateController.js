@@ -1,6 +1,7 @@
 const translate = require("google-translate-api-x");
+const { languages } = require("google-translate-api-x");
 const logger = require("../utils/logger");
-const { STATUS_CODES, SUPPORTED_LANGUAGES } = require("../config/config");
+const { STATUS_CODES, POPULAR_LANGUAGES } = require("../config/config");
 
 // Servidor: Caché LRU de alto rendimiento en memoria RAM para respuestas en 0ms
 const serverTranslationCache = new Map();
@@ -42,10 +43,10 @@ function setCachedTranslation(targetLanguage, str, translatedStr) {
 const NON_TRANSLATABLE_REGEX = /^[\d\s\-_.,:;!?()\[\]{}@#$%&*+=/\\|<>'"~`]*$/;
 
 /**
- * Traduce un lote en paralelo dividiéndolo en fragmentos más pequeños (chunks)
+ * Traduce un lote en paralelo dividiéndolo en fragmentos más pequeños (chunks de 35)
  * para evitar demoras y límites de tasa en la capa gratuita de Render.
  */
-async function translateInParallelChunks(uniqueTexts, targetLanguage, chunkSize = 35) {
+async function translateInParallelChunks(uniqueTexts, targetLanguage, sourceLanguage = "auto", chunkSize = 35) {
   const chunks = [];
   for (let i = 0; i < uniqueTexts.length; i += chunkSize) {
     chunks.push(uniqueTexts.slice(i, i + chunkSize));
@@ -55,6 +56,7 @@ async function translateInParallelChunks(uniqueTexts, targetLanguage, chunkSize 
     try {
       const res = await translate(chunk, {
         to: targetLanguage,
+        from: sourceLanguage || "auto",
         rejectOnPartialFail: false,
         forceBatch: true
       });
@@ -62,12 +64,15 @@ async function translateInParallelChunks(uniqueTexts, targetLanguage, chunkSize 
         ? res.map((r, idx) => (r && r.text ? r.text : chunk[idx]))
         : [res && res.text ? res.text : chunk[0]];
     } catch (chunkError) {
-      logger.warn(`Fallback individual para chunk de ${chunk.length} elementos debido a: ${chunkError.message}`);
-      // Fallback: intentar traducir individualmente si el lote falla
+      logger.warn(`Fallback individual para chunk de ${chunk.length} elementos: ${chunkError.message}`);
+      // Fallback: traducir individualmente si el lote falla
       const individualResults = await Promise.all(
         chunk.map(async (text) => {
           try {
-            const singleRes = await translate(text, { to: targetLanguage });
+            const singleRes = await translate(text, {
+              to: targetLanguage,
+              from: sourceLanguage || "auto"
+            });
             return singleRes && singleRes.text ? singleRes.text : text;
           } catch {
             return text; // Preservar texto original si falla
@@ -84,13 +89,13 @@ async function translateInParallelChunks(uniqueTexts, targetLanguage, chunkSize 
 
 /**
  * @desc Traduce texto o lista de textos a un idioma objetivo con deduplicación y caché en RAM
- * @param {Object} req - Request con text o texts y targetLanguage
+ * @param {Object} req - Request con text o texts, targetLanguage, sourceLanguage opcional
  * @param {Object} res - Response object
  * @param {Function} next - Next middleware
  */
 exports.translateText = async (req, res, next) => {
   const data = req.method === "GET" ? req.query : req.body;
-  const { text, texts, targetLanguage } = data;
+  const { text, texts, targetLanguage, sourceLanguage } = data;
 
   try {
     // 1. Manejo de Lotes de Texto (/api/translate con texts: [...])
@@ -127,14 +132,24 @@ exports.translateText = async (req, res, next) => {
 
       // Si todo se resolvió con la caché o filtros de números, responder de inmediato
       if (missingMap.size === 0) {
-        return res.status(STATUS_CODES.OK).json({ translatedTexts: results });
+        return res.status(STATUS_CODES.OK).json({
+          success: true,
+          translatedTexts: results,
+          targetLanguage,
+          count: results.length
+        });
       }
 
       // Lista única de textos que realmente necesitan red
       const uniqueMissingList = Array.from(missingMap.keys());
 
       // Traducir en paralelo por fragmentos
-      const translatedBatch = await translateInParallelChunks(uniqueMissingList, targetLanguage, 35);
+      const translatedBatch = await translateInParallelChunks(
+        uniqueMissingList,
+        targetLanguage,
+        sourceLanguage,
+        35
+      );
 
       // Poblar resultados y almacenar en caché
       for (let k = 0; k < uniqueMissingList.length; k++) {
@@ -149,44 +164,72 @@ exports.translateText = async (req, res, next) => {
       }
 
       logger.info(`Lote optimizado: ${totalCount} textos procesados (${uniqueMissingList.length} únicos a red) a '${targetLanguage}'`);
-      return res.status(STATUS_CODES.OK).json({ translatedTexts: results });
+      return res.status(STATUS_CODES.OK).json({
+        success: true,
+        translatedTexts: results,
+        targetLanguage,
+        count: results.length
+      });
     }
 
     // 2. Manejo de Texto Unitario (/api/translate con text: "...")
     if (typeof text === "string") {
       if (!text || NON_TRANSLATABLE_REGEX.test(text.trim())) {
-        return res.status(STATUS_CODES.OK).json({ translatedText: text });
+        return res.status(STATUS_CODES.OK).json({
+          success: true,
+          translatedText: text,
+          targetLanguage
+        });
       }
 
       const cachedSingle = getCachedTranslation(targetLanguage, text);
       if (cachedSingle !== undefined) {
-        return res.status(STATUS_CODES.OK).json({ translatedText: cachedSingle });
+        return res.status(STATUS_CODES.OK).json({
+          success: true,
+          translatedText: cachedSingle,
+          targetLanguage
+        });
       }
 
-      const result = await translate(text, { to: targetLanguage });
+      const result = await translate(text, {
+        to: targetLanguage,
+        from: sourceLanguage || "auto"
+      });
       const translatedText = result && result.text ? result.text : text;
       setCachedTranslation(targetLanguage, text, translatedText);
 
-      return res.status(STATUS_CODES.OK).json({ translatedText });
+      return res.status(STATUS_CODES.OK).json({
+        success: true,
+        translatedText,
+        targetLanguage
+      });
     }
 
     return res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
       error: "Parámetros inválidos. Debe proporcionar 'text' o 'texts' junto a 'targetLanguage'."
     });
   } catch (error) {
     logger.error(`Error en translateText: ${error.message}`);
-    next(error);
+    return res.status(STATUS_CODES.SERVER_ERROR).json({
+      success: false,
+      error: "Error en el servicio de traducción: " + (error.message || "Fallo inesperado")
+    });
   }
 };
 
 /**
- * @desc Lista de idiomas soportados
+ * @desc Lista oficial y completa de más de 200 idiomas soportados
  */
 exports.getLanguages = (req, res) => {
-  res.setHeader("Cache-Control", "public, max-age=86400"); // Caché de 24 horas
+  res.setHeader("Cache-Control", "public, max-age=86400, s-maxage=86400");
+  const langKeys = Object.keys(languages).filter((k) => k !== "auto");
   res.status(STATUS_CODES.OK).json({
     success: true,
-    languages: SUPPORTED_LANGUAGES
+    total: langKeys.length,
+    popular: POPULAR_LANGUAGES,
+    languages: langKeys,
+    dictionary: languages
   });
 };
 

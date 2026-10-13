@@ -89,7 +89,20 @@
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, "text/html");
 
-      // Actualizar título de la página
+      // Actualizar título de la página y pre-traducción fluida en memoria
+      const rawTitle = doc.title;
+      try {
+        const savedLang = window.translator ? window.translator.getSavedLanguage() : null;
+        if (window.translator) {
+          window.translator.setOriginalTitle(rawTitle);
+          if (savedLang && savedLang !== "original" && savedLang !== "es") {
+            window.translator.preTranslateDocument(doc, savedLang);
+          }
+        }
+      } catch (transErr) {
+        console.warn("[SPA Router] Advertencia en pre-traducción:", transErr);
+      }
+
       document.title = doc.title;
 
       // Actualizar favicon si está definido en el nuevo documento
@@ -97,17 +110,6 @@
       const newFavicon = doc.querySelector("link[rel*='icon']");
       if (currentFavicon && newFavicon) {
         currentFavicon.href = newFavicon.href;
-      }
-
-      // Pre-traducción en memoria antes de pintar en pantalla:
-      // Elimina completamente el parpadeo de texto original en navegación SPA
-      try {
-        const savedLang = window.translator ? window.translator.getSavedLanguage() : null;
-        if (window.translator && savedLang && savedLang !== "original" && savedLang !== "es") {
-          window.translator.preTranslateDomTree(doc.body, savedLang);
-        }
-      } catch (transErr) {
-        console.warn("[SPA Router] Advertencia en pre-traducción:", transErr);
       }
 
       // Reemplazar contenido de la página ya con el idioma correspondiente
@@ -134,6 +136,14 @@
       } finally {
         isNavigatingSpa = false;
       }
+
+      // Asegurar que si hay un idioma activo en cookie, la nueva página complete su traducción y título
+      try {
+        const activeLang = window.translator ? window.translator.getSavedLanguage() : null;
+        if (window.translator && activeLang && activeLang !== "original" && activeLang !== "es") {
+          window.translator.translatePage(activeLang);
+        }
+      } catch (postTransErr) {}
 
       // Manejar scroll a ancla o al inicio
       const parsedUrl = new URL(url, window.location.href);

@@ -18,9 +18,18 @@ app.use(compression({
   }
 }));
 
-// 2. Parsers y Políticas CORS
+// 2. Parsers, Seguridad y Políticas CORS
 app.use(express.json({ limit: "1mb" }));
 app.use(cors);
+app.options("*", cors);
+
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  next();
+});
 
 // 3. Middleware de URLs limpias: Redirige permanentemente (301) cualquier petición con extensión .html
 app.use((req, res, next) => {
