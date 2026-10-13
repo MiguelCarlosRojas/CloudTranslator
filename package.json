@@ -27,6 +27,7 @@
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "google-translate-api-x": "^10.7.2",
+    "msedge-tts": "^2.1.0",
     "winston": "^3.17.0"
   },
   "devDependencies": {

@@ -220,7 +220,24 @@
     },
 
     /**
-     * Auto-inyecta encabezado y pie de página si los contenedores existen
+     * Aplica automáticamente el diseño del componente select-wrapper y form-select-custom a todos los selects
+     */
+    decorateSelects() {
+      document.querySelectorAll("select").forEach(select => {
+        if (!select.closest(".select-wrapper")) {
+          const wrapper = document.createElement("div");
+          wrapper.className = "select-wrapper";
+          select.parentNode.insertBefore(wrapper, select);
+          wrapper.appendChild(select);
+        }
+        if (!select.classList.contains("form-select-custom")) {
+          select.classList.add("form-select-custom");
+        }
+      });
+    },
+
+    /**
+     * Auto-inyecta encabezado, pie de página y decora controles si existen
      */
     init() {
       const headerContainer = document.querySelector("[data-component='header']");
@@ -238,6 +255,7 @@
         footerContainer.className = "footer-full";
       }
 
+      this.decorateSelects();
       this.initDrawerEvents();
     }
   };
@@ -247,8 +265,12 @@
 
   // Auto-inicializar cuando el DOM esté listo
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => CloudComponents.initDrawerEvents());
+    document.addEventListener("DOMContentLoaded", () => {
+      CloudComponents.decorateSelects();
+      CloudComponents.initDrawerEvents();
+    });
   } else {
+    CloudComponents.decorateSelects();
     CloudComponents.initDrawerEvents();
   }
 })(window, document);

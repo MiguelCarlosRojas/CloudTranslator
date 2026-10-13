@@ -128,21 +128,119 @@
     <!-- Hero de Donaciones con Mensaje de Compromiso -->
     <div class="donate-hero">
       <span class="hero-tag-glow" style="color: #10b981; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.1);">
-        APOYO A LA COMUNIDAD Y CÓDIGO ABIERTO
+        ✨ PROYECTO LIBRE Y DE CÓDIGO ABIERTO
       </span>
-      <h1 style="margin: 18px 0 12px; font-size: clamp(2rem, 4vw, 2.8rem);">
+      <h1 style="margin: 20px 0 14px; font-size: clamp(2.1rem, 4.2vw, 3rem); font-weight: 800; letter-spacing: -0.02em;">
         Impulsa el Crecimiento de CloudTranslator
       </h1>
-      <p class="lead" style="max-width: 860px; margin: 0 auto; color: var(--text-secondary); line-height: 1.75;">
-        CloudTranslator es un ecosistema libre y gratuito desarrollado para que cualquier estudiante, programador o empresa pueda traducir la web, sintetizar audio y clonar voces sin barreras de costos. Cada donación que recibimos es inmensamente valorada y se reinvierte íntegramente en la mejora continua de la plataforma.
+      <p class="lead" style="max-width: 820px; margin: 0 auto; color: var(--text-secondary); line-height: 1.8; font-size: 1.05rem;">
+        CloudTranslator fue creado para que desarrolladores, estudiantes y creadores de todo el mundo puedan traducir páginas web, generar voces humanas con IA y clonar su voz sin costes ni barreras de entrada. <strong>Cada aporte es valorado profundamente</strong> y financia directamente nuestra infraestructura y modelos neurales.
       </p>
+
+      <!-- Badges de Reconocimiento -->
+      <div style="display: flex; justify-content: center; gap: 12px; margin-top: 24px; flex-wrap: wrap;">
+        <span class="brand-badge" style="background: rgba(16, 185, 129, 0.15); border-color: #10b981; color: #10b981; font-weight: 700;">
+          ✓ 100% Reinvertido en Infraestructura
+        </span>
+        <span class="brand-badge" style="background: rgba(0, 112, 186, 0.15); border-color: #38bdf8; color: #38bdf8; font-weight: 700;">
+          ✓ Microservicio Gratuito para Todos
+        </span>
+        <span class="brand-badge" style="background: rgba(168, 85, 247, 0.15); border-color: #d946ef; color: #d946ef; font-weight: 700;">
+          ✓ Modelos Neuronales Sin Restricciones
+        </span>
+      </div>
     </div>
 
-    <!-- En qué se invierten las donaciones -->
-    <section>
+    <!-- Métodos de Donación: PayPal & Yape QR con Cuadro Completo y Modal -->
+    <section style="margin-bottom: clamp(40px, 6vw, 68px);">
       <div class="section-full-title">
-        <h2>¿En Qué se Utiliza tu Aporte?</h2>
-        <p>Transparencia y compromiso en el destino de cada contribución.</p>
+        <h2>Elige tu Canal de Apoyo</h2>
+        <p>Aceptamos transferencias nacionales desde Perú vía Yape y pagos internacionales con tarjetas mediante PayPal.</p>
+      </div>
+
+      <div class="donations-grid" style="grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 32px; max-width: 980px; margin: 0 auto;">
+        
+        <!-- Método 1: PayPal Internacional -->
+        <div class="donation-card donation-card-paypal">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <span class="badge badge-paypal" style="font-weight: 700; letter-spacing: 0.04em;">INTERNACIONAL / TARJETAS</span>
+              <svg class="icon" viewBox="0 0 24 24" style="color: #0070ba; width: 24px; height: 24px;"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+            </div>
+
+            <h3 style="font-size: 1.45rem; margin-bottom: 10px; color: #ffffff;">Donar vía PayPal</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">
+              Dona de forma segura desde cualquier país con tu saldo PayPal o tarjetas Visa, MasterCard y American Express.
+            </p>
+
+            <!-- Sugerencias de Montos Rápidos -->
+            <div style="margin-bottom: 20px;">
+              <span style="display: block; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">
+                MONTOS SUGERIDOS
+              </span>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <a href="https://paypal.me/miguelcarlosrojas/5" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding: 7px 14px; font-size: 0.82rem; font-weight: 700; border-color: rgba(0, 112, 186, 0.4);">$5 USD</a>
+                <a href="https://paypal.me/miguelcarlosrojas/10" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding: 7px 14px; font-size: 0.82rem; font-weight: 700; border-color: rgba(0, 112, 186, 0.4);">$10 USD</a>
+                <a href="https://paypal.me/miguelcarlosrojas/25" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding: 7px 14px; font-size: 0.82rem; font-weight: 700; border-color: rgba(0, 112, 186, 0.4);">$25 USD</a>
+                <a href="https://paypal.me/miguelcarlosrojas/50" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="padding: 7px 14px; font-size: 0.82rem; font-weight: 700; border-color: rgba(0, 112, 186, 0.4);">$50 USD</a>
+              </div>
+            </div>
+
+            <!-- Enlace Directo Copiable -->
+            <div style="background: rgba(0, 112, 186, 0.08); border: 1px solid rgba(0, 112, 186, 0.28); border-radius: var(--radius-md); padding: 14px; margin-bottom: 22px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <strong style="color: var(--text-white); font-size: 0.85rem;">Enlace Oficial:</strong>
+                <button id="btn-copy-paypal" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.74rem;">Copiar Link</button>
+              </div>
+              <p id="paypal-link-text" style="font-size: 0.82rem; color: #38bdf8; font-family: var(--font-mono); margin: 0; word-break: break-all;">
+                https://paypal.me/miguelcarlosrojas
+              </p>
+            </div>
+          </div>
+
+          <a href="https://paypal.me/miguelcarlosrojas" target="_blank" rel="noopener noreferrer" class="btn btn-paypal w-full" style="font-size: 0.96rem;">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Donar con PayPal Ahora
+          </a>
+        </div>
+
+        <!-- Método 2: Yape (QR Grande Ocupando Todo el Ancho del Cuadro) -->
+        <div class="donation-card donation-card-yape">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <span class="badge badge-yape" style="font-weight: 700; letter-spacing: 0.04em;">PERÚ // PAGO MÓVIL YAPE</span>
+              <span style="font-size: 0.8rem; color: #d946ef; font-weight: 700; font-family: var(--font-mono);">0% COMISIÓN</span>
+            </div>
+
+            <h3 style="font-size: 1.45rem; margin-bottom: 10px; color: #ffffff;">Donar por Código QR Yape</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px;">
+              Escanea el código QR directamente desde la app de Yape en tu teléfono celular para transferencias instantáneas desde Perú.
+            </p>
+
+            <div style="background: rgba(116, 34, 132, 0.12); border: 1px solid rgba(116, 34, 132, 0.35); border-radius: var(--radius-md); padding: 10px 14px; margin-bottom: 16px; font-size: 0.84rem; color: var(--text-muted);">
+              Titular de Cuenta: <strong style="color: #ffffff;">Miguel Angel Carlos Rojas</strong>
+            </div>
+
+            <!-- Cuadro donde la imagen ocupa TODO el ancho del contenedor -->
+            <div class="qr-box-full" id="qr-box-trigger" title="Haz clic sobre el código QR para ampliarlo y escanearlo con comodidad">
+              <img src="/img/yape-qr.png" alt="Código QR de Yape - Miguel Angel Carlos Rojas" id="yape-qr-page-img">
+            </div>
+          </div>
+
+          <button id="btn-open-qr-page-modal" class="btn btn-secondary w-full" style="padding: 13px 20px; font-weight: 700; font-size: 0.92rem;">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Ampliar Código QR para Escanear
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- En qué se invierten las donaciones -->
+    <section style="margin-bottom: clamp(40px, 6vw, 68px);">
+      <div class="section-full-title">
+        <h2>Transparencia: ¿En Qué se Utiliza tu Aporte?</h2>
+        <p>Cada céntimo recibido se destina a mantener vivo y optimizado el ecosistema.</p>
       </div>
 
       <div class="cards-full-grid">
@@ -160,7 +258,7 @@
           <div class="tech-card-icon" style="color: var(--secondary);">
             <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
           </div>
-          <h3>Cómputo para Clonación y TTS</h3>
+          <h3>Cómputo para Clonación y TTS Neural</h3>
           <p>La síntesis vocal por IA y la extracción de formantes espectrales requieren cómputo intensivo. Las donaciones financian el procesamiento de redes neuronales acústicas de alta resolución.</p>
         </div>
 
@@ -169,94 +267,32 @@
           <div class="tech-card-icon" style="color: var(--primary);">
             <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
           </div>
-          <h3>Nuevos Idiomas y Funcionalidades</h3>
+          <h3>Nuevos Idiomas y SDKs Abiertos</h3>
           <p>Añadir soporte para lenguas nativas y dialectos regionales poco representados, así como crear nuevos conectores y plugins para WordPress, React, Shopify y Node.js.</p>
         </div>
       </div>
     </section>
 
-    <!-- Métodos de Donación: PayPal & Yape QR al 100% de Ancho -->
-    <section>
-      <div class="section-full-title">
-        <h2>Métodos de Donación Disponibles</h2>
-        <p>Elige la alternativa más cómoda para ti. Todas las donaciones son recibidas con profundo agradecimiento.</p>
-      </div>
-
-      <div class="donations-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
-        
-        <!-- Método 1: PayPal Internacional -->
-        <div class="donation-card" style="border-color: rgba(0, 112, 186, 0.4); display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <div class="donation-header">
-              <span class="badge badge-paypal">INTERNACIONAL / TARJETAS</span>
-            </div>
-            <h3 style="font-size: 1.35rem; margin-bottom: 8px;">Donar a través de PayPal</h3>
-            <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">
-              Ideal para donaciones desde cualquier país del mundo utilizando saldo PayPal, tarjeta de crédito o débito (Visa, Mastercard, Amex).
-            </p>
-
-            <div style="background: rgba(0, 112, 186, 0.08); border: 1px solid rgba(0, 112, 186, 0.25); border-radius: var(--radius-md); padding: 18px; margin-bottom: 24px;">
-              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                <svg class="icon" viewBox="0 0 24 24" style="color: #38bdf8;"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                <strong style="color: var(--text-white); font-size: 0.95rem;">Enlace Oficial Directo</strong>
-              </div>
-              <p style="font-size: 0.82rem; color: var(--text-muted); font-family: var(--font-mono); word-break: break-all;">
-                https://paypal.me/miguelcarlosrojas
-              </p>
-            </div>
-          </div>
-
-          <a href="https://paypal.me/miguelcarlosrojas" target="_blank" rel="noopener noreferrer" class="btn btn-paypal w-full" style="padding: 14px; font-weight: 700; font-size: 0.95rem; text-decoration: none !important;">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            Donar con PayPal Ahora
-          </a>
-        </div>
-
-        <!-- Método 2: Yape (QR Grande Ocupando Todo el Ancho del Cuadro) -->
-        <div class="donation-card" style="border-color: rgba(168, 85, 247, 0.4); display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <div class="donation-header">
-              <span class="badge badge-yape">PERÚ // YAPE QR</span>
-            </div>
-            <h3 style="font-size: 1.35rem; margin-bottom: 8px;">Donar por Código QR de Yape</h3>
-            <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px;">
-              Escanea el código QR directamente desde la app de Yape en tu teléfono celular para transferencias instantáneas desde Perú.
-            </p>
-
-            <div style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 12px;">
-              Titular: <strong style="color: var(--text-white);">Miguel Angel Carlos Rojas</strong>
-            </div>
-
-            <!-- Cuadro donde la imagen ocupa TODO el ancho del cuadro -->
-            <div class="qr-box-full">
-              <img src="/img/yape-qr.png" alt="Código QR de Yape - Miguel Angel Carlos Rojas" id="yape-qr-page-img" style="cursor: zoom-in;" title="Haz clic para ver en pantalla completa">
-            </div>
-          </div>
-
-          <button id="btn-open-qr-page-modal" class="btn btn-outline w-full" style="padding: 13px; font-size: 0.9rem; border-color: rgba(168, 85, 247, 0.4); color: var(--text-white);">
-            <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            Ampliar Código QR para Escanear
-          </button>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- Modal para Escanear QR en Pantalla Completa -->
-    <div id="qr-modal" class="qr-modal-backdrop" style="display: none;">
+    <!-- Modal para Escanear QR en Pantalla Completa Perfectamente Centrado -->
+    <div id="qr-modal" class="qr-modal-backdrop">
       <div class="qr-modal-dialog">
         <div class="qr-modal-header">
-          <h3>Código QR de Yape - Escaneo Directo</h3>
+          <h3>
+            <svg class="icon" viewBox="0 0 24 24" style="color: #d946ef;"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01M17 7h.01M7 17h.01M17 17h.01"/></svg>
+            Código QR Yape - Escaneo Directo
+          </h3>
           <button id="qr-modal-close" class="btn-modal-close" aria-label="Cerrar ventana emergente">✕</button>
         </div>
         <div class="qr-modal-body">
           <img src="/img/yape-qr.png" alt="Código QR de Yape Ampliado" class="qr-modal-img">
           <p class="qr-modal-caption">
-            Abre tu aplicación Yape en el teléfono móvil, pulsa en "Escanear QR" y enfoca la pantalla.
+            Abre tu aplicación Yape en el teléfono celular, pulsa en el botón <strong>"Escanear QR"</strong> y enfoca este código directamente en tu pantalla.
           </p>
-          <span style="display: block; font-size: 0.85rem; color: var(--text-white); font-weight: 600; margin-top: 8px;">
-            Beneficiario: Miguel Angel Carlos Rojas
-          </span>
+          <div style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: var(--radius-sm); padding: 8px 16px; margin-top: 6px;">
+            <span style="font-size: 0.85rem; color: #ffffff; font-weight: 700;">
+              Beneficiario: Miguel Angel Carlos Rojas
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -328,26 +364,51 @@
         if (val) window.translator.translatePage(val);
       };
 
-      // Modal del Código QR
+      // Modal Centrado del Código QR
       const qrModal = document.getElementById("qr-modal");
       const btnOpenModal = document.getElementById("btn-open-qr-page-modal");
-      const qrImg = document.getElementById("yape-qr-page-img");
+      const qrBoxTrigger = document.getElementById("qr-box-trigger");
       const btnCloseModal = document.getElementById("qr-modal-close");
 
       function openModal() {
-        if (qrModal) qrModal.style.display = "flex";
+        if (qrModal) {
+          qrModal.style.display = "flex";
+          document.body.style.overflow = "hidden";
+        }
       }
+
       function closeModal() {
-        if (qrModal) qrModal.style.display = "none";
+        if (qrModal) {
+          qrModal.style.display = "none";
+          document.body.style.overflow = "";
+        }
       }
 
       if (btnOpenModal) btnOpenModal.addEventListener("click", openModal);
-      if (qrImg) qrImg.addEventListener("click", openModal);
+      if (qrBoxTrigger) qrBoxTrigger.addEventListener("click", openModal);
       if (btnCloseModal) btnCloseModal.addEventListener("click", closeModal);
 
       if (qrModal) {
         qrModal.addEventListener("click", (e) => {
           if (e.target === qrModal) closeModal();
+        });
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeModal();
+      });
+
+      // Botón para Copiar Enlace de PayPal
+      const btnCopyPaypal = document.getElementById("btn-copy-paypal");
+      const paypalText = document.getElementById("paypal-link-text");
+      if (btnCopyPaypal && paypalText) {
+        btnCopyPaypal.addEventListener("click", () => {
+          navigator.clipboard.writeText(paypalText.textContent.trim()).then(() => {
+            btnCopyPaypal.textContent = "¡Copiado!";
+            setTimeout(() => { btnCopyPaypal.textContent = "Copiar Link"; }, 2000);
+          }).catch(() => {
+            prompt("Copia el enlace de PayPal:", paypalText.textContent.trim());
+          });
         });
       }
     });

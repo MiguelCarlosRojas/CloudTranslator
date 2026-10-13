@@ -223,20 +223,24 @@
           <div class="studio-controls-row">
             <div class="studio-control-col">
               <label class="studio-label" for="clone-similarity-select">FIDELIDAD TIMBRAL</label>
-              <select id="clone-similarity-select" class="studio-select">
-                <option value="high">Alta (Formantes Exactos F0)</option>
-                <option value="balanced">Equilibrada (Fluidez Adaptativa)</option>
-                <option value="expressive">Expresiva (Prosodia Dinámica)</option>
-              </select>
+              <div class="select-wrapper">
+                <select id="clone-similarity-select" class="form-select-custom studio-select">
+                  <option value="high">Alta (Formantes Exactos F0)</option>
+                  <option value="balanced">Equilibrada (Fluidez Adaptativa)</option>
+                  <option value="expressive">Expresiva (Prosodia Dinámica)</option>
+                </select>
+              </div>
             </div>
 
             <div class="studio-control-col">
               <label class="studio-label" for="clone-gender-select">PERFIL VOCAL</label>
-              <select id="clone-gender-select" class="studio-select">
-                <option value="auto">Auto-detectar con AudioContext</option>
-                <option value="male">Grave / Masculino (~120Hz)</option>
-                <option value="female">Agudo / Femenino (~210Hz)</option>
-              </select>
+              <div class="select-wrapper">
+                <select id="clone-gender-select" class="form-select-custom studio-select">
+                  <option value="auto">Auto-detectar con AudioContext</option>
+                  <option value="male">Grave / Masculino (~120Hz)</option>
+                  <option value="female">Agudo / Femenino (~210Hz)</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -555,6 +559,7 @@
             body: JSON.stringify({
               text,
               pitch: pitchMultiplier,
+              gender: cloneGender.value,
               similarity: cloneSimilarity.value,
               audioSampleBase64: currentSampleBase64
             })
@@ -568,12 +573,14 @@
               byteNumbers[i] = byteCharacters.charCodeAt(i);
             }
             const byteArray = new Uint8Array(byteNumbers);
-            generatedWavBlob = new Blob([byteArray], { type: "audio/wav" });
+            const mimeType = data.mimeType || "audio/mpeg";
+            generatedWavBlob = new Blob([byteArray], { type: mimeType });
             const resultUrl = URL.createObjectURL(generatedWavBlob);
 
             cloneResultAudio.src = resultUrl;
             cloneResultAudio.load();
-            cloneFilesizeBadge.textContent = `${(generatedWavBlob.size / 1024).toFixed(1)} KB • WAV PCM`;
+            const formatName = (data.format || "mp3").toUpperCase();
+            cloneFilesizeBadge.textContent = `${(generatedWavBlob.size / 1024).toFixed(1)} KB • ${formatName} NEURAL`;
             cloneResultBox.style.display = "block";
             cloneResultAudio.play().catch(() => {});
 
@@ -592,25 +599,26 @@
         }
       });
 
-      // DESCARGA FÍSICA REAL DEL ARCHIVO WAV
+      // DESCARGA FÍSICA REAL DEL ARCHIVO DE AUDIO
       btnDownloadClone.addEventListener("click", () => {
         if (!generatedWavBlob) {
           alert("Primero sintetiza un audio para poder descargarlo.");
           return;
         }
 
+        const ext = generatedWavBlob.type.includes("wav") ? "wav" : "mp3";
         const downloadUrl = URL.createObjectURL(generatedWavBlob);
         const a = document.createElement("a");
         a.href = downloadUrl;
-        a.download = `voz-clonada-cloudtranslator-${Date.now()}.wav`;
+        a.download = `voz-clonada-cloudtranslator-${Date.now()}.${ext}`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         setTimeout(() => URL.revokeObjectURL(downloadUrl), 2000);
 
-        btnDownloadClone.textContent = "¡Archivo WAV Descargado!";
+        btnDownloadClone.textContent = `¡Archivo ${ext.toUpperCase()} Descargado!`;
         setTimeout(() => {
-          btnDownloadClone.textContent = "Descargar Audio Clonado (WAV)";
+          btnDownloadClone.textContent = "Descargar Audio Clonado (MP3 / WAV)";
         }, 2500);
       });
     });

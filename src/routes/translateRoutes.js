@@ -107,7 +107,7 @@ router.get("/tts/download", (req, res) => {
 // Pilar 3: Clonación de Voz con IA
 router.post("/voice-clone", async (req, res) => {
   try {
-    const { text, audioSampleBase64, pitch = 1.0, similarity = "high", lang = "es" } = req.body || {};
+    const { text, audioSampleBase64, pitch = 1.0, similarity = "high", lang = "es", gender = "auto" } = req.body || {};
     if (!text || typeof text !== "string") {
       return res.status(400).json({
         status: "error",
@@ -118,6 +118,7 @@ router.post("/voice-clone", async (req, res) => {
     const result = await cloneVoice(text, {
       audioSampleBase64,
       lang,
+      gender,
       pitch: Number(pitch) || 1.0,
       similarity
     });

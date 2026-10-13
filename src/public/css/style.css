@@ -1693,6 +1693,147 @@ footer {
   outline: none;
 }
 
+/* ==========================================================================
+   Componentes UI Reutilizables: Selectores y Dropdowns Estilizados
+   ========================================================================== */
+.studio-controls-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.studio-control-col {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.select-wrapper::after,
+.studio-control-col::after {
+  content: "";
+  position: absolute;
+  right: 14px;
+  top: calc(50% + 12px);
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid var(--text-muted);
+  border-bottom: 2px solid var(--text-muted);
+  transform: translateY(-50%) rotate(45deg);
+  pointer-events: none;
+  transition: border-color 0.2s ease;
+}
+
+.select-wrapper:hover::after,
+.studio-control-col:hover::after {
+  border-color: var(--primary);
+}
+
+.form-select-custom,
+.studio-select {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: rgba(8, 12, 24, 0.95);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-white);
+  padding: 12px 36px 12px 14px;
+  font-size: 0.88rem;
+  font-family: var(--font-sans);
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.form-select-custom:hover,
+.studio-select:hover {
+  border-color: rgba(0, 240, 255, 0.4);
+  background: rgba(12, 18, 34, 0.98);
+}
+
+.form-select-custom:focus,
+.studio-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.15), 0 0 16px rgba(0, 240, 255, 0.2);
+  background: rgba(14, 20, 38, 1);
+}
+
+.form-select-custom optgroup,
+.studio-select optgroup {
+  background: #090c17;
+  color: var(--primary);
+  font-weight: 700;
+  padding: 6px 10px;
+}
+
+.form-select-custom option,
+.studio-select option {
+  background: #0a0e1a;
+  color: #ffffff;
+  padding: 8px 12px;
+}
+
+/* ==========================================================================
+   Componente Reutilizable: Botón de Peligro / Eliminar con Tooltip
+   ========================================================================== */
+.btn-icon-danger {
+  position: relative;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #f87171;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-icon-danger:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #ffffff;
+  transform: scale(1.05);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.5);
+}
+
+.btn-icon-danger .tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: rgba(15, 23, 42, 0.95);
+  color: #ffffff;
+  font-size: 0.72rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  white-space: nowrap;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 100;
+  font-family: var(--font-sans);
+}
+
+.btn-icon-danger:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 .audio-visualizer-bar {
   display: flex;
   align-items: center;
@@ -1809,55 +1950,91 @@ footer {
 }
 
 .donation-card {
-  background: rgba(7, 9, 17, 0.85);
+  background: rgba(8, 11, 22, 0.9);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 28px 24px;
+  border-radius: var(--radius-xl);
+  padding: 30px 26px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 16px;
+  justify-content: space-between;
+  gap: 18px;
   transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
 }
 
 .donation-card:hover {
-  border-color: rgba(0, 240, 255, 0.35);
-  transform: translateY(-3px);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
 }
 
 .donation-card-paypal {
-  border-top: 3px solid #0070ba;
+  border-color: rgba(0, 112, 186, 0.4);
+}
+
+.donation-card-paypal:hover {
+  border-color: #0070ba;
+  box-shadow: 0 16px 40px rgba(0, 112, 186, 0.25);
 }
 
 .donation-card-yape {
-  border-top: 3px solid #742284;
+  border-color: rgba(168, 85, 247, 0.4);
 }
 
-.yape-qr-frame {
-  width: 220px;
-  height: 220px;
-  border-radius: var(--radius-md);
-  border: 2px solid rgba(116, 34, 132, 0.4);
+.donation-card-yape:hover {
+  border-color: #a855f7;
+  box-shadow: 0 16px 40px rgba(168, 85, 247, 0.25);
+}
+
+.donate-hero {
+  text-align: center;
+  padding: clamp(36px, 6vw, 64px) 20px 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.badge-paypal {
+  background: rgba(0, 112, 186, 0.18);
+  color: #38bdf8;
+  border: 1px solid rgba(0, 112, 186, 0.4);
+}
+
+.badge-yape {
+  background: rgba(116, 34, 132, 0.2);
+  color: #d946ef;
+  border: 1px solid rgba(116, 34, 132, 0.45);
+}
+
+/* Cuadro QR al 100% de Ancho con Efecto Glow */
+.qr-box-full {
+  width: 100%;
   background: #ffffff;
-  padding: 8px;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 25px rgba(116, 34, 132, 0.25);
-  cursor: pointer;
-  transition: transform 0.2s ease;
+  border: 2px solid rgba(168, 85, 247, 0.35);
+  box-shadow: 0 12px 32px rgba(116, 34, 132, 0.2);
+  margin-bottom: 16px;
+  transition: all 0.25s ease;
+  cursor: zoom-in;
 }
 
-.yape-qr-frame:hover {
-  transform: scale(1.03);
+.qr-box-full:hover {
+  border-color: #d946ef;
+  box-shadow: 0 16px 40px rgba(217, 70, 239, 0.35);
+  transform: translateY(-2px);
 }
 
-.yape-qr-img {
+.qr-box-full img {
   width: 100%;
-  height: 100%;
+  height: auto;
+  max-height: 280px;
   object-fit: contain;
+  display: block;
 }
 
 .btn-paypal {
@@ -1866,8 +2043,9 @@ footer {
   font-weight: 700;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 12px 24px;
+  padding: 13px 24px;
   border-radius: var(--radius-md);
   text-decoration: none !important;
   transition: all 0.2s ease;
@@ -1878,68 +2056,82 @@ footer {
 .btn-paypal:hover {
   background: #005ea6;
   transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(0, 112, 186, 0.5);
+  box-shadow: 0 6px 20px rgba(0, 112, 186, 0.5);
   color: #ffffff !important;
 }
 
-.btn-yape-view {
-  background: rgba(116, 34, 132, 0.2);
-  color: #d946ef;
-  border: 1px solid rgba(116, 34, 132, 0.4);
-  font-weight: 600;
-  padding: 8px 16px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
-}
-
-.btn-yape-view:hover {
-  background: #742284;
-  color: #ffffff;
-}
-
-/* Modal QR Grande */
-.qr-modal {
+/* Modal QR Grande - Centrado y Alineado Horizontalmente */
+.qr-modal,
+.qr-modal-backdrop {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(10px);
-  z-index: 100000;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(2, 4, 10, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 999999;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  box-sizing: border-box;
 }
 
-.qr-modal.open {
-  display: flex;
+.qr-modal.open,
+.qr-modal-backdrop.open,
+.qr-modal[style*="display: flex"],
+.qr-modal-backdrop[style*="display: flex"] {
+  display: flex !important;
 }
 
+.qr-modal-dialog,
 .qr-modal-content {
-  background: #0d101d;
-  border: 1px solid var(--border-card);
+  background: linear-gradient(180deg, #0d1124 0%, #070914 100%);
+  border: 1px solid rgba(168, 85, 247, 0.4);
   border-radius: var(--radius-xl);
-  padding: 32px;
   max-width: 440px;
   width: 100%;
-  text-align: center;
+  padding: 28px 24px 24px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(168, 85, 247, 0.25);
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+  text-align: center;
+  animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  margin: auto;
 }
 
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.qr-modal-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.qr-modal-header h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-white);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-modal-close,
 .qr-modal-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
   background: rgba(255, 255, 255, 0.08);
-  border: none;
+  border: 1px solid var(--border-subtle);
   color: var(--text-white);
   width: 32px;
   height: 32px;
@@ -1948,6 +2140,43 @@ footer {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.btn-modal-close:hover,
+.qr-modal-close:hover {
+  background: rgba(239, 68, 68, 0.8);
+  border-color: #ef4444;
+  transform: rotate(90deg);
+}
+
+.qr-modal-body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.qr-modal-img {
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  border: 2px solid rgba(168, 85, 247, 0.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  margin-bottom: 16px;
+}
+
+.qr-modal-caption {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0 0 10px;
 }
 
 /* Barra de Progreso SPA */
