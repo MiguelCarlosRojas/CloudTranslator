@@ -7,13 +7,16 @@
   <meta property="og:title" content="CloudTranslator - Traducción en la Nube, TTS y Clonación de Voz">
   <meta property="og:description" content="Tres tecnologías avanzadas integradas: traducción por lotes del DOM en 1 consulta HTTP, locución multilingüe TTS y clonación de voz por IA.">
   <title>CloudTranslator - Traducción en la Nube, TTS y Clonación de Voz</title>
-  <link rel="icon" type="image/png" href="/favicon.png">
-  <link rel="shortcut icon" type="image/png" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/img/logo.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/img/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/logo.png">
   <link rel="stylesheet" href="/css/style.css">
   <script>
     (function(){try{var m=document.cookie.match(/(?:^|; )cloud_translator_lang=([^;]*)/);var l=m?decodeURIComponent(m[1]):null;if(l&&l!=="original"&&l!=="es"){document.documentElement.classList.add("ct-pending");setTimeout(function(){document.documentElement.classList.remove("ct-pending");},800);}}catch(e){}})();
   </script>
   <script src="/js/spa-router.js" defer></script>
+  <script src="/components/components.js" defer></script>
 </head>
 <body>
 
@@ -22,10 +25,10 @@
     <div class="nav-container">
       <a href="/" class="brand-wrapper">
         <span class="brand-logo">
-          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="28" height="28">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="38" height="38">
           CloudTranslator
         </span>
-        <span class="brand-badge">v1.0.0</span>
+        <span class="brand-badge">v2.5.0</span>
       </a>
 
       <nav class="desktop-nav">
@@ -90,7 +93,7 @@
     <aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
       <div class="drawer-header">
         <a href="/" class="drawer-brand">
-          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="26" height="26">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
           <span>CloudTranslator</span>
         </a>
         <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral">✕</button>
@@ -122,18 +125,28 @@
 
   <main class="full-container">
     
-    <!-- Hero Principal -->
+    <!-- Hero Principal con Logo Gigante a la Derecha -->
     <section class="hero-full">
-      <span class="hero-tag-glow">Plataforma Multimodal de Inteligencia Artificial</span>
-      <h1>Traducción en la Nube, Texto a Voz y Clonación de Voz por IA</h1>
-      <p class="lead">
-        Ecosistema lingüístico y acústico de alto rendimiento alojado en <strong>https://cloudtranslator.onrender.com</strong>: traduce páginas completas en 1 sola consulta HTTP sin saturar la red, genera locución auditiva multilingüe con Texto a Voz (TTS), y sintetiza tu propia voz con modelos de clonación neuronal.
-      </p>
-      <div class="hero-actions">
-        <a href="/translator" class="btn btn-primary">Traductor en la Nube</a>
-        <a href="/tts" class="btn btn-outline">Estudio Texto a Voz</a>
-        <a href="/voice-clone" class="btn btn-outline">Estudio Clonación IA</a>
-        <a href="/docs" class="btn btn-outline">Documentación</a>
+      <div class="hero-split">
+        <div class="hero-split-content">
+          <span class="hero-tag-glow">Plataforma Multimodal de Inteligencia Artificial</span>
+          <h1>Traducción en la Nube, Texto a Voz y Clonación de Voz por IA</h1>
+          <p class="lead">
+            Tres tecnologías integradas en un ecosistema unificado: traduce páginas y textos en 1 sola consulta HTTP sin saturar la red, genera locución auditiva en múltiples idiomas con Texto a Voz (TTS), y sintetiza tu propia voz con modelos de clonación neuronal.
+          </p>
+          <div class="hero-actions">
+            <a href="/tts" class="btn btn-primary">Probar Texto a Voz</a>
+            <a href="/voice-clone" class="btn btn-outline" style="border-color: rgba(0, 240, 255, 0.4); color: var(--primary);">Estudio de Clonación</a>
+            <a href="/docs" class="btn btn-outline">Documentación Técnica</a>
+          </div>
+        </div>
+
+        <div class="hero-split-media">
+          <div class="hero-logo-wrapper">
+            <div class="hero-logo-glow"></div>
+            <img src="/img/logo.png" alt="CloudTranslator Logo" class="hero-logo-big" width="290" height="290">
+          </div>
+        </div>
       </div>
     </section>
 

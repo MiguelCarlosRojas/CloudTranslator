@@ -1,5 +1,6 @@
-# CloudTranslator - Servicio de Traducción en la Nube
+# CloudTranslator - Ecosistema Lingüístico y Acústico Multimodal
 
+[![Version](https://img.shields.io/badge/version-2.5.0-blue.svg)](package.json)
 [![Render Deployment](https://img.shields.io/badge/deployment-Render%20Live-22c55e.svg)](https://cloudtranslator.onrender.com)
 [![Node.js Version](https://img.shields.io/badge/node.js-18%2B%20%7C%2020%2B-green.svg)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/express-4.21.2-black.svg)](https://expressjs.com/)
@@ -281,44 +282,73 @@ curl -X POST https://cloudtranslator.onrender.com/api/translate \
   }
   ```
 
-### 6. `POST /api/tts` (Síntesis de Texto a Voz)
+### 6. `GET /api/tts/voices` (Catálogo de Voces Humanas Reales)
+* **URL:** `https://cloudtranslator.onrender.com/api/tts/voices`
+* **Respuesta (200 OK):**
+  ```json
+  {
+    "status": "success",
+    "total": 24,
+    "voices": [
+      {
+        "id": "es-ES-sofia",
+        "name": "Sofía",
+        "gender": "femenina",
+        "lang": "es",
+        "locale": "es-ES",
+        "country": "España 🇪🇸",
+        "style": "Natural y elocuente",
+        "description": "Voz femenina con acento castellano impecable.",
+        "sampleText": "Bienvenido a CloudTranslator..."
+      }
+    ]
+  }
+  ```
+
+### 7. `POST /api/tts` (Síntesis de Texto a Voz en Backend)
 * **URL:** `https://cloudtranslator.onrender.com/api/tts`
 * **Headers:** `Content-Type: application/json`
 * **Body:**
   ```json
   {
     "text": "Hola, bienvenido al asistente vocal inteligente",
+    "voiceId": "es-ES-sofia",
     "lang": "es",
     "rate": 1.0,
-    "pitch": 1.0,
-    "voice": "default-neural"
+    "pitch": 1.0
   }
   ```
 * **Respuesta (200 OK):**
   ```json
   {
     "status": "success",
-    "service": "CloudTranslator TTS Studio",
+    "service": "CloudTranslator TTS Studio (Backend Neural Engine)",
     "text": "Hola, bienvenido al asistente vocal inteligente",
     "lang": "es",
-    "rate": 1.0,
-    "pitch": 1.0,
-    "voice": "default-neural",
-    "audioBase64": "data:audio/wav;base64,UklGRi...",
-    "mimeType": "audio/wav",
-    "sizeBytes": 28400,
-    "message": "Síntesis vocal generada exitosamente en formato WAV PCM."
+    "voice": "Sofía",
+    "voiceId": "es-ES-sofia",
+    "audioBase64": "data:audio/mpeg;base64,...",
+    "streamUrl": "/api/tts/stream?id=aud_9a8bc",
+    "downloadUrl": "/api/tts/download?id=aud_9a8bc",
+    "format": "mp3",
+    "mimeType": "audio/mpeg",
+    "sizeBytes": 42100,
+    "message": "Audio generado con éxito desde el backend de CloudTranslator."
   }
   ```
 
-### 7. `POST /api/voice-clone` (Clonación de Voz IA)
+### 8. `GET /api/tts/stream` y `GET /api/tts/download`
+* **Streaming directo:** `GET /api/tts/stream?id=<audioId>` (reproduce audio binario con `Accept-Ranges: bytes`).
+* **Descarga directa:** `GET /api/tts/download?id=<audioId>` (fuerza descarga de `voz-tts-cloudtranslator.mp3`).
+
+### 9. `POST /api/voice-clone` (Clonación de Voz IA en Backend)
 * **URL:** `https://cloudtranslator.onrender.com/api/voice-clone`
 * **Headers:** `Content-Type: application/json`
 * **Body:**
   ```json
   {
     "text": "Este es un mensaje clonado con mi timbre de voz original",
-    "audioSampleBase64": "data:audio/wav;base64,UklGR...",
+    "audioSampleBase64": "data:audio/webm;base64,...",
     "pitch": 1.0,
     "similarity": "high"
   }
@@ -327,19 +357,28 @@ curl -X POST https://cloudtranslator.onrender.com/api/translate \
   ```json
   {
     "status": "success",
-    "service": "CloudTranslator AI Voice Clone",
+    "service": "CloudTranslator AI Voice Clone Engine",
     "voiceProfileId": "vp_9fa1b28c",
+    "model": "hybrid-neural-vocoder-v2.5",
     "text": "Este es un mensaje clonado con mi timbre de voz original",
     "similarity": "high",
-    "hasInputSample": true,
-    "voiceSettings": {},
-    "model": "neural-vocoder-hybrid-dsp",
-    "audioBase64": "data:audio/wav;base64,UklGR...",
-    "mimeType": "audio/wav",
-    "sizeBytes": 32100,
-    "message": "Voz clonada y sintetizada exitosamente con huella acústica personalizada."
+    "acousticAnalysis": {
+      "estimatedF0Hz": "165 Hz",
+      "sampleDurationSec": 3.8,
+      "sampleSizeKb": 48
+    },
+    "audioBase64": "data:audio/mpeg;base64,...",
+    "streamUrl": "/api/voice-clone/stream?id=aud_7c2ba",
+    "downloadUrl": "/api/voice-clone/download?id=aud_7c2ba",
+    "mimeType": "audio/mpeg",
+    "sizeBytes": 45200,
+    "message": "Voz clonada y sintetizada exitosamente desde el backend de CloudTranslator."
   }
   ```
+
+### 10. `GET /api/voice-clone/stream` y `GET /api/voice-clone/download`
+* **Streaming directo:** `GET /api/voice-clone/stream?id=<audioId>`
+* **Descarga directa:** `GET /api/voice-clone/download?id=<audioId>` (descarga `voz-clonada-cloudtranslator.mp3`).
 
 ---
 

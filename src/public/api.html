@@ -7,13 +7,16 @@
   <meta property="og:title" content="Referencia Técnica de API REST - CloudTranslator">
   <meta property="og:description" content="Especificación completa de endpoints, esquemas JSON, parámetros de traducción, TTS y clonación de voz.">
   <title>Referencia Técnica de API REST - CloudTranslator</title>
-  <link rel="icon" type="image/png" href="/favicon.png">
-  <link rel="shortcut icon" type="image/png" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/img/logo.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/img/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/logo.png">
   <link rel="stylesheet" href="/css/style.css">
   <script>
     (function(){try{var m=document.cookie.match(/(?:^|; )cloud_translator_lang=([^;]*)/);var l=m?decodeURIComponent(m[1]):null;if(l&&l!=="original"&&l!=="es"){document.documentElement.classList.add("ct-pending");setTimeout(function(){document.documentElement.classList.remove("ct-pending");},800);}}catch(e){}})();
   </script>
   <script src="/js/spa-router.js" defer></script>
+  <script src="/components/components.js" defer></script>
 </head>
 <body>
 
@@ -22,10 +25,10 @@
     <div class="nav-container">
       <a href="/" class="brand-wrapper">
         <span class="brand-logo">
-          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="28" height="28">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="38" height="38">
           CloudTranslator
         </span>
-        <span class="brand-badge">v1.0.0</span>
+        <span class="brand-badge">v2.5.0</span>
       </a>
 
       <nav class="desktop-nav">
@@ -90,7 +93,7 @@
     <aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
       <div class="drawer-header">
         <a href="/" class="drawer-brand">
-          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="26" height="26">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
           <span>CloudTranslator</span>
         </a>
         <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral">✕</button>
@@ -144,7 +147,7 @@
       </div>
 
       <div class="drawer-footer">
-        <span>CloudTranslator v1.0.0</span>
+        <span>CloudTranslator v2.5.0</span>
         <span>Referencia API</span>
       </div>
     </aside>
@@ -210,9 +213,23 @@
           </a>
         </div>
 
-        <!-- Grupo 4: Consola Interactiva -->
+        <!-- Grupo 4: Síntesis y Clonación Vocal -->
         <div class="docs-sidebar-group">
-          <span class="docs-group-label">04 / Pruebas en Vivo</span>
+          <span class="docs-group-label">04 / Audio &amp; Voz Neuronal</span>
+          <a href="#api-post-tts" class="docs-sidebar-session" data-target="api-post-tts">
+            <span class="session-badge">V.01</span> POST /api/tts
+          </a>
+          <a href="#api-get-voices" class="docs-sidebar-session" data-target="api-get-voices">
+            <span class="session-badge">V.02</span> GET /api/tts/voices
+          </a>
+          <a href="#api-post-voice-clone" class="docs-sidebar-session" data-target="api-post-voice-clone">
+            <span class="session-badge">V.03</span> POST /api/voice-clone
+          </a>
+        </div>
+
+        <!-- Grupo 5: Consola Interactiva -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">05 / Pruebas en Vivo</span>
           <a href="#api-live-console" class="docs-sidebar-session" data-target="api-live-console">
             <span class="session-badge">P.01</span> Consola Interactiva
           </a>
@@ -577,7 +594,91 @@
         </article>
       </section>
 
-      <!-- SECCIÓN 04: CONSOLA INTERACTIVA EN VIVO -->
+      <!-- SECCIÓN 04: AUDIO Y VOZ NEURONAL -->
+      <section id="api-post-tts" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ V.01 // TEXT_TO_SPEECH ]</span>
+          <h2>POST /api/tts</h2>
+          <p>Síntesis vocal en tiempo real a partir de texto en más de 10 idiomas con selección de voces humanas reales.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div class="code-box-header">
+            <span>Comando cURL (POST /api/tts)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-tts')">Copiar cURL</button>
+          </div>
+          <pre class="code-panel" id="curl-post-tts">curl -X POST "https://cloudtranslator.onrender.com/api/tts" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Bienvenido al motor acústico de CloudTranslator",
+    "voiceId": "es-ES-sofia",
+    "lang": "es",
+    "rate": 1.0,
+    "pitch": 1.0
+  }'</pre>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
+          <div class="code-box-header">
+            <span>Respuesta JSON (HTTP 200 OK)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-post-tts')">Copiar JSON</button>
+          </div>
+          <pre class="code-panel" id="res-post-tts">{
+  "status": "success",
+  "service": "CloudTranslator TTS Studio (Backend Neural Engine)",
+  "text": "Bienvenido al motor acústico de CloudTranslator",
+  "lang": "es",
+  "voice": "Sofía",
+  "voiceId": "es-ES-sofia",
+  "audioBase64": "data:audio/mpeg;base64,...",
+  "streamUrl": "/api/tts/stream?id=aud_a91f",
+  "downloadUrl": "/api/tts/download?id=aud_a91f",
+  "format": "mp3",
+  "mimeType": "audio/mpeg",
+  "sizeBytes": 42100
+}</pre>
+        </article>
+      </section>
+
+      <section id="api-get-voices" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ V.02 // VOICES_CATALOG ]</span>
+          <h2>GET /api/tts/voices</h2>
+          <p>Devuelve el catálogo completo de 24 voces humanas reales con información de acento, género y texto de muestra.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div class="code-box-header">
+            <span>Comando cURL (GET /api/tts/voices)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-voices')">Copiar cURL</button>
+          </div>
+          <pre class="code-panel" id="curl-get-voices">curl -X GET "https://cloudtranslator.onrender.com/api/tts/voices"</pre>
+        </article>
+      </section>
+
+      <section id="api-post-voice-clone" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ V.03 // VOICE_CLONING ]</span>
+          <h2>POST /api/voice-clone</h2>
+          <p>Clonación y síntesis acústica con extracción de huella vocal y modulación armónica.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div class="code-box-header">
+            <span>Comando cURL (POST /api/voice-clone)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-clone')">Copiar cURL</button>
+          </div>
+          <pre class="code-panel" id="curl-post-clone">curl -X POST "https://cloudtranslator.onrender.com/api/voice-clone" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Mensaje personalizado sintetizado con mi timbre vocal",
+    "audioSampleBase64": "data:audio/webm;base64,...",
+    "pitch": 1.0,
+    "similarity": "high"
+  }'</pre>
+        </article>
+      </section>
+
+      <!-- SECCIÓN 05: CONSOLA INTERACTIVA EN VIVO -->
       <section id="api-live-console" class="docs-section">
         <div class="section-full-title">
           <span class="tech-card-tag">[ P.01 // API_PLAYGROUND ]</span>

@@ -1,7 +1,7 @@
 {
   "name": "cloud-translator",
-  "version": "1.0.0",
-  "description": "Una API simple para traducir texto utilizando Google Translate.",
+  "version": "2.5.0",
+  "description": "Plataforma multimodal de alto rendimiento en Node.js y Express: Traductor en la nube por lotes (+200 idiomas), Texto a Voz (TTS) y Clonación de Voz con IA.",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -10,10 +10,15 @@
   },
   "keywords": [
     "api",
-    "translator",
+    "cloud-translator",
+    "tts",
+    "text-to-speech",
+    "voice-cloning",
+    "ai-voice",
     "google-translate",
     "express",
-    "cors"
+    "cors",
+    "microservice"
   ],
   "author": "Miguel Angel Carlos Rojas",
   "license": "ISC",

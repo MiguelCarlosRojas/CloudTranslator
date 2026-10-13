@@ -7,13 +7,16 @@
   <meta property="og:title" content="Texto a Voz (TTS Studio) - CloudTranslator">
   <meta property="og:description" content="Síntesis vocal en tiempo real con ecualizador animado y API REST de audio PCM.">
   <title>Texto a Voz (TTS) - CloudTranslator</title>
-  <link rel="icon" type="image/png" href="/favicon.png">
-  <link rel="shortcut icon" type="image/png" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/img/logo.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/img/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/logo.png">
   <link rel="stylesheet" href="/css/style.css">
   <script>
     (function(){try{var m=document.cookie.match(/(?:^|; )cloud_translator_lang=([^;]*)/);var l=m?decodeURIComponent(m[1]):null;if(l&&l!=="original"&&l!=="es"){document.documentElement.classList.add("ct-pending");setTimeout(function(){document.documentElement.classList.remove("ct-pending");},800);}}catch(e){}})();
   </script>
   <script src="/js/spa-router.js" defer></script>
+  <script src="/components/components.js" defer></script>
 </head>
 <body>
 
@@ -22,10 +25,10 @@
     <div class="nav-container">
       <a href="/" class="brand-wrapper">
         <span class="brand-logo">
-          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="28" height="28">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="38" height="38">
           CloudTranslator
         </span>
-        <span class="brand-badge">v1.0.0</span>
+        <span class="brand-badge">v2.5.0</span>
       </a>
 
       <nav class="desktop-nav">
@@ -90,7 +93,7 @@
     <aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
       <div class="drawer-header">
         <a href="/" class="drawer-brand">
-          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="26" height="26">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
           <span>CloudTranslator</span>
         </a>
         <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral">✕</button>
@@ -237,9 +240,37 @@
           <div style="margin-top: 14px;">
             <button id="tts-btn-download" class="btn btn-outline w-full" style="padding: 10px 16px; font-size: 0.85rem;">
               <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Descargar Audio Generado (WAV)
+              Descargar Audio Generado (MP3 / WAV)
             </button>
           </div>
+          <audio id="backend-audio-player" preload="auto" style="display: none;"></audio>
+        </div>
+      </div>
+    </section>
+
+    <!-- Catálogo de Voces Humanas Reales (24 Voces Disponibles) -->
+    <section class="content-box-card" id="catalog-section">
+      <div class="section-full-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <div>
+          <span class="tech-card-tag">[ VOICES_ECOSYSTEM // 24_REAL_HUMANS ]</span>
+          <h2>Catálogo de Voces Humanas Reales</h2>
+          <p>Voces acústicas con acentos auténticos, prosodia natural y articulación cristalina en más de 10 idiomas.</p>
+        </div>
+        <div id="catalog-filters" style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <button class="btn btn-primary btn-filter-voice active" data-filter="all" style="padding: 6px 12px; font-size: 0.74rem;">Todas</button>
+          <button class="btn btn-outline btn-filter-voice" data-filter="es" style="padding: 6px 12px; font-size: 0.74rem;">Español</button>
+          <button class="btn btn-outline btn-filter-voice" data-filter="en" style="padding: 6px 12px; font-size: 0.74rem;">English</button>
+          <button class="btn btn-outline btn-filter-voice" data-filter="fr" style="padding: 6px 12px; font-size: 0.74rem;">Français</button>
+          <button class="btn btn-outline btn-filter-voice" data-filter="de" style="padding: 6px 12px; font-size: 0.74rem;">Deutsch</button>
+          <button class="btn btn-outline btn-filter-voice" data-filter="it" style="padding: 6px 12px; font-size: 0.74rem;">Italiano</button>
+          <button class="btn btn-outline btn-filter-voice" data-filter="pt" style="padding: 6px 12px; font-size: 0.74rem;">Português</button>
+          <button class="btn btn-outline btn-filter-voice" data-filter="ja" style="padding: 6px 12px; font-size: 0.74rem;">日本語</button>
+        </div>
+      </div>
+
+      <div id="voices-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 20px;">
+        <div style="grid-column: 1 / -1; padding: 20px; text-align: center; color: var(--text-muted);">
+          Cargando catálogo de 24 voces humanas desde el backend...
         </div>
       </div>
     </section>
@@ -343,7 +374,9 @@
         if (val) window.translator.translatePage(val);
       };
 
-      // LÓGICA COMPLETA DE TTS
+      // ==========================================
+      // LÓGICA DE SÍNTESIS VOCAL (BACKEND NEURAL)
+      // ==========================================
       const ttsInput = document.getElementById("tts-input-text");
       const ttsCharCount = document.getElementById("tts-char-count");
       const ttsLang = document.getElementById("tts-lang-select");
@@ -359,9 +392,11 @@
       const ttsStatusLabel = document.getElementById("tts-status-label");
       const ttsTimeLabel = document.getElementById("tts-time-label");
       const ttsBars = document.getElementById("tts-bars-container");
+      const audioPlayer = document.getElementById("backend-audio-player");
+      const catalogGrid = document.getElementById("voices-cards-grid");
 
-      let voicesList = [];
-      let currentUtterance = null;
+      let backendVoices = [];
+      let lastGeneratedAudio = null;
       let playStartTime = 0;
       let timerInterval = null;
 
@@ -383,30 +418,6 @@
           ttsPitchVal.textContent = parseFloat(e.target.value).toFixed(1);
         });
       }
-
-      function populateVoices() {
-        if (!("speechSynthesis" in window)) return;
-        voicesList = window.speechSynthesis.getVoices();
-        if (!ttsVoice) return;
-        ttsVoice.innerHTML = "";
-
-        const currentLangPrefix = (ttsLang.value || "es").split("-")[0];
-        const filtered = voicesList.filter(v => v.lang.startsWith(currentLangPrefix));
-        const listToDisplay = filtered.length > 0 ? filtered : voicesList;
-
-        listToDisplay.forEach((v) => {
-          const opt = document.createElement("option");
-          opt.value = v.name;
-          opt.textContent = `${v.name} (${v.lang})${v.default ? " [Predeterminada]" : ""}`;
-          ttsVoice.appendChild(opt);
-        });
-      }
-
-      if ("speechSynthesis" in window) {
-        populateVoices();
-        window.speechSynthesis.onvoiceschanged = populateVoices;
-      }
-      if (ttsLang) ttsLang.addEventListener("change", populateVoices);
 
       function setStatus(text, isPlaying = false) {
         if (ttsStatusLabel) {
@@ -437,64 +448,204 @@
         if (ttsTimeLabel) ttsTimeLabel.textContent = "00:00";
       }
 
-      if (ttsBtnPlay) {
-        ttsBtnPlay.addEventListener("click", () => {
-          const text = (ttsInput.value || "").trim();
-          if (!text) return;
+      // Cargar Catálogo de 24 Voces desde el Backend
+      async function loadVoicesCatalog() {
+        try {
+          const res = await fetch("/api/tts/voices");
+          const data = await res.json();
+          if (data && data.voices) {
+            backendVoices = data.voices;
+            renderVoiceSelector();
+            renderVoiceCatalogCards("all");
+          }
+        } catch (err) {
+          console.warn("Error al cargar catálogo de voces:", err);
+        }
+      }
 
-          if (window.speechSynthesis.paused) {
-            window.speechSynthesis.resume();
-            setStatus("REPRODUCIENDO", true);
+      function renderVoiceSelector() {
+        if (!ttsVoice) return;
+        ttsVoice.innerHTML = "";
+
+        const groups = {};
+        backendVoices.forEach(v => {
+          const langKey = v.country ? v.country.split(" ")[0] : v.lang;
+          if (!groups[langKey]) groups[langKey] = [];
+          groups[langKey].push(v);
+        });
+
+        Object.keys(groups).forEach(grp => {
+          const optGroup = document.createElement("optgroup");
+          optGroup.label = grp;
+          groups[grp].forEach(v => {
+            const opt = document.createElement("option");
+            opt.value = v.id;
+            opt.textContent = `${v.name} (${v.gender === "femenina" ? "♀" : "♂"} ${v.style}) - ${v.country}`;
+            optGroup.appendChild(opt);
+          });
+          ttsVoice.appendChild(optGroup);
+        });
+      }
+
+      function renderVoiceCatalogCards(filter = "all") {
+        if (!catalogGrid) return;
+        catalogGrid.innerHTML = "";
+
+        const filtered = filter === "all" ? backendVoices : backendVoices.filter(v => v.lang === filter);
+        filtered.forEach(v => {
+          const card = document.createElement("div");
+          card.className = "tech-card";
+          card.style.padding = "20px";
+          card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+              <div>
+                <span class="tech-card-tag" style="margin-bottom: 4px;">${v.country}</span>
+                <h3 style="font-size: 1.1rem; margin: 0; color: #fff;">${v.name}</h3>
+              </div>
+              <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: var(--primary); font-size: 0.7rem; padding: 3px 8px; border-radius: 99px;">
+                ${v.gender === "femenina" ? "♀ Femenina" : "♂ Masculina"}
+              </span>
+            </div>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5;">${v.description}</p>
+            <div style="margin-top: auto; display: flex; gap: 8px;">
+              <button class="btn btn-outline btn-sample-play" data-voice="${v.id}" data-text="${encodeURIComponent(v.sampleText)}" style="flex: 1; padding: 7px 10px; font-size: 0.75rem;">
+                <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Muestra
+              </button>
+              <button class="btn btn-primary btn-select-voice" data-voice="${v.id}" style="flex: 1; padding: 7px 10px; font-size: 0.75rem;">
+                Usar Voz
+              </button>
+            </div>
+          `;
+          catalogGrid.appendChild(card);
+        });
+
+        // Eventos de botones en tarjetas
+        document.querySelectorAll(".btn-select-voice").forEach(b => {
+          b.addEventListener("click", (e) => {
+            const vId = e.currentTarget.getAttribute("data-voice");
+            if (ttsVoice) ttsVoice.value = vId;
+            document.querySelector(".studio-wrapper").scrollIntoView({ behavior: "smooth" });
+          });
+        });
+
+        document.querySelectorAll(".btn-sample-play").forEach(b => {
+          b.addEventListener("click", async (e) => {
+            const vId = e.currentTarget.getAttribute("data-voice");
+            const sampleTxt = decodeURIComponent(e.currentTarget.getAttribute("data-text"));
+            e.currentTarget.disabled = true;
+            try {
+              const res = await fetch("/api/tts", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: sampleTxt, voiceId: vId })
+              });
+              const d = await res.json();
+              if (d.audioBase64) {
+                audioPlayer.src = d.audioBase64;
+                audioPlayer.play();
+                setStatus(`REPRODUCIENDO (${vId})`, true);
+                startTimer();
+              }
+            } catch (err) {}
+            setTimeout(() => { e.currentTarget.disabled = false; }, 1000);
+          });
+        });
+      }
+
+      // Filtros de categoría de voz
+      document.querySelectorAll(".btn-filter-voice").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          document.querySelectorAll(".btn-filter-voice").forEach(b => {
+            b.className = "btn btn-outline btn-filter-voice";
+          });
+          e.currentTarget.className = "btn btn-primary btn-filter-voice active";
+          renderVoiceCatalogCards(e.currentTarget.getAttribute("data-filter"));
+        });
+      });
+
+      // Eventos del Audio Player HTML5
+      audioPlayer.addEventListener("play", () => {
+        setStatus("REPRODUCIENDO", true);
+        startTimer();
+      });
+      audioPlayer.addEventListener("pause", () => {
+        setStatus("PAUSADO", false);
+        if (timerInterval) clearInterval(timerInterval);
+      });
+      audioPlayer.addEventListener("ended", () => {
+        setStatus("COMPLETADO", false);
+        stopTimer();
+      });
+      audioPlayer.addEventListener("error", () => {
+        setStatus("ERROR", false);
+        stopTimer();
+      });
+
+      // Botón Reproducir / Generar con Backend 100% Real
+      if (ttsBtnPlay) {
+        ttsBtnPlay.addEventListener("click", async () => {
+          const text = (ttsInput.value || "").trim();
+          if (!text) {
+            alert("Escribe un texto para generar locución.");
             return;
           }
 
-          window.speechSynthesis.cancel();
-          currentUtterance = new SpeechSynthesisUtterance(text);
-          currentUtterance.rate = parseFloat(ttsRate.value) || 1.0;
-          currentUtterance.pitch = parseFloat(ttsPitch.value) || 1.0;
-          currentUtterance.lang = ttsLang.value;
+          if (audioPlayer.paused && audioPlayer.src && audioPlayer.currentTime > 0) {
+            audioPlayer.play();
+            return;
+          }
 
-          const selectedName = ttsVoice.value;
-          const chosen = voicesList.find(v => v.name === selectedName);
-          if (chosen) currentUtterance.voice = chosen;
+          ttsBtnPlay.disabled = true;
+          setStatus("SINTETIZANDO EN BACKEND...", true);
 
-          currentUtterance.onstart = () => {
-            setStatus("REPRODUCIENDO", true);
-            startTimer();
-          };
+          try {
+            const resp = await fetch("/api/tts", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                text,
+                voiceId: ttsVoice.value,
+                lang: ttsLang.value.slice(0, 2),
+                rate: parseFloat(ttsRate.value) || 1.0,
+                pitch: parseFloat(ttsPitch.value) || 1.0
+              })
+            });
 
-          currentUtterance.onend = () => {
-            setStatus("COMPLETADO", false);
-            stopTimer();
-          };
-
-          currentUtterance.onerror = () => {
+            const data = await resp.json();
+            if (data.status === "success" && data.audioBase64) {
+              lastGeneratedAudio = data;
+              audioPlayer.src = data.audioBase64;
+              await audioPlayer.play();
+              setStatus("REPRODUCIENDO", true);
+            } else {
+              throw new Error(data.error || "No se pudo generar la síntesis vocal");
+            }
+          } catch (err) {
+            alert("Error al sintetizar voz: " + err.message);
             setStatus("ERROR", false);
-            stopTimer();
-          };
-
-          window.speechSynthesis.speak(currentUtterance);
+          } finally {
+            ttsBtnPlay.disabled = false;
+          }
         });
       }
 
       if (ttsBtnPause) {
         ttsBtnPause.addEventListener("click", () => {
-          if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
-            window.speechSynthesis.pause();
-            setStatus("PAUSADO", false);
-            if (timerInterval) clearInterval(timerInterval);
-          }
+          if (!audioPlayer.paused) audioPlayer.pause();
         });
       }
 
       if (ttsBtnStop) {
         ttsBtnStop.addEventListener("click", () => {
-          window.speechSynthesis.cancel();
+          audioPlayer.pause();
+          audioPlayer.currentTime = 0;
           setStatus("DETENIDO", false);
           stopTimer();
         });
       }
 
+      // Descarga Real del Archivo de Audio
       if (ttsBtnDownload) {
         ttsBtnDownload.addEventListener("click", async () => {
           const text = (ttsInput.value || "").trim();
@@ -504,54 +655,63 @@
           }
 
           ttsBtnDownload.disabled = true;
-          ttsBtnDownload.textContent = "Generando archivo WAV...";
+          ttsBtnDownload.textContent = "Generando audio en el backend...";
 
           try {
-            const resp = await fetch("/api/tts", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                text,
-                lang: ttsLang.value.slice(0, 2),
-                rate: parseFloat(ttsRate.value) || 1.0,
-                pitch: parseFloat(ttsPitch.value) || 1.0
-              })
-            });
+            let audioData = lastGeneratedAudio;
+            if (!audioData || audioData.text !== text) {
+              const resp = await fetch("/api/tts", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  text,
+                  voiceId: ttsVoice.value,
+                  lang: ttsLang.value.slice(0, 2),
+                  rate: parseFloat(ttsRate.value) || 1.0,
+                  pitch: parseFloat(ttsPitch.value) || 1.0
+                })
+              });
+              audioData = await resp.json();
+            }
 
-            const data = await resp.json();
-            if (data.audioBase64) {
-              const byteCharacters = atob(data.audioBase64.split(",")[1]);
+            if (audioData && audioData.audioBase64) {
+              const byteCharacters = atob(audioData.audioBase64.split(",")[1]);
               const byteNumbers = new Array(byteCharacters.length);
               for (let i = 0; i < byteCharacters.length; i++) {
                 byteNumbers[i] = byteCharacters.charCodeAt(i);
               }
               const byteArray = new Uint8Array(byteNumbers);
-              const blob = new Blob([byteArray], { type: "audio/wav" });
+              const ext = audioData.format || "mp3";
+              const mime = audioData.mimeType || "audio/mpeg";
+              const blob = new Blob([byteArray], { type: mime });
               const url = URL.createObjectURL(blob);
 
               const a = document.createElement("a");
               a.href = url;
-              a.download = `tts-cloudtranslator-${Date.now()}.wav`;
+              a.download = `voz-tts-cloudtranslator-${Date.now()}.${ext}`;
               document.body.appendChild(a);
               a.click();
               document.body.removeChild(a);
               setTimeout(() => URL.revokeObjectURL(url), 2000);
 
-              ttsBtnDownload.textContent = "¡Descarga iniciada con éxito!";
+              ttsBtnDownload.textContent = "¡Descarga completada!";
               setTimeout(() => {
-                ttsBtnDownload.textContent = "Descargar Audio Generado (WAV)";
+                ttsBtnDownload.textContent = "Descargar Audio Generado (MP3 / WAV)";
                 ttsBtnDownload.disabled = false;
               }, 2500);
             } else {
-              throw new Error("No se pudo obtener el audio");
+              throw new Error("No se pudo obtener el buffer de audio");
             }
           } catch (e) {
-            alert("Error al generar descarga de audio: " + e.message);
+            alert("Error al descargar audio: " + e.message);
             ttsBtnDownload.disabled = false;
-            ttsBtnDownload.textContent = "Descargar Audio Generado (WAV)";
+            ttsBtnDownload.textContent = "Descargar Audio Generado (MP3 / WAV)";
           }
         });
       }
+
+      // Cargar voces al inicio
+      loadVoicesCatalog();
     });
   </script>
 </body>

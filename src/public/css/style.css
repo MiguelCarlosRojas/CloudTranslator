@@ -238,17 +238,17 @@ body.ct-translating {
 }
 
 .brand-img {
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
   object-fit: contain;
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.45);
   flex-shrink: 0;
-  transition: transform 0.2s ease;
+  transition: transform 0.25s ease;
 }
 
 .brand-wrapper:hover .brand-img {
-  transform: scale(1.08);
+  transform: scale(1.1);
 }
 
 .brand-wrapper:hover .brand-logo {
@@ -763,6 +763,91 @@ body.ct-translating {
 .hero-actions .btn {
   padding: 10px 22px;
   font-size: 0.88rem;
+}
+
+/* ==========================================================================
+   Hero Split con Logo Gigante a la Derecha (Responsive Desktop & Mobile)
+   ========================================================================== */
+.hero-split {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(28px, 4vw, 56px);
+}
+
+.hero-split-content {
+  flex: 1 1 58%;
+  max-width: 720px;
+}
+
+.hero-split-media {
+  flex: 1 1 38%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.hero-logo-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 330px;
+}
+
+.hero-logo-glow {
+  position: absolute;
+  width: 290px;
+  height: 290px;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.35) 0%, rgba(99, 102, 241, 0.22) 48%, transparent 72%);
+  filter: blur(34px);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: heroGlowPulse 4s ease-in-out infinite alternate;
+}
+
+.hero-logo-big {
+  width: 100%;
+  max-width: 290px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 15px 35px rgba(0, 240, 255, 0.4));
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-logo-big:hover {
+  transform: scale(1.06) rotate(2deg);
+}
+
+@keyframes heroGlowPulse {
+  0% { transform: scale(0.88); opacity: 0.6; }
+  100% { transform: scale(1.18); opacity: 1; }
+}
+
+@media (max-width: 920px) {
+  .hero-split {
+    flex-direction: column-reverse;
+    text-align: center;
+    gap: 32px;
+  }
+  .hero-split-content {
+    max-width: 100%;
+  }
+  .hero-actions {
+    justify-content: center;
+  }
+  .hero-logo-big {
+    max-width: 210px;
+  }
+  .hero-logo-glow {
+    width: 210px;
+    height: 210px;
+  }
 }
 
 /* ==========================================================================
