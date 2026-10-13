@@ -59,6 +59,8 @@ app.get("/", (req, res) => {
     documentation: "https://cloudtranslator.onrender.com/docs",
     endpoints: {
       translate: "POST /api/translate",
+      tts: "POST /api/tts",
+      voiceClone: "POST /api/voice-clone",
       languages: "GET /api/languages",
       health: "GET /api/health",
       ping: "GET /api/ping"
@@ -77,6 +79,8 @@ app.get("/api", (req, res, next) => {
     documentation: "https://cloudtranslator.onrender.com/api",
     endpoints: {
       translate: "POST /api/translate",
+      tts: "POST /api/tts",
+      voiceClone: "POST /api/voice-clone",
       languages: "GET /api/languages",
       health: "GET /api/health",
       ping: "GET /api/ping"

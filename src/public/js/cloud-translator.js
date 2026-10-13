@@ -127,12 +127,22 @@
     preTranslateDocument(doc, targetLanguage) {
       if (!doc || !targetLanguage || targetLanguage === "original" || targetLanguage === "es") return;
       const lang = targetLanguage.trim().toLowerCase();
+      const langCache = this.cache[lang];
+      if (!langCache) return;
+
       if (doc.body) {
         this.preTranslateDomTree(doc.body, lang);
       }
-      if (doc.title && this.cache[lang] && this.cache[lang][doc.title]) {
-        doc.title = this.cache[lang][doc.title];
+      if (doc.title && langCache[doc.title]) {
+        doc.title = langCache[doc.title];
       }
+      const metaTags = doc.querySelectorAll('meta[name="description"], meta[property="og:description"], meta[name="twitter:description"]');
+      metaTags.forEach((m) => {
+        const c = m.getAttribute("content");
+        if (c && langCache[c]) {
+          m.setAttribute("content", langCache[c]);
+        }
+      });
     }
 
     /**
@@ -509,6 +519,26 @@
           }
         }
       });
+
+      // Escaneo y registro de meta descripciones de página
+      if (typeof document !== "undefined") {
+        const metaDescTags = document.querySelectorAll(
+          'meta[name="description"], meta[property="og:description"], meta[name="twitter:description"]'
+        );
+        metaDescTags.forEach((meta) => {
+          const content = meta.getAttribute("content");
+          if (content && content.trim() && !/^[\d\s\-_.,:;!?()\[\]{}@#$%&*+=/\\|<>'"~`]+$/.test(content.trim())) {
+            let list = this.attrMap.get(meta);
+            if (!list) {
+              list = [];
+              this.attrMap.set(meta, list);
+            }
+            if (!list.some(item => item.attr === "content")) {
+              list.push({ attr: "content", originalText: content });
+            }
+          }
+        });
+      }
     }
 
     _updateStatusUI(text) {

@@ -40,10 +40,29 @@ El microservicio se ejecuta de forma continua y autónoma en **Render**:
 
 ---
 
+## Las 3 Capacidades Principales (Pilares Funcionales)
+
+CloudTranslator integra 3 soluciones lingüísticas de última generación en una única plataforma:
+
+1. 🌐 **Traductor en la Nube:**  
+   * Traducción por lotes de alta velocidad (+200 idiomas) con una sola petición consolidada.
+   * Extracción inteligente del DOM respetando atributos, tags no traducibles y metadatos (`document.title`, `<meta name="description">`).
+   * Persistencia estricta en cookies (`cloud_translator_lang`).
+2. 🎙️ **Texto a Voz (TTS Studio):**  
+   * Síntesis vocal multilingüe en tiempo real.
+   * Selección de voces del sistema operativo / navegador, calibración de velocidad (rate) y tono (pitch).
+   * Ecualizador visual animado por ondas de frecuencia.
+3. 🧬 **Clonación de Voz con IA (Voice Cloning Studio):**  
+   * Grabación directa con micrófono del usuario (`getUserMedia`) o carga de muestras de audio (`.wav`, `.mp3`, `.ogg`, `.m4a`).
+   * Análisis espectral y extracción de huella acústica con síntesis sobre textos personalizados.
+   * Reproductor de audio integrado con opción de descarga de muestras sintetizadas.
+
+---
+
 ## Arquitectura y Características Principales
 
 1. **Una Sola Petición HTTP Consolidada:** En lugar de lanzar cientos de peticiones individuales por cada etiqueta del DOM, el cliente escanea la página con `TreeWalker` y envía un solo arreglo `texts: [...]` en un único `POST`.
-2. **Traducción Automática de Pestaña / Ventana (`document.title`):** Al cambiar de idioma, el título de la pestaña del navegador se traduce y sincroniza automáticamente junto al contenido de la página, y se restaura fielmente al volver al idioma original.
+2. **Traducción Automática de Pestaña / Ventana (`document.title`) y Metadatos:** Al cambiar de idioma, el título de la pestaña del navegador y las meta etiquetas de descripción se traducen automáticamente y se restauran al volver al idioma original.
 3. **Caché en Memoria RAM de Alto Rendimiento:**  
    * **Servidor (`translateController.js`):** Mantiene una caché LRU de hasta 10,000 entradas (`targetLanguage:texto`). Las frases previamente traducidas responden en 0 ms sin consultar la API externa.
    * **Cliente (`cloud-translator.js`):** Mantiene caché en memoria activa durante la sesión (cero uso de `localStorage`), garantizando transiciones instantáneas.
@@ -262,20 +281,75 @@ curl -X POST https://cloudtranslator.onrender.com/api/translate \
   }
   ```
 
+### 6. `POST /api/tts` (Síntesis de Texto a Voz)
+* **URL:** `https://cloudtranslator.onrender.com/api/tts`
+* **Body:**
+  ```json
+  {
+    "text": "Hola, bienvenido al asistente vocal inteligente",
+    "lang": "es",
+    "speed": 1.0,
+    "pitch": 1.0
+  }
+  ```
+* **Respuesta (200 OK):**
+  ```json
+  {
+    "success": true,
+    "provider": "browser-speech-synthesis-stream",
+    "text": "Hola, bienvenido al asistente vocal inteligente",
+    "lang": "es",
+    "speed": 1.0,
+    "pitch": 1.0,
+    "chars": 48
+  }
+  ```
+
+### 7. `POST /api/voice-clone` (Clonación de Voz IA)
+* **URL:** `https://cloudtranslator.onrender.com/api/voice-clone`
+* **Body:**
+  ```json
+  {
+    "text": "Este es un mensaje clonado con mi timbre de voz original",
+    "audioSampleBase64": "data:audio/webm;base64,GkXfo59ChoEBQveBA...",
+    "lang": "es"
+  }
+  ```
+* **Respuesta (200 OK):**
+  ```json
+  {
+    "success": true,
+    "status": "voice_synthesized",
+    "voiceProfileId": "vp_9fa1b28c",
+    "sampleDurationSec": 5.4,
+    "synthesizedText": "Este es un mensaje clonado con mi timbre de voz original",
+    "synthesizedAudioUrl": "/audio/clone_vp_9fa1b28c.wav"
+  }
+  ```
+
 ---
 
 ## Módulos Públicos del Portal Web
 
 CloudTranslator incluye un portal web interactivo responsive con enrutador SPA:
 
-* **[Inicio / Landing Page](https://cloudtranslator.onrender.com/)**: Demostración en vivo de traducción del DOM, métricas y panel de pruebas.
+* **[Inicio / Landing Page](https://cloudtranslator.onrender.com/)**: Demostración en vivo de traducción del DOM, TTS Studio, Voice Cloning Studio, donaciones y métricas.
 * **[Documentación](https://cloudtranslator.onrender.com/docs)**: Arquitectura, flujo por lotes del DOM y preguntas frecuentes.
-* **[Referencia de API REST](https://cloudtranslator.onrender.com/api)**: Playground interactivo (`/api/translate`, `/api/health`, `/api/languages`, `/api/ping`), esquemas JSON y copiado con un clic.
+* **[Referencia de API REST](https://cloudtranslator.onrender.com/api)**: Playground interactivo (`/api/translate`, `/api/health`, `/api/languages`, `/api/ping`, `/api/tts`, `/api/voice-clone`), esquemas JSON y copiado con un clic.
 * **[Aprender (Guías de Integración)](https://cloudtranslator.onrender.com/learn)**: Guías para React, Vue, Vanilla JS, microservicios y optimización de latencia.
 * **[Soporte Técnico](https://cloudtranslator.onrender.com/support)**: Canales de contacto y asistencia directa.
 * **[Centro de Ayuda](https://cloudtranslator.onrender.com/help)**: Solución de problemas comunes y códigos de error.
 * **[Monitor de Estado del Cluster](https://cloudtranslator.onrender.com/status)**: Estado del servicio, uptime y salud del servidor.
 * **[Políticas de Privacidad](https://cloudtranslator.onrender.com/privacy)**, **[Seguridad](https://cloudtranslator.onrender.com/security)** y **[Términos de Servicio](https://cloudtranslator.onrender.com/terms)**.
+
+---
+
+## Donaciones y Apoyo al Proyecto
+
+CloudTranslator opera como una iniciativa abierta y de libre acceso. Si el servicio te ha sido útil y deseas colaborar con los costos de hosting y desarrollo continuo, puedes realizar una donación a través de:
+
+* 💳 **PayPal:** [https://paypal.me/miguelcarlosrojas](https://paypal.me/miguelcarlosrojas)
+* 📱 **Yape (Perú):** Escanea el código QR disponible en la [sección de Donaciones del portal](https://cloudtranslator.onrender.com/#donations-section) a nombre de Miguel Angel Carlos Rojas.
 
 ---
 

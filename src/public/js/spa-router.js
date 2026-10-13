@@ -160,20 +160,20 @@
         window.scrollTo(0, 0);
       }
 
-      // Actualizar clase active en los enlaces del menú
-      try {
-        const currentPath = parsedUrl.pathname;
-        document.querySelectorAll(".main-menu a").forEach(link => {
-          const linkHref = link.getAttribute("href");
-          if (!linkHref) return;
-          const linkPath = new URL(linkHref, window.location.href).pathname;
-          if (linkPath === currentPath || (currentPath === "/" && (linkPath === "/" || linkPath === "/index.html"))) {
-            link.classList.add("active");
-          } else {
-            link.classList.remove("active");
-          }
-        });
-      } catch (navErr) {}
+      // Actualizar meta description y etiquetas OpenGraph
+      const currentMetaDesc = document.querySelector('meta[name="description"]');
+      const newMetaDesc = doc.querySelector('meta[name="description"]');
+      if (currentMetaDesc && newMetaDesc) {
+        currentMetaDesc.setAttribute("content", newMetaDesc.getAttribute("content") || "");
+      }
+      const currentOgDesc = document.querySelector('meta[property="og:description"]');
+      const newOgDesc = doc.querySelector('meta[property="og:description"]');
+      if (currentOgDesc && newOgDesc) {
+        currentOgDesc.setAttribute("content", newOgDesc.getAttribute("content") || "");
+      }
+
+      // Actualizar clase active en todos los enlaces de navegación (cabecera, menú lateral y pie de página)
+      updateActiveLinks(parsedUrl.pathname);
 
       finishProgress();
     } catch (err) {
@@ -252,32 +252,69 @@
     navigate(window.location.href, false);
   });
 
-  // Manejador global para el menú móvil (Hamburger Drawer)
+  // Actualizar estado 'active' en cabecera, menú lateral y pie de página
+  function updateActiveLinks(pathname) {
+    try {
+      const currentPath = pathname || window.location.pathname;
+      const allLinks = document.querySelectorAll(".main-menu a, .drawer-menu a, .footer-col a, .footer-links a");
+      allLinks.forEach(link => {
+        const linkHref = link.getAttribute("href");
+        if (!linkHref || linkHref.startsWith("#") || linkHref.startsWith("http://") || linkHref.startsWith("https://")) return;
+        try {
+          const linkPath = new URL(linkHref, window.location.href).pathname;
+          const isMatch = (linkPath === currentPath) || 
+                          ((currentPath === "/" || currentPath === "/index.html") && (linkPath === "/" || linkPath === "/index.html"));
+          if (isMatch) {
+            link.classList.add("active");
+          } else {
+            link.classList.remove("active");
+          }
+        } catch (e) {}
+      });
+    } catch (e) {}
+  }
+
+  // Manejador global para la barra de navegación lateral móvil y backdrop
   document.addEventListener("click", (e) => {
     const toggleBtn = e.target.closest("#menu-toggle-btn");
     if (toggleBtn) {
       const drawer = document.getElementById("mobile-drawer");
+      const backdrop = document.getElementById("drawer-backdrop");
       if (drawer) {
         const isOpen = drawer.classList.toggle("open");
         toggleBtn.classList.toggle("active", isOpen);
         document.body.classList.toggle("drawer-open", isOpen);
+        if (backdrop) backdrop.classList.toggle("open", isOpen);
       }
       return;
     }
 
-    // Si se hace clic en un enlace del cajón móvil, cerrarlo automáticamente
+    // Botón de cierre explícito de la barra lateral (X) o clic fuera en backdrop
+    const closeBtn = e.target.closest("#drawer-close-btn");
+    const backdropClick = e.target.closest("#drawer-backdrop");
     const drawerLink = e.target.closest("#mobile-drawer a");
-    if (drawerLink) {
+
+    if (closeBtn || backdropClick || drawerLink) {
       const drawer = document.getElementById("mobile-drawer");
       const toggleBtn = document.getElementById("menu-toggle-btn");
+      const backdrop = document.getElementById("drawer-backdrop");
       if (drawer) drawer.classList.remove("open");
       if (toggleBtn) toggleBtn.classList.remove("active");
+      if (backdrop) backdrop.classList.remove("open");
       document.body.classList.remove("drawer-open");
     }
   });
 
+  // Inicializar estado activo al cargar el documento
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => updateActiveLinks(window.location.pathname), { once: true });
+  } else {
+    updateActiveLinks(window.location.pathname);
+  }
+
   // Exponer API opcional
   window.SPARouter = {
-    navigate: navigate
+    navigate: navigate,
+    updateActiveLinks: updateActiveLinks
   };
 })();
