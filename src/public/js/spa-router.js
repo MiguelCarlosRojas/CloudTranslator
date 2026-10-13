@@ -175,6 +175,19 @@
       // Actualizar clase active en todos los enlaces de navegación (cabecera, menú lateral y pie de página)
       updateActiveLinks(parsedUrl.pathname);
 
+      // Cerrar drawer lateral si estaba abierto y desbloquear desplazamiento
+      const activeDrawer = document.getElementById("mobile-drawer");
+      const activeBackdrop = document.getElementById("drawer-backdrop");
+      const activeToggle = document.getElementById("menu-toggle-btn");
+      if (activeDrawer) activeDrawer.classList.remove("open");
+      if (activeBackdrop) activeBackdrop.classList.remove("open");
+      if (activeToggle) activeToggle.classList.remove("active");
+      document.body.classList.remove("drawer-open");
+
+      if (window.CloudComponents && window.CloudComponents.decorateSelects) {
+        window.CloudComponents.decorateSelects();
+      }
+
       finishProgress();
     } catch (err) {
       if (err.name !== "AbortError") {
@@ -273,37 +286,6 @@
       });
     } catch (e) {}
   }
-
-  // Manejador global para la barra de navegación lateral móvil y backdrop
-  document.addEventListener("click", (e) => {
-    const toggleBtn = e.target.closest("#menu-toggle-btn");
-    if (toggleBtn) {
-      const drawer = document.getElementById("mobile-drawer");
-      const backdrop = document.getElementById("drawer-backdrop");
-      if (drawer) {
-        const isOpen = drawer.classList.toggle("open");
-        toggleBtn.classList.toggle("active", isOpen);
-        document.body.classList.toggle("drawer-open", isOpen);
-        if (backdrop) backdrop.classList.toggle("open", isOpen);
-      }
-      return;
-    }
-
-    // Botón de cierre explícito de la barra lateral (X) o clic fuera en backdrop
-    const closeBtn = e.target.closest("#drawer-close-btn");
-    const backdropClick = e.target.closest("#drawer-backdrop");
-    const drawerLink = e.target.closest("#mobile-drawer a");
-
-    if (closeBtn || backdropClick || drawerLink) {
-      const drawer = document.getElementById("mobile-drawer");
-      const toggleBtn = document.getElementById("menu-toggle-btn");
-      const backdrop = document.getElementById("drawer-backdrop");
-      if (drawer) drawer.classList.remove("open");
-      if (toggleBtn) toggleBtn.classList.remove("active");
-      if (backdrop) backdrop.classList.remove("open");
-      document.body.classList.remove("drawer-open");
-    }
-  });
 
   // Inicializar estado activo al cargar el documento
   if (document.readyState === "loading") {

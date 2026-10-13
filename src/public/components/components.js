@@ -83,7 +83,7 @@
       <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
       <span>CloudTranslator</span>
     </a>
-    <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral">✕</button>
+    <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
 
   <div class="drawer-body">
@@ -189,41 +189,69 @@
     },
 
     /**
-     * Inicializa eventos del drawer móvil
+     * Inicializa eventos del drawer móvil con delegación global e idempotencia
      */
     initDrawerEvents() {
-      const menuBtn = document.getElementById("menu-toggle-btn");
-      const drawer = document.getElementById("mobile-drawer");
-      const backdrop = document.getElementById("drawer-backdrop");
-      const closeBtn = document.getElementById("drawer-close-btn");
+      if (window._drawerEventsBound) return;
+      window._drawerEventsBound = true;
 
-      if (!menuBtn || !drawer || !backdrop) return;
+      document.addEventListener("click", (e) => {
+        const toggleBtn = e.target.closest("#menu-toggle-btn");
+        const drawer = document.getElementById("mobile-drawer");
+        const backdrop = document.getElementById("drawer-backdrop");
 
-      const openDrawer = () => {
-        drawer.classList.add("open");
-        backdrop.classList.add("open");
-        document.body.classList.add("drawer-open");
-      };
+        if (toggleBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!drawer) return;
+          const isOpen = drawer.classList.contains("open");
+          if (isOpen) {
+            drawer.classList.remove("open");
+            toggleBtn.classList.remove("active");
+            if (backdrop) backdrop.classList.remove("open");
+            document.body.classList.remove("drawer-open");
+          } else {
+            drawer.classList.add("open");
+            toggleBtn.classList.add("active");
+            if (backdrop) backdrop.classList.add("open");
+            document.body.classList.add("drawer-open");
+          }
+          return;
+        }
 
-      const closeDrawer = () => {
-        drawer.classList.remove("open");
-        backdrop.classList.remove("open");
-        document.body.classList.remove("drawer-open");
-      };
+        const closeBtn = e.target.closest("#drawer-close-btn");
+        const backdropClick = e.target.closest("#drawer-backdrop");
+        const drawerLink = e.target.closest("#mobile-drawer a");
 
-      menuBtn.addEventListener("click", openDrawer);
-      if (closeBtn) closeBtn.addEventListener("click", closeDrawer);
-      backdrop.addEventListener("click", closeDrawer);
+        if (closeBtn || backdropClick || drawerLink) {
+          if (drawer) drawer.classList.remove("open");
+          const btn = document.getElementById("menu-toggle-btn");
+          if (btn) btn.classList.remove("active");
+          if (backdrop) backdrop.classList.remove("open");
+          document.body.classList.remove("drawer-open");
+        }
+      });
+
       document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && drawer.classList.contains("open")) closeDrawer();
+        if (e.key === "Escape") {
+          const drawer = document.getElementById("mobile-drawer");
+          const backdrop = document.getElementById("drawer-backdrop");
+          const btn = document.getElementById("menu-toggle-btn");
+          if (drawer && drawer.classList.contains("open")) {
+            drawer.classList.remove("open");
+            if (btn) btn.classList.remove("active");
+            if (backdrop) backdrop.classList.remove("open");
+            document.body.classList.remove("drawer-open");
+          }
+        }
       });
     },
 
     /**
-     * Aplica automáticamente el diseño del componente select-wrapper y form-select-custom a todos los selects
+     * Aplica automáticamente el diseño del componente select-wrapper y form-select-custom a los selects de consolas
      */
     decorateSelects() {
-      document.querySelectorAll("select").forEach(select => {
+      document.querySelectorAll(".studio-panel select, .voice-selector").forEach(select => {
         if (!select.closest(".select-wrapper")) {
           const wrapper = document.createElement("div");
           wrapper.className = "select-wrapper";

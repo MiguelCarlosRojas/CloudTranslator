@@ -45,15 +45,15 @@ El microservicio se ejecuta de forma continua y autónoma en **Render**:
 
 CloudTranslator integra 3 soluciones lingüísticas de última generación en una arquitectura modular con páginas dedicadas:
 
-1. 🌐 **[Traductor en la Nube](/translator):**  
+1. **[Traductor en la Nube](/translator):**  
    * Traducción por lotes de alta velocidad (+200 idiomas) con una sola petición consolidada.
    * Extracción inteligente del DOM con `TreeWalker` respetando atributos, tags no traducibles y metadatos (`document.title`, `<meta name="description">`).
    * Persistencia estricta en cookies (`cloud_translator_lang`).
-2. 🎙️ **[Texto a Voz (TTS Studio)](/tts):**  
+2. **[Texto a Voz (TTS Studio)](/tts):**  
    * Síntesis vocal multilingüe en tiempo real con descarga física de audio en formato `.wav`.
    * Selección de voces del sistema operativo / navegador, calibración de velocidad (rate) y tono (pitch).
    * Ecualizador visual animado por ondas de frecuencia.
-3. 🧬 **[Clonación de Voz con IA (Voice Cloning Studio)](/voice-clone):**  
+3. **[Clonación de Voz con IA (Voice Cloning Studio)](/voice-clone):**  
    * Grabación directa con micrófono del usuario (`getUserMedia`) o carga de muestras de audio (`.wav`, `.mp3`, `.ogg`, `.m4a`).
    * Extracción de frecuencia fundamental (F0), botón de eliminar muestra grabada con confirmación y reproducción previa.
    * Generación y descarga real de archivos de audio sintetizado `.wav` en PCM 16-bit.
@@ -296,7 +296,7 @@ curl -X POST https://cloudtranslator.onrender.com/api/translate \
         "gender": "femenina",
         "lang": "es",
         "locale": "es-ES",
-        "country": "España 🇪🇸",
+        "country": "España",
         "style": "Natural y elocuente",
         "description": "Voz femenina con acento castellano impecable.",
         "sampleText": "Bienvenido a CloudTranslator..."
@@ -405,8 +405,8 @@ CloudTranslator incluye un portal web interactivo responsive estructurado con p�
 
 CloudTranslator opera como una iniciativa abierta y de libre acceso. Si el servicio te ha sido útil y deseas colaborar con los costos de hosting y desarrollo continuo, puedes realizar una donación a través de:
 
-* 💳 **PayPal:** [https://paypal.me/miguelcarlosrojas](https://paypal.me/miguelcarlosrojas)
-* 📱 **Yape (Perú):** Escanea el código QR disponible en la [Página de Donaciones](https://cloudtranslator.onrender.com/donate) a nombre de Miguel Angel Carlos Rojas.
+* **PayPal:** [https://paypal.me/miguelcarlosrojas](https://paypal.me/miguelcarlosrojas)
+* **Yape (Perú):** Escanea el código QR disponible en la [Página de Donaciones](https://cloudtranslator.onrender.com/donate) a nombre de Miguel Angel Carlos Rojas.
 
 ---
 

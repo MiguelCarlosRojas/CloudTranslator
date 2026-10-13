@@ -96,7 +96,7 @@
           <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
           <span>CloudTranslator</span>
         </a>
-        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral">✕</button>
+        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
 
       <div class="drawer-body">
@@ -178,7 +178,7 @@
             </div>
 
             <div class="studio-control-col">
-              <label class="studio-label" for="tts-voice-select">TIMBRE DE VOZ</label>
+              <label class="studio-label" for="tts-voice-select">VOZ</label>
               <div class="select-wrapper">
                 <select id="tts-voice-select" class="form-select-custom studio-select">
                   <option value="default">Cargando catálogo neural...</option>
@@ -476,7 +476,7 @@
           groups[grp].forEach(v => {
             const opt = document.createElement("option");
             opt.value = v.id;
-            opt.textContent = `${v.name} (${v.gender === "femenina" ? "♀" : "♂"} ${v.style}) - ${v.country}`;
+            opt.textContent = `${v.name} (${v.gender === "femenina" ? "Femenina" : "Masculina"} - ${v.style}) - ${v.country}`;
             optGroup.appendChild(opt);
           });
           ttsVoice.appendChild(optGroup);
@@ -499,7 +499,7 @@
                 <h3 style="font-size: 1.1rem; margin: 0; color: #fff;">${v.name}</h3>
               </div>
               <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: var(--primary); font-size: 0.7rem; padding: 3px 8px; border-radius: 99px;">
-                ${v.gender === "femenina" ? "♀ Femenina" : "♂ Masculina"}
+                ${v.gender === "femenina" ? "Femenina" : "Masculina"}
               </span>
             </div>
             <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5;">${v.description}</p>

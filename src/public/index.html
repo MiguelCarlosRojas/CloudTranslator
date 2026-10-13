@@ -96,7 +96,7 @@
           <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
           <span>CloudTranslator</span>
         </a>
-        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral">✕</button>
+        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
 
       <div class="drawer-body">
@@ -508,7 +508,7 @@
             const latency = Math.round(performance.now() - t0);
             const data = await resp.json();
 
-            demoLatencyBadge.textContent = "⚡ " + latency + "ms | " + resp.status + " " + resp.statusText;
+            demoLatencyBadge.textContent = "LATENCIA: " + latency + "ms | " + resp.status + " " + resp.statusText;
             demoLatencyBadge.style.display = "inline-block";
             demoOutputJson.textContent = JSON.stringify(data, null, 2);
           } catch (e) {

@@ -96,7 +96,7 @@
           <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
           <span>CloudTranslator</span>
         </a>
-        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral">✕</button>
+        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
 
       <div class="drawer-body">
@@ -170,7 +170,7 @@
                 Habla con naturalidad durante 4 a 10 segundos leyendo cualquier frase.
               </p>
               <div style="display: flex; gap: 10px; justify-content: center;">
-                <button id="btn-start-record" class="btn btn-secondary" style="padding: 10px 18px; font-size: 0.85rem;">
+                <button id="btn-start-record" class="btn btn-primary" style="padding: 10px 20px; font-size: 0.85rem; font-weight: 700;">
                   Iniciar Grabación
                 </button>
                 <button id="btn-stop-record" class="btn btn-outline" style="padding: 10px 18px; font-size: 0.85rem; display: none;">
@@ -222,7 +222,7 @@
 
           <div class="studio-controls-row">
             <div class="studio-control-col">
-              <label class="studio-label" for="clone-similarity-select">FIDELIDAD TIMBRAL</label>
+              <label class="studio-label" for="clone-similarity-select">FIDELIDAD</label>
               <div class="select-wrapper">
                 <select id="clone-similarity-select" class="form-select-custom studio-select">
                   <option value="high">Alta (Formantes Exactos F0)</option>
@@ -233,7 +233,7 @@
             </div>
 
             <div class="studio-control-col">
-              <label class="studio-label" for="clone-gender-select">PERFIL VOCAL</label>
+              <label class="studio-label" for="clone-gender-select">VOZ / PERFIL</label>
               <div class="select-wrapper">
                 <select id="clone-gender-select" class="form-select-custom studio-select">
                   <option value="auto">Auto-detectar con AudioContext</option>
@@ -246,7 +246,7 @@
 
           <!-- Botón de Generación -->
           <div style="margin-top: 18px;">
-            <button id="btn-synthesize-clone" class="btn btn-secondary w-full" style="padding: 13px 20px; font-weight: 700;">
+            <button id="btn-synthesize-clone" class="btn btn-primary w-full" style="padding: 13px 20px; font-weight: 700;">
               <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
               Sintetizar Voz Clonada
             </button>
