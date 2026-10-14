@@ -31,10 +31,16 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ## Propiedad Intelectual y Atribución
 
 1. **Autoría del Proyecto:**  
-   Todo el código fuente original, la arquitectura del microservicio, el sistema de caché en memoria del servidor, el script cliente de extracción del DOM con persistencia por cookies, y la documentación incluida en este repositorio son creación intelectual de Miguel Angel Carlos Rojas.
+   Todo el código fuente original, la arquitectura del microservicio, el sistema de caché en memoria del servidor, el motor de extracción por lotes del DOM con persistencia por cookies, el estudio de Texto a Voz (TTS), el motor de Clonación de Voz con IA, el conversor universal de video a MP3/MP4, los componentes reutilizables y la documentación incluida en este repositorio son creación intelectual de Miguel Angel Carlos Rojas.
 
-2. **Bibliotecas de Terceros:**  
+2. **Los 4 Pilares Protegidos del Ecosistema:**
+   * **Pilar 1 - Traductor en la Nube:** Algoritmo de traducción por lotes en una sola consulta HTTP con soporte para más de 200 idiomas.
+   * **Pilar 2 - Texto a Voz (TTS Studio):** Motor de síntesis neuronal multilingüe con catálogo de voces y modulación acústica.
+   * **Pilar 3 - Clonación de Voz con IA:** Sistema de extracción acústica de pitch (F0), emulación de timbre y síntesis de audio.
+   * **Pilar 4 - Conversor Multimedia (MP3 / MP4):** Motor de extracción y conversión universal de audio y video desde YouTube, TikTok, Instagram, Twitter/X y enlaces directos.
+
+3. **Bibliotecas de Terceros:**  
    Las dependencias de código abierto utilizadas en este proyecto (`express`, `google-translate-api-x`, `cors`, `compression`, `winston`, `nodemon`) pertenecen a sus respectivos autores y se rigen bajo sus licencias correspondientes (MIT, ISC, Apache-2.0).
 
-3. **Uso de la API y Servicio en la Nube:**  
-   Se permite la libre integración de aplicaciones web, móviles o de backend con el servicio público `https://cloudtranslator.onrender.com/api/translate` bajo políticas de uso justo y sin fines maliciosos.
+4. **Uso de la API y Servicio en la Nube:**  
+   Se permite la libre integración de aplicaciones web, móviles o de backend con los servicios y endpoints públicos de `https://cloudtranslator.onrender.com/api/*` bajo políticas de uso justo y sin fines maliciosos.

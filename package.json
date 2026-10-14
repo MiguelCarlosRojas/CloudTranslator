@@ -23,12 +23,16 @@
   "author": "Miguel Angel Carlos Rojas",
   "license": "ISC",
   "dependencies": {
+    "btch-downloader": "^6.4.0",
     "compression": "^1.8.2",
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "google-translate-api-x": "^10.7.2",
     "msedge-tts": "^2.1.0",
-    "winston": "^3.17.0"
+    "rahad-all-downloader-v2": "^2.8.0",
+    "snapsave-media-downloader": "^2.5.1",
+    "winston": "^3.17.0",
+    "youtubei.js": "^18.1.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

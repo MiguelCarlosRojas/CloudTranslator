@@ -111,11 +111,12 @@
         </div>
 
         <div class="drawer-section">
-          <span class="drawer-title">LOS 3 PILARES</span>
+          <span class="drawer-title">LOS 4 PILARES</span>
           <ul class="drawer-menu">
-            <li><a href="/translator"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traductor en la Nube</a></li>
+            <li><a href="/translator"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Traductor en la Nube</a></li>
             <li><a href="/tts"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS)</a></li>
             <li><a href="/voice-clone"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz (IA)</a></li>
+            <li><a href="/converter"><svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="8" cy="12" r="2"/></svg> Conversor Multimedia (MP3 / MP4)</a></li>
             <li><a href="/donate"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
           </ul>
         </div>
@@ -234,9 +235,32 @@
           </a>
         </div>
 
-        <!-- Grupo 5: Consola Interactiva -->
+        <!-- Grupo 5: Pilar 4 - Conversor Multimedia (MP3 / MP4) -->
         <div class="docs-sidebar-group">
-          <span class="docs-group-label">05 / Pruebas en Vivo</span>
+          <span class="docs-group-label">05 / Pilar 4: Conversor Multimedia</span>
+          <a href="#api-get-media-platforms" class="docs-sidebar-session" data-target="api-get-media-platforms">
+            <span class="session-badge">M.01</span> GET /api/media/platforms
+          </a>
+          <a href="#api-post-media-info" class="docs-sidebar-session" data-target="api-post-media-info">
+            <span class="session-badge">M.02</span> POST /api/media/info
+          </a>
+          <a href="#api-post-media-convert" class="docs-sidebar-session" data-target="api-post-media-convert">
+            <span class="session-badge">M.03</span> POST /api/media/convert
+          </a>
+          <a href="#api-post-media-batch" class="docs-sidebar-session" data-target="api-post-media-batch">
+            <span class="session-badge">M.04</span> POST /api/media/batch
+          </a>
+          <a href="#api-get-media-stream" class="docs-sidebar-session" data-target="api-get-media-stream">
+            <span class="session-badge">M.05</span> GET /api/media/stream
+          </a>
+          <a href="#api-get-media-download" class="docs-sidebar-session" data-target="api-get-media-download">
+            <span class="session-badge">M.06</span> GET /api/media/download
+          </a>
+        </div>
+
+        <!-- Grupo 6: Consola Interactiva -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">06 / Pruebas en Vivo</span>
           <a href="#api-live-console" class="docs-sidebar-session" data-target="api-live-console">
             <span class="session-badge">P.01</span> Consola Interactiva
           </a>
@@ -821,11 +845,148 @@
             <span>Comando cURL (GET /api/voice-clone/download)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-vc-download')">Copiar cURL</button>
           </div>
-          <pre class="code-panel" id="curl-get-vc-download">curl -L -O "https://cloudtranslator.onrender.com/api/voice-clone/download?sampleId=smp_78ab"</pre>
+      <!-- ================================================================= -->
+      <!-- PILAR 4: CONVERSOR MULTIMEDIA (MP3 / MP4) -->
+      <!-- ================================================================= -->
+      <section id="api-get-media-platforms" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ M.01 // MEDIA_PLATFORMS ]</span>
+          <h2>GET /api/media/platforms</h2>
+          <p>Catálogo de plataformas soportadas (YouTube, TikTok, Instagram, Facebook, Twitter/X, Pinterest, Reddit y Enlace Directo) con sus formatos y calidades permitidas.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div class="code-box-header">
+            <span>Comando cURL (GET /api/media/platforms)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-media-platforms')">Copiar cURL</button>
+          </div>
+          <pre class="code-panel" id="curl-get-media-platforms">curl -X GET "https://cloudtranslator.onrender.com/api/media/platforms"</pre>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 18px;">Respuesta JSON de Ejemplo</h4>
+          <pre class="code-panel">{
+  "status": "success",
+  "service": "CloudTranslator Media Converter API (Pilar 04)",
+  "total": 8,
+  "platforms": [
+    {
+      "id": "youtube",
+      "name": "YouTube",
+      "badge": "YouTube / Shorts",
+      "formats": ["mp3", "mp4"],
+      "qualitiesMp3": ["320kbps", "192kbps", "128kbps"],
+      "qualitiesMp4": ["1080p", "720p", "480p", "360p"]
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "badge": "TikTok (Sin Marca de Agua)",
+      "formats": ["mp3", "mp4"]
+    }
+  ]
+}</pre>
         </article>
       </section>
 
-      <!-- SECCIÓN 05: CONSOLA INTERACTIVA EN VIVO -->
+      <section id="api-post-media-info" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ M.02 // MEDIA_INFO ]</span>
+          <h2>POST /api/media/info</h2>
+          <p>Inspecciona un enlace multimedia y extrae en tiempo real el título, autor, duración, miniatura y formatos disponibles.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div class="code-box-header">
+            <span>Comando cURL (POST /api/media/info)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-media-info')">Copiar cURL</button>
+          </div>
+          <pre class="code-panel" id="curl-post-media-info">curl -X POST "https://cloudtranslator.onrender.com/api/media/info" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw"
+  }'</pre>
+        </article>
+      </section>
+
+      <section id="api-post-media-convert" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ M.03 // MEDIA_CONVERT ]</span>
+          <h2>POST /api/media/convert</h2>
+          <p>Convierte el video al formato solicitado (<code>"mp3"</code> o <code>"mp4"</code>) con la tasa de bits o resolución elegida. Retorna URLs para streaming y descarga física.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div class="code-box-header">
+            <span>Comando cURL (POST /api/media/convert)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-media-convert')">Copiar cURL</button>
+          </div>
+          <pre class="code-panel" id="curl-post-media-convert">curl -X POST "https://cloudtranslator.onrender.com/api/media/convert" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+    "format": "mp3",
+    "quality": "320k"
+  }'</pre>
+        </article>
+      </section>
+
+      <section id="api-post-media-batch" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ M.04 // MEDIA_BATCH ]</span>
+          <h2>POST /api/media/batch</h2>
+          <p>Procesa concurrentemente un arreglo de hasta 10 enlaces de video simultáneos.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div class="code-box-header">
+            <span>Comando cURL (POST /api/media/batch)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-media-batch')">Copiar cURL</button>
+          </div>
+          <pre class="code-panel" id="curl-post-media-batch">curl -X POST "https://cloudtranslator.onrender.com/api/media/batch" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "urls": [
+      "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+      "https://www.tiktok.com/@tiktok/video/7106594312292453678"
+    ],
+    "format": "mp3",
+    "quality": "320k"
+  }'</pre>
+        </article>
+      </section>
+
+      <section id="api-get-media-stream" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ M.05 // MEDIA_STREAM ]</span>
+          <h2>GET /api/media/stream</h2>
+          <p>Streaming directo para reproductores HTML5 <code>&lt;audio&gt;</code> y <code>&lt;video&gt;</code> con soporte completo para encabezados HTTP <code>Range: bytes=...</code> (206 Partial Content).</p>
+        </div>
+
+        <article class="content-box-card">
+          <div class="code-box-header">
+            <span>Comando cURL (GET /api/media/stream)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-media-stream')">Copiar cURL</button>
+          </div>
+          <pre class="code-panel" id="curl-get-media-stream">curl -X GET "https://cloudtranslator.onrender.com/api/media/stream?id=media_12345_abc"</pre>
+        </article>
+      </section>
+
+      <section id="api-get-media-download" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ M.06 // MEDIA_DOWNLOAD ]</span>
+          <h2>GET /api/media/download</h2>
+          <p>Descarga física con encabezado <code>Content-Disposition: attachment; filename="[nombre].[formato]"</code>.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div class="code-box-header">
+            <span>Comando cURL (GET /api/media/download)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-media-download')">Copiar cURL</button>
+          </div>
+          <pre class="code-panel" id="curl-get-media-download">curl -L -O "https://cloudtranslator.onrender.com/api/media/download?id=media_12345_abc"</pre>
+        </article>
+      </section>
+
+      <!-- SECCIÓN 06: CONSOLA INTERACTIVA EN VIVO -->
       <section id="api-live-console" class="docs-section">
         <div class="section-full-title">
           <span class="tech-card-tag">[ P.01 // API_PLAYGROUND ]</span>
@@ -897,6 +1058,7 @@
           <li><a href="/translator">Traductor en la Nube</a></li>
           <li><a href="/tts">Texto a Voz (TTS)</a></li>
           <li><a href="/voice-clone">Clonación de Voz IA</a></li>
+          <li><a href="/converter">Conversor MP3 / MP4</a></li>
         </ul>
       </div>
 

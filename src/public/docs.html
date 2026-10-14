@@ -111,11 +111,12 @@
         </div>
 
         <div class="drawer-section">
-          <span class="drawer-title">LOS 3 PILARES</span>
+          <span class="drawer-title">LOS 4 PILARES</span>
           <ul class="drawer-menu">
             <li><a href="/translator"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traductor en la Nube</a></li>
             <li><a href="/tts"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS)</a></li>
             <li><a href="/voice-clone"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz (IA)</a></li>
+            <li><a href="/converter"><svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="8" cy="12" r="2"/></svg> Conversor Multimedia (MP3 / MP4)</a></li>
             <li><a href="/donate"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
           </ul>
         </div>
@@ -260,6 +261,22 @@
             </a>
             <a href="#sub-clone-synthesize" class="docs-sidebar-sublink" data-target="sub-clone-synthesize">
               <span class="sub-num">6.2</span> Síntesis con IA
+            </a>
+          </div>
+        </div>
+
+        <!-- Sesión 07: Pilar 4 - Conversor Multimedia (MP3 / MP4) -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">07 / Pilar 4: Conversor Multimedia</span>
+          <a href="#session-media-converter" class="docs-sidebar-session" data-target="session-media-converter">
+            <span class="session-badge">S.07</span> Conversor MP3 / MP4
+          </a>
+          <div class="docs-sidebar-subsessions">
+            <a href="#sub-media-platforms" class="docs-sidebar-sublink" data-target="sub-media-platforms">
+              <span class="sub-num">7.1</span> Plataformas &amp; Metadatos
+            </a>
+            <a href="#sub-media-convert" class="docs-sidebar-sublink" data-target="sub-media-convert">
+              <span class="sub-num">7.2</span> Conversión &amp; Descarga
             </a>
           </div>
         </div>
@@ -893,6 +910,112 @@ clonarVozEnServidor();</pre>
         </article>
       </section>
 
+      <!-- ================================================================= -->
+      <!-- SESIÓN 07: PILAR 4 - CONVERSOR MULTIMEDIA UNIVERSAL (MP3 / MP4) -->
+      <!-- ================================================================= -->
+      <section id="session-media-converter" class="docs-section">
+        <div class="docs-section-header">
+          <span class="session-badge-large">SESIÓN 07</span>
+          <h2>Pilar 4: Conversor Multimedia Universal (MP3 y MP4)</h2>
+        </div>
+        <p class="lead">
+          Motor universal de extracción y transcodificación de audio y video en la nube. Permite convertir enlaces de <strong>YouTube, TikTok, Instagram Reels, Facebook, Twitter/X, Pinterest y Reddit</strong> a archivos de audio <strong>MP3 (hasta 320 kbps)</strong> o video <strong>MP4</strong> sin marcas de agua, con soporte para streaming HTTP 206 y descarga física directa.
+        </p>
+
+        <!-- Subsesión 7.1 -->
+        <article id="sub-media-platforms" class="docs-subsection">
+          <h3>7.1 Detección de Plataformas &amp; Extracción de Metadatos</h3>
+          <p>
+            El endpoint <code>POST /api/media/info</code> analiza cualquier URL, detecta el servicio de procedencia, valida el identificador y extrae título, autor, duración, miniatura en alta resolución y las opciones de bitrate disponibles.
+          </p>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 18px;">Petición cURL para Inspeccionar Enlace</h4>
+          <div class="code-box-header">
+            <span>cURL - POST /api/media/info</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-curl-media-info')">Copiar</button>
+          </div>
+          <pre class="code-panel" id="code-curl-media-info">curl -X POST https://cloudtranslator.onrender.com/api/media/info \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw"
+  }'</pre>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 18px;">Respuesta JSON</h4>
+          <pre class="code-panel">{
+  "status": "success",
+  "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+  "platform": "YouTube",
+  "platformId": "youtube",
+  "title": "Me at the zoo",
+  "author": "jawed",
+  "duration": "00:19",
+  "thumbnail": "https://i.ytimg.com/vi/jNQXAC9IVRw/hqdefault.jpg",
+  "formats": [
+    {
+      "type": "mp3",
+      "extension": "mp3",
+      "qualities": ["320k", "192k", "128k"]
+    },
+    {
+      "type": "mp4",
+      "extension": "mp4",
+      "qualities": ["1080p", "720p", "480p", "360p"]
+    }
+  ]
+}</pre>
+        </article>
+
+        <!-- Subsesión 7.2 -->
+        <article id="sub-media-convert" class="docs-subsection">
+          <h3>7.2 Conversión a MP3 / MP4, Streaming y Descarga</h3>
+          <p>
+            El endpoint <code>POST /api/media/convert</code> procesa el enlace con el formato solicitado (<code>"mp3"</code> o <code>"mp4"</code>) y la calidad deseada (<code>"320k"</code>, <code>"192k"</code>, <code>"1080p"</code>, etc.). Retorna tokens seguros para streaming en tiempo real y descarga física.
+          </p>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 18px;">Petición en JavaScript (Fetch)</h4>
+          <div class="code-box-header">
+            <span>JavaScript - Conversión y Reproducción</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-js-media-convert')">Copiar</button>
+          </div>
+          <pre class="code-panel" id="code-js-media-convert">async function convertirVideo(enlaceVideo, formato = "mp3", calidad = "320k") {
+  const res = await fetch("https://cloudtranslator.onrender.com/api/media/convert", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      url: enlaceVideo,
+      format: formato,
+      quality: calidad
+    })
+  });
+
+  const data = await res.json();
+  console.log("Título:", data.title);
+  console.log("Tamaño:", data.sizeFormatted);
+
+  // Reproducir en navegador sin esperar la descarga completa
+  if (data.format === "mp3") {
+    const audio = new Audio(data.streamUrl);
+    audio.play();
+  }
+
+  // Enlace físico directo para descargar el archivo
+  window.location.href = data.downloadUrl;
+}</pre>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 18px;">Conversión por Lotes (POST /api/media/batch)</h4>
+          <pre class="code-panel">curl -X POST https://cloudtranslator.onrender.com/api/media/batch \
+  -H "Content-Type: application/json" \
+  -d '{
+    "urls": [
+      "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+      "https://www.tiktok.com/@tiktok/video/7106594312292453678"
+    ],
+    "format": "mp3",
+    "quality": "320k"
+  }'</pre>
+        </article>
+      </section>
+
     </main>
   </div>
 
@@ -905,7 +1028,7 @@ clonarVozEnServidor();</pre>
           <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="22" height="22">
           CloudTranslator
         </h4>
-        <p>Ecosistema cloud de procesamiento lingüístico y síntesis vocal de alto rendimiento: traducción neuronal distribuida, Texto a Voz (TTS) y Clonación de Voz por Inteligencia Artificial.</p>
+        <p>Ecosistema cloud de procesamiento lingüístico y multimedia de alto rendimiento: traducción neuronal distribuida, Texto a Voz (TTS), Clonación de Voz por IA y Conversor Universal a MP3/MP4.</p>
         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
           Microservicio libre en Render • <span class="badge badge-online">ONLINE</span>
         </p>
@@ -918,6 +1041,7 @@ clonarVozEnServidor();</pre>
           <li><a href="/translator">Traductor en la Nube</a></li>
           <li><a href="/tts">Texto a Voz (TTS)</a></li>
           <li><a href="/voice-clone">Clonación de Voz IA</a></li>
+          <li><a href="/converter">Conversor MP3 / MP4</a></li>
         </ul>
       </div>
 

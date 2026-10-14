@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Conversor Universal de Video y Audio de CloudTranslator | Convierte enlaces de YouTube, TikTok, Instagram, Facebook y Twitter a MP3 y MP4 de alta calidad.">
+  <meta property="og:title" content="Conversor Multimedia (MP3 / MP4) - CloudTranslator">
+  <meta property="og:description" content="Pega cualquier enlace de YouTube, TikTok, Instagram y conviértelo al instante a MP3 o MP4 sin marcas de agua.">
+  <title>Conversor Multimedia (MP3 / MP4) - CloudTranslator</title>
+  <link rel="icon" type="image/png" sizes="192x192" href="/img/logo.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/img/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/logo.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <script>
+    (function(){try{var m=document.cookie.match(/(?:^|; )cloud_translator_lang=([^;]*)/);var l=m?decodeURIComponent(m[1]):null;if(l&&l!=="original"&&l!=="es"){document.documentElement.classList.add("ct-pending");setTimeout(function(){document.documentElement.classList.remove("ct-pending");},800);}}catch(e){}})();
+  </script>
+  <script src="/js/spa-router.js" defer></script>
+  <script src="/components/components.js" defer></script>
+</head>
+<body>
+
+  <!-- Barra Superior -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <a href="/" class="brand-wrapper">
+        <span class="brand-logo">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="38" height="38">
+          CloudTranslator
+        </span>
+        <span class="brand-badge">v2.5.0</span>
+      </a>
+
+      <nav class="desktop-nav">
+        <ul class="main-menu">
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/docs">Documentación</a></li>
+          <li><a href="/support">Soporte</a></li>
+          <li><a href="/status">Estado</a></li>
+        </ul>
+      </nav>
+
+      <!-- Barra de Herramientas de Traducción Activa -->
+      <div class="toolbar-controls no-translate" data-no-translate>
+        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+          English
+        </button>
+
+        <div class="selector-box">
+          <div class="selector-dropdown">
+            <select id="select-lang" aria-label="Seleccionar idioma">
+              <option value="en">English (en)</option>
+              <option value="es">Español (es)</option>
+              <option value="fr">Français (fr)</option>
+              <option value="de">Deutsch (de)</option>
+              <option value="it">Italiano (it)</option>
+              <option value="pt">Portugués (pt)</option>
+              <option value="ja">日本語 (ja)</option>
+              <option value="zh-CN">中文 (zh-CN)</option>
+              <option value="ru">Русский (ru)</option>
+            </select>
+          </div>
+          <div class="custom-lang-group">
+            <input type="text" id="input-custom-lang" placeholder="ISO" maxlength="5" title="Código ISO personalizado">
+            <button id="btn-translate-custom" class="btn btn-primary" title="Traducir">GO</button>
+          </div>
+        </div>
+
+        <button id="btn-restore" class="btn btn-outline" title="Restaurar idioma original">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+          Original
+        </button>
+
+        <div id="status-pill" class="status-pill" title="Estado del microservicio">
+          <span class="spinner"></span>
+          <span id="status-text">LISTO</span>
+        </div>
+      </div>
+
+      <!-- Botón Hamburguesa Móvil -->
+      <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Abrir Menú de Navegación">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+
+    <!-- Backdrop para Barra Lateral -->
+    <div id="drawer-backdrop"></div>
+
+    <!-- Barra de Navegación Lateral Móvil -->
+    <aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
+      <div class="drawer-header">
+        <a href="/" class="drawer-brand">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
+          <span>CloudTranslator</span>
+        </a>
+        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+
+      <div class="drawer-body">
+        <div class="drawer-section">
+          <span class="drawer-title">NAVEGACIÓN DEL PORTAL</span>
+          <ul class="drawer-menu">
+            <li><a href="/"><svg class="icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Inicio</a></li>
+            <li><a href="/docs"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Documentación</a></li>
+            <li><a href="/support"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Soporte</a></li>
+            <li><a href="/status"><svg class="icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Estado Servidor</a></li>
+          </ul>
+        </div>
+
+        <div class="drawer-section">
+          <span class="drawer-title">LOS 4 PILARES</span>
+          <ul class="drawer-menu">
+            <li><a href="/translator"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traductor en la Nube</a></li>
+            <li><a href="/tts"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS)</a></li>
+            <li><a href="/voice-clone"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz (IA)</a></li>
+            <li><a href="/converter" class="active"><svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="8" cy="12" r="2"/></svg> Conversor Multimedia (MP3 / MP4)</a></li>
+            <li><a href="/donate"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+  </header>
+
+  <main class="full-container">
+
+    <!-- Hero de la Página -->
+    <section class="hero-full">
+      <div class="hero-split">
+        <div class="hero-split-content">
+          <span class="hero-tag-glow">PILAR 04 // CONVERSOR MULTIMEDIA UNIVERSAL</span>
+          <h1 style="font-size: clamp(2rem, 4.4vw, 3rem); font-weight: 800;">Conversor de Video a MP3 y MP4</h1>
+          <p class="lead">
+            Pega cualquier enlace de <strong>YouTube, TikTok, Instagram Reels, Facebook, Twitter/X, Pinterest</strong> o enlaces multimedia directos. Selecciona si deseas extraer el audio en <strong>MP3</strong> de alta definición o descargar el video completo en <strong>MP4</strong> sin marcas de agua.
+          </p>
+          <div class="hero-actions">
+            <a href="#converter-studio" class="btn btn-primary">Iniciar Conversión</a>
+            <a href="/api" class="btn btn-outline">Probar en API REST</a>
+            <a href="/docs#media-converter" class="btn btn-outline">Docs Técnicos</a>
+          </div>
+        </div>
+
+        <div class="hero-split-media">
+          <div class="hero-logo-wrapper">
+            <div class="hero-logo-glow" style="background: radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, rgba(0, 240, 255, 0.2) 60%, transparent 80%);"></div>
+            <img src="/img/logo.png" alt="CloudTranslator Media" class="hero-logo-big" width="290" height="290">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Estudio de Conversión Multimedia -->
+    <section id="converter-studio" class="content-box-card" style="border-color: rgba(0, 240, 255, 0.35); box-shadow: var(--shadow-lg);">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+        <div>
+          <span class="tech-card-tag">[ MEDIA_STUDIO // MP3_MP4_ENGINE ]</span>
+          <h2 style="margin: 6px 0 0;">Estudio de Descarga y Conversión</h2>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button id="btn-toggle-batch" class="btn btn-outline" style="font-size: 0.8rem; padding: 6px 12px;">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            Modo Lote (Múltiples Enlaces)
+          </button>
+          <button id="btn-paste-clipboard" class="btn btn-outline" style="font-size: 0.8rem; padding: 6px 12px;">
+            <svg class="icon" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+            Pegar Enlace
+          </button>
+        </div>
+      </div>
+
+      <!-- Selector de Plataformas -->
+      <div style="margin-bottom: 18px;">
+        <span style="display: block; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 8px;">PLATAFORMAS COMPATIBLES (DETECCIÓN AUTOMÁTICA)</span>
+        <div class="platform-chips-container" style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <span class="platform-chip active" data-platform="youtube" style="background: rgba(255, 0, 0, 0.15); border: 1px solid rgba(255, 0, 0, 0.4); color: #ff6b6b; padding: 6px 12px; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+            YouTube / Shorts
+          </span>
+          <span class="platform-chip" data-platform="tiktok" style="background: rgba(255, 0, 80, 0.15); border: 1px solid rgba(255, 0, 80, 0.4); color: #ff477e; padding: 6px 12px; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+            TikTok
+          </span>
+          <span class="platform-chip" data-platform="instagram" style="background: rgba(225, 48, 108, 0.15); border: 1px solid rgba(225, 48, 108, 0.4); color: #f77f00; padding: 6px 12px; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+            Instagram Reels
+          </span>
+          <span class="platform-chip" data-platform="facebook" style="background: rgba(24, 119, 242, 0.15); border: 1px solid rgba(24, 119, 242, 0.4); color: #4dabf7; padding: 6px 12px; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+            Facebook
+          </span>
+          <span class="platform-chip" data-platform="twitter" style="background: rgba(29, 161, 242, 0.15); border: 1px solid rgba(29, 161, 242, 0.4); color: #38bdf8; padding: 6px 12px; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+            Twitter / X
+          </span>
+          <span class="platform-chip" data-platform="pinterest" style="background: rgba(189, 8, 28, 0.15); border: 1px solid rgba(189, 8, 28, 0.4); color: #ff8787; padding: 6px 12px; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+            Pinterest
+          </span>
+          <span class="platform-chip" data-platform="direct" style="background: rgba(0, 240, 255, 0.15); border: 1px solid rgba(0, 240, 255, 0.4); color: var(--primary); padding: 6px 12px; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+            Enlace Directo
+          </span>
+        </div>
+      </div>
+
+      <!-- Entrada de Enlace Único -->
+      <div id="single-link-box" style="margin-bottom: 20px;">
+        <label for="input-video-url" style="display: block; font-size: 0.8rem; font-family: var(--font-mono); color: var(--text-secondary); margin-bottom: 8px;">ENLACE DEL VIDEO O CONTENIDO MULTIMEDIA</label>
+        <div style="position: relative;">
+          <input type="url" id="input-video-url" placeholder="Ejemplo: https://www.youtube.com/watch?v=... o https://www.tiktok.com/@..." value="https://www.youtube.com/watch?v=jNQXAC9IVRw" style="width: 100%; padding: 14px 44px 14px 16px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-card); border-radius: var(--radius-md); color: #ffffff; font-size: 0.95rem; outline: none; transition: all 0.2s ease;">
+          <button id="btn-clear-url" title="Limpiar enlace" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; display: flex; align-items: center;">
+            <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Entrada en Modo Lote (Oculta por defecto) -->
+      <div id="batch-link-box" style="display: none; margin-bottom: 20px;">
+        <label for="input-batch-urls" style="display: block; font-size: 0.8rem; font-family: var(--font-mono); color: var(--text-secondary); margin-bottom: 8px;">LISTA DE ENLACES (UNO POR LÍNEA, HASTA 10 ENLACES)</label>
+        <textarea id="input-batch-urls" rows="4" placeholder="https://www.youtube.com/watch?v=...&#10;https://www.tiktok.com/@...&#10;https://www.instagram.com/reel/..." style="width: 100%; padding: 12px 16px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-card); border-radius: var(--radius-md); color: #ffffff; font-size: 0.9rem; font-family: var(--font-mono); outline: none; resize: vertical;"></textarea>
+      </div>
+
+      <!-- Configuración de Formato y Calidad (Pestañas de Formato MP3 vs MP4) -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <!-- Selector de Formato -->
+        <div>
+          <span style="display: block; font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 8px;">SELECCIONA EL FORMATO DE SALIDA</span>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <button id="btn-format-mp3" class="btn btn-format-tab active" data-format="mp3" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: 1px solid var(--primary); background: rgba(0, 240, 255, 0.12); color: #ffffff; font-weight: 700; border-radius: var(--radius-md); cursor: pointer;">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              🎵 Audio MP3
+            </button>
+            <button id="btn-format-mp4" class="btn btn-format-tab" data-format="mp4" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: 1px solid var(--border-card); background: rgba(15, 17, 24, 0.8); color: var(--text-secondary); font-weight: 700; border-radius: var(--radius-md); cursor: pointer;">
+              <svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
+              🎬 Video MP4
+            </button>
+          </div>
+        </div>
+
+        <!-- Selector de Calidad -->
+        <div>
+          <span style="display: block; font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 8px;">CALIDAD Y TASA DE BITS</span>
+          <div class="select-wrapper">
+            <select id="select-quality" aria-label="Seleccionar Calidad" style="width: 100%; padding: 13px 16px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-card); border-radius: var(--radius-md); color: #ffffff; font-size: 0.9rem; outline: none;">
+              <!-- Se puebla dinámicamente según el formato -->
+              <option value="320k">320 kbps (Alta Fidelidad / Studio Master)</option>
+              <option value="192k">192 kbps (Estándar Recomendado)</option>
+              <option value="128k">128 kbps (Ahorro de Datos)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Acciones Principales -->
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;">
+        <button id="btn-convert" class="btn btn-primary" style="flex: 2; min-width: 200px; padding: 14px 24px; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+          <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span id="btn-convert-text">Convertir y Descargar</span>
+        </button>
+        <button id="btn-inspect" class="btn btn-outline" style="flex: 1; min-width: 150px; padding: 14px 18px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          Analizar Enlace
+        </button>
+      </div>
+
+      <!-- Barra de Progreso y Estado de Conversión -->
+      <div id="conversion-progress-box" style="display: none; margin-bottom: 20px; background: rgba(10, 12, 18, 0.8); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.85rem;">
+          <span id="progress-status-text" style="color: var(--primary); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+            <span class="spinner" style="display: inline-block; width: 14px; height: 14px;"></span>
+            Procesando conversión multimedia...
+          </span>
+          <span id="progress-percent" style="font-family: var(--font-mono); color: var(--text-white); font-weight: 700;">0%</span>
+        </div>
+        <div style="width: 100%; height: 8px; background: rgba(255, 255, 255, 0.08); border-radius: var(--radius-full); overflow: hidden;">
+          <div id="progress-bar-fill" style="width: 0%; height: 100%; background: var(--primary-gradient); transition: width 0.3s ease;"></div>
+        </div>
+      </div>
+
+      <!-- Tarjeta de Resultado con Vista Previa y Reproductor Integrado -->
+      <div id="result-card" style="display: none; background: rgba(15, 17, 24, 0.95); border: 1px solid rgba(0, 240, 255, 0.4); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-glow);">
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
+          <!-- Miniatura del Video -->
+          <div style="position: relative; width: 220px; max-width: 100%; aspect-ratio: 16/9; background: #000; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-card); flex-shrink: 0;">
+            <img id="res-thumbnail" src="/img/logo.png" alt="Miniatura de Video" style="width: 100%; height: 100%; object-fit: cover;">
+            <span id="res-platform-badge" style="position: absolute; top: 8px; left: 8px; background: rgba(0, 0, 0, 0.75); color: #ffffff; padding: 3px 8px; border-radius: var(--radius-xs); font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">YOUTUBE</span>
+            <span id="res-duration-badge" style="position: absolute; bottom: 8px; right: 8px; background: rgba(0, 0, 0, 0.85); color: #ffffff; padding: 2px 6px; border-radius: var(--radius-xs); font-size: 0.7rem; font-family: var(--font-mono);">00:00</span>
+          </div>
+
+          <!-- Información y Detalles -->
+          <div style="flex: 1; min-width: 250px;">
+            <span id="res-format-badge" class="brand-badge" style="background: rgba(0, 240, 255, 0.15); border-color: rgba(0, 240, 255, 0.4); color: var(--primary); margin-bottom: 8px; display: inline-block;">MP3 320 KBPS</span>
+            <h3 id="res-title" style="margin: 0 0 6px; font-size: 1.15rem; line-height: 1.4;">Título del Video</h3>
+            <p id="res-author" style="margin: 0 0 14px; font-size: 0.85rem; color: var(--text-muted);">Canal / Autor</p>
+
+            <div style="display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.8rem; font-family: var(--font-mono); color: var(--text-secondary); margin-bottom: 16px;">
+              <span>TAMAÑO: <strong id="res-size" style="color: #ffffff;">0 MB</strong></span>
+              <span>ESTADO: <strong style="color: #10b981;">COMPLETADO</strong></span>
+              <span>TTL EN CACHÉ: <strong style="color: var(--primary);">30 MIN</strong></span>
+            </div>
+
+            <!-- Reproductor Integrado para Audio MP3 -->
+            <div id="audio-player-wrapper" style="margin-bottom: 16px;">
+              <audio id="html5-audio-player" controls style="width: 100%; border-radius: var(--radius-md); outline: none; filter: invert(0.9) hue-rotate(180deg);"></audio>
+            </div>
+
+            <!-- Reproductor Integrado para Video MP4 -->
+            <div id="video-player-wrapper" style="display: none; margin-bottom: 16px; border-radius: var(--radius-md); overflow: hidden; max-height: 320px; background: #000;">
+              <video id="html5-video-player" controls style="width: 100%; height: auto; max-height: 320px; outline: none;"></video>
+            </div>
+
+            <!-- Acciones de Descarga y Compartir -->
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <a id="btn-download-file" href="#" class="btn btn-primary" download style="padding: 11px 20px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                Descargar Archivo Físico
+              </a>
+              <button id="btn-copy-stream" class="btn btn-outline" style="padding: 11px 16px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                <svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                Copiar Enlace Directo
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Especificaciones de Arquitectura del Pilar 04 -->
+    <section>
+      <div class="section-full-title">
+        <h2>Arquitectura Técnica del Conversor</h2>
+        <p>Procesamiento distribuido con streaming en tiempo real y soporte para múltiples plataformas.</p>
+      </div>
+
+      <div class="cards-full-grid">
+        <div class="tech-card">
+          <span class="tech-card-tag">[ 01 // NO_WATERMARK ]</span>
+          <div class="tech-card-icon">
+            <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <h3>Extracción Limpia Sin Marcas</h3>
+          <p>Los algoritmos de TikTok e Instagram filtran la marca de agua y los overlays para entregar el video limpio en resolución HD o extraer la pista sonora original en formato MP3 puro.</p>
+        </div>
+
+        <div class="tech-card">
+          <span class="tech-card-tag">[ 02 // RANGE_STREAMING ]</span>
+          <div class="tech-card-icon">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <h3>Streaming con Rango HTTP (206)</h3>
+          <p>El endpoint <code>/api/media/stream</code> soporta encabezados <code>Accept-Ranges: bytes</code>, lo que permite reproducir y avanzar (scrubbing) instantáneamente sin descargar el archivo completo.</p>
+        </div>
+
+        <div class="tech-card">
+          <span class="tech-card-tag">[ 03 // MULTI_PLATFORM ]</span>
+          <div class="tech-card-icon">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+          </div>
+          <h3>Ecosistema de Redes Sociales</h3>
+          <p>Detección inteligente de URL para YouTube, YouTube Shorts, TikTok, Instagram Reels, Facebook Watch, Twitter/X, Pinterest, Reddit y archivos multimedia con CDN público.</p>
+        </div>
+
+        <div class="tech-card">
+          <span class="tech-card-tag">[ 04 // REST_API_READY ]</span>
+          <div class="tech-card-icon">
+            <svg class="icon" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <h3>Endpoints API REST para Desarrolladores</h3>
+          <p>Integra el conversor en tus aplicaciones mediante <code>POST /api/media/convert</code>, <code>POST /api/media/info</code> y descargas directas mediante <code>GET /api/media/download</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Consola Interactiva para Desarrolladores (cURL & Fetch) -->
+    <section class="content-box-card">
+      <span class="tech-card-tag">[ DEVELOPER // API_INTEGRATION ]</span>
+      <h2>Integración en tus Proyectos</h2>
+      <p style="margin-bottom: 16px;">Ejemplo de petición REST para convertir enlaces a MP3 o MP4 desde cURL, JavaScript o Python:</p>
+
+      <div class="code-box-wrapper">
+        <div class="code-box-header">
+          <span>Petición cURL hacia /api/media/convert</span>
+          <button class="btn btn-outline" style="font-size: 0.75rem; padding: 4px 10px;" onclick="navigator.clipboard.writeText(document.getElementById('code-sample-media').innerText)">Copiar Código</button>
+        </div>
+        <pre class="code-panel" id="code-sample-media">curl -X POST https://cloudtranslator.onrender.com/api/media/convert \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+    "format": "mp3",
+    "quality": "320k"
+  }'</pre>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Pie de Página -->
+  <footer>
+    <div id="footer-placeholder"></div>
+  </footer>
+
+  <!-- Script del Conversor Multimedia -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Cargar Footer modular
+      if (window.CloudComponents && document.getElementById("footer-placeholder")) {
+        document.getElementById("footer-placeholder").innerHTML = window.CloudComponents.getFooterHTML("converter");
+      }
+
+      // Estado del Estudio
+      let selectedFormat = "mp3";
+      let isBatchMode = false;
+
+      const inputUrl = document.getElementById("input-video-url");
+      const btnClear = document.getElementById("btn-clear-url");
+      const btnPaste = document.getElementById("btn-paste-clipboard");
+      const btnToggleBatch = document.getElementById("btn-toggle-batch");
+      const singleBox = document.getElementById("single-link-box");
+      const batchBox = document.getElementById("batch-link-box");
+      const batchUrls = document.getElementById("input-batch-urls");
+
+      const btnFormatMp3 = document.getElementById("btn-format-mp3");
+      const btnFormatMp4 = document.getElementById("btn-format-mp4");
+      const selectQuality = document.getElementById("select-quality");
+
+      const btnConvert = document.getElementById("btn-convert");
+      const btnConvertText = document.getElementById("btn-convert-text");
+      const btnInspect = document.getElementById("btn-inspect");
+
+      const progressBox = document.getElementById("conversion-progress-box");
+      const progressStatus = document.getElementById("progress-status-text");
+      const progressPercent = document.getElementById("progress-percent");
+      const progressBar = document.getElementById("progress-bar-fill");
+
+      const resultCard = document.getElementById("result-card");
+      const resThumbnail = document.getElementById("res-thumbnail");
+      const resPlatform = document.getElementById("res-platform-badge");
+      const resDuration = document.getElementById("res-duration-badge");
+      const resFormat = document.getElementById("res-format-badge");
+      const resTitle = document.getElementById("res-title");
+      const resAuthor = document.getElementById("res-author");
+      const resSize = document.getElementById("res-size");
+      const btnDownload = document.getElementById("btn-download-file");
+      const btnCopyStream = document.getElementById("btn-copy-stream");
+
+      const audioWrapper = document.getElementById("audio-player-wrapper");
+      const audioPlayer = document.getElementById("html5-audio-player");
+      const videoWrapper = document.getElementById("video-player-wrapper");
+      const videoPlayer = document.getElementById("html5-video-player");
+
+      // Calidades según formato
+      const qualityOptions = {
+        mp3: [
+          { value: "320k", label: "320 kbps (Alta Fidelidad / Studio Master)" },
+          { value: "192k", label: "192 kbps (Estándar Recomendado)" },
+          { value: "128k", label: "128 kbps (Ahorro de Datos)" }
+        ],
+        mp4: [
+          { value: "1080p", label: "1080p Full HD (60fps)" },
+          { value: "720p", label: "720p HD Estándar" },
+          { value: "480p", label: "480p SD" },
+          { value: "360p", label: "360p Móvil" }
+        ]
+      };
+
+      function updateQualityOptions(fmt) {
+        selectQuality.innerHTML = "";
+        qualityOptions[fmt].forEach(opt => {
+          const el = document.createElement("option");
+          el.value = opt.value;
+          el.textContent = opt.label;
+          selectQuality.appendChild(el);
+        });
+      }
+
+      // Conmutar Pestaña de Formato
+      btnFormatMp3.addEventListener("click", () => {
+        selectedFormat = "mp3";
+        btnFormatMp3.classList.add("active");
+        btnFormatMp3.style.borderColor = "var(--primary)";
+        btnFormatMp3.style.background = "rgba(0, 240, 255, 0.12)";
+        btnFormatMp3.style.color = "#ffffff";
+
+        btnFormatMp4.classList.remove("active");
+        btnFormatMp4.style.borderColor = "var(--border-card)";
+        btnFormatMp4.style.background = "rgba(15, 17, 24, 0.8)";
+        btnFormatMp4.style.color = "var(--text-secondary)";
+
+        updateQualityOptions("mp3");
+      });
+
+      btnFormatMp4.addEventListener("click", () => {
+        selectedFormat = "mp4";
+        btnFormatMp4.classList.add("active");
+        btnFormatMp4.style.borderColor = "var(--primary)";
+        btnFormatMp4.style.background = "rgba(0, 240, 255, 0.12)";
+        btnFormatMp4.style.color = "#ffffff";
+
+        btnFormatMp3.classList.remove("active");
+        btnFormatMp3.style.borderColor = "var(--border-card)";
+        btnFormatMp3.style.background = "rgba(15, 17, 24, 0.8)";
+        btnFormatMp3.style.color = "var(--text-secondary)";
+
+        updateQualityOptions("mp4");
+      });
+
+      // Limpiar URL
+      btnClear.addEventListener("click", () => {
+        inputUrl.value = "";
+        inputUrl.focus();
+      });
+
+      // Pegar Enlace del Portapapeles
+      btnPaste.addEventListener("click", async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          if (text) {
+            inputUrl.value = text.trim();
+            runInspect();
+          }
+        } catch {
+          inputUrl.focus();
+        }
+      });
+
+      // Toggle Modo Lote
+      btnToggleBatch.addEventListener("click", () => {
+        isBatchMode = !isBatchMode;
+        if (isBatchMode) {
+          singleBox.style.display = "none";
+          batchBox.style.display = "block";
+          btnToggleBatch.textContent = "Modo Enlace Único";
+          btnConvertText.textContent = "Convertir Lote de Videos";
+        } else {
+          singleBox.style.display = "block";
+          batchBox.style.display = "none";
+          btnToggleBatch.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg> Modo Lote (Múltiples Enlaces)`;
+          btnConvertText.textContent = "Convertir y Descargar";
+        }
+      });
+
+      // Chips de Plataforma para demostración rápida
+      document.querySelectorAll(".platform-chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+          const plat = chip.getAttribute("data-platform");
+          const samples = {
+            youtube: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+            tiktok: "https://www.tiktok.com/@tiktok/video/7106594312292453678",
+            instagram: "https://www.instagram.com/reel/C8_example",
+            facebook: "https://www.facebook.com/watch/?v=123456789",
+            twitter: "https://x.com/OpenAI/status/123456789",
+            pinterest: "https://www.pinterest.com/pin/123456789/",
+            direct: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+          };
+          if (samples[plat]) {
+            inputUrl.value = samples[plat];
+            runInspect();
+          }
+        });
+      });
+
+      // Función: Analizar Enlace
+      async function runInspect() {
+        const url = inputUrl.value.trim();
+        if (!url) {
+          alert("Por favor introduce un enlace de video.");
+          return;
+        }
+
+        btnInspect.disabled = true;
+        btnInspect.textContent = "Analizando...";
+
+        try {
+          const res = await fetch("/api/media/info", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url })
+          });
+          const data = await res.json();
+
+          if (data.status === "success") {
+            resultCard.style.display = "block";
+            resTitle.textContent = data.title;
+            resAuthor.textContent = data.author || "Autor Desconocido";
+            resThumbnail.src = data.thumbnail || "/img/logo.png";
+            resPlatform.textContent = data.platform;
+            resDuration.textContent = data.duration || "00:00";
+            resFormat.textContent = `${selectedFormat.toUpperCase()} - ${selectQuality.value}`;
+            resSize.textContent = "Calculando...";
+            audioWrapper.style.display = "none";
+            videoWrapper.style.display = "none";
+            btnDownload.style.display = "none";
+          } else {
+            alert(data.error || "No se pudieron obtener detalles del video.");
+          }
+        } catch (err) {
+          alert("Error de red al analizar: " + err.message);
+        } finally {
+          btnInspect.disabled = false;
+          btnInspect.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Analizar Enlace`;
+        }
+      }
+
+      btnInspect.addEventListener("click", runInspect);
+
+      // Función: Convertir y Descargar
+      btnConvert.addEventListener("click", async () => {
+        const quality = selectQuality.value;
+
+        if (isBatchMode) {
+          const rawLines = batchUrls.value.trim().split("\n").map(l => l.trim()).filter(Boolean);
+          if (rawLines.length === 0) {
+            alert("Introduce al menos un enlace en el modo lote.");
+            return;
+          }
+
+          progressBox.style.display = "block";
+          progressBar.style.width = "40%";
+          progressPercent.textContent = "40%";
+          progressStatus.innerHTML = `<span class="spinner"></span> Procesando lote de ${rawLines.length} enlaces...`;
+
+          try {
+            const res = await fetch("/api/media/batch", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ urls: rawLines, format: selectedFormat, quality })
+            });
+            const data = await res.json();
+            progressBar.style.width = "100%";
+            progressPercent.textContent = "100%";
+
+            if (data.status === "success" && data.items && data.items.length > 0) {
+              const firstSuccess = data.items.find(i => i.status === "success") || data.items[0];
+              displayResult(firstSuccess);
+              progressStatus.textContent = `¡Lote completado! ${data.items.length} videos procesados.`;
+            } else {
+              alert(data.error || "Error al procesar el lote.");
+            }
+          } catch (err) {
+            alert("Error en proceso por lotes: " + err.message);
+          }
+          return;
+        }
+
+        const url = inputUrl.value.trim();
+        if (!url) {
+          alert("Por favor introduce un enlace de video.");
+          return;
+        }
+
+        btnConvert.disabled = true;
+        progressBox.style.display = "block";
+        progressBar.style.width = "25%";
+        progressPercent.textContent = "25%";
+        progressStatus.innerHTML = `<span class="spinner"></span> Analizando protocolo y extrayendo stream...`;
+
+        try {
+          setTimeout(() => {
+            if (progressBar.style.width === "25%") {
+              progressBar.style.width = "65%";
+              progressPercent.textContent = "65%";
+              progressStatus.innerHTML = `<span class="spinner"></span> Transcodificando a ${selectedFormat.toUpperCase()} (${quality})...`;
+            }
+          }, 600);
+
+          const res = await fetch("/api/media/convert", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url, format: selectedFormat, quality })
+          });
+          const data = await res.json();
+
+          progressBar.style.width = "100%";
+          progressPercent.textContent = "100%";
+
+          if (data.status === "success") {
+            progressStatus.textContent = "¡Conversión exitosa!";
+            displayResult(data);
+          } else {
+            alert(data.error || "Error en la conversión del video.");
+          }
+        } catch (err) {
+          alert("Error de red: " + err.message);
+        } finally {
+          btnConvert.disabled = false;
+        }
+      });
+
+      function displayResult(item) {
+        resultCard.style.display = "block";
+        resTitle.textContent = item.title;
+        resAuthor.textContent = item.author || "Autor";
+        resThumbnail.src = item.thumbnail || "/img/logo.png";
+        resPlatform.textContent = item.platform || "MEDIA";
+        resDuration.textContent = item.duration || "00:00";
+        resFormat.textContent = `${item.format.toUpperCase()} ${item.quality.toUpperCase()}`;
+        resSize.textContent = item.sizeFormatted || "4.5 MB";
+
+        btnDownload.style.display = "inline-flex";
+        btnDownload.href = item.downloadUrl;
+        btnDownload.setAttribute("download", item.filename || `media.${item.format}`);
+
+        btnCopyStream.onclick = () => {
+          navigator.clipboard.writeText(window.location.origin + item.streamUrl);
+          alert("Enlace copiado al portapapeles.");
+        };
+
+        if (item.format === "mp4") {
+          audioWrapper.style.display = "none";
+          videoWrapper.style.display = "block";
+          videoPlayer.src = item.streamUrl;
+        } else {
+          videoWrapper.style.display = "none";
+          audioWrapper.style.display = "block";
+          audioPlayer.src = item.streamUrl;
+        }
+
+        resultCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    });
+  </script>
+</body>
+</html>

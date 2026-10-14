@@ -243,6 +243,13 @@ exports.getHealth = (req, res) => {
     success: true,
     status: "ok",
     uptime: Math.floor(process.uptime()),
+    pillars: 4,
+    services: {
+      translator: { name: "Traducción en la Nube", status: "online" },
+      tts: { name: "Texto a Voz Neuronal", status: "online" },
+      voiceClone: { name: "Clonación de Voz IA", status: "online" },
+      mediaConverter: { name: "Conversor Multimedia (MP3 / MP4)", status: "online" }
+    },
     cache: {
       entries: serverTranslationCache.size,
       maxEntries: MAX_SERVER_CACHE_ENTRIES,

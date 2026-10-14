@@ -56,11 +56,23 @@ app.get("/", (req, res) => {
   res.json({
     service: "CloudTranslator API",
     status: "online",
+    pillars: [
+      "1. Traductor en la Nube (+200 idiomas por lotes)",
+      "2. Texto a Voz Neuronal (TTS Studio)",
+      "3. Clonación de Voz por Inteligencia Artificial",
+      "4. Conversor Multimedia Universal (YouTube, TikTok, Instagram a MP3 / MP4)"
+    ],
     documentation: "https://cloudtranslator.onrender.com/docs",
     endpoints: {
       translate: "POST /api/translate",
       tts: "POST /api/tts",
       voiceClone: "POST /api/voice-clone",
+      mediaInfo: "POST /api/media/info",
+      mediaConvert: "POST /api/media/convert",
+      mediaBatch: "POST /api/media/batch",
+      mediaStream: "GET /api/media/stream",
+      mediaDownload: "GET /api/media/download",
+      mediaPlatforms: "GET /api/media/platforms",
       languages: "GET /api/languages",
       health: "GET /api/health",
       ping: "GET /api/ping"
@@ -76,11 +88,23 @@ app.get("/api", (req, res, next) => {
   res.json({
     service: "CloudTranslator API REST",
     status: "online",
+    pillars: [
+      "1. Traductor en la Nube (+200 idiomas por lotes)",
+      "2. Texto a Voz Neuronal (TTS Studio)",
+      "3. Clonación de Voz por Inteligencia Artificial",
+      "4. Conversor Multimedia Universal (YouTube, TikTok, Instagram a MP3 / MP4)"
+    ],
     documentation: "https://cloudtranslator.onrender.com/api",
     endpoints: {
       translate: "POST /api/translate",
       tts: "POST /api/tts",
       voiceClone: "POST /api/voice-clone",
+      mediaInfo: "POST /api/media/info",
+      mediaConvert: "POST /api/media/convert",
+      mediaBatch: "POST /api/media/batch",
+      mediaStream: "GET /api/media/stream",
+      mediaDownload: "GET /api/media/download",
+      mediaPlatforms: "GET /api/media/platforms",
       languages: "GET /api/languages",
       health: "GET /api/health",
       ping: "GET /api/ping"
@@ -96,6 +120,8 @@ const pageRoutes = [
   { path: "/translator", file: "translator.html" },
   { path: "/tts", file: "tts.html" },
   { path: "/voice-clone", file: "voice-clone.html" },
+  { path: "/converter", file: "converter.html" },
+  { path: "/media", file: "converter.html" },
   { path: "/donate", file: "donate.html" },
   { path: "/docs", file: "docs.html" },
   { path: "/learn", file: "learn.html" },
@@ -132,3 +158,5 @@ const server = app.listen(PORT, () => {
 
 server.keepAliveTimeout = 65000; // Supera el timeout de 60s del reverse proxy de Render
 server.headersTimeout = 66000;
+
+module.exports = { app, server };

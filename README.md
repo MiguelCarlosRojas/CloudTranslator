@@ -1,4 +1,4 @@
-# CloudTranslator - Ecosistema Lingüístico y Acústico Multimodal
+# CloudTranslator - Ecosistema Lingüístico, Acústico y Multimedia Multimodal
 
 [![Version](https://img.shields.io/badge/version-2.5.0-blue.svg)](package.json)
 [![Render Deployment](https://img.shields.io/badge/deployment-Render%20Live-22c55e.svg)](https://cloudtranslator.onrender.com)
@@ -12,13 +12,13 @@
 ## Metadatos del Repositorio de GitHub
 
 > **Description:**  
-> Microservicio y API REST de alto rendimiento en Node.js y Express para traducción en la nube por lotes (+200 idiomas), con persistencia por cookies, soporte CORS universal y desplegado en Render.
+> Microservicio y API REST de alto rendimiento en Node.js y Express para traducción en la nube por lotes, TTS neuronal, clonación vocal IA y conversor universal MP3/MP4, desplegado en Render.
 >
 > **Website:**  
 > `https://cloudtranslator.onrender.com`
 >
 > **Topics:**  
-> `api`, `cloud-translator`, `express`, `google-translate`, `javascript`, `microservice`, `nodejs`, `render`, `rest-api`, `translation`
+> `api`, `cloud-translator`, `express`, `google-translate`, `javascript`, `microservice`, `mp3-converter`, `mp4-downloader`, `nodejs`, `render`, `rest-api`, `text-to-speech`, `translation`, `voice-cloning`
 
 ---
 
@@ -28,6 +28,7 @@ El microservicio se ejecuta de forma continua y autónoma en **Render**:
 
 * **URL Oficial del Servicio:** [https://cloudtranslator.onrender.com](https://cloudtranslator.onrender.com)
 * **Endpoint de Traducción:** `https://cloudtranslator.onrender.com/api/translate`
+* **Conversor MP3 / MP4:** `https://cloudtranslator.onrender.com/api/media/convert`
 * **Ping Ultrarrápido (Keep-Alive):** `https://cloudtranslator.onrender.com/api/ping`
 * **Health Check & Monitoreo:** `https://cloudtranslator.onrender.com/api/health`
 * **Idiomas Disponibles (+200):** `https://cloudtranslator.onrender.com/api/languages`
@@ -41,22 +42,26 @@ El microservicio se ejecuta de forma continua y autónoma en **Render**:
 
 ---
 
-## Las 3 Capacidades Principales (Pilares Funcionales)
+## Los 4 Pilares Funcionales del Ecosistema
 
-CloudTranslator integra 3 soluciones lingüísticas de última generación en una arquitectura modular con páginas dedicadas:
+CloudTranslator integra 4 soluciones tecnológicas avanzadas en una arquitectura unificada con consolas interactivas dedicadas:
 
 1. **[Traductor en la Nube](/translator):**  
-   * Traducción por lotes de alta velocidad (+200 idiomas) con una sola petición consolidada.
+   * Traducción por lotes de alta velocidad (+200 idiomas) con una sola petición HTTP consolidada.
    * Extracción inteligente del DOM con `TreeWalker` respetando atributos, tags no traducibles y metadatos (`document.title`, `<meta name="description">`).
-   * Persistencia estricta en cookies (`cloud_translator_lang`).
+   * Persistencia estricta en cookies técnicas (`cloud_translator_lang`).
 2. **[Texto a Voz (TTS Studio)](/tts):**  
-   * Síntesis vocal multilingüe en tiempo real con descarga física de audio en formato `.wav`.
-   * Selección de voces del sistema operativo / navegador, calibración de velocidad (rate) y tono (pitch).
-   * Ecualizador visual animado por ondas de frecuencia.
+   * Síntesis vocal multilingüe en tiempo real con descarga física de audio en formato `.wav` o `.mp3`.
+   * Selección de voces del sistema operativo / navegador, calibración de velocidad (*rate*) y tono (*pitch*).
+   * Ecualizador visual animado por ondas de frecuencia y catálogo de 24 voces neuronales backend.
 3. **[Clonación de Voz con IA (Voice Cloning Studio)](/voice-clone):**  
-   * Grabación directa con micrófono del usuario (`getUserMedia`) o carga de muestras de audio (`.wav`, `.mp3`, `.ogg`, `.m4a`).
+   * Grabación directa con micrófono del usuario (`getUserMedia`) o carga de archivos de audio (`.wav`, `.mp3`, `.ogg`, `.m4a`).
    * Extracción de frecuencia fundamental (F0), botón de eliminar muestra grabada con confirmación y reproducción previa.
-   * Generación y descarga real de archivos de audio sintetizado `.wav` en PCM 16-bit.
+   * Generación y descarga real de archivos de audio sintetizado `.wav` en PCM 16-bit y `.mp3` de alta fidelidad.
+4. **[Conversor Multimedia Universal (MP3 / MP4 Studio)](/converter):**  
+   * Conversión y descarga de audio y video desde **YouTube, TikTok, Instagram Reels, Facebook, Twitter/X, Pinterest** y URLs directas.
+   * Selector dinámico entre **Audio MP3** (320kbps, 256kbps, 192kbps, 128kbps) y **Video MP4** (1080p Full HD, 720p HD, 480p, 360p) sin marcas de agua.
+   * Procesamiento en modo individual o en lote (hasta 10 enlaces simultáneos), con streaming directo y descarga binaria forzada.
 
 ---
 
@@ -380,19 +385,101 @@ curl -X POST https://cloudtranslator.onrender.com/api/translate \
 * **Streaming directo:** `GET /api/voice-clone/stream?id=<audioId>`
 * **Descarga directa:** `GET /api/voice-clone/download?id=<audioId>` (descarga `voz-clonada-cloudtranslator.mp3`).
 
+### 11. `POST /api/media/convert` (Conversión de Video a MP3 / MP4)
+* **URL:** `https://cloudtranslator.onrender.com/api/media/convert`
+* **Headers:** `Content-Type: application/json`
+* **Body:**
+  ```json
+  {
+    "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+    "format": "mp3",
+    "quality": "320kbps"
+  }
+  ```
+* **Respuesta (200 OK):**
+  ```json
+  {
+    "status": "success",
+    "service": "CloudTranslator Media Engine v1.0",
+    "platform": "youtube",
+    "format": "mp3",
+    "quality": "320kbps",
+    "title": "Audio de alta calidad (320kbps) extraído de YouTube",
+    "author": "CloudTranslator Media Engine",
+    "duration": "03:45",
+    "size": "8.5 MB",
+    "mediaId": "media_3f29b1",
+    "streamUrl": "/api/media/stream?id=media_3f29b1",
+    "downloadUrl": "/api/media/download?id=media_3f29b1",
+    "directDownloadUrl": "https://rr3---sn-...",
+    "sourceUrl": "https://www.youtube.com/watch?v=jNQXAC9IVRw"
+  }
+  ```
+
+### 12. `POST /api/media/batch` (Conversión Múltiple por Lote)
+* **URL:** `https://cloudtranslator.onrender.com/api/media/batch`
+* **Headers:** `Content-Type: application/json`
+* **Body:**
+  ```json
+  {
+    "urls": [
+      "https://www.youtube.com/watch?v=example1",
+      "https://www.tiktok.com/@user/video/example2"
+    ],
+    "format": "mp4",
+    "quality": "1080p"
+  }
+  ```
+* **Respuesta (200 OK):**
+  ```json
+  {
+    "status": "success",
+    "service": "CloudTranslator Media Engine v1.0",
+    "total": 2,
+    "format": "mp4",
+    "quality": "1080p",
+    "results": [ ... ]
+  }
+  ```
+
+### 13. `GET /api/media/platforms` (Catálogo de Plataformas y Formatos)
+* **URL:** `https://cloudtranslator.onrender.com/api/media/platforms`
+* **Respuesta (200 OK):**
+  ```json
+  {
+    "status": "success",
+    "platforms": [
+      { "id": "youtube", "name": "YouTube & Shorts", "formats": ["mp3", "mp4"] },
+      { "id": "tiktok", "name": "TikTok", "formats": ["mp3", "mp4"] },
+      { "id": "instagram", "name": "Instagram Reels", "formats": ["mp3", "mp4"] },
+      { "id": "facebook", "name": "Facebook Video", "formats": ["mp3", "mp4"] },
+      { "id": "twitter", "name": "Twitter / X", "formats": ["mp3", "mp4"] },
+      { "id": "pinterest", "name": "Pinterest Video", "formats": ["mp3", "mp4"] },
+      { "id": "direct", "name": "Direct Media Link", "formats": ["mp3", "mp4"] }
+    ],
+    "audioQualities": ["320kbps", "256kbps", "192kbps", "128kbps"],
+    "videoQualities": ["1080p", "720p", "480p", "360p"]
+  }
+  ```
+
+### 14. `GET /api/media/stream` y `GET /api/media/download`
+* **Streaming directo:** `GET /api/media/stream?id=<mediaId>`
+* **Descarga directa:** `GET /api/media/download?id=<mediaId>` (fuerza descarga de `media-cloudtranslator.mp3` o `.mp4`).
+
 ---
 
 ## Módulos Públicos del Portal Web
 
 CloudTranslator incluye un portal web interactivo responsive estructurado con páginas dedicadas:
 
-* **[Inicio / Landing Page](https://cloudtranslator.onrender.com/)**: Visión general, métricas del cluster, arquitectura en 6 pilares, demo interactiva y accesos directos.
+* **[Inicio / Landing Page](https://cloudtranslator.onrender.com/)**: Visión general, métricas del cluster, arquitectura en 4 pilares, demo interactiva y accesos directos.
 * **[Traductor en la Nube](https://cloudtranslator.onrender.com/translator)**: Página dedicada al Pilar 1 con consola en vivo, extracción por lotes del DOM y configuración de cookies.
 * **[Texto a Voz (TTS Studio)](https://cloudtranslator.onrender.com/tts)**: Página dedicada al Pilar 2 con síntesis vocal multilingüe, modulación de tono/velocidad, ecualizador en tiempo real y descarga de audio `.wav`.
 * **[Clonación de Voz IA](https://cloudtranslator.onrender.com/voice-clone)**: Página dedicada al Pilar 3 con grabación directa por micrófono, carga de archivos, análisis de pitch F0, reproductor de muestra con eliminación y descarga real de `.wav`.
+* **[Conversor Multimedia (MP3 / MP4)](https://cloudtranslator.onrender.com/converter)**: Página dedicada al Pilar 4 para conversión de YouTube, TikTok, Instagram, Twitter/X y enlaces directos a MP3 o MP4 sin marcas de agua.
 * **[Donaciones](https://cloudtranslator.onrender.com/donate)**: Página dedicada para apoyar el mantenimiento de servidores con PayPal y QR de Yape ampliable.
-* **[Documentación Técnica](https://cloudtranslator.onrender.com/docs)**: Arquitectura, flujo por lotes del DOM y preguntas frecuentes.
-* **[Referencia de API REST](https://cloudtranslator.onrender.com/api)**: Playground interactivo (`/api/translate`, `/api/tts`, `/api/voice-clone`, `/api/health`, `/api/languages`, `/api/ping`).
+* **[Documentación Técnica](https://cloudtranslator.onrender.com/docs)**: Arquitectura, flujo por lotes del DOM, especificación de los 4 pilares y preguntas frecuentes.
+* **[Referencia de API REST](https://cloudtranslator.onrender.com/api)**: Playground interactivo (`/api/translate`, `/api/tts`, `/api/voice-clone`, `/api/media/convert`, `/api/health`, `/api/languages`, `/api/ping`).
 * **[Aprender (Guías de Integración)](https://cloudtranslator.onrender.com/learn)**: Guías para React, Vue, Vanilla JS, microservicios y optimización de latencia.
 * **[Soporte Técnico](https://cloudtranslator.onrender.com/support)**: Canales de contacto y asistencia directa.
 * **[Centro de Ayuda](https://cloudtranslator.onrender.com/help)**: Solución de problemas comunes y códigos de error.
