@@ -314,14 +314,40 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
     throw new Error("La URL suministrada no pertenece a un servicio soportado ni es un enlace multimedia válido.");
   }
 
+  let defaultAuthor = "Desconocido";
+  let defaultTitle = "Video Multimedia";
+
+  if (platform.id === "tiktok") {
+    const uMatch = cleanUrl.match(/tiktok\.com\/@([a-zA-Z0-9_.-]+)/i);
+    defaultAuthor = uMatch ? `@${uMatch[1]}` : "@tiktok_creator";
+    defaultTitle = uMatch ? `TikTok de @${uMatch[1]}` : "TikTok Video";
+  } else if (platform.id === "instagram") {
+    const igMatch = cleanUrl.match(/instagram\.com\/(?:p|reel|reels|tv)\/([a-zA-Z0-9_-]+)/i);
+    defaultAuthor = "Instagram Creator";
+    defaultTitle = igMatch ? `Instagram Reel (${igMatch[1]})` : "Instagram Video";
+  } else if (platform.id === "twitter") {
+    const twMatch = cleanUrl.match(/(?:twitter\.com|x\.com)\/([a-zA-Z0-9_]+)\/status\/(\d+)/i);
+    defaultAuthor = twMatch ? `@${twMatch[1]}` : "X / Twitter Creator";
+    defaultTitle = twMatch ? `X (Twitter) Video de @${twMatch[1]}` : "Twitter / X Video";
+  } else if (platform.id === "facebook") {
+    defaultAuthor = "Facebook Watch";
+    defaultTitle = "Facebook Video";
+  } else if (platform.id === "pinterest") {
+    defaultAuthor = "Pinterest Creator";
+    defaultTitle = "Pinterest Pin";
+  } else if (platform.id === "reddit") {
+    defaultAuthor = "Reddit User";
+    defaultTitle = "Reddit Video";
+  }
+
   let info = {
     url: cleanUrl,
     platform: platform.name,
     platformId: platform.id,
     platformColor: platform.color,
     platformBadge: platform.badge,
-    title: "Video Multimedia",
-    author: "Desconocido",
+    title: defaultTitle,
+    author: defaultAuthor,
     duration: "00:00",
     durationSeconds: 0,
     thumbnail: "/img/logo.png",
@@ -365,6 +391,7 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
     if (videoId) {
       info.thumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
       info.title = `YouTube Video (${videoId})`;
+      info.author = "YouTube Creator";
 
       // 1.1 Obtener título y duración exacta desde Innertube (youtubei.js)
       try {
@@ -389,7 +416,7 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
       const ytRes = await btch.youtube(normalized);
       if (ytRes && ytRes.status) {
         if (ytRes.title && (!info.title || info.title.startsWith("YouTube Video"))) info.title = ytRes.title;
-        if (ytRes.author && info.author === "Desconocido") info.author = ytRes.author;
+        if (ytRes.author && (info.author === "Desconocido" || info.author === "YouTube Creator")) info.author = ytRes.author;
         if (ytRes.thumbnail) info.thumbnail = ytRes.thumbnail;
         info.mp4Url = ytRes.mp4 || null;
         info.mp3Url = ytRes.mp3 || ytRes.mp4 || null;
@@ -441,7 +468,8 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
         const d = tikRes.data.data;
         if (d.title) info.title = d.title.slice(0, 120);
         if (d.author?.nickname) info.author = d.author.nickname;
-        if (d.cover) info.thumbnail = d.cover;
+        else if (d.author?.unique_id) info.author = `@${d.author.unique_id}`;
+        if (d.cover || d.origin_cover) info.thumbnail = d.cover || d.origin_cover;
         if (typeof d.duration === "number" && d.duration > 0) {
           info.durationSeconds = d.duration;
           info.duration = formatDurationSeconds(d.duration);
@@ -462,6 +490,9 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
         if (dlData && dlData.data) {
           if (dlData.data.title) info.title = dlData.data.title;
           if (dlData.data.thumbnail) info.thumbnail = dlData.data.thumbnail;
+          if (dlData.data.author?.nickname || dlData.data.author?.name) {
+            info.author = dlData.data.author.nickname || dlData.data.author.name;
+          }
           info.mp4Url = dlData.data.download?.no_watermark || dlData.data.videoUrl || null;
           info.mp3Url = dlData.data.download?.music || info.mp4Url;
           info.directMediaUrl = requestedFormat === "mp4" ? (info.mp4Url || info.mp3Url) : (info.mp3Url || info.mp4Url);
@@ -498,6 +529,7 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
       if (dl && dl.data) {
         if (dl.data.title) info.title = dl.data.title;
         if (dl.data.thumbnail) info.thumbnail = dl.data.thumbnail;
+        if (dl.data.author) info.author = dl.data.author;
         const vUrl = dl.data.download?.no_watermark || dl.data.videoUrl;
         if (vUrl) {
           info.mp4Url = vUrl;
@@ -522,6 +554,7 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
             }
             if (media.thumbnail || media.thumb) info.thumbnail = media.thumbnail || media.thumb;
             if (media.title) info.title = media.title;
+            if (media.author) info.author = media.author;
           }
         }
       } catch (igErr) {
@@ -538,6 +571,7 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
       if (dl && dl.data) {
         if (dl.data.title) info.title = dl.data.title;
         if (dl.data.thumbnail) info.thumbnail = dl.data.thumbnail;
+        if (dl.data.author) info.author = dl.data.author;
         const vUrl = dl.data.download?.HD || dl.data.videoUrl;
         if (vUrl) {
           info.mp4Url = vUrl;
@@ -610,6 +644,22 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
     info.directMediaUrl = cleanUrl;
     info.mp4Url = cleanUrl;
     info.mp3Url = cleanUrl;
+  }
+
+  // Asegurar autor y título descriptivos (nunca "Desconocido")
+  if (!info.author || info.author === "Desconocido") {
+    info.author = defaultAuthor !== "Desconocido" ? defaultAuthor : platform.name;
+  }
+  if (!info.title || info.title === "Video Multimedia") {
+    info.title = defaultTitle;
+  }
+
+  // Si la miniatura es una URL remota externa (TikTok, Instagram, Twitter, etc.),
+  // enrutar a través de nuestro proxy para garantizar que nunca sea bloqueada por CORS o Referer
+  if (info.thumbnail && typeof info.thumbnail === "string" && info.thumbnail.startsWith("http")) {
+    if (!info.thumbnail.includes("i.ytimg.com") && !info.thumbnail.includes("/api/media/thumbnail-proxy")) {
+      info.thumbnail = `/api/media/thumbnail-proxy?url=${encodeURIComponent(info.thumbnail)}`;
+    }
   }
 
   return info;

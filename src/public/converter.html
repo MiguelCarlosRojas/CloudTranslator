@@ -247,13 +247,13 @@
       </div>
 
       <!-- Barra de Acciones Principales -->
-      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;">
-        <button id="btn-convert" class="btn btn-primary" style="flex: 2; min-width: 200px; padding: 14px 24px; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
-          <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+        <button id="btn-convert" class="btn btn-primary" style="flex: 1.5; min-width: 170px; padding: 10px 18px; font-weight: 600; font-size: 0.92rem; height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <svg class="icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           <span id="btn-convert-text">Convertir y Descargar</span>
         </button>
-        <button id="btn-inspect" class="btn btn-outline" style="flex: 1; min-width: 150px; padding: 14px 18px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;">
-          <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <button id="btn-inspect" class="btn btn-outline" style="flex: 1; min-width: 130px; padding: 10px 16px; font-weight: 600; font-size: 0.92rem; height: 42px; display: flex; align-items: center; justify-content: center; gap: 7px;">
+          <svg class="icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           Analizar Enlace
         </button>
       </div>
@@ -277,7 +277,7 @@
         <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
           <!-- Miniatura del Video -->
           <div style="position: relative; width: 220px; max-width: 100%; aspect-ratio: 16/9; background: #000; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-card); flex-shrink: 0;">
-            <img id="res-thumbnail" src="/img/logo.png" alt="Miniatura de Video" style="width: 100%; height: 100%; object-fit: cover;">
+            <img id="res-thumbnail" src="/img/logo.png" alt="Miniatura de Video" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='/img/logo.png';" style="width: 100%; height: 100%; object-fit: cover;">
             <span id="res-platform-badge" style="position: absolute; top: 8px; left: 8px; background: rgba(0, 0, 0, 0.75); color: #ffffff; padding: 3px 8px; border-radius: var(--radius-xs); font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">YOUTUBE</span>
             <span id="res-duration-badge" style="position: absolute; bottom: 8px; right: 8px; background: rgba(0, 0, 0, 0.85); color: #ffffff; padding: 2px 6px; border-radius: var(--radius-xs); font-size: 0.7rem; font-family: var(--font-mono);">00:00</span>
           </div>
@@ -468,8 +468,73 @@
         });
       }
 
-      // Conmutar Pestaña de Formato
+      // Detener y limpiar reproductores de medios
+      function stopMediaPlayback() {
+        if (audioPlayer) {
+          audioPlayer.pause();
+          audioPlayer.currentTime = 0;
+          audioPlayer.removeAttribute("src");
+          try { audioPlayer.load(); } catch {}
+        }
+        if (videoPlayer) {
+          videoPlayer.pause();
+          videoPlayer.currentTime = 0;
+          videoPlayer.removeAttribute("src");
+          try { videoPlayer.load(); } catch {}
+        }
+      }
+
+      // Ocultar resultado anterior y detener reproducción
+      function hidePreviousResult() {
+        resultCard.style.display = "none";
+        stopMediaPlayback();
+      }
+
+      // Deshabilitar / Habilitar todos los controles mientras se procesa
+      function setFormDisabled(disabled) {
+        inputUrl.disabled = disabled;
+        batchUrls.disabled = disabled;
+        btnClear.disabled = disabled;
+        btnPaste.disabled = disabled;
+        btnToggleBatch.disabled = disabled;
+        btnFormatMp3.disabled = disabled;
+        btnFormatMp4.disabled = disabled;
+        selectQuality.disabled = disabled;
+        btnConvert.disabled = disabled;
+        btnInspect.disabled = disabled;
+
+        const interactiveBtns = [
+          btnFormatMp3,
+          btnFormatMp4,
+          selectQuality,
+          btnConvert,
+          btnInspect,
+          btnClear,
+          btnPaste,
+          btnToggleBatch
+        ];
+
+        interactiveBtns.forEach(el => {
+          if (el) {
+            el.style.pointerEvents = disabled ? "none" : "auto";
+            el.style.opacity = disabled ? "0.55" : "1";
+            el.style.cursor = disabled ? "not-allowed" : "pointer";
+          }
+        });
+
+        if (inputUrl) {
+          inputUrl.style.opacity = disabled ? "0.6" : "1";
+          inputUrl.style.cursor = disabled ? "not-allowed" : "text";
+        }
+        if (batchUrls) {
+          batchUrls.style.opacity = disabled ? "0.6" : "1";
+          batchUrls.style.cursor = disabled ? "not-allowed" : "text";
+        }
+      }
+
+      // Conmutar Pestaña de Formato (detiene la reproducción previa)
       btnFormatMp3.addEventListener("click", () => {
+        stopMediaPlayback();
         selectedFormat = "mp3";
         btnFormatMp3.classList.add("active");
         btnFormatMp3.style.borderColor = "var(--primary)";
@@ -485,6 +550,7 @@
       });
 
       btnFormatMp4.addEventListener("click", () => {
+        stopMediaPlayback();
         selectedFormat = "mp4";
         btnFormatMp4.classList.add("active");
         btnFormatMp4.style.borderColor = "var(--primary)";
@@ -499,9 +565,15 @@
         updateQualityOptions("mp4");
       });
 
+      // Si el usuario edita o cambia la URL, ocultar el resultado previo y parar la reproducción
+      inputUrl.addEventListener("input", () => {
+        hidePreviousResult();
+      });
+
       // Limpiar URL
       btnClear.addEventListener("click", () => {
         inputUrl.value = "";
+        hidePreviousResult();
         inputUrl.focus();
       });
 
@@ -511,6 +583,7 @@
           const text = await navigator.clipboard.readText();
           if (text) {
             inputUrl.value = text.trim();
+            hidePreviousResult();
             runInspect();
           }
         } catch {
@@ -520,6 +593,7 @@
 
       // Toggle Modo Lote
       btnToggleBatch.addEventListener("click", () => {
+        hidePreviousResult();
         isBatchMode = !isBatchMode;
         if (isBatchMode) {
           singleBox.style.display = "none";
@@ -537,10 +611,11 @@
       // Chips de Plataforma para demostración rápida
       document.querySelectorAll(".platform-chip").forEach(chip => {
         chip.addEventListener("click", () => {
+          hidePreviousResult();
           const plat = chip.getAttribute("data-platform");
           const samples = {
             youtube: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
-            tiktok: "https://www.tiktok.com/@tiktok/video/7106594312292453678",
+            tiktok: "https://www.tiktok.com/@scout2015/video/6718335390845095173",
             instagram: "https://www.instagram.com/reel/C8_example",
             facebook: "https://www.facebook.com/watch/?v=123456789",
             twitter: "https://x.com/OpenAI/status/123456789",
@@ -562,7 +637,8 @@
           return;
         }
 
-        btnInspect.disabled = true;
+        hidePreviousResult();
+        setFormDisabled(true);
         btnInspect.textContent = "Analizando...";
 
         try {
@@ -576,7 +652,7 @@
           if (data.status === "success") {
             resultCard.style.display = "block";
             resTitle.textContent = data.title;
-            resAuthor.textContent = data.author || "Autor Desconocido";
+            resAuthor.textContent = data.author || "Autor";
             resThumbnail.src = data.thumbnail || "/img/logo.png";
             resPlatform.textContent = data.platform;
             resDuration.textContent = data.duration || "00:00";
@@ -591,8 +667,8 @@
         } catch (err) {
           alert("Error de red al analizar: " + err.message);
         } finally {
-          btnInspect.disabled = false;
-          btnInspect.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Analizar Enlace`;
+          setFormDisabled(false);
+          btnInspect.innerHTML = `<svg class="icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Analizar Enlace`;
         }
       }
 
@@ -609,6 +685,8 @@
             return;
           }
 
+          hidePreviousResult();
+          setFormDisabled(true);
           progressBox.style.display = "block";
           progressBar.style.width = "40%";
           progressPercent.textContent = "40%";
@@ -633,6 +711,8 @@
             }
           } catch (err) {
             alert("Error en proceso por lotes: " + err.message);
+          } finally {
+            setFormDisabled(false);
           }
           return;
         }
@@ -643,7 +723,8 @@
           return;
         }
 
-        btnConvert.disabled = true;
+        hidePreviousResult();
+        setFormDisabled(true);
         progressBox.style.display = "block";
         progressBar.style.width = "25%";
         progressPercent.textContent = "25%";
@@ -677,7 +758,7 @@
         } catch (err) {
           alert("Error de red: " + err.message);
         } finally {
-          btnConvert.disabled = false;
+          setFormDisabled(false);
         }
       });
 

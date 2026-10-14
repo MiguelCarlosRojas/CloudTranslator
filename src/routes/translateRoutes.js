@@ -209,6 +209,42 @@ router.post("/media/info", async (req, res) => {
   }
 });
 
+// Proxy de miniaturas multimedia para evitar bloqueos por CORS o Referer de TikTok/Instagram/Facebook
+router.get("/media/thumbnail-proxy", async (req, res) => {
+  const { url } = req.query;
+  if (!url || typeof url !== "string") {
+    return res.redirect("/img/logo.png");
+  }
+
+  try {
+    const targetUrl = req.query.url;
+    const reqHeaders = {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+      "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+    };
+
+    if (targetUrl.includes("tiktok") || targetUrl.includes("byteoversea") || targetUrl.includes("ibytedtos")) {
+      reqHeaders["Referer"] = "https://www.tiktok.com/";
+    } else if (targetUrl.includes("instagram") || targetUrl.includes("cdninstagram") || targetUrl.includes("fbcdn")) {
+      reqHeaders["Referer"] = "https://www.instagram.com/";
+    }
+
+    const imgRes = await axios.get(targetUrl, {
+      responseType: "stream",
+      headers: reqHeaders,
+      timeout: 9000
+    });
+
+    res.setHeader("Content-Type", imgRes.headers["content-type"] || "image/jpeg");
+    res.setHeader("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
+    imgRes.data.pipe(res);
+  } catch (err) {
+    logger.warn(`Fallback proxy de miniatura para ${url}: ${err.message}`);
+    res.redirect("/img/logo.png");
+  }
+});
+
+
 // Conversión a MP3 o MP4 con calidad seleccionada
 router.post("/media/convert", async (req, res) => {
   try {
