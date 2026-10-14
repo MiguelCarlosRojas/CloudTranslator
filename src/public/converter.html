@@ -696,18 +696,21 @@
         btnDownload.setAttribute("download", item.filename || `media.${item.format}`);
 
         btnCopyStream.onclick = () => {
-          navigator.clipboard.writeText(window.location.origin + item.streamUrl);
-          alert("Enlace copiado al portapapeles.");
+          const streamFull = item.directDownloadUrl || (window.location.origin + item.downloadUrl);
+          navigator.clipboard.writeText(streamFull);
+          alert("Enlace directo copiado al portapapeles.");
         };
 
         if (item.format === "mp4") {
           audioWrapper.style.display = "none";
           videoWrapper.style.display = "block";
           videoPlayer.src = item.streamUrl;
+          try { videoPlayer.load(); } catch {}
         } else {
           videoWrapper.style.display = "none";
           audioWrapper.style.display = "block";
           audioPlayer.src = item.streamUrl;
+          try { audioPlayer.load(); } catch {}
         }
 
         resultCard.scrollIntoView({ behavior: "smooth", block: "nearest" });

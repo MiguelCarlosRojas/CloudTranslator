@@ -5,6 +5,7 @@
  */
 
 const axios = require("axios");
+const btch = require("btch-downloader");
 const logger = require("./logger");
 
 // Almacén en RAM para sesiones de streaming y descargas de medios (TTL: 30 minutos)
@@ -22,6 +23,23 @@ const cleanupInterval = setInterval(() => {
 }, 10 * 60 * 1000);
 if (cleanupInterval.unref) {
   cleanupInterval.unref();
+}
+
+/**
+ * Normaliza enlaces de YouTube (shorts, youtu.be, m.youtube) a formato estándar
+ */
+function normalizeYouTubeUrl(url) {
+  if (!url || typeof url !== "string") return url;
+  let clean = url.trim();
+  const shortsMatch = clean.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/i);
+  if (shortsMatch) {
+    return `https://www.youtube.com/watch?v=${shortsMatch[1]}`;
+  }
+  const youtuMatch = clean.match(/youtu\.be\/([a-zA-Z0-9_-]+)/i);
+  if (youtuMatch) {
+    return `https://www.youtube.com/watch?v=${youtuMatch[1]}`;
+  }
+  return clean;
 }
 
 /**
@@ -215,7 +233,7 @@ function generateFallbackAudio(title, platform) {
 /**
  * Extrae metadatos y opciones de conversión de un enlace de video
  */
-async function extractMediaInfo(url) {
+async function extractMediaInfo(url, requestedFormat = "mp3") {
   if (!url || typeof url !== "string") {
     throw new Error("Debe proporcionar una URL válida de video.");
   }
@@ -264,20 +282,41 @@ async function extractMediaInfo(url) {
         ]
       }
     ],
+    mp4Url: null,
+    mp3Url: null,
     directMediaUrl: null
   };
 
-  // Estrategia 1: YouTube
+  // Estrategia 1: YouTube y YouTube Shorts
   if (platform.id === "youtube") {
-    const ytMatch = cleanUrl.match(platform.regex);
+    const normalized = normalizeYouTubeUrl(cleanUrl);
+    const ytMatch = normalized.match(/(?:v=|\/embed\/|\/watch\?v=|\/shorts\/)([a-zA-Z0-9_-]{11})/);
     const videoId = ytMatch ? ytMatch[1] : null;
 
     if (videoId) {
       info.thumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
       info.title = `YouTube Video (${videoId})`;
+    }
+
+    try {
+      const ytRes = await btch.youtube(normalized);
+      if (ytRes && ytRes.status) {
+        if (ytRes.title) info.title = ytRes.title;
+        if (ytRes.author) info.author = ytRes.author;
+        if (ytRes.thumbnail) info.thumbnail = ytRes.thumbnail;
+        info.mp4Url = ytRes.mp4 || null;
+        info.mp3Url = ytRes.mp3 || ytRes.mp4 || null;
+        info.directMediaUrl = requestedFormat === "mp4" ? (info.mp4Url || info.mp3Url) : (info.mp3Url || info.mp4Url);
+      }
+    } catch (err) {
+      logger.warn(`btch.youtube no disponible para ${normalized}: ${err.message}`);
+    }
+
+    // Complementar metadatos mediante oEmbed si es necesario
+    if (videoId && (!info.title || info.title.startsWith("YouTube Video"))) {
       try {
         const oembedRes = await axios.get(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`, {
-          timeout: 4500
+          timeout: 4000
         });
         if (oembedRes.data) {
           info.title = oembedRes.data.title || info.title;
@@ -286,39 +325,139 @@ async function extractMediaInfo(url) {
             info.thumbnail = oembedRes.data.thumbnail_url;
           }
         }
-      } catch (err) {
-        logger.warn(`oEmbed YouTube no disponible para ${videoId}: ${err.message}`);
-      }
+      } catch {}
     }
   }
 
-  // Estrategia 2: TikTok, Instagram, Twitter, Facebook vía Snapsave
-  if (["tiktok", "instagram", "facebook", "twitter"].includes(platform.id)) {
+  // Estrategia 2: TikTok (Vía TikWM API y fallback btch.ttdl)
+  else if (platform.id === "tiktok") {
     try {
-      const { snapsave } = await import("snapsave-media-downloader");
-      const snapResult = await snapsave(cleanUrl);
-      if (snapResult && snapResult.success && snapResult.data) {
-        if (snapResult.data.description) {
-          info.title = snapResult.data.description.slice(0, 100);
+      const tikRes = await axios.get(`https://www.tikwm.com/api/?url=${encodeURIComponent(cleanUrl)}`, {
+        timeout: 8000,
+        headers: { "User-Agent": "Mozilla/5.0" }
+      });
+      if (tikRes.data && tikRes.data.code === 0 && tikRes.data.data) {
+        const d = tikRes.data.data;
+        if (d.title) info.title = d.title.slice(0, 100);
+        if (d.author?.nickname) info.author = d.author.nickname;
+        if (d.cover) info.thumbnail = d.cover;
+        if (d.duration) {
+          const mins = Math.floor(d.duration / 60).toString().padStart(2, "0");
+          const secs = (d.duration % 60).toString().padStart(2, "0");
+          info.duration = `${mins}:${secs}`;
         }
-        if (snapResult.data.preview) {
-          info.thumbnail = snapResult.data.preview;
-        }
-        if (snapResult.data.media && snapResult.data.media.length > 0) {
-          info.directMediaUrl = snapResult.data.media[0].url;
-        }
+        info.mp4Url = d.play || d.hdplay || null;
+        info.mp3Url = d.music || d.play || null;
+        info.directMediaUrl = requestedFormat === "mp4" ? (info.mp4Url || info.mp3Url) : (info.mp3Url || info.mp4Url);
       }
-    } catch (snapErr) {
-      logger.warn(`Snapsave fallback para ${platform.name}: ${snapErr.message}`);
+    } catch (tikErr) {
+      logger.warn(`TikWM fallback para TikTok: ${tikErr.message}`);
+    }
+
+    if (!info.directMediaUrl) {
+      try {
+        const ttRes = await btch.ttdl(cleanUrl);
+        if (ttRes && ttRes.status) {
+          if (ttRes.title) info.title = ttRes.title;
+          if (ttRes.thumbnail) info.thumbnail = ttRes.thumbnail;
+          const v = Array.isArray(ttRes.video) ? ttRes.video[0] : ttRes.video;
+          const a = Array.isArray(ttRes.audio) ? ttRes.audio[0] : ttRes.audio;
+          info.mp4Url = v || null;
+          info.mp3Url = a || v || null;
+          info.directMediaUrl = requestedFormat === "mp4" ? (info.mp4Url || info.mp3Url) : (info.mp3Url || info.mp4Url);
+        }
+      } catch (ttErr) {
+        logger.warn(`btch.ttdl fallback fallo: ${ttErr.message}`);
+      }
     }
   }
 
-  // Estrategia 3: Enlace Directo
-  if (platform.id === "direct") {
+  // Estrategia 3: Instagram Reels y Posts
+  else if (platform.id === "instagram") {
+    try {
+      const igRes = await btch.igdl(cleanUrl);
+      if (igRes && igRes.status && igRes.result) {
+        const items = Array.isArray(igRes.result) ? igRes.result : [igRes.result];
+        const media = items[0];
+        if (media) {
+          const vUrl = media.url || media.video || media.download_url;
+          if (vUrl) {
+            info.mp4Url = vUrl;
+            info.mp3Url = vUrl;
+            info.directMediaUrl = vUrl;
+          }
+          if (media.thumbnail || media.thumb) info.thumbnail = media.thumbnail || media.thumb;
+          if (media.title) info.title = media.title;
+        }
+      }
+    } catch (igErr) {
+      logger.warn(`btch.igdl fallo para Instagram: ${igErr.message}`);
+    }
+  }
+
+  // Estrategia 4: Twitter / X
+  else if (platform.id === "twitter") {
+    try {
+      const twRes = await btch.twitter(cleanUrl);
+      if (twRes && twRes.status && twRes.url) {
+        const vUrl = Array.isArray(twRes.url) ? twRes.url[0]?.hd || twRes.url[0]?.sd || twRes.url[0] : twRes.url;
+        if (vUrl) {
+          info.mp4Url = vUrl;
+          info.mp3Url = vUrl;
+          info.directMediaUrl = vUrl;
+        }
+        if (twRes.title) info.title = twRes.title;
+        if (twRes.thumb) info.thumbnail = twRes.thumb;
+      }
+    } catch (twErr) {
+      logger.warn(`btch.twitter fallo para Twitter/X: ${twErr.message}`);
+    }
+  }
+
+  // Estrategia 5: Facebook Video
+  else if (platform.id === "facebook") {
+    try {
+      const fbRes = await btch.fbdown(cleanUrl);
+      if (fbRes && fbRes.status) {
+        const vUrl = fbRes.Normal_video || fbRes.HD || fbRes.video;
+        if (vUrl) {
+          info.mp4Url = vUrl;
+          info.mp3Url = vUrl;
+          info.directMediaUrl = vUrl;
+        }
+        if (fbRes.title) info.title = fbRes.title;
+      }
+    } catch (fbErr) {
+      logger.warn(`btch.fbdown fallo para Facebook: ${fbErr.message}`);
+    }
+  }
+
+  // Estrategia 6: Pinterest Video
+  else if (platform.id === "pinterest") {
+    try {
+      const pinRes = await btch.pinterest(cleanUrl);
+      if (pinRes && pinRes.status && pinRes.result) {
+        const vUrl = pinRes.result.url || pinRes.result.video;
+        if (vUrl) {
+          info.mp4Url = vUrl;
+          info.mp3Url = vUrl;
+          info.directMediaUrl = vUrl;
+        }
+        if (pinRes.result.title) info.title = pinRes.result.title;
+      }
+    } catch (pinErr) {
+      logger.warn(`btch.pinterest fallo para Pinterest: ${pinErr.message}`);
+    }
+  }
+
+  // Estrategia 7: Enlace Directo Multimedia
+  else if (platform.id === "direct" || /^https?:\/\/.+\.(mp4|webm|mov|mkv|mp3|wav|ogg|m4a|aac)(\?.*)?$/i.test(cleanUrl)) {
     const filenameMatch = cleanUrl.match(/\/([^\/?#]+)[^/]*$/);
     const rawFilename = filenameMatch ? filenameMatch[1] : "archivo-multimedia";
     info.title = decodeURIComponent(rawFilename);
     info.directMediaUrl = cleanUrl;
+    info.mp4Url = cleanUrl;
+    info.mp3Url = cleanUrl;
   }
 
   return info;
@@ -336,31 +475,44 @@ async function processConversion(options = {}) {
   }
 
   const selectedFormat = format.toLowerCase() === "mp4" ? "mp4" : "mp3";
-  const mediaInfo = await extractMediaInfo(url);
+  const mediaInfo = await extractMediaInfo(url, selectedFormat);
 
   const jobId = "media_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
   const cleanTitle = sanitizeFilename(mediaInfo.title, `${mediaInfo.platformId}-media`);
   const extension = selectedFormat;
-  const mimeType = selectedFormat === "mp4" ? "video/mp4" : "audio/mpeg";
+  let mimeType = selectedFormat === "mp4" ? "video/mp4" : "audio/mpeg";
   const downloadFilename = `CloudTranslator_${cleanTitle}.${extension}`;
 
   let mediaBuffer = null;
-  let remoteStreamUrl = mediaInfo.directMediaUrl;
+  let remoteStreamUrl = selectedFormat === "mp4"
+    ? (mediaInfo.mp4Url || mediaInfo.directMediaUrl)
+    : (mediaInfo.mp3Url || mediaInfo.directMediaUrl);
   let sizeBytes = 0;
 
-  // Intento de descarga / proxy de streaming directo si se resolvió una URL remota
+  // Intento de detección de tamaño real y MIME remoto vía HEAD request
   if (remoteStreamUrl) {
     try {
-      const headRes = await axios.head(remoteStreamUrl, { timeout: 4000 });
+      const headRes = await axios.head(remoteStreamUrl, {
+        timeout: 5000,
+        headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" }
+      });
       if (headRes.headers["content-length"]) {
         sizeBytes = parseInt(headRes.headers["content-length"], 10);
       }
+      if (headRes.headers["content-type"]) {
+        const ct = headRes.headers["content-type"].toLowerCase();
+        if (selectedFormat === "mp4" && (ct.includes("video") || ct.includes("mp4"))) {
+          mimeType = headRes.headers["content-type"];
+        } else if (selectedFormat === "mp3" && (ct.includes("audio") || ct.includes("mpeg") || ct.includes("webm"))) {
+          mimeType = headRes.headers["content-type"];
+        }
+      }
     } catch {
-      // Ignorar fallo en HEAD
+      // Si HEAD falla, continuamos con el stream URL directo
     }
   }
 
-  // Si no hay buffer directo remoto, generamos buffer de contingencia local de alta fidelidad
+  // Si no se obtuvo URL remota, generamos buffer local de contingencia
   if (!mediaBuffer && !remoteStreamUrl) {
     mediaBuffer = generateFallbackAudio(mediaInfo.title, mediaInfo.platform);
     sizeBytes = mediaBuffer.length;
@@ -380,14 +532,15 @@ async function processConversion(options = {}) {
     filename: downloadFilename,
     buffer: mediaBuffer,
     remoteUrl: remoteStreamUrl,
-    sizeBytes: sizeBytes || (mediaBuffer ? mediaBuffer.length : 4500000),
+    sizeBytes: sizeBytes || (mediaBuffer ? mediaBuffer.length : 15000000),
     thumbnail: mediaInfo.thumbnail,
     createdAt: Date.now()
   });
 
-  const baseUrl = ""; // Rutas relativas para compatibilidad con cualquier dominio/puerto
+  const baseUrl = ""; // Rutas relativas para compatibilidad universal
   const streamUrl = `${baseUrl}/api/media/stream?id=${jobId}`;
   const downloadUrl = `${baseUrl}/api/media/download?id=${jobId}`;
+  const calculatedSize = sizeBytes || (mediaBuffer ? mediaBuffer.length : 15000000);
 
   return {
     status: "success",
@@ -403,10 +556,11 @@ async function processConversion(options = {}) {
     streamUrl,
     downloadUrl,
     remoteDirectUrl: remoteStreamUrl,
+    directDownloadUrl: remoteStreamUrl,
     filename: downloadFilename,
     mimeType,
-    sizeBytes: sizeBytes || (mediaBuffer ? mediaBuffer.length : 4500000),
-    sizeFormatted: formatBytes(sizeBytes || (mediaBuffer ? mediaBuffer.length : 4500000)),
+    sizeBytes: calculatedSize,
+    sizeFormatted: formatBytes(calculatedSize),
     message: `Conversión completada a formato ${selectedFormat.toUpperCase()} (${quality}). Listo para escuchar o descargar.`
   };
 }

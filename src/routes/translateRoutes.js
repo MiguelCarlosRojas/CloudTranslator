@@ -283,10 +283,19 @@ router.get("/media/stream", async (req, res) => {
     // Si tiene URL remota directa
     if (item.remoteUrl) {
       try {
+        const streamHeaders = {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+        };
+        if (req.headers.range) {
+          streamHeaders["Range"] = req.headers.range;
+        }
+
         const streamRes = await axios.get(item.remoteUrl, {
           responseType: "stream",
-          headers: req.headers.range ? { Range: req.headers.range } : {}
+          headers: streamHeaders,
+          timeout: 30000
         });
+
         res.status(streamRes.status);
         for (const [k, v] of Object.entries(streamRes.headers)) {
           if (["content-type", "content-length", "accept-ranges", "content-range"].includes(k.toLowerCase())) {
@@ -342,7 +351,17 @@ router.get("/media/download", async (req, res) => {
 
     if (item.remoteUrl) {
       try {
-        const streamRes = await axios.get(item.remoteUrl, { responseType: "stream" });
+        const streamRes = await axios.get(item.remoteUrl, {
+          responseType: "stream",
+          timeout: 45000,
+          headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" }
+        });
+        if (streamRes.headers["content-length"]) {
+          res.setHeader("Content-Length", streamRes.headers["content-length"]);
+        }
+        if (streamRes.headers["content-type"]) {
+          res.setHeader("Content-Type", streamRes.headers["content-type"]);
+        }
         return streamRes.data.pipe(res);
       } catch (e) {
         logger.warn(`Fallback a buffer local para descarga: ${e.message}`);
