@@ -7,6 +7,7 @@ const {
   VOICE_CATALOG,
   synthesizeSpeech,
   cloneVoice,
+  extractFullVoiceFeatures,
   getAudioById
 } = require("../utils/audioSynthesizer");
 const {
@@ -114,9 +115,57 @@ router.get("/tts/download", (req, res) => {
 });
 
 // Pilar 3: Clonación de Voz con IA
+router.post("/voice-clone/analyze", async (req, res) => {
+  try {
+    const { audioSampleBase64 } = req.body || {};
+    if (!audioSampleBase64 || typeof audioSampleBase64 !== "string") {
+      return res.status(400).json({
+        status: "error",
+        error: "Debe proporcionar el campo 'audioSampleBase64' con la muestra grabada o subida."
+      });
+    }
+
+    const rawBase64 = audioSampleBase64.replace(/^data:[^;]+;base64,/, "");
+    const sampleBuf = Buffer.from(rawBase64, "base64");
+    if (sampleBuf.length < 200) {
+      return res.status(400).json({
+        status: "error",
+        error: "La muestra de audio es demasiado pequeña o está corrupta."
+      });
+    }
+
+    const features = await extractFullVoiceFeatures(sampleBuf);
+    res.json({
+      status: "success",
+      analysis: {
+        fundamentalFrequencyHz: features.f0Hz,
+        durationSeconds: features.durationSec,
+        detectedGender: features.gender === "male" ? "Masculina" : "Femenina",
+        voiceClassification: features.voiceRange,
+        sampleSizeBytes: features.sizeBytes,
+        timbreBands: features.bandEnergies
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      error: "Error al analizar muestra de audio: " + error.message
+    });
+  }
+});
+
 router.post("/voice-clone", async (req, res) => {
   try {
-    const { text, audioSampleBase64, pitch = 1.0, similarity = "high", lang = "es", gender = "auto" } = req.body || {};
+    const {
+      text,
+      audioSampleBase64,
+      pitch = 1.0,
+      similarity = "high",
+      lang = "es",
+      gender = "auto",
+      format = "wav"
+    } = req.body || {};
+
     if (!text || typeof text !== "string") {
       return res.status(400).json({
         status: "error",
@@ -129,7 +178,8 @@ router.post("/voice-clone", async (req, res) => {
       lang,
       gender,
       pitch: Number(pitch) || 1.0,
-      similarity
+      similarity,
+      format: format === "mp3" ? "mp3" : "wav"
     });
 
     res.json(result);
