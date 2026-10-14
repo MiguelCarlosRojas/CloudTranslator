@@ -231,6 +231,21 @@ function generateFallbackAudio(title, platform) {
 }
 
 /**
+ * Formatea segundos a tiempo legible (MM:SS o HH:MM:SS)
+ */
+function formatDurationSeconds(totalSeconds) {
+  const s = Math.floor(Number(totalSeconds) || 0);
+  if (s <= 0) return "00:00";
+  const hours = Math.floor(s / 3600);
+  const minutes = Math.floor((s % 3600) / 60);
+  const seconds = s % 60;
+  if (hours > 0) {
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  }
+  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+}
+
+/**
  * Extrae metadatos y opciones de conversión de un enlace de video
  */
 async function extractMediaInfo(url, requestedFormat = "mp3") {
@@ -253,8 +268,8 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
     platformBadge: platform.badge,
     title: "Video Multimedia",
     author: "Desconocido",
-    duration: "03:15",
-    durationSeconds: 195,
+    duration: "00:00",
+    durationSeconds: 0,
     thumbnail: "/img/logo.png",
     description: "",
     formats: [
@@ -307,9 +322,37 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
         info.mp4Url = ytRes.mp4 || null;
         info.mp3Url = ytRes.mp3 || ytRes.mp4 || null;
         info.directMediaUrl = requestedFormat === "mp4" ? (info.mp4Url || info.mp3Url) : (info.mp3Url || info.mp4Url);
+
+        // Extraer duración real desde el parámetro dur del stream de Google Video
+        const rawStream = ytRes.mp4 || ytRes.mp3 || "";
+        const decodedStream = decodeURIComponent(rawStream);
+        const durMatch = decodedStream.match(/[?&]dur=([0-9.]+)/);
+        if (durMatch) {
+          info.durationSeconds = Math.round(parseFloat(durMatch[1]));
+          info.duration = formatDurationSeconds(info.durationSeconds);
+        }
       }
     } catch (err) {
       logger.warn(`btch.youtube no disponible para ${normalized}: ${err.message}`);
+    }
+
+    // Si aún no se resolvió la duración o el título, consultar Innertube (youtubei.js)
+    if (videoId && (info.duration === "00:00" || !info.title || info.title.startsWith("YouTube Video"))) {
+      try {
+        const { Innertube, UniversalCache } = require("youtubei.js");
+        const ytSession = await Innertube.create({ cache: new UniversalCache(false) });
+        const basic = await ytSession.getBasicInfo(videoId);
+        if (basic && basic.basic_info) {
+          if (basic.basic_info.title) info.title = basic.basic_info.title;
+          if (basic.basic_info.author) info.author = basic.basic_info.author;
+          if (basic.basic_info.duration) {
+            info.durationSeconds = basic.basic_info.duration;
+            info.duration = formatDurationSeconds(info.durationSeconds);
+          }
+        }
+      } catch (innerErr) {
+        logger.warn(`Innertube basic_info no disponible para ${videoId}: ${innerErr.message}`);
+      }
     }
 
     // Complementar metadatos mediante oEmbed si es necesario

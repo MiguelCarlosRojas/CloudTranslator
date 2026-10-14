@@ -239,6 +239,11 @@
     // Resolver URL destino
     const targetUrl = new URL(anchor.href, window.location.href);
 
+    // Nunca interceptar endpoints de la API REST o descargas multimedia
+    if (targetUrl.pathname.startsWith("/api/") || targetUrl.pathname === "/api") {
+      return;
+    }
+
     // Verificar mismo origen (evitar interceptar links externos)
     if (targetUrl.origin !== window.location.origin) {
       return;

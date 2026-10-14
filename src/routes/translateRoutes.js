@@ -346,29 +346,15 @@ router.get("/media/download", async (req, res) => {
       return res.status(404).send("Medio no encontrado o expirado para descarga.");
     }
 
-    res.setHeader("Content-Disposition", `attachment; filename="${item.filename}"`);
-    res.setHeader("Content-Type", item.mimeType);
-
+    // Redirección directa al stream de alta velocidad CDN para evitar timeout de reverse proxy
     if (item.remoteUrl) {
-      try {
-        const streamRes = await axios.get(item.remoteUrl, {
-          responseType: "stream",
-          timeout: 45000,
-          headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" }
-        });
-        if (streamRes.headers["content-length"]) {
-          res.setHeader("Content-Length", streamRes.headers["content-length"]);
-        }
-        if (streamRes.headers["content-type"]) {
-          res.setHeader("Content-Type", streamRes.headers["content-type"]);
-        }
-        return streamRes.data.pipe(res);
-      } catch (e) {
-        logger.warn(`Fallback a buffer local para descarga: ${e.message}`);
-      }
+      return res.redirect(302, item.remoteUrl);
     }
 
     if (item.buffer) {
+      const asciiFilename = (item.filename || "media.mp4").replace(/[^\x20-\x7E]/g, "_");
+      res.setHeader("Content-Disposition", `attachment; filename="${asciiFilename}"`);
+      res.setHeader("Content-Type", item.mimeType);
       res.setHeader("Content-Length", item.buffer.length);
       return res.send(item.buffer);
     }

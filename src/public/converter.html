@@ -692,8 +692,11 @@
         resSize.textContent = item.sizeFormatted || "4.5 MB";
 
         btnDownload.style.display = "inline-flex";
-        btnDownload.href = item.downloadUrl;
+        const downloadTarget = item.directDownloadUrl || item.downloadUrl;
+        btnDownload.href = downloadTarget;
         btnDownload.setAttribute("download", item.filename || `media.${item.format}`);
+        btnDownload.setAttribute("target", "_blank");
+        btnDownload.setAttribute("rel", "noopener noreferrer");
 
         btnCopyStream.onclick = () => {
           const streamFull = item.directDownloadUrl || (window.location.origin + item.downloadUrl);
