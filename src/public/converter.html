@@ -692,15 +692,13 @@
         resSize.textContent = item.sizeFormatted || "4.5 MB";
 
         btnDownload.style.display = "inline-flex";
-        const downloadTarget = item.directDownloadUrl || item.downloadUrl;
-        btnDownload.href = downloadTarget;
+        btnDownload.href = item.downloadUrl;
         btnDownload.setAttribute("download", item.filename || `media.${item.format}`);
-        btnDownload.setAttribute("target", "_blank");
-        btnDownload.setAttribute("rel", "noopener noreferrer");
+        btnDownload.removeAttribute("target");
 
         btnCopyStream.onclick = () => {
-          const streamFull = item.directDownloadUrl || (window.location.origin + item.downloadUrl);
-          navigator.clipboard.writeText(streamFull);
+          const downloadFull = window.location.origin + item.downloadUrl;
+          navigator.clipboard.writeText(downloadFull);
           alert("Enlace directo copiado al portapapeles.");
         };
 

@@ -40,7 +40,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
    * **Pilar 4 - Conversor Multimedia (MP3 / MP4):** Motor de extracción y conversión universal de audio y video desde YouTube, TikTok, Instagram, Twitter/X y enlaces directos.
 
 3. **Bibliotecas de Terceros:**  
-   Las dependencias de código abierto utilizadas en este proyecto (`express`, `google-translate-api-x`, `cors`, `compression`, `winston`, `nodemon`) pertenecen a sus respectivos autores y se rigen bajo sus licencias correspondientes (MIT, ISC, Apache-2.0).
+   Las dependencias de código abierto utilizadas en este proyecto (`express`, `google-translate-api-x`, `@ffmpeg-installer/ffmpeg`, `fluent-ffmpeg`, `youtubei.js`, `btch-downloader`, `rahad-all-downloader-v2`, `cors`, `compression`, `winston`, `nodemon`) pertenecen a sus respectivos autores y se rigen bajo sus licencias correspondientes (MIT, ISC, Apache-2.0, LGPL/GPL).
 
 4. **Uso de la API y Servicio en la Nube:**  
    Se permite la libre integración de aplicaciones web, móviles o de backend con los servicios y endpoints públicos de `https://cloudtranslator.onrender.com/api/*` bajo políticas de uso justo y sin fines maliciosos.

@@ -35,3 +35,8 @@ CloudTranslator.postman_collection.json
 
 # Ignorar directorio temporal raíz public
 /public/
+
+# Cache temporal multimedia
+data/media_cache/
+*.mp3
+*.mp4

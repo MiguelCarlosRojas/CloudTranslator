@@ -385,7 +385,7 @@ curl -X POST https://cloudtranslator.onrender.com/api/translate \
 * **Streaming directo:** `GET /api/voice-clone/stream?id=<audioId>`
 * **Descarga directa:** `GET /api/voice-clone/download?id=<audioId>` (descarga `voz-clonada-cloudtranslator.mp3`).
 
-### 11. `POST /api/media/convert` (Conversión de Video a MP3 / MP4)
+### 11. `POST /api/media/convert` (Conversión 100% Nativa en Backend a MP3 / MP4 con FFmpeg)
 * **URL:** `https://cloudtranslator.onrender.com/api/media/convert`
 * **Headers:** `Content-Type: application/json`
 * **Body:**
@@ -393,28 +393,36 @@ curl -X POST https://cloudtranslator.onrender.com/api/translate \
   {
     "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
     "format": "mp3",
-    "quality": "320kbps"
+    "quality": "320k"
   }
   ```
 * **Respuesta (200 OK):**
   ```json
   {
     "status": "success",
-    "service": "CloudTranslator Media Engine v1.0",
-    "platform": "youtube",
+    "id": "media_1791994923320_st2b9b",
+    "title": "Me at the zoo",
+    "author": "jawed",
+    "platform": "YouTube",
+    "platformId": "youtube",
     "format": "mp3",
-    "quality": "320kbps",
-    "title": "Audio de alta calidad (320kbps) extraído de YouTube",
-    "author": "CloudTranslator Media Engine",
-    "duration": "03:45",
-    "size": "8.5 MB",
-    "mediaId": "media_3f29b1",
-    "streamUrl": "/api/media/stream?id=media_3f29b1",
-    "downloadUrl": "/api/media/download?id=media_3f29b1",
-    "directDownloadUrl": "https://rr3---sn-...",
-    "sourceUrl": "https://www.youtube.com/watch?v=jNQXAC9IVRw"
+    "quality": "320k",
+    "thumbnail": "https://i.ytimg.com/vi/jNQXAC9IVRw/hqdefault.jpg",
+    "duration": "00:19",
+    "durationSeconds": 19,
+    "streamUrl": "/api/media/stream?id=media_1791994923320_st2b9b",
+    "downloadUrl": "/api/media/download?id=media_1791994923320_st2b9b",
+    "filename": "CloudTranslator_Me_at_the_zoo.mp3",
+    "mimeType": "audio/mpeg",
+    "sizeBytes": 762285,
+    "sizeFormatted": "744.4 KB",
+    "message": "Conversión completada a formato MP3 (320k). Descarga directa disponible desde CloudTranslator."
   }
   ```
+
+> [!TIP]
+> **Descarga y Streaming Directo Sin Redirecciones:**  
+> Las peticiones hacia `GET /api/media/download?id=...` y `GET /api/media/stream?id=...` son servidas **100% de manera directa desde el disco del servidor** mediante streams de Node.js con soporte para `Accept-Ranges: bytes` (HTTP 206) y encabezados `Content-Disposition: attachment`. Esto elimina cualquier redirección externa a CDNs de terceros y previene errores de acceso 403 Forbidden.
 
 ### 12. `POST /api/media/batch` (Conversión Múltiple por Lote)
 * **URL:** `https://cloudtranslator.onrender.com/api/media/batch`

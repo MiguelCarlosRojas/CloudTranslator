@@ -1,3 +1,4 @@
+const fs = require("fs");
 const express = require("express");
 const router = express.Router();
 const validateRequest = require("../middlewares/validateRequest");
@@ -280,35 +281,36 @@ router.get("/media/stream", async (req, res) => {
       return res.status(404).send("Medio no encontrado o expirado (TTL 30 min).");
     }
 
-    // Si tiene URL remota directa
-    if (item.remoteUrl) {
-      try {
-        const streamHeaders = {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-        };
-        if (req.headers.range) {
-          streamHeaders["Range"] = req.headers.range;
-        }
+    // Servir desde archivo físico en disco generado por FFmpeg (con soporte Range 206)
+    if (item.filePath && fs.existsSync(item.filePath)) {
+      const stat = fs.statSync(item.filePath);
+      const total = stat.size;
+      const range = req.headers.range;
 
-        const streamRes = await axios.get(item.remoteUrl, {
-          responseType: "stream",
-          headers: streamHeaders,
-          timeout: 30000
-        });
+      if (range) {
+        const parts = range.replace(/bytes=/, "").split("-");
+        const start = parseInt(parts[0], 10);
+        const end = parts[1] ? parseInt(parts[1], 10) : total - 1;
+        const chunkSize = end - start + 1;
 
-        res.status(streamRes.status);
-        for (const [k, v] of Object.entries(streamRes.headers)) {
-          if (["content-type", "content-length", "accept-ranges", "content-range"].includes(k.toLowerCase())) {
-            res.setHeader(k, v);
-          }
-        }
-        return streamRes.data.pipe(res);
-      } catch (remoteErr) {
-        logger.warn(`Fallback a buffer local en stream: ${remoteErr.message}`);
+        res.status(206);
+        res.setHeader("Content-Range", `bytes ${start}-${end}/${total}`);
+        res.setHeader("Accept-Ranges", "bytes");
+        res.setHeader("Content-Length", chunkSize);
+        res.setHeader("Content-Type", item.mimeType);
+
+        const stream = fs.createReadStream(item.filePath, { start, end });
+        return stream.pipe(res);
       }
+
+      res.setHeader("Content-Type", item.mimeType);
+      res.setHeader("Content-Length", total);
+      res.setHeader("Accept-Ranges", "bytes");
+      const stream = fs.createReadStream(item.filePath);
+      return stream.pipe(res);
     }
 
-    // Buffer local con soporte para Range Requests (Seeking / Scrubbing)
+    // Respaldo en memoria si existe buffer directo
     if (item.buffer) {
       const total = item.buffer.length;
       const range = req.headers.range;
@@ -330,14 +332,14 @@ router.get("/media/stream", async (req, res) => {
       return res.send(item.buffer);
     }
 
-    res.status(404).send("No hay buffer de audio o video disponible.");
+    res.status(404).send("No hay archivo ni buffer multimedia disponible.");
   } catch (err) {
     logger.error(`Error en /media/stream: ${err.message}`);
     res.status(500).send("Error interno en streaming de medios.");
   }
 });
 
-// Descarga directa física del archivo (.mp3 o .mp4)
+// Descarga directa física del archivo (.mp3 o .mp4) desde el servidor local
 router.get("/media/download", async (req, res) => {
   try {
     const { id } = req.query;
@@ -346,13 +348,19 @@ router.get("/media/download", async (req, res) => {
       return res.status(404).send("Medio no encontrado o expirado para descarga.");
     }
 
-    // Redirección directa al stream de alta velocidad CDN para evitar timeout de reverse proxy
-    if (item.remoteUrl) {
-      return res.redirect(302, item.remoteUrl);
+    const asciiFilename = (item.filename || `media.${item.format}`).replace(/[^\x20-\x7E]/g, "_");
+
+    // Servir directamente desde el disco del servidor (100% nativo sin redirecciones a terceros)
+    if (item.filePath && fs.existsSync(item.filePath)) {
+      const stat = fs.statSync(item.filePath);
+      res.setHeader("Content-Disposition", `attachment; filename="${asciiFilename}"`);
+      res.setHeader("Content-Type", item.mimeType);
+      res.setHeader("Content-Length", stat.size);
+      const stream = fs.createReadStream(item.filePath);
+      return stream.pipe(res);
     }
 
     if (item.buffer) {
-      const asciiFilename = (item.filename || "media.mp4").replace(/[^\x20-\x7E]/g, "_");
       res.setHeader("Content-Disposition", `attachment; filename="${asciiFilename}"`);
       res.setHeader("Content-Type", item.mimeType);
       res.setHeader("Content-Length", item.buffer.length);

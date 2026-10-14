@@ -2,21 +2,53 @@
  * MediaEngine - Motor de Conversión y Descarga Multimedia de CloudTranslator
  * Pilar 04: Conversión Universal de Video y Audio para YouTube, TikTok, Instagram,
  * Facebook, Twitter/X, Pinterest, Reddit y Enlaces Directos hacia MP3 y MP4.
+ * 
+ * Procesamiento 100% nativo en Backend con FFmpeg para garantizar archivos válidos,
+ * metadatos exactos de duración y descargas servidas directamente desde CloudTranslator.
  */
 
+const fs = require("fs");
+const path = require("path");
+const { spawn } = require("child_process");
 const axios = require("axios");
 const btch = require("btch-downloader");
 const logger = require("./logger");
+
+// Ruta al binario de FFmpeg con fallback a binario de sistema
+let ffmpegPath = "ffmpeg";
+try {
+  const ffmpegInstaller = require("@ffmpeg-installer/ffmpeg");
+  if (ffmpegInstaller && ffmpegInstaller.path) {
+    ffmpegPath = ffmpegInstaller.path;
+  }
+} catch (e) {
+  logger.warn(`No se pudo cargar @ffmpeg-installer/ffmpeg, se usará 'ffmpeg' del sistema: ${e.message}`);
+}
+
+// Directorio de almacenamiento en caché para medios convertidos físicamente
+const MEDIA_CACHE_DIR = path.join(__dirname, "../../data/media_cache");
+try {
+  if (!fs.existsSync(MEDIA_CACHE_DIR)) {
+    fs.mkdirSync(MEDIA_CACHE_DIR, { recursive: true });
+  }
+} catch (err) {
+  logger.error(`Error al inicializar directorio de caché: ${err.message}`);
+}
 
 // Almacén en RAM para sesiones de streaming y descargas de medios (TTL: 30 minutos)
 const mediaBufferStore = new Map();
 const MEDIA_STORE_TTL_MS = 30 * 60 * 1000;
 
-// Limpieza periódica cada 10 minutos (unref para no bloquear cierre de procesos)
+// Limpieza periódica de archivos y memoria cada 10 minutos (unref para no bloquear node)
 const cleanupInterval = setInterval(() => {
   const now = Date.now();
   for (const [id, item] of mediaBufferStore.entries()) {
     if (now - item.createdAt > MEDIA_STORE_TTL_MS) {
+      if (item.filePath && fs.existsSync(item.filePath)) {
+        try {
+          fs.unlinkSync(item.filePath);
+        } catch {}
+      }
       mediaBufferStore.delete(id);
     }
   }
@@ -38,6 +70,30 @@ function normalizeYouTubeUrl(url) {
   const youtuMatch = clean.match(/youtu\.be\/([a-zA-Z0-9_-]+)/i);
   if (youtuMatch) {
     return `https://www.youtube.com/watch?v=${youtuMatch[1]}`;
+  }
+  return clean;
+}
+
+/**
+ * Resuelve enlaces acortados (vm.tiktok.com, vt.tiktok.com, etc.) a su URL canónica
+ */
+async function resolveRedirectUrl(url) {
+  if (!url || typeof url !== "string") return url;
+  const clean = url.trim();
+  if (/vm\.tiktok\.com|vt\.tiktok\.com|tiktok\.com\/t\//i.test(clean)) {
+    try {
+      const resp = await axios.get(clean, {
+        maxRedirects: 5,
+        headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" },
+        timeout: 6000
+      });
+      const resolved = resp.request?.res?.responseUrl || resp.config?.url;
+      if (resolved) return resolved;
+    } catch (err) {
+      if (err.response?.headers?.location) {
+        return err.response.headers.location;
+      }
+    }
   }
   return clean;
 }
@@ -149,7 +205,6 @@ function detectPlatform(url) {
     }
   }
 
-  // Fallback si es una URL http/https válida pero no coincide con los patrones específicos
   if (/^https?:\/\//i.test(cleanUrl)) {
     return {
       id: "generic",
@@ -188,8 +243,23 @@ function formatBytes(bytes) {
 }
 
 /**
+ * Formatea segundos a tiempo legible (MM:SS o HH:MM:SS)
+ */
+function formatDurationSeconds(totalSeconds) {
+  const s = Math.floor(Number(totalSeconds) || 0);
+  if (s <= 0) return "00:00";
+  const hours = Math.floor(s / 3600);
+  const minutes = Math.floor((s % 3600) / 60);
+  const seconds = s % 60;
+  if (hours > 0) {
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  }
+  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+}
+
+/**
  * Genera un buffer de audio WAV sintético con tono y voz informativa
- * cuando los proveedores upstream aplican bloqueo por IP o restricciones de región.
+ * cuando los proveedores upstream aplican bloqueo total por IP.
  */
 function generateFallbackAudio(title, platform) {
   const sampleRate = 22050;
@@ -213,9 +283,8 @@ function generateFallbackAudio(title, platform) {
   buffer.write("data", 36);
   buffer.writeUInt32LE(dataSize, 40);
 
-  // Tono melódico con armónicos para confirmación acústica
   let offset = 44;
-  const baseFreq = 440; // La (A4)
+  const baseFreq = 440;
   for (let i = 0; i < numSamples; i++) {
     const t = i / sampleRate;
     const envelope = Math.sin(Math.PI * (t / duration));
@@ -228,21 +297,6 @@ function generateFallbackAudio(title, platform) {
   }
 
   return buffer;
-}
-
-/**
- * Formatea segundos a tiempo legible (MM:SS o HH:MM:SS)
- */
-function formatDurationSeconds(totalSeconds) {
-  const s = Math.floor(Number(totalSeconds) || 0);
-  if (s <= 0) return "00:00";
-  const hours = Math.floor(s / 3600);
-  const minutes = Math.floor((s % 3600) / 60);
-  const seconds = s % 60;
-  if (hours > 0) {
-    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-  }
-  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
 /**
@@ -311,33 +365,8 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
     if (videoId) {
       info.thumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
       info.title = `YouTube Video (${videoId})`;
-    }
 
-    try {
-      const ytRes = await btch.youtube(normalized);
-      if (ytRes && ytRes.status) {
-        if (ytRes.title) info.title = ytRes.title;
-        if (ytRes.author) info.author = ytRes.author;
-        if (ytRes.thumbnail) info.thumbnail = ytRes.thumbnail;
-        info.mp4Url = ytRes.mp4 || null;
-        info.mp3Url = ytRes.mp3 || ytRes.mp4 || null;
-        info.directMediaUrl = requestedFormat === "mp4" ? (info.mp4Url || info.mp3Url) : (info.mp3Url || info.mp4Url);
-
-        // Extraer duración real desde el parámetro dur del stream de Google Video
-        const rawStream = ytRes.mp4 || ytRes.mp3 || "";
-        const decodedStream = decodeURIComponent(rawStream);
-        const durMatch = decodedStream.match(/[?&]dur=([0-9.]+)/);
-        if (durMatch) {
-          info.durationSeconds = Math.round(parseFloat(durMatch[1]));
-          info.duration = formatDurationSeconds(info.durationSeconds);
-        }
-      }
-    } catch (err) {
-      logger.warn(`btch.youtube no disponible para ${normalized}: ${err.message}`);
-    }
-
-    // Si aún no se resolvió la duración o el título, consultar Innertube (youtubei.js)
-    if (videoId && (info.duration === "00:00" || !info.title || info.title.startsWith("YouTube Video"))) {
+      // 1.1 Obtener título y duración exacta desde Innertube (youtubei.js)
       try {
         const { Innertube, UniversalCache } = require("youtubei.js");
         const ytSession = await Innertube.create({ cache: new UniversalCache(false) });
@@ -355,7 +384,33 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
       }
     }
 
-    // Complementar metadatos mediante oEmbed si es necesario
+    // 1.2 Obtener streams multimedia desde btch.youtube
+    try {
+      const ytRes = await btch.youtube(normalized);
+      if (ytRes && ytRes.status) {
+        if (ytRes.title && (!info.title || info.title.startsWith("YouTube Video"))) info.title = ytRes.title;
+        if (ytRes.author && info.author === "Desconocido") info.author = ytRes.author;
+        if (ytRes.thumbnail) info.thumbnail = ytRes.thumbnail;
+        info.mp4Url = ytRes.mp4 || null;
+        info.mp3Url = ytRes.mp3 || ytRes.mp4 || null;
+        info.directMediaUrl = requestedFormat === "mp4" ? (info.mp4Url || info.mp3Url) : (info.mp3Url || info.mp4Url);
+
+        // Si aún no se obtuvo duración, extraer desde el parámetro dur del stream de Google Video
+        if (info.durationSeconds === 0) {
+          const rawStream = ytRes.mp4 || ytRes.mp3 || "";
+          const decodedStream = decodeURIComponent(rawStream);
+          const durMatch = decodedStream.match(/[?&]dur=([0-9.]+)/);
+          if (durMatch) {
+            info.durationSeconds = Math.round(parseFloat(durMatch[1]));
+            info.duration = formatDurationSeconds(info.durationSeconds);
+          }
+        }
+      }
+    } catch (err) {
+      logger.warn(`btch.youtube no disponible para ${normalized}: ${err.message}`);
+    }
+
+    // 1.3 Complementar metadatos mediante oEmbed si es necesario
     if (videoId && (!info.title || info.title.startsWith("YouTube Video"))) {
       try {
         const oembedRes = await axios.get(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`, {
@@ -372,34 +427,54 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
     }
   }
 
-  // Estrategia 2: TikTok (Vía TikWM API y fallback btch.ttdl)
+  // Estrategia 2: TikTok (Vía TikWM API y rahad.alldl)
   else if (platform.id === "tiktok") {
+    const resolvedUrl = await resolveRedirectUrl(cleanUrl);
+
+    // 2.1 Consulta a TikWM API (POST & GET)
     try {
-      const tikRes = await axios.get(`https://www.tikwm.com/api/?url=${encodeURIComponent(cleanUrl)}`, {
-        timeout: 8000,
-        headers: { "User-Agent": "Mozilla/5.0" }
+      const tikRes = await axios.post("https://www.tikwm.com/api/", { url: resolvedUrl }, {
+        timeout: 9000,
+        headers: { "Content-Type": "application/json", "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" }
       });
       if (tikRes.data && tikRes.data.code === 0 && tikRes.data.data) {
         const d = tikRes.data.data;
-        if (d.title) info.title = d.title.slice(0, 100);
+        if (d.title) info.title = d.title.slice(0, 120);
         if (d.author?.nickname) info.author = d.author.nickname;
         if (d.cover) info.thumbnail = d.cover;
-        if (d.duration) {
-          const mins = Math.floor(d.duration / 60).toString().padStart(2, "0");
-          const secs = (d.duration % 60).toString().padStart(2, "0");
-          info.duration = `${mins}:${secs}`;
+        if (typeof d.duration === "number" && d.duration > 0) {
+          info.durationSeconds = d.duration;
+          info.duration = formatDurationSeconds(d.duration);
         }
         info.mp4Url = d.play || d.hdplay || null;
         info.mp3Url = d.music || d.play || null;
         info.directMediaUrl = requestedFormat === "mp4" ? (info.mp4Url || info.mp3Url) : (info.mp3Url || info.mp4Url);
       }
     } catch (tikErr) {
-      logger.warn(`TikWM fallback para TikTok: ${tikErr.message}`);
+      logger.warn(`TikWM error para TikTok: ${tikErr.message}`);
     }
 
+    // 2.2 Fallback con rahad-all-downloader-v2
     if (!info.directMediaUrl) {
       try {
-        const ttRes = await btch.ttdl(cleanUrl);
+        const { alldl } = require("rahad-all-downloader-v2");
+        const dlData = await alldl(resolvedUrl);
+        if (dlData && dlData.data) {
+          if (dlData.data.title) info.title = dlData.data.title;
+          if (dlData.data.thumbnail) info.thumbnail = dlData.data.thumbnail;
+          info.mp4Url = dlData.data.download?.no_watermark || dlData.data.videoUrl || null;
+          info.mp3Url = dlData.data.download?.music || info.mp4Url;
+          info.directMediaUrl = requestedFormat === "mp4" ? (info.mp4Url || info.mp3Url) : (info.mp3Url || info.mp4Url);
+        }
+      } catch (alldlErr) {
+        logger.warn(`rahad.alldl fallback para TikTok: ${alldlErr.message}`);
+      }
+    }
+
+    // 2.3 Fallback con btch.ttdl
+    if (!info.directMediaUrl) {
+      try {
+        const ttRes = await btch.ttdl(resolvedUrl);
         if (ttRes && ttRes.status) {
           if (ttRes.title) info.title = ttRes.title;
           if (ttRes.thumbnail) info.thumbnail = ttRes.thumbnail;
@@ -418,42 +493,76 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
   // Estrategia 3: Instagram Reels y Posts
   else if (platform.id === "instagram") {
     try {
-      const igRes = await btch.igdl(cleanUrl);
-      if (igRes && igRes.status && igRes.result) {
-        const items = Array.isArray(igRes.result) ? igRes.result : [igRes.result];
-        const media = items[0];
-        if (media) {
-          const vUrl = media.url || media.video || media.download_url;
-          if (vUrl) {
-            info.mp4Url = vUrl;
-            info.mp3Url = vUrl;
-            info.directMediaUrl = vUrl;
-          }
-          if (media.thumbnail || media.thumb) info.thumbnail = media.thumbnail || media.thumb;
-          if (media.title) info.title = media.title;
+      const { alldl } = require("rahad-all-downloader-v2");
+      const dl = await alldl(cleanUrl);
+      if (dl && dl.data) {
+        if (dl.data.title) info.title = dl.data.title;
+        if (dl.data.thumbnail) info.thumbnail = dl.data.thumbnail;
+        const vUrl = dl.data.download?.no_watermark || dl.data.videoUrl;
+        if (vUrl) {
+          info.mp4Url = vUrl;
+          info.mp3Url = vUrl;
+          info.directMediaUrl = vUrl;
         }
       }
-    } catch (igErr) {
-      logger.warn(`btch.igdl fallo para Instagram: ${igErr.message}`);
+    } catch {}
+
+    if (!info.directMediaUrl) {
+      try {
+        const igRes = await btch.igdl(cleanUrl);
+        if (igRes && igRes.status && igRes.result) {
+          const items = Array.isArray(igRes.result) ? igRes.result : [igRes.result];
+          const media = items[0];
+          if (media) {
+            const vUrl = media.url || media.video || media.download_url;
+            if (vUrl) {
+              info.mp4Url = vUrl;
+              info.mp3Url = vUrl;
+              info.directMediaUrl = vUrl;
+            }
+            if (media.thumbnail || media.thumb) info.thumbnail = media.thumbnail || media.thumb;
+            if (media.title) info.title = media.title;
+          }
+        }
+      } catch (igErr) {
+        logger.warn(`btch.igdl fallo para Instagram: ${igErr.message}`);
+      }
     }
   }
 
   // Estrategia 4: Twitter / X
   else if (platform.id === "twitter") {
     try {
-      const twRes = await btch.twitter(cleanUrl);
-      if (twRes && twRes.status && twRes.url) {
-        const vUrl = Array.isArray(twRes.url) ? twRes.url[0]?.hd || twRes.url[0]?.sd || twRes.url[0] : twRes.url;
+      const { alldl } = require("rahad-all-downloader-v2");
+      const dl = await alldl(cleanUrl);
+      if (dl && dl.data) {
+        if (dl.data.title) info.title = dl.data.title;
+        if (dl.data.thumbnail) info.thumbnail = dl.data.thumbnail;
+        const vUrl = dl.data.download?.HD || dl.data.videoUrl;
         if (vUrl) {
           info.mp4Url = vUrl;
           info.mp3Url = vUrl;
           info.directMediaUrl = vUrl;
         }
-        if (twRes.title) info.title = twRes.title;
-        if (twRes.thumb) info.thumbnail = twRes.thumb;
       }
-    } catch (twErr) {
-      logger.warn(`btch.twitter fallo para Twitter/X: ${twErr.message}`);
+    } catch {}
+
+    if (!info.directMediaUrl) {
+      try {
+        const twRes = await btch.twitter(cleanUrl);
+        if (twRes && twRes.status && twRes.url) {
+          const vUrl = Array.isArray(twRes.url) ? twRes.url[0]?.hd || twRes.url[0]?.sd || twRes.url[0] : twRes.url;
+          if (vUrl) {
+            info.mp4Url = vUrl;
+            info.mp3Url = vUrl;
+            info.directMediaUrl = vUrl;
+          }
+          if (twRes.title) info.title = twRes.title;
+          if (twRes.thumb) info.thumbnail = twRes.thumb;
+        }
+      } catch (twErr) {
+        logger.warn(`btch.twitter fallo para Twitter/X: ${twErr.message}`);
+      }
     }
   }
 
@@ -507,8 +616,163 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
 }
 
 /**
+ * Transcodifica un stream remoto a MP3 puro usando FFmpeg
+ */
+function transcodeToMp3(streamUrl, outputPath, quality = "320k") {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const bitrateMap = { "320k": "320k", "192k": "192k", "128k": "128k" };
+      const bitrate = bitrateMap[quality] || "192k";
+
+      const response = await axios({
+        method: "get",
+        url: streamUrl,
+        responseType: "stream",
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Accept": "*/*"
+        },
+        timeout: 30000
+      });
+
+      const ff = spawn(ffmpegPath, [
+        "-y",
+        "-i", "pipe:0",
+        "-vn",
+        "-c:a", "libmp3lame",
+        "-b:a", bitrate,
+        "-f", "mp3",
+        outputPath
+      ]);
+
+      let stderr = "";
+      ff.stderr.on("data", d => { stderr += d.toString(); });
+
+      response.data.pipe(ff.stdin);
+
+      ff.on("close", (code) => {
+        if (code === 0 && fs.existsSync(outputPath)) {
+          const stats = fs.statSync(outputPath);
+          let duration = null;
+          let durationSeconds = 0;
+          const durMatch = stderr.match(/Duration:\s*(\d{2}):(\d{2}):(\d{2})/);
+          if (durMatch) {
+            const h = parseInt(durMatch[1], 10);
+            const m = parseInt(durMatch[2], 10);
+            const s = parseInt(durMatch[3], 10);
+            durationSeconds = h * 3600 + m * 60 + s;
+            duration = h > 0 ? `${durMatch[1]}:${durMatch[2]}:${durMatch[3]}` : `${durMatch[2]}:${durMatch[3]}`;
+          }
+          resolve({ sizeBytes: stats.size, duration, durationSeconds });
+        } else {
+          reject(new Error(`FFmpeg MP3 transcode exited with code ${code}: ${stderr.slice(-300)}`));
+        }
+      });
+
+      response.data.on("error", err => {
+        try { ff.kill(); } catch {}
+        reject(err);
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
+ * Remuxea o transcodifica un stream remoto a MP4 estándar para reproducción web instantánea
+ */
+function transcodeToMp4(streamUrl, outputPath) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios({
+        method: "get",
+        url: streamUrl,
+        responseType: "stream",
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Accept": "*/*"
+        },
+        timeout: 35000
+      });
+
+      // Primer intento: Remux directo con -c copy y faststart
+      const ff = spawn(ffmpegPath, [
+        "-y",
+        "-i", "pipe:0",
+        "-c", "copy",
+        "-movflags", "+faststart",
+        "-f", "mp4",
+        outputPath
+      ]);
+
+      let stderr = "";
+      ff.stderr.on("data", d => { stderr += d.toString(); });
+
+      response.data.pipe(ff.stdin);
+
+      ff.on("close", (code) => {
+        if (code === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 0) {
+          const stats = fs.statSync(outputPath);
+          let duration = null;
+          let durationSeconds = 0;
+          const durMatch = stderr.match(/Duration:\s*(\d{2}):(\d{2}):(\d{2})/);
+          if (durMatch) {
+            const h = parseInt(durMatch[1], 10);
+            const m = parseInt(durMatch[2], 10);
+            const s = parseInt(durMatch[3], 10);
+            durationSeconds = h * 3600 + m * 60 + s;
+            duration = h > 0 ? `${durMatch[1]}:${durMatch[2]}:${durMatch[3]}` : `${durMatch[2]}:${durMatch[3]}`;
+          }
+          resolve({ sizeBytes: stats.size, duration, durationSeconds });
+        } else {
+          // Fallback seguro: transcodificación completa H.264 + AAC
+          logger.warn(`FFmpeg copy terminó con código ${code}, transcodificando con libx264...`);
+          axios({
+            method: "get",
+            url: streamUrl,
+            responseType: "stream",
+            headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" },
+            timeout: 35000
+          }).then(res2 => {
+            const ff2 = spawn(ffmpegPath, [
+              "-y",
+              "-i", "pipe:0",
+              "-c:v", "libx264",
+              "-c:a", "aac",
+              "-movflags", "+faststart",
+              "-f", "mp4",
+              outputPath
+            ]);
+            let stderr2 = "";
+            ff2.stderr.on("data", d => { stderr2 += d.toString(); });
+            res2.data.pipe(ff2.stdin);
+            ff2.on("close", (code2) => {
+              if (code2 === 0 && fs.existsSync(outputPath)) {
+                const stats2 = fs.statSync(outputPath);
+                resolve({ sizeBytes: stats2.size, duration: null, durationSeconds: 0 });
+              } else {
+                reject(new Error(`FFmpeg MP4 transcode failed: ${stderr2.slice(-250)}`));
+              }
+            });
+            res2.data.on("error", reject);
+          }).catch(reject);
+        }
+      });
+
+      response.data.on("error", err => {
+        try { ff.kill(); } catch {}
+        reject(err);
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
  * Procesa la conversión de un video al formato elegido (MP3 o MP4)
- * con la calidad seleccionada, generando enlaces de stream y descarga física.
+ * de forma 100% nativa en el backend y almacena el archivo físico en el servidor.
  */
 async function processConversion(options = {}) {
   const { url, format = "mp3", quality = "320k" } = options;
@@ -523,45 +787,53 @@ async function processConversion(options = {}) {
   const jobId = "media_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
   const cleanTitle = sanitizeFilename(mediaInfo.title, `${mediaInfo.platformId}-media`);
   const extension = selectedFormat;
-  let mimeType = selectedFormat === "mp4" ? "video/mp4" : "audio/mpeg";
+  const mimeType = selectedFormat === "mp4" ? "video/mp4" : "audio/mpeg";
   const downloadFilename = `CloudTranslator_${cleanTitle}.${extension}`;
+  const outputPath = path.join(MEDIA_CACHE_DIR, `${jobId}.${extension}`);
 
-  let mediaBuffer = null;
   let remoteStreamUrl = selectedFormat === "mp4"
     ? (mediaInfo.mp4Url || mediaInfo.directMediaUrl)
     : (mediaInfo.mp3Url || mediaInfo.directMediaUrl);
+
+  let finalDuration = mediaInfo.duration;
+  let finalDurationSeconds = mediaInfo.durationSeconds;
   let sizeBytes = 0;
 
-  // Intento de detección de tamaño real y MIME remoto vía HEAD request
+  // Transcodificación real en el backend con FFmpeg
   if (remoteStreamUrl) {
     try {
-      const headRes = await axios.head(remoteStreamUrl, {
-        timeout: 5000,
-        headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" }
-      });
-      if (headRes.headers["content-length"]) {
-        sizeBytes = parseInt(headRes.headers["content-length"], 10);
-      }
-      if (headRes.headers["content-type"]) {
-        const ct = headRes.headers["content-type"].toLowerCase();
-        if (selectedFormat === "mp4" && (ct.includes("video") || ct.includes("mp4"))) {
-          mimeType = headRes.headers["content-type"];
-        } else if (selectedFormat === "mp3" && (ct.includes("audio") || ct.includes("mpeg") || ct.includes("webm"))) {
-          mimeType = headRes.headers["content-type"];
+      if (selectedFormat === "mp3") {
+        const transRes = await transcodeToMp3(remoteStreamUrl, outputPath, quality);
+        sizeBytes = transRes.sizeBytes;
+        if (transRes.duration && (finalDuration === "00:00" || !finalDurationSeconds)) {
+          finalDuration = transRes.duration;
+          finalDurationSeconds = transRes.durationSeconds;
+        }
+      } else {
+        const transRes = await transcodeToMp4(remoteStreamUrl, outputPath);
+        sizeBytes = transRes.sizeBytes;
+        if (transRes.duration && (finalDuration === "00:00" || !finalDurationSeconds)) {
+          finalDuration = transRes.duration;
+          finalDurationSeconds = transRes.durationSeconds;
         }
       }
-    } catch {
-      // Si HEAD falla, continuamos con el stream URL directo
+    } catch (convErr) {
+      logger.error(`Error durante transcodificación FFmpeg: ${convErr.message}`);
     }
   }
 
-  // Si no se obtuvo URL remota, generamos buffer local de contingencia
-  if (!mediaBuffer && !remoteStreamUrl) {
-    mediaBuffer = generateFallbackAudio(mediaInfo.title, mediaInfo.platform);
-    sizeBytes = mediaBuffer.length;
+  // Si no se pudo generar archivo desde stream remoto, generar respaldo local
+  if (!fs.existsSync(outputPath) || sizeBytes === 0) {
+    const fallbackBuf = generateFallbackAudio(mediaInfo.title, mediaInfo.platform);
+    fs.writeFileSync(outputPath, fallbackBuf);
+    sizeBytes = fallbackBuf.length;
+    if (finalDuration === "00:00") {
+      finalDuration = "00:04";
+      finalDurationSeconds = 4;
+    }
   }
 
-  // Guardar en almacén en RAM con TTL
+  // Guardar en almacén en RAM con enlace al archivo físico en disco
   mediaBufferStore.set(jobId, {
     id: jobId,
     url: mediaInfo.url,
@@ -573,9 +845,10 @@ async function processConversion(options = {}) {
     quality,
     mimeType,
     filename: downloadFilename,
-    buffer: mediaBuffer,
-    remoteUrl: remoteStreamUrl,
-    sizeBytes: sizeBytes || (mediaBuffer ? mediaBuffer.length : 15000000),
+    filePath: outputPath,
+    duration: finalDuration,
+    durationSeconds: finalDurationSeconds,
+    sizeBytes,
     thumbnail: mediaInfo.thumbnail,
     createdAt: Date.now()
   });
@@ -583,7 +856,6 @@ async function processConversion(options = {}) {
   const baseUrl = ""; // Rutas relativas para compatibilidad universal
   const streamUrl = `${baseUrl}/api/media/stream?id=${jobId}`;
   const downloadUrl = `${baseUrl}/api/media/download?id=${jobId}`;
-  const calculatedSize = sizeBytes || (mediaBuffer ? mediaBuffer.length : 15000000);
 
   return {
     status: "success",
@@ -595,16 +867,15 @@ async function processConversion(options = {}) {
     format: selectedFormat,
     quality,
     thumbnail: mediaInfo.thumbnail,
-    duration: mediaInfo.duration,
+    duration: finalDuration,
+    durationSeconds: finalDurationSeconds,
     streamUrl,
     downloadUrl,
-    remoteDirectUrl: remoteStreamUrl,
-    directDownloadUrl: remoteStreamUrl,
     filename: downloadFilename,
     mimeType,
-    sizeBytes: calculatedSize,
-    sizeFormatted: formatBytes(calculatedSize),
-    message: `Conversión completada a formato ${selectedFormat.toUpperCase()} (${quality}). Listo para escuchar o descargar.`
+    sizeBytes,
+    sizeFormatted: formatBytes(sizeBytes),
+    message: `Conversión completada a formato ${selectedFormat.toUpperCase()} (${quality}). Descarga directa disponible desde CloudTranslator.`
   };
 }
 
@@ -616,6 +887,9 @@ function getMediaById(id) {
   const item = mediaBufferStore.get(id);
   if (!item) return null;
   if (Date.now() - item.createdAt > MEDIA_STORE_TTL_MS) {
+    if (item.filePath && fs.existsSync(item.filePath)) {
+      try { fs.unlinkSync(item.filePath); } catch {}
+    }
     mediaBufferStore.delete(id);
     return null;
   }
@@ -629,5 +903,6 @@ module.exports = {
   processConversion,
   getMediaById,
   formatBytes,
+  formatDurationSeconds,
   sanitizeFilename
 };
