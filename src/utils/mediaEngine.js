@@ -25,6 +25,16 @@ try {
   logger.warn(`No se pudo cargar @ffmpeg-installer/ffmpeg, se usará 'ffmpeg' del sistema: ${e.message}`);
 }
 
+/**
+ * Envoltorio para limitar tiempo de espera en promesas de descarga de terceros
+ */
+function withTimeout(promise, ms = 4500) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(`Timeout after ${ms}ms`)), ms))
+  ]);
+}
+
 // Directorio de almacenamiento en caché para medios convertidos físicamente
 const MEDIA_CACHE_DIR = path.join(__dirname, "../../data/media_cache");
 try {
@@ -47,6 +57,11 @@ const cleanupInterval = setInterval(() => {
       if (item.filePath && fs.existsSync(item.filePath)) {
         try {
           fs.unlinkSync(item.filePath);
+        } catch {}
+      }
+      if (item.thumbPath && fs.existsSync(item.thumbPath)) {
+        try {
+          fs.unlinkSync(item.thumbPath);
         } catch {}
       }
       mediaBufferStore.delete(id);
@@ -486,7 +501,7 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
     if (!info.directMediaUrl) {
       try {
         const { alldl } = require("rahad-all-downloader-v2");
-        const dlData = await alldl(resolvedUrl);
+        const dlData = await withTimeout(alldl(resolvedUrl), 4500);
         if (dlData && dlData.data) {
           if (dlData.data.title) info.title = dlData.data.title;
           if (dlData.data.thumbnail) info.thumbnail = dlData.data.thumbnail;
@@ -505,7 +520,7 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
     // 2.3 Fallback con btch.ttdl
     if (!info.directMediaUrl) {
       try {
-        const ttRes = await btch.ttdl(resolvedUrl);
+        const ttRes = await withTimeout(btch.ttdl(resolvedUrl), 4500);
         if (ttRes && ttRes.status) {
           if (ttRes.title) info.title = ttRes.title;
           if (ttRes.thumbnail) info.thumbnail = ttRes.thumbnail;
@@ -525,7 +540,7 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
   else if (platform.id === "instagram") {
     try {
       const { alldl } = require("rahad-all-downloader-v2");
-      const dl = await alldl(cleanUrl);
+      const dl = await withTimeout(alldl(cleanUrl), 4500);
       if (dl && dl.data) {
         if (dl.data.title) info.title = dl.data.title;
         if (dl.data.thumbnail) info.thumbnail = dl.data.thumbnail;
@@ -541,7 +556,7 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
 
     if (!info.directMediaUrl) {
       try {
-        const igRes = await btch.igdl(cleanUrl);
+        const igRes = await withTimeout(btch.igdl(cleanUrl), 4500);
         if (igRes && igRes.status && igRes.result) {
           const items = Array.isArray(igRes.result) ? igRes.result : [igRes.result];
           const media = items[0];
@@ -567,7 +582,7 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
   else if (platform.id === "twitter") {
     try {
       const { alldl } = require("rahad-all-downloader-v2");
-      const dl = await alldl(cleanUrl);
+      const dl = await withTimeout(alldl(cleanUrl), 4500);
       if (dl && dl.data) {
         if (dl.data.title) info.title = dl.data.title;
         if (dl.data.thumbnail) info.thumbnail = dl.data.thumbnail;
@@ -583,7 +598,7 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
 
     if (!info.directMediaUrl) {
       try {
-        const twRes = await btch.twitter(cleanUrl);
+        const twRes = await withTimeout(btch.twitter(cleanUrl), 4500);
         if (twRes && twRes.status && twRes.url) {
           const vUrl = Array.isArray(twRes.url) ? twRes.url[0]?.hd || twRes.url[0]?.sd || twRes.url[0] : twRes.url;
           if (vUrl) {
@@ -603,7 +618,7 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
   // Estrategia 5: Facebook Video
   else if (platform.id === "facebook") {
     try {
-      const fbRes = await btch.fbdown(cleanUrl);
+      const fbRes = await withTimeout(btch.fbdown(cleanUrl), 4500);
       if (fbRes && fbRes.status) {
         const vUrl = fbRes.Normal_video || fbRes.HD || fbRes.video;
         if (vUrl) {
@@ -612,6 +627,7 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
           info.directMediaUrl = vUrl;
         }
         if (fbRes.title) info.title = fbRes.title;
+        if (fbRes.thumbnail || fbRes.thumb) info.thumbnail = fbRes.thumbnail || fbRes.thumb;
       }
     } catch (fbErr) {
       logger.warn(`btch.fbdown fallo para Facebook: ${fbErr.message}`);
@@ -621,7 +637,7 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
   // Estrategia 6: Pinterest Video
   else if (platform.id === "pinterest") {
     try {
-      const pinRes = await btch.pinterest(cleanUrl);
+      const pinRes = await withTimeout(btch.pinterest(cleanUrl), 4500);
       if (pinRes && pinRes.status && pinRes.result) {
         const vUrl = pinRes.result.url || pinRes.result.video;
         if (vUrl) {
@@ -655,11 +671,14 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
   }
 
   // Si la miniatura es una URL remota externa (TikTok, Instagram, Twitter, etc.),
-  // enrutar a través de nuestro proxy para garantizar que nunca sea bloqueada por CORS o Referer
+  // enrutar a través de nuestro proxy para garantizar que nunca sea bloqueada por CORS o Referer.
+  // Si no se obtuvo miniatura remota o es el logo por defecto, generar miniatura estilizada por proxy SVG.
   if (info.thumbnail && typeof info.thumbnail === "string" && info.thumbnail.startsWith("http")) {
     if (!info.thumbnail.includes("i.ytimg.com") && !info.thumbnail.includes("/api/media/thumbnail-proxy")) {
-      info.thumbnail = `/api/media/thumbnail-proxy?url=${encodeURIComponent(info.thumbnail)}`;
+      info.thumbnail = `/api/media/thumbnail-proxy?url=${encodeURIComponent(info.thumbnail)}&title=${encodeURIComponent(info.title)}&platform=${encodeURIComponent(info.platform)}&author=${encodeURIComponent(info.author)}`;
     }
+  } else if (!info.thumbnail || info.thumbnail === "/img/logo.png") {
+    info.thumbnail = `/api/media/thumbnail-proxy?title=${encodeURIComponent(info.title)}&platform=${encodeURIComponent(info.platform)}&author=${encodeURIComponent(info.author)}`;
   }
 
   return info;
@@ -691,6 +710,8 @@ function transcodeToMp3(streamUrl, outputPath, quality = "320k") {
         "-vn",
         "-c:a", "libmp3lame",
         "-b:a", bitrate,
+        "-id3v2_version", "3",
+        "-write_xing", "1",
         "-f", "mp3",
         outputPath
       ]);
@@ -883,6 +904,30 @@ async function processConversion(options = {}) {
     }
   }
 
+  const thumbPath = path.join(MEDIA_CACHE_DIR, `${jobId}_thumb.jpg`);
+  let finalThumbnail = mediaInfo.thumbnail;
+
+  if (selectedFormat === "mp4" && fs.existsSync(outputPath)) {
+    try {
+      const ffThumb = spawn(ffmpegPath, [
+        "-y",
+        "-ss", "00:00:01",
+        "-i", outputPath,
+        "-vframes", "1",
+        "-q:v", "2",
+        thumbPath
+      ]);
+      await new Promise(res => ffThumb.on("close", res));
+      if (fs.existsSync(thumbPath) && fs.statSync(thumbPath).size > 0) {
+        finalThumbnail = `/api/media/thumbnail?id=${jobId}`;
+      }
+    } catch {}
+  }
+
+  if (!finalThumbnail || finalThumbnail === "/img/logo.png") {
+    finalThumbnail = `/api/media/thumbnail-proxy?title=${encodeURIComponent(mediaInfo.title)}&platform=${encodeURIComponent(mediaInfo.platform)}&author=${encodeURIComponent(mediaInfo.author)}`;
+  }
+
   // Guardar en almacén en RAM con enlace al archivo físico en disco
   mediaBufferStore.set(jobId, {
     id: jobId,
@@ -896,10 +941,11 @@ async function processConversion(options = {}) {
     mimeType,
     filename: downloadFilename,
     filePath: outputPath,
+    thumbPath,
     duration: finalDuration,
     durationSeconds: finalDurationSeconds,
     sizeBytes,
-    thumbnail: mediaInfo.thumbnail,
+    thumbnail: finalThumbnail,
     createdAt: Date.now()
   });
 

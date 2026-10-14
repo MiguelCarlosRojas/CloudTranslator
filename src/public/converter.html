@@ -250,7 +250,7 @@
       <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
         <button id="btn-convert" class="btn btn-primary" style="flex: 1.5; min-width: 170px; padding: 10px 18px; font-weight: 600; font-size: 0.92rem; height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px;">
           <svg class="icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          <span id="btn-convert-text">Convertir y Descargar</span>
+          <span id="btn-convert-text">Convertir</span>
         </button>
         <button id="btn-inspect" class="btn btn-outline" style="flex: 1; min-width: 130px; padding: 10px 16px; font-weight: 600; font-size: 0.92rem; height: 42px; display: flex; align-items: center; justify-content: center; gap: 7px;">
           <svg class="icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -277,7 +277,7 @@
         <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
           <!-- Miniatura del Video -->
           <div style="position: relative; width: 220px; max-width: 100%; aspect-ratio: 16/9; background: #000; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-card); flex-shrink: 0;">
-            <img id="res-thumbnail" src="/img/logo.png" alt="Miniatura de Video" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.onerror=null; this.src='/img/logo.png';" style="width: 100%; height: 100%; object-fit: cover;">
+            <img id="res-thumbnail" src="/img/logo.png" alt="Miniatura de Video" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='/img/logo.png';" style="width: 100%; height: 100%; object-fit: cover;">
             <span id="res-platform-badge" style="position: absolute; top: 8px; left: 8px; background: rgba(0, 0, 0, 0.75); color: #ffffff; padding: 3px 8px; border-radius: var(--radius-xs); font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">YOUTUBE</span>
             <span id="res-duration-badge" style="position: absolute; bottom: 8px; right: 8px; background: rgba(0, 0, 0, 0.85); color: #ffffff; padding: 2px 6px; border-radius: var(--radius-xs); font-size: 0.7rem; font-family: var(--font-mono);">00:00</span>
           </div>
@@ -289,6 +289,7 @@
             <p id="res-author" style="margin: 0 0 14px; font-size: 0.85rem; color: var(--text-muted);">Canal / Autor</p>
 
             <div style="display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.8rem; font-family: var(--font-mono); color: var(--text-secondary); margin-bottom: 16px;">
+              <span>DURACIÓN: <strong id="res-duration-text" style="color: var(--primary);">00:00</strong></span>
               <span>TAMAÑO: <strong id="res-size" style="color: #ffffff;">0 MB</strong></span>
               <span>ESTADO: <strong style="color: #10b981;">COMPLETADO</strong></span>
               <span>TTL EN CACHÉ: <strong style="color: var(--primary);">30 MIN</strong></span>
@@ -306,11 +307,11 @@
 
             <!-- Acciones de Descarga y Compartir -->
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-              <a id="btn-download-file" href="#" class="btn btn-primary" download style="padding: 11px 20px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
+              <a id="btn-download-file" href="#" class="btn btn-primary" download style="padding: 10px 18px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
                 <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                Descargar Archivo Físico
+                Descargar
               </a>
-              <button id="btn-copy-stream" class="btn btn-outline" style="padding: 11px 16px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+              <button id="btn-copy-stream" class="btn btn-outline" style="padding: 10px 16px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
                 <svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                 Copiar Enlace Directo
               </button>
@@ -532,9 +533,17 @@
         }
       }
 
-      // Conmutar Pestaña de Formato (detiene la reproducción previa)
+      // Reinicia y oculta la barra de estado y mensaje de conversión previa
+      function resetProgressBox() {
+        progressBox.style.display = "none";
+        progressStatus.innerHTML = "";
+        progressPercent.textContent = "0%";
+        progressBar.style.width = "0%";
+      }
+
+      // Conmutar Pestaña de Formato (NO detiene la reproducción previa para permitir escuchar mientras se navega)
       btnFormatMp3.addEventListener("click", () => {
-        stopMediaPlayback();
+        resetProgressBox();
         selectedFormat = "mp3";
         btnFormatMp3.classList.add("active");
         btnFormatMp3.style.borderColor = "var(--primary)";
@@ -550,7 +559,7 @@
       });
 
       btnFormatMp4.addEventListener("click", () => {
-        stopMediaPlayback();
+        resetProgressBox();
         selectedFormat = "mp4";
         btnFormatMp4.classList.add("active");
         btnFormatMp4.style.borderColor = "var(--primary)";
@@ -565,14 +574,26 @@
         updateQualityOptions("mp4");
       });
 
-      // Si el usuario edita o cambia la URL, ocultar el resultado previo y parar la reproducción
+      // Si el usuario cambia la calidad o tasa de bits, resetear el mensaje de éxito anterior
+      selectQuality.addEventListener("change", () => {
+        resetProgressBox();
+      });
+
+      // Si el usuario edita o cambia la URL, resetear el progreso, ocultar resultado previo y parar reproducción
       inputUrl.addEventListener("input", () => {
+        resetProgressBox();
+        hidePreviousResult();
+      });
+
+      batchUrls.addEventListener("input", () => {
+        resetProgressBox();
         hidePreviousResult();
       });
 
       // Limpiar URL
       btnClear.addEventListener("click", () => {
         inputUrl.value = "";
+        resetProgressBox();
         hidePreviousResult();
         inputUrl.focus();
       });
@@ -583,6 +604,7 @@
           const text = await navigator.clipboard.readText();
           if (text) {
             inputUrl.value = text.trim();
+            resetProgressBox();
             hidePreviousResult();
             runInspect();
           }
@@ -593,33 +615,35 @@
 
       // Toggle Modo Lote
       btnToggleBatch.addEventListener("click", () => {
+        resetProgressBox();
         hidePreviousResult();
         isBatchMode = !isBatchMode;
         if (isBatchMode) {
           singleBox.style.display = "none";
           batchBox.style.display = "block";
           btnToggleBatch.textContent = "Modo Enlace Único";
-          btnConvertText.textContent = "Convertir Lote de Videos";
+          btnConvertText.textContent = "Convertir Lote";
         } else {
           singleBox.style.display = "block";
           batchBox.style.display = "none";
           btnToggleBatch.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg> Modo Lote (Múltiples Enlaces)`;
-          btnConvertText.textContent = "Convertir y Descargar";
+          btnConvertText.textContent = "Convertir";
         }
       });
 
       // Chips de Plataforma para demostración rápida
       document.querySelectorAll(".platform-chip").forEach(chip => {
         chip.addEventListener("click", () => {
+          resetProgressBox();
           hidePreviousResult();
           const plat = chip.getAttribute("data-platform");
           const samples = {
             youtube: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
             tiktok: "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-            instagram: "https://www.instagram.com/reel/C8_example",
-            facebook: "https://www.facebook.com/watch/?v=123456789",
-            twitter: "https://x.com/OpenAI/status/123456789",
-            pinterest: "https://www.pinterest.com/pin/123456789/",
+            instagram: "https://www.instagram.com/reel/C3zYyqJv3qC/",
+            facebook: "https://www.facebook.com/watch/?v=10153231379946729",
+            twitter: "https://x.com/OpenAI/status/1758223617180496152",
+            pinterest: "https://www.pinterest.com/pin/687352358399999999/",
             direct: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
           };
           if (samples[plat]) {
@@ -653,9 +677,15 @@
             resultCard.style.display = "block";
             resTitle.textContent = data.title;
             resAuthor.textContent = data.author || "Autor";
-            resThumbnail.src = data.thumbnail || "/img/logo.png";
+            resThumbnail.src = data.thumbnail || `/api/media/thumbnail-proxy?title=${encodeURIComponent(data.title)}&platform=${encodeURIComponent(data.platform)}&author=${encodeURIComponent(data.author || "")}`;
+            resThumbnail.onerror = () => {
+              resThumbnail.onerror = null;
+              resThumbnail.src = `/api/media/thumbnail-proxy?title=${encodeURIComponent(data.title)}&platform=${encodeURIComponent(data.platform)}&author=${encodeURIComponent(data.author || "")}`;
+            };
             resPlatform.textContent = data.platform;
             resDuration.textContent = data.duration || "00:00";
+            const resDurationText = document.getElementById("res-duration-text");
+            if (resDurationText) resDurationText.textContent = data.duration || "00:00";
             resFormat.textContent = `${selectedFormat.toUpperCase()} - ${selectQuality.value}`;
             resSize.textContent = "Calculando...";
             audioWrapper.style.display = "none";
@@ -674,7 +704,7 @@
 
       btnInspect.addEventListener("click", runInspect);
 
-      // Función: Convertir y Descargar
+      // Función: Convertir
       btnConvert.addEventListener("click", async () => {
         const quality = selectQuality.value;
 
@@ -762,13 +792,44 @@
         }
       });
 
+      // Actualizar visualización de duración de audio y video
+      function updateDurationDisplay(seconds) {
+        if (!seconds || isNaN(seconds) || !isFinite(seconds) || seconds <= 0) return;
+        const m = Math.floor(seconds / 60);
+        const s = Math.floor(seconds % 60);
+        const durStr = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        resDuration.textContent = durStr;
+        const dText = document.getElementById("res-duration-text");
+        if (dText) dText.textContent = durStr;
+      }
+
+      audioPlayer.addEventListener("loadedmetadata", () => {
+        updateDurationDisplay(audioPlayer.duration);
+      });
+      audioPlayer.addEventListener("durationchange", () => {
+        updateDurationDisplay(audioPlayer.duration);
+      });
+
+      videoPlayer.addEventListener("loadedmetadata", () => {
+        updateDurationDisplay(videoPlayer.duration);
+      });
+      videoPlayer.addEventListener("durationchange", () => {
+        updateDurationDisplay(videoPlayer.duration);
+      });
+
       function displayResult(item) {
         resultCard.style.display = "block";
         resTitle.textContent = item.title;
         resAuthor.textContent = item.author || "Autor";
-        resThumbnail.src = item.thumbnail || "/img/logo.png";
+        resThumbnail.src = item.thumbnail || `/api/media/thumbnail-proxy?title=${encodeURIComponent(item.title)}&platform=${encodeURIComponent(item.platform)}&author=${encodeURIComponent(item.author || "")}`;
+        resThumbnail.onerror = () => {
+          resThumbnail.onerror = null;
+          resThumbnail.src = `/api/media/thumbnail-proxy?title=${encodeURIComponent(item.title)}&platform=${encodeURIComponent(item.platform)}&author=${encodeURIComponent(item.author || "")}`;
+        };
         resPlatform.textContent = item.platform || "MEDIA";
         resDuration.textContent = item.duration || "00:00";
+        const resDurationText = document.getElementById("res-duration-text");
+        if (resDurationText) resDurationText.textContent = item.duration || "00:00";
         resFormat.textContent = `${item.format.toUpperCase()} ${item.quality.toUpperCase()}`;
         resSize.textContent = item.sizeFormatted || "4.5 MB";
 
