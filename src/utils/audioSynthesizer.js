@@ -1245,6 +1245,20 @@ async function cloneWithSeedVCDiffusion(sourceWavBuffer, userWavBuffer, options 
 }
 
 /**
+ * Decodifica de forma segura cualquier Data URI o string Base64 de audio a Buffer binario,
+ * soportando mime types complejos con múltiples parámetros (ej. data:audio/webm;codecs=opus;base64,...).
+ */
+function decodeBase64Audio(base64String) {
+  if (!base64String || typeof base64String !== "string") {
+    return Buffer.alloc(0);
+  }
+  const commaIdx = base64String.indexOf(",");
+  const cleanBase64 = commaIdx !== -1 ? base64String.slice(commaIdx + 1) : base64String;
+  const sanitized = cleanBase64.replace(/\s+/g, "");
+  return Buffer.from(sanitized, "base64");
+}
+
+/**
  * Pilar 03: Motor de Clonación de Voz con IA 100% en el backend.
  * Extrae la huella vocal real (F0, formantes, timbre, género) de la muestra
  * grabada por el usuario o archivo subido (.mp3, .wav, .m4a, .webm)
@@ -1267,9 +1281,8 @@ async function cloneVoice(text, options = {}) {
   // 1. Análisis espectral forense y extracción de WAV de la muestra del usuario
   if (audioSampleBase64 && typeof audioSampleBase64 === "string") {
     try {
-      const rawBase64 = audioSampleBase64.replace(/^data:[^;]+;base64,/, "");
-      const sampleBuf = Buffer.from(rawBase64, "base64");
-      if (sampleBuf.length > 500) {
+      const sampleBuf = decodeBase64Audio(audioSampleBase64);
+      if (sampleBuf.length > 200) {
         userFeatures = await extractFullVoiceFeatures(sampleBuf);
         userWavBuffer = await convertAudioBufferToWav(sampleBuf, 24000);
       }
@@ -1465,5 +1478,6 @@ module.exports = {
   cloneVoice,
   extractFullVoiceFeatures,
   generateWavBuffer,
-  getAudioById
+  getAudioById,
+  decodeBase64Audio
 };

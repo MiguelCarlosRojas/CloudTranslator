@@ -8,7 +8,8 @@ const {
   synthesizeSpeech,
   cloneVoice,
   extractFullVoiceFeatures,
-  getAudioById
+  getAudioById,
+  decodeBase64Audio
 } = require("../utils/audioSynthesizer");
 const {
   SUPPORTED_PLATFORMS,
@@ -125,12 +126,11 @@ router.post("/voice-clone/analyze", async (req, res) => {
       });
     }
 
-    const rawBase64 = audioSampleBase64.replace(/^data:[^;]+;base64,/, "");
-    const sampleBuf = Buffer.from(rawBase64, "base64");
+    const sampleBuf = decodeBase64Audio(audioSampleBase64);
     if (sampleBuf.length < 200) {
       return res.status(400).json({
         status: "error",
-        error: "La muestra de audio es demasiado pequeña o está corrupta."
+        error: "La muestra de audio es demasiado pequeña o está corrupta (bytes recibidos: " + sampleBuf.length + ")."
       });
     }
 
