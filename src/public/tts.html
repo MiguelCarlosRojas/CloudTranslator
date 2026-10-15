@@ -405,15 +405,72 @@
       }
       if (ttsInput) ttsInput.addEventListener("input", updateCharCount);
 
+      function stopCurrentPlayback() {
+        if (audioPlayer && (!audioPlayer.paused || audioPlayer.currentTime > 0)) {
+          audioPlayer.pause();
+          audioPlayer.currentTime = 0;
+          setStatus("DETENIDO", false);
+          stopTimer();
+          setTTSPlaybackLock(false);
+        }
+      }
+
+      function setTTSPlaybackLock(isLocked) {
+        const lockableElements = [
+          ttsInput,
+          ttsLang,
+          ttsVoice,
+          ttsRate,
+          ttsPitch,
+          ttsBtnPlay,
+          ttsBtnDownload
+        ];
+
+        lockableElements.forEach(el => {
+          if (el) {
+            el.disabled = isLocked;
+            el.style.pointerEvents = isLocked ? "none" : "auto";
+            el.style.opacity = isLocked ? "0.6" : "1";
+          }
+        });
+
+        if (ttsInput) {
+          ttsInput.readOnly = isLocked;
+          ttsInput.style.cursor = isLocked ? "not-allowed" : "text";
+        }
+
+        document.querySelectorAll(".btn-select-voice, .btn-sample-play, .btn-filter-voice").forEach(btn => {
+          btn.disabled = isLocked;
+          btn.style.pointerEvents = isLocked ? "none" : "auto";
+          btn.style.opacity = isLocked ? "0.6" : "1";
+        });
+
+        // Asegurar que Pausar y Detener SIEMPRE estén activos para interactuar durante la reproducción
+        if (ttsBtnPause) {
+          ttsBtnPause.disabled = false;
+          ttsBtnPause.style.pointerEvents = "auto";
+          ttsBtnPause.style.opacity = "1";
+          ttsBtnPause.style.cursor = "pointer";
+        }
+        if (ttsBtnStop) {
+          ttsBtnStop.disabled = false;
+          ttsBtnStop.style.pointerEvents = "auto";
+          ttsBtnStop.style.opacity = "1";
+          ttsBtnStop.style.cursor = "pointer";
+        }
+      }
+
       if (ttsRate) {
         ttsRate.addEventListener("input", (e) => {
           ttsRateVal.textContent = parseFloat(e.target.value).toFixed(1) + "x";
+          stopCurrentPlayback();
         });
       }
 
       if (ttsPitch) {
         ttsPitch.addEventListener("input", (e) => {
           ttsPitchVal.textContent = parseFloat(e.target.value).toFixed(1);
+          stopCurrentPlayback();
         });
       }
 
@@ -521,6 +578,7 @@
         // Eventos de botones en tarjetas
         document.querySelectorAll(".btn-select-voice").forEach(b => {
           b.addEventListener("click", (e) => {
+            stopCurrentPlayback();
             const vId = e.currentTarget.getAttribute("data-voice");
             if (ttsVoice) ttsVoice.value = vId;
             const foundVoice = backendVoices.find(v => v.id === vId);
@@ -534,6 +592,7 @@
 
         document.querySelectorAll(".btn-sample-play").forEach(b => {
           b.addEventListener("click", async (e) => {
+            stopCurrentPlayback();
             const vId = e.currentTarget.getAttribute("data-voice");
             const sampleTxt = decodeURIComponent(e.currentTarget.getAttribute("data-text"));
             e.currentTarget.disabled = true;
@@ -546,7 +605,7 @@
               const d = await res.json();
               if (d.audioBase64) {
                 audioPlayer.src = d.audioBase64;
-                audioPlayer.play();
+                await audioPlayer.play();
                 setStatus(`REPRODUCIENDO (${vId})`, true);
                 startTimer();
               }
@@ -559,6 +618,7 @@
       // Sincronización bidireccional entre selector de idioma y selector de voz
       if (ttsLang) {
         ttsLang.addEventListener("change", () => {
+          stopCurrentPlayback();
           const lCode = ttsLang.value.slice(0, 2);
           const firstMatching = backendVoices.find(v => v.lang === lCode);
           if (firstMatching && ttsVoice) {
@@ -569,6 +629,7 @@
 
       if (ttsVoice) {
         ttsVoice.addEventListener("change", () => {
+          stopCurrentPlayback();
           const vObj = backendVoices.find(v => v.id === ttsVoice.value);
           if (vObj && ttsLang) {
             const matchedOpt = Array.from(ttsLang.options).find(o => o.value.startsWith(vObj.lang));
@@ -588,22 +649,26 @@
         });
       });
 
-      // Eventos del Audio Player HTML5
+      // Eventos del Audio Player HTML5 con bloqueo automático
       audioPlayer.addEventListener("play", () => {
         setStatus("REPRODUCIENDO", true);
         startTimer();
+        setTTSPlaybackLock(true);
       });
       audioPlayer.addEventListener("pause", () => {
         setStatus("PAUSADO", false);
         if (timerInterval) clearInterval(timerInterval);
+        setTTSPlaybackLock(false);
       });
       audioPlayer.addEventListener("ended", () => {
         setStatus("COMPLETADO", false);
         stopTimer();
+        setTTSPlaybackLock(false);
       });
       audioPlayer.addEventListener("error", () => {
         setStatus("ERROR", false);
         stopTimer();
+        setTTSPlaybackLock(false);
       });
 
       // Botón Reproducir / Generar con Backend 100% Real
@@ -620,7 +685,8 @@
             return;
           }
 
-          ttsBtnPlay.disabled = true;
+          setTTSPlaybackLock(true);
+          ttsBtnPlay.innerHTML = `<span class="spinner" style="display:inline-block; margin-right:8px;"></span> Sintetizando...`;
           setStatus("SINTETIZANDO EN BACKEND...", true);
 
           try {
@@ -648,15 +714,19 @@
           } catch (err) {
             alert("Error al sintetizar voz: " + err.message);
             setStatus("ERROR", false);
+            setTTSPlaybackLock(false);
           } finally {
-            ttsBtnPlay.disabled = false;
+            ttsBtnPlay.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg> Reproducir`;
           }
         });
       }
 
       if (ttsBtnPause) {
         ttsBtnPause.addEventListener("click", () => {
-          if (!audioPlayer.paused) audioPlayer.pause();
+          if (!audioPlayer.paused) {
+            audioPlayer.pause();
+            setTTSPlaybackLock(false);
+          }
         });
       }
 
@@ -666,6 +736,7 @@
           audioPlayer.currentTime = 0;
           setStatus("DETENIDO", false);
           stopTimer();
+          setTTSPlaybackLock(false);
         });
       }
 
