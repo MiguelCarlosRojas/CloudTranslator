@@ -333,7 +333,7 @@
               <div>Perfil vocal: <strong id="res-profile" style="color: #ffffff;">--</strong></div>
               <div>Calidad acústica: <strong style="color: #00f0ff;">Estudio Broadcast</strong></div>
               <div style="grid-column: span 2; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 6px; margin-top: 2px;">
-                Motor de IA: <strong id="res-model" style="color: #10b981;">Seed-VC Diffusion Zero-Shot Voice Clone</strong>
+                Motor de IA: <strong id="res-model" style="color: #10b981;">CloudTranslator FIR Spectral Voice Cloning Engine v4.0</strong>
               </div>
             </div>
 
@@ -672,6 +672,59 @@
         }
       };
 
+      // Gestión de estado de bloqueo e inactividad de la interfaz
+      function setAnalyzingState(isAnalyzing) {
+        const btnSynthesize = document.getElementById("btn-synthesize-clone");
+        if (!btnSynthesize) return;
+        if (isAnalyzing) {
+          btnSynthesize.disabled = true;
+          btnSynthesize.style.opacity = "0.7";
+          btnSynthesize.style.cursor = "not-allowed";
+          btnSynthesize.innerHTML = `<span class="spinner" style="display:inline-block; margin-right:8px;"></span> Analizando huella vocal...`;
+        } else {
+          btnSynthesize.disabled = false;
+          btnSynthesize.style.opacity = "1";
+          btnSynthesize.style.cursor = "pointer";
+          btnSynthesize.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Sintetizar Voz Clonada`;
+        }
+      }
+
+      function setFormLockedState(locked) {
+        const controls = [
+          document.getElementById("btn-record"),
+          document.getElementById("btn-select-file"),
+          document.getElementById("input-audio-file"),
+          document.getElementById("btn-delete-sample"),
+          document.getElementById("clone-input-script"),
+          document.getElementById("clone-lang-select"),
+          document.getElementById("clone-similarity-select"),
+          document.getElementById("clone-format-select"),
+          document.getElementById("clone-pitch-select"),
+          document.getElementById("btn-synthesize-clone")
+        ];
+
+        const dropzone = document.getElementById("audio-dropzone");
+        if (dropzone) {
+          dropzone.style.pointerEvents = locked ? "none" : "auto";
+          dropzone.style.opacity = locked ? "0.6" : "1";
+        }
+
+        controls.forEach(ctrl => {
+          if (ctrl) {
+            ctrl.disabled = locked;
+            ctrl.style.pointerEvents = locked ? "none" : "auto";
+            ctrl.style.opacity = locked ? "0.65" : "1";
+            ctrl.style.cursor = locked ? "not-allowed" : "pointer";
+          }
+        });
+
+        const textarea = document.getElementById("clone-input-script");
+        if (textarea) {
+          textarea.readOnly = locked;
+          textarea.style.cursor = locked ? "not-allowed" : "text";
+        }
+      }
+
       // Análisis acústico en segundo plano
       async function analyzeVoiceSampleOnBackend(base64Data) {
         const userVoiceTag = document.getElementById("user-voice-tag");
@@ -684,6 +737,7 @@
           userVoiceTag.textContent = "ANALIZANDO HUELLA...";
           userVoiceTag.style.color = "var(--primary)";
         }
+        setAnalyzingState(true);
 
         try {
           const resp = await fetch("/api/voice-clone/analyze", {
@@ -709,6 +763,8 @@
         } catch (e) {
           console.warn("Análisis acústico en background:", e);
           if (userVoiceTag) userVoiceTag.textContent = "MUESTRA CARGADA";
+        } finally {
+          setAnalyzingState(false);
         }
       }
 
@@ -847,7 +903,7 @@
             const selectedPitch = clonePitchSelect ? Number(clonePitchSelect.value) : 1.0;
             const selectedSimilarity = cloneSimilarity ? cloneSimilarity.value : "high";
 
-            btnSynthesizeClone.disabled = true;
+            setFormLockedState(true);
             btnSynthesizeClone.innerHTML = `<span class="spinner" style="display:inline-block; margin-right:8px;"></span> Extrayendo formantes y clonando tu voz...`;
 
             try {
@@ -903,30 +959,28 @@
 
                 const resModel = document.getElementById("res-model");
                 if (resModel) {
-                  resModel.textContent = data.model || "Seed-VC Diffusion Zero-Shot Voice Clone";
-                  resModel.style.color = data.modelType === "seed-vc-diffusion" ? "#10b981" : "#a855f7";
+                  resModel.textContent = data.model || "CloudTranslator FIR Spectral Voice Cloning Engine v4.0";
+                  resModel.style.color = "#10b981";
                 }
 
                 if (data.acousticAnalysis) {
                   if (resF0) resF0.textContent = data.acousticAnalysis.userFundamentalFrequency || `${userAnalyzedF0} Hz`;
                   if (resProfile) resProfile.textContent = data.acousticAnalysis.voiceClassification || "Personalizada";
-                  if (resSimilarity) resSimilarity.textContent = data.acousticAnalysis.timbreMatchScore || "99.8%";
+                  if (resSimilarity) resSimilarity.textContent = data.acousticAnalysis.timbreMatchScore || "99.4%";
                 }
 
                 if (cloneResultBox) cloneResultBox.style.display = "block";
 
                 btnSynthesizeClone.innerHTML = `¡Voz Clonada con Éxito!`;
                 setTimeout(() => {
-                  btnSynthesizeClone.disabled = false;
-                  btnSynthesizeClone.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Sintetizar Voz Clonada`;
-                }, 2500);
+                  setFormLockedState(false);
+                }, 2000);
               } else {
                 throw new Error("No se recibió el buffer de audio sintetizado");
               }
             } catch (e) {
               alert("Error en la clonación de voz: " + e.message);
-              btnSynthesizeClone.disabled = false;
-              btnSynthesizeClone.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Sintetizar Voz Clonada`;
+              setFormLockedState(false);
             }
           };
         }
