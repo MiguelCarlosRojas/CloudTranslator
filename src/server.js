@@ -9,9 +9,9 @@ const logger = require("./utils/logger");
 
 const app = express();
 
-// 1. Compresión de respuestas HTTP (Gzip/Deflate) para acelerar transferencia y reducir ancho de banda
+// 1. Compresión de respuestas HTTP (Gzip/Deflate) optimizada para conexiones lentas y bajo ancho de banda
 app.use(compression({
-  threshold: 512, // Comprimir respuestas mayores a 512 bytes
+  threshold: 256, // Comprimir respuestas mayores a 256 bytes
   filter: (req, res) => {
     if (req.headers["x-no-compression"]) return false;
     return compression.filter(req, res);
@@ -140,13 +140,18 @@ pageRoutes.forEach(({ path: routePath, file }) => {
   });
 });
 
-// 9. Archivos estáticos optimizados con caché HTTP y ETag
+// 9. Archivos estáticos optimizados con caché HTTP, ETag y stale-while-revalidate para conexiones lentas
 app.use(express.static(path.join(__dirname, "public"), {
   extensions: ["html"],
   index: false,
   maxAge: "1d",
   etag: true,
-  lastModified: true
+  lastModified: true,
+  setHeaders: (res, filePath) => {
+    if (filePath.match(/\.(css|js|png|jpg|jpeg|svg|ico|woff2|woff)$/i)) {
+      res.setHeader("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
+    }
+  }
 }));
 
 // 10. Manejo global de errores

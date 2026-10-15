@@ -86,6 +86,53 @@ router.post("/tts", async (req, res) => {
   }
 });
 
+// Helper: Parseo seguro de Cookies HTTP sin dependencias
+function parseCookies(req) {
+  const cookies = {};
+  const header = req.headers.cookie;
+  if (header) {
+    header.split(";").forEach(c => {
+      const parts = c.split("=");
+      const key = parts.shift().trim();
+      const val = decodeURIComponent(parts.join("="));
+      if (key) cookies[key] = val;
+    });
+  }
+  return cookies;
+}
+
+// Helper: Streaming de audio de alto rendimiento con soporte HTTP 206 Partial Content
+function streamAudioBuffer(req, res, audioItem) {
+  const buffer = audioItem.buffer;
+  const total = buffer.length;
+  const range = req.headers.range;
+
+  if (range) {
+    const parts = range.replace(/bytes=/, "").split("-");
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : total - 1;
+    const chunksize = (end - start) + 1;
+    const sliced = buffer.subarray(start, end + 1);
+
+    res.writeHead(206, {
+      "Content-Range": `bytes ${start}-${end}/${total}`,
+      "Accept-Ranges": "bytes",
+      "Content-Length": chunksize,
+      "Content-Type": audioItem.mimeType,
+      "Cache-Control": "public, max-age=1800"
+    });
+    res.end(sliced);
+  } else {
+    res.writeHead(200, {
+      "Content-Length": total,
+      "Content-Type": audioItem.mimeType,
+      "Accept-Ranges": "bytes",
+      "Cache-Control": "public, max-age=1800"
+    });
+    res.end(buffer);
+  }
+}
+
 // Streaming de audio TTS (para etiquetas <audio> o reproductores de clientes)
 router.get("/tts/stream", (req, res) => {
   const { id } = req.query;
@@ -94,10 +141,7 @@ router.get("/tts/stream", (req, res) => {
     return res.status(404).send("Audio no encontrado o expirado (TTL 30 min).");
   }
 
-  res.setHeader("Content-Type", audioItem.mimeType);
-  res.setHeader("Content-Length", audioItem.buffer.length);
-  res.setHeader("Accept-Ranges", "bytes");
-  res.send(audioItem.buffer);
+  streamAudioBuffer(req, res, audioItem);
 });
 
 // Descarga directa de archivo de audio TTS
@@ -164,7 +208,9 @@ router.post("/voice-clone", async (req, res) => {
       similarity = "high",
       lang = "es",
       gender = "auto",
-      format = "wav"
+      format = "wav",
+      apiKey: bodyApiKey,
+      engine: bodyEngine
     } = req.body || {};
 
     if (!text || typeof text !== "string") {
@@ -174,13 +220,20 @@ router.post("/voice-clone", async (req, res) => {
       });
     }
 
+    // Extracción de clave y motor desde cookies, headers o variables de entorno en Render
+    const cookies = parseCookies(req);
+    const resolvedApiKey = bodyApiKey || req.headers["x-api-key"] || req.headers["x-hf-token"] || cookies.ct_vc_key || null;
+    const resolvedEngine = bodyEngine || req.headers["x-engine"] || cookies.ct_vc_engine || "auto";
+
     const result = await cloneVoice(text, {
       audioSampleBase64,
       lang,
       gender,
       pitch: Number(pitch) || 1.0,
       similarity,
-      format: format === "mp3" ? "mp3" : "wav"
+      format: format === "mp3" ? "mp3" : "wav",
+      apiKey: resolvedApiKey,
+      engine: resolvedEngine
     });
 
     res.json(result);
@@ -192,7 +245,7 @@ router.post("/voice-clone", async (req, res) => {
   }
 });
 
-// Streaming de voz clonada
+// Streaming de voz clonada con soporte HTTP 206 Partial Content (carga instantánea en redes lentas)
 router.get("/voice-clone/stream", (req, res) => {
   const { id } = req.query;
   const audioItem = getAudioById(id);
@@ -200,10 +253,7 @@ router.get("/voice-clone/stream", (req, res) => {
     return res.status(404).send("Audio clonado no encontrado o expirado.");
   }
 
-  res.setHeader("Content-Type", audioItem.mimeType);
-  res.setHeader("Content-Length", audioItem.buffer.length);
-  res.setHeader("Accept-Ranges", "bytes");
-  res.send(audioItem.buffer);
+  streamAudioBuffer(req, res, audioItem);
 });
 
 // Descarga directa de archivo de voz clonada

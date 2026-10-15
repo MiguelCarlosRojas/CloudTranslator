@@ -402,28 +402,46 @@
     async _fetchTranslationSingleRequest(textsBatch, targetLanguage) {
       if (!textsBatch || textsBatch.length === 0) return;
 
-      try {
-        const response = await fetch(this.endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            texts: textsBatch,
-            targetLanguage: targetLanguage
-          })
-        });
+      const doFetch = async (attempt = 1) => {
+        const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+        const timeoutId = controller ? setTimeout(() => controller.abort(), 12000) : null;
 
-        if (response.ok) {
-          const data = await response.json();
-          if (data && Array.isArray(data.translatedTexts)) {
-            data.translatedTexts.forEach((translatedStr, idx) => {
-              this.cache[targetLanguage][textsBatch[idx]] = translatedStr;
-            });
-            return;
+        try {
+          const response = await fetch(this.endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              texts: textsBatch,
+              targetLanguage: targetLanguage
+            }),
+            signal: controller ? controller.signal : undefined
+          });
+
+          if (timeoutId) clearTimeout(timeoutId);
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data && Array.isArray(data.translatedTexts)) {
+              data.translatedTexts.forEach((translatedStr, idx) => {
+                this.cache[targetLanguage][textsBatch[idx]] = translatedStr;
+              });
+              return true;
+            }
           }
+        } catch (e) {
+          if (timeoutId) clearTimeout(timeoutId);
+          if (attempt === 1) {
+            // Reintento adaptativo para redes lentas o inestables
+            await new Promise(r => setTimeout(r, 400));
+            return doFetch(2);
+          }
+          console.warn("[CloudTranslator] Advertencia en lote de traducción:", e);
         }
-      } catch (e) {
-        console.warn("[CloudTranslator] Advertencia en lote de traducción:", e);
-      }
+        return false;
+      };
+
+      const success = await doFetch();
+      if (success) return;
 
       // Fallback
       for (const singleText of textsBatch) {

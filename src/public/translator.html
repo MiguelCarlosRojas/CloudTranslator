@@ -412,12 +412,27 @@
         }
       }
 
+      // Caché en memoria del cliente para respuestas instantáneas en 0ms
+      const translatorClientCache = new Map();
+
       if (btnRun) {
         btnRun.addEventListener("click", async () => {
           const text = (inputText.value || "").trim();
           const to = targetLang.value;
           if (!text) {
             inputText.focus();
+            return;
+          }
+
+          const cacheKey = `${to}:${text}`;
+          if (translatorClientCache.has(cacheKey)) {
+            const cached = translatorClientCache.get(cacheKey);
+            latencyBadge.textContent = "LATENCIA: 0ms (CACHÉ LOCAL)";
+            latencyBadge.style.display = "inline-block";
+            outputJson.textContent = JSON.stringify(cached, null, 2);
+            outputText.textContent = cached.translatedText || text;
+            stats.textContent = `Éxito • ${(cached.translatedText || text).length} caracteres • 0ms (Caché local)`;
+            stats.style.color = "#10b981";
             return;
           }
 
@@ -442,6 +457,7 @@
             outputJson.textContent = JSON.stringify(data, null, 2);
 
             if (data.translatedText) {
+              translatorClientCache.set(cacheKey, data);
               outputText.textContent = data.translatedText;
               stats.textContent = `Éxito • ${data.translatedText.length} caracteres • ${latency}ms`;
               stats.style.color = "#10b981";

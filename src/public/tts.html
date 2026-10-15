@@ -671,6 +671,9 @@
         setTTSPlaybackLock(false);
       });
 
+      // Caché local en memoria del cliente para respuestas en 0ms
+      const ttsClientCache = new Map();
+
       // Botón Reproducir / Generar con Backend 100% Real
       if (ttsBtnPlay) {
         ttsBtnPlay.addEventListener("click", async () => {
@@ -685,27 +688,43 @@
             return;
           }
 
+          const selectedVoiceId = ttsVoice.value;
+          const rateVal = parseFloat(ttsRate.value) || 1.0;
+          const pitchVal = parseFloat(ttsPitch.value) || 1.0;
+          const clientCacheKey = `${selectedVoiceId}:${rateVal}:${pitchVal}:${text}`;
+
+          // Si ya lo tenemos en memoria, reproducir al instante en 0ms sin consumir red
+          if (ttsClientCache.has(clientCacheKey)) {
+            const cached = ttsClientCache.get(clientCacheKey);
+            lastGeneratedAudio = cached;
+            audioPlayer.src = cached.streamUrl || cached.audioBase64;
+            await audioPlayer.play();
+            setStatus("REPRODUCIENDO (0ms CACHÉ)", true);
+            return;
+          }
+
           setTTSPlaybackLock(true);
           ttsBtnPlay.innerHTML = `<span class="spinner" style="display:inline-block; margin-right:8px;"></span> Sintetizando...`;
           setStatus("SINTETIZANDO EN BACKEND...", true);
 
           try {
-            const selectedVoiceId = ttsVoice.value;
             const resp = await fetch("/api/tts", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 text,
                 voiceId: selectedVoiceId,
-                rate: parseFloat(ttsRate.value) || 1.0,
-                pitch: parseFloat(ttsPitch.value) || 1.0
+                rate: rateVal,
+                pitch: pitchVal
               })
             });
 
             const data = await resp.json();
-            if (data.status === "success" && data.audioBase64) {
+            if (data.status === "success" && (data.streamUrl || data.audioBase64)) {
               lastGeneratedAudio = data;
-              audioPlayer.src = data.audioBase64;
+              ttsClientCache.set(clientCacheKey, data);
+              // Usar streamUrl para inicio de reproducción inmediato por HTTP 206 en redes lentas
+              audioPlayer.src = data.streamUrl || data.audioBase64;
               await audioPlayer.play();
               setStatus("REPRODUCIENDO", true);
             } else {
