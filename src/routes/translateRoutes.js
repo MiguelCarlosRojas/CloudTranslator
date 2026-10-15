@@ -208,9 +208,7 @@ router.post("/voice-clone", async (req, res) => {
       similarity = "high",
       lang = "es",
       gender = "auto",
-      format = "wav",
-      apiKey: bodyApiKey,
-      engine: bodyEngine
+      format = "wav"
     } = req.body || {};
 
     if (!text || typeof text !== "string") {
@@ -220,20 +218,13 @@ router.post("/voice-clone", async (req, res) => {
       });
     }
 
-    // Extracción de clave y motor desde cookies, headers o variables de entorno en Render
-    const cookies = parseCookies(req);
-    const resolvedApiKey = bodyApiKey || req.headers["x-api-key"] || req.headers["x-hf-token"] || cookies.ct_vc_key || null;
-    const resolvedEngine = bodyEngine || req.headers["x-engine"] || cookies.ct_vc_engine || "auto";
-
     const result = await cloneVoice(text, {
       audioSampleBase64,
       lang,
       gender,
       pitch: Number(pitch) || 1.0,
       similarity,
-      format: format === "mp3" ? "mp3" : "wav",
-      apiKey: resolvedApiKey,
-      engine: resolvedEngine
+      format: format === "mp3" ? "mp3" : "wav"
     });
 
     res.json(result);

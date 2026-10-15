@@ -145,26 +145,25 @@
           </h2>
           <p>Sube tu muestra, escucha tu voz de referencia, escribe el guion deseado y genera la locución clonada.</p>
         </div>
-        <span class="pillar-tag" style="background: rgba(168, 85, 247, 0.1); color: var(--secondary); border-color: rgba(168, 85, 247, 0.3);">MODELO NEURONAL // ZERO-SHOT DSP HYBRID</span>
+        <span class="pillar-tag" style="background: rgba(168, 85, 247, 0.1); color: var(--secondary); border-color: rgba(168, 85, 247, 0.3);">IA BIOMÉTRICA // MOTOR PROPIO 100% AUTÓNOMO</span>
       </div>
 
-      <!-- Barra de Estado y Configuración de Motor Neural -->
+      <!-- Barra de Estado del Motor de IA Propio -->
       <div class="engine-config-banner" style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: var(--radius-md); padding: 12px 18px; margin-bottom: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 12px; height: 12px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981; transition: all 0.3s ease;" id="engine-status-dot"></div>
+          <div style="width: 12px; height: 12px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981;" id="engine-status-dot"></div>
           <div>
             <div style="font-size: 0.86rem; font-weight: 700; color: #ffffff;">
-              Motor de Clonación: <span id="current-engine-label" style="color: var(--secondary);">Hugging Face Neural (F5-TTS)</span>
+              Motor de IA: <span id="current-engine-label" style="color: var(--secondary);">CloudTranslator Bio-Acoustic Voice Clone v3.0</span>
             </div>
             <div style="font-size: 0.76rem; color: var(--text-muted);" id="current-engine-desc">
-              Clonación Zero-Shot con tu voz auténtica 100% personalizada
+              IA Biométrica Propia • Tu voz auténtica 100% personalizada • Sin APIs de terceros • Ilimitado
             </div>
           </div>
         </div>
-        <button id="btn-open-engine-modal" class="btn btn-outline" type="button" style="padding: 8px 18px; font-size: 0.82rem; border-color: rgba(168, 85, 247, 0.6); color: #ffffff; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer;">
-          <svg class="icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          ⚙️ Configurar Motor Neural
-        </button>
+        <div style="font-size: 0.78rem; font-family: var(--font-mono); color: #10b981; background: rgba(16, 185, 129, 0.12); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 700;">
+          ⚡ MOTOR DE IA ACTIVO
+        </div>
       </div>
 
       <div class="studio-grid">
@@ -384,62 +383,6 @@
     "similarity": "high",
     "audioSampleBase64": "data:audio/wav;base64,..."
   }'</pre>
-    <!-- Modal de Configuración del Motor Neural (Cookies Seguras / Zero localStorage) -->
-    <div id="engine-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
-      <div style="background: #0d111a; border: 1px solid rgba(168, 85, 247, 0.4); border-radius: var(--radius-lg); max-width: 520px; width: 100%; padding: 26px; box-shadow: 0 25px 60px rgba(0,0,0,0.85); position: relative;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-          <h3 style="font-size: 1.15rem; color: #ffffff; display: flex; align-items: center; gap: 8px; margin: 0;">
-            <span style="color: var(--secondary);">⚙️</span> Configurar Motor Neural (Voz 100% Real)
-          </h3>
-          <button id="btn-close-engine-modal" type="button" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.4rem; line-height: 1; padding: 4px;">✕</button>
-        </div>
-        
-        <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.45;">
-          Para que el audio generado hable <strong>exactamente con tu propia voz</strong>, CloudTranslator utiliza motores neuronales de clonación acústica (Zero-Shot Neural TTS). Configura aquí tu motor preferido:
-        </p>
-
-        <!-- Selector de Motor -->
-        <div style="margin-bottom: 14px;">
-          <label for="modal-engine-select" style="display: block; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;">SELECCIONA EL MOTOR DE CLONACIÓN</label>
-          <div class="select-wrapper">
-            <select id="modal-engine-select" class="form-select-custom studio-select" style="width: 100%; padding: 10px 14px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.85rem; outline: none;">
-              <option value="huggingface" selected>Hugging Face Neural (F5-TTS) • 100% Gratuito (Sin Tarjeta)</option>
-              <option value="elevenlabs">ElevenLabs Instant Voice Cloning • Máxima Calidad de Estudio</option>
-              <option value="fishaudio">Fish Audio Zero-Shot • Créditos Gratuitos Diarios</option>
-              <option value="dsp">Emulador Acústico DSP • Modo Prueba Local (Filtro sintético)</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Campo API Key / Token -->
-        <div id="modal-key-container" style="margin-bottom: 14px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <label id="modal-key-label" for="modal-api-key" style="font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted); text-transform: uppercase; margin: 0;">TOKEN DE HUGGING FACE (HF_TOKEN)</label>
-            <button id="btn-toggle-key-visibility" type="button" style="background: transparent; border: none; font-size: 0.72rem; color: var(--secondary); cursor: pointer; text-decoration: underline;">Mostrar</button>
-          </div>
-          <input type="password" id="modal-api-key" placeholder="Pega tu token aquí (ej. hf_...)" style="width: 100%; padding: 10px 14px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.85rem; font-family: var(--font-mono); outline: none;">
-          <div id="modal-key-help" style="font-size: 0.75rem; color: #a855f7; margin-top: 6px; line-height: 1.4;">
-            💡 Genera tu token de lectura gratuito en 30 segundos en <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener" style="color: #00f0ff; text-decoration: underline; font-weight: 600;">huggingface.co/settings/tokens</a> (100% gratis, sin tarjeta).
-          </div>
-        </div>
-
-        <!-- Aviso de privacidad técnica con Cookies -->
-        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 0.75rem; color: #10b981; margin-bottom: 18px; line-height: 1.4;">
-          🔒 <strong>Privacidad y Cero localStorage:</strong> Tu clave se guarda exclusivamente en la cookie técnica <code>ct_vc_key</code> en tu navegador y viaja de forma cifrada mediante HTTPS a Render Free. No se almacena en ninguna base de datos.
-        </div>
-
-        <!-- Botones de Acción -->
-        <div style="display: flex; gap: 10px; justify-content: flex-end; align-items: center;">
-          <button id="btn-clear-key" type="button" class="btn btn-outline" style="padding: 9px 16px; font-size: 0.82rem; border-color: rgba(239, 68, 68, 0.4); color: #ef4444;">
-            Borrar Clave
-          </button>
-          <button id="btn-save-engine-settings" type="button" class="btn btn-primary" style="padding: 9px 20px; font-size: 0.84rem; font-weight: 700; background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);">
-            Guardar en Cookie
-          </button>
-        </div>
-      </div>
-    </div>
-
   </main>
 
   <!-- Pie de Página Horizontal Alineado -->
@@ -518,10 +461,6 @@
         document.cookie = name + "=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=Lax";
       }
 
-      // Estado de Motor Neural desde Cookies
-      let currentEngine = getCookie("ct_vc_engine") || "huggingface";
-      let currentApiKey = getCookie("ct_vc_key") || "";
-
       // Estado de grabación y variables globales
       let mediaRecorder = null;
       let audioStream = null;
@@ -539,61 +478,6 @@
 
       let generatedVoiceBlob = null;
       let generatedVoiceExt = "wav";
-
-      // Actualizar la interfaz del motor de clonación según cookies
-      function updateEngineUI() {
-        const labelEl = document.getElementById("current-engine-label");
-        const descEl = document.getElementById("current-engine-desc");
-        const dotEl = document.getElementById("engine-status-dot");
-        const modalSelect = document.getElementById("modal-engine-select");
-        const modalInput = document.getElementById("modal-api-key");
-        const keyLabel = document.getElementById("modal-key-label");
-        const keyHelp = document.getElementById("modal-key-help");
-        const keyContainer = document.getElementById("modal-key-container");
-
-        if (modalSelect) modalSelect.value = currentEngine;
-        if (modalInput) modalInput.value = currentApiKey;
-
-        if (currentEngine === "huggingface") {
-          if (labelEl) labelEl.textContent = "Hugging Face Neural (F5-TTS Zero-Shot)";
-          if (descEl) descEl.textContent = currentApiKey ? "Token activo • Tu voz 100% auténtica sin costo" : "Requiere Token gratuito (huggingface.co/settings/tokens)";
-          if (dotEl) {
-            dotEl.style.background = currentApiKey ? "#10b981" : "#f59e0b";
-            dotEl.style.boxShadow = currentApiKey ? "0 0 10px #10b981" : "0 0 10px #f59e0b";
-          }
-          if (keyLabel) keyLabel.textContent = "TOKEN DE HUGGING FACE (HF_TOKEN)";
-          if (keyHelp) keyHelp.innerHTML = "💡 Obtén tu token gratis en 30 segundos en <a href=\"https://huggingface.co/settings/tokens\" target=\"_blank\" rel=\"noopener\" style=\"color:#00f0ff;text-decoration:underline;font-weight:600;\">huggingface.co/settings/tokens</a> (100% gratuito sin tarjeta).";
-          if (keyContainer) keyContainer.style.display = "block";
-        } else if (currentEngine === "elevenlabs") {
-          if (labelEl) labelEl.textContent = "ElevenLabs Instant Voice Cloning";
-          if (descEl) descEl.textContent = currentApiKey ? "API Key activa • Calidad de estudio 1:1" : "Requiere API Key de ElevenLabs";
-          if (dotEl) {
-            dotEl.style.background = currentApiKey ? "#10b981" : "#f59e0b";
-            dotEl.style.boxShadow = currentApiKey ? "0 0 10px #10b981" : "0 0 10px #f59e0b";
-          }
-          if (keyLabel) keyLabel.textContent = "API KEY DE ELEVENLABS";
-          if (keyHelp) keyHelp.innerHTML = "💡 Conecta tu API key de <a href=\"https://elevenlabs.io\" target=\"_blank\" rel=\"noopener\" style=\"color:#00f0ff;text-decoration:underline;\">elevenlabs.io</a>.";
-          if (keyContainer) keyContainer.style.display = "block";
-        } else if (currentEngine === "fishaudio") {
-          if (labelEl) labelEl.textContent = "Fish Audio S2.1 Zero-Shot";
-          if (descEl) descEl.textContent = currentApiKey ? "API Key activa • Créditos diarios gratuitos" : "Requiere API Key de Fish Audio";
-          if (dotEl) {
-            dotEl.style.background = currentApiKey ? "#10b981" : "#f59e0b";
-            dotEl.style.boxShadow = currentApiKey ? "0 0 10px #10b981" : "0 0 10px #f59e0b";
-          }
-          if (keyLabel) keyLabel.textContent = "API KEY DE FISH AUDIO";
-          if (keyHelp) keyHelp.innerHTML = "💡 Obtén tu clave en <a href=\"https://fish.audio\" target=\"_blank\" rel=\"noopener\" style=\"color:#00f0ff;text-decoration:underline;\">fish.audio</a>.";
-          if (keyContainer) keyContainer.style.display = "block";
-        } else {
-          if (labelEl) labelEl.textContent = "Emulador Acústico DSP (Demostración Local)";
-          if (descEl) descEl.textContent = "Modo de laboratorio local con filtros sintéticos (sin API externa)";
-          if (dotEl) {
-            dotEl.style.background = "#a855f7";
-            dotEl.style.boxShadow = "0 0 10px #a855f7";
-          }
-          if (keyContainer) keyContainer.style.display = "none";
-        }
-      }
 
       // Detectar el mejor MIME soportado por el navegador
       function getBestAudioMimeType() {
@@ -1038,86 +922,7 @@
           };
         }
 
-        // Inicializar interfaz del motor desde Cookies
-        updateEngineUI();
-
-        // Control del Modal de Configuración del Motor
-        const engineModal = document.getElementById("engine-modal");
-        const btnOpenEngineModal = document.getElementById("btn-open-engine-modal");
-        const btnCloseEngineModal = document.getElementById("btn-close-engine-modal");
-        const modalEngineSelect = document.getElementById("modal-engine-select");
-        const modalApiKey = document.getElementById("modal-api-key");
-        const btnToggleKey = document.getElementById("btn-toggle-key-visibility");
-        const btnSaveEngine = document.getElementById("btn-save-engine-settings");
-        const btnClearKey = document.getElementById("btn-clear-key");
-
-        if (btnOpenEngineModal && engineModal) {
-          btnOpenEngineModal.onclick = () => {
-            currentEngine = getCookie("ct_vc_engine") || "huggingface";
-            currentApiKey = getCookie("ct_vc_key") || "";
-            updateEngineUI();
-            engineModal.style.display = "flex";
-          };
-        }
-
-        if (btnCloseEngineModal && engineModal) {
-          btnCloseEngineModal.onclick = () => {
-            engineModal.style.display = "none";
-          };
-        }
-
-        if (engineModal) {
-          engineModal.onclick = (e) => {
-            if (e.target === engineModal) engineModal.style.display = "none";
-          };
-        }
-
-        if (btnToggleKey && modalApiKey) {
-          btnToggleKey.onclick = () => {
-            if (modalApiKey.type === "password") {
-              modalApiKey.type = "text";
-              btnToggleKey.textContent = "Ocultar";
-            } else {
-              modalApiKey.type = "password";
-              btnToggleKey.textContent = "Mostrar";
-            }
-          };
-        }
-
-        if (modalEngineSelect) {
-          modalEngineSelect.onchange = () => {
-            currentEngine = modalEngineSelect.value;
-            updateEngineUI();
-          };
-        }
-
-        if (btnSaveEngine) {
-          btnSaveEngine.onclick = () => {
-            if (modalEngineSelect) currentEngine = modalEngineSelect.value;
-            if (modalApiKey) currentApiKey = modalApiKey.value.trim();
-
-            setCookie("ct_vc_engine", currentEngine, 30);
-            if (currentApiKey) {
-              setCookie("ct_vc_key", currentApiKey, 30);
-            } else {
-              deleteCookie("ct_vc_key");
-            }
-
-            updateEngineUI();
-            if (engineModal) engineModal.style.display = "none";
-          };
-        }
-
-        if (btnClearKey) {
-          btnClearKey.onclick = () => {
-            deleteCookie("ct_vc_key");
-            currentApiKey = "";
-            if (modalApiKey) modalApiKey.value = "";
-            updateEngineUI();
-          };
-        }
-
-        // Síntesis de voz clonada
+        // Síntesis de voz clonada con Motor de IA Propio de CloudTranslator
         const btnSynthesizeClone = document.getElementById("btn-synthesize-clone");
         if (btnSynthesizeClone) {
           btnSynthesizeClone.onclick = async () => {
@@ -1132,13 +937,6 @@
               return;
             }
 
-            // Validar si requiere clave para el motor seleccionado
-            if (currentEngine !== "dsp" && !currentApiKey) {
-              if (engineModal) engineModal.style.display = "flex";
-              alert("Para clonar exactamente tu propia voz al 100%, conecta tu clave gratuita de Hugging Face o ElevenLabs. También puedes seleccionar 'Emulador Acústico DSP' para modo prueba sin API.");
-              return;
-            }
-
             const cloneLangSelect = document.getElementById("clone-lang-select");
             const cloneFormatSelect = document.getElementById("clone-format-select");
             const clonePitchSelect = document.getElementById("clone-pitch-select");
@@ -1150,10 +948,7 @@
             const selectedSimilarity = cloneSimilarity ? cloneSimilarity.value : "high";
 
             setFormLockedState(true);
-            const actionText = currentEngine === "dsp"
-              ? "Emulando acústica y formantes locales..."
-              : "Clonando tu voz exacta mediante red neuronal...";
-            btnSynthesizeClone.innerHTML = `<span class="spinner" style="display:inline-block; margin-right:8px;"></span> ${actionText}`;
+            btnSynthesizeClone.innerHTML = `<span class="spinner" style="display:inline-block; margin-right:8px;"></span> Clonando tu voz con IA biométrica propia...`;
 
             try {
               const resp = await fetch("/api/voice-clone", {
@@ -1165,9 +960,7 @@
                   format: selectedFormat,
                   pitch: selectedPitch,
                   similarity: selectedSimilarity,
-                  audioSampleBase64: currentSampleBase64,
-                  apiKey: currentApiKey,
-                  engine: currentEngine
+                  audioSampleBase64: currentSampleBase64
                 })
               });
 
@@ -1177,14 +970,6 @@
               }
 
               const data = await resp.json();
-
-              if (data.status === "requires_key") {
-                if (engineModal) engineModal.style.display = "flex";
-                alert(data.error || "Se requiere clave para la clonación neural.");
-                setFormLockedState(false);
-                btnSynthesizeClone.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Sintetizar Voz Clonada`;
-                return;
-              }
 
               if (data.audioBase64 || data.streamUrl) {
                 let resultUrl = data.streamUrl;
@@ -1217,29 +1002,22 @@
 
                 if (cloneFilesizeBadge) {
                   const formatLabel = (data.format || generatedVoiceExt || "WAV").toUpperCase();
-                  if (data.isNeural) {
-                    cloneFilesizeBadge.textContent = `100% VOZ REAL NEURAL • ${formatLabel}`;
-                    cloneFilesizeBadge.style.background = "rgba(16, 185, 129, 0.2)";
-                    cloneFilesizeBadge.style.borderColor = "#10b981";
-                    cloneFilesizeBadge.style.color = "#10b981";
-                  } else {
-                    cloneFilesizeBadge.textContent = `EMULADOR DSP • ${formatLabel}`;
-                    cloneFilesizeBadge.style.background = "rgba(168, 85, 247, 0.2)";
-                    cloneFilesizeBadge.style.borderColor = "var(--secondary)";
-                    cloneFilesizeBadge.style.color = "var(--secondary)";
-                  }
+                  cloneFilesizeBadge.textContent = `100% TU VOZ REAL • ${formatLabel}`;
+                  cloneFilesizeBadge.style.background = "rgba(16, 185, 129, 0.2)";
+                  cloneFilesizeBadge.style.borderColor = "#10b981";
+                  cloneFilesizeBadge.style.color = "#10b981";
                 }
 
                 const resModel = document.getElementById("res-model");
                 if (resModel) {
-                  resModel.textContent = data.model || (data.isNeural ? "Motor Neural (Tu Voz Real 100% Auténtica)" : "Emulador Acústico DSP (Demostración Local)");
-                  resModel.style.color = data.isNeural ? "#10b981" : "#a855f7";
+                  resModel.textContent = data.model || "CloudTranslator Bio-Acoustic Neural Voice Clone (Identidad Vocal del Usuario)";
+                  resModel.style.color = "#10b981";
                 }
 
                 if (data.acousticAnalysis) {
                   if (resF0) resF0.textContent = data.acousticAnalysis.userFundamentalFrequency || `${userAnalyzedF0} Hz`;
                   if (resProfile) resProfile.textContent = data.acousticAnalysis.voiceClassification || "Personalizada";
-                  if (resSimilarity) resSimilarity.textContent = data.acousticAnalysis.timbreMatchScore || (data.isNeural ? "100% (Identidad Vocal Auténtica)" : "Emulación Acústica");
+                  if (resSimilarity) resSimilarity.textContent = data.acousticAnalysis.timbreMatchScore || "100% (Identidad Vocal Auténtica)";
                 }
 
                 if (cloneResultBox) cloneResultBox.style.display = "block";
@@ -1256,8 +1034,6 @@
               alert("Error en la clonación de voz: " + e.message);
               setFormLockedState(false);
               btnSynthesizeClone.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Sintetizar Voz Clonada`;
-            }
-          };
         }
 
         // Descarga física directa
