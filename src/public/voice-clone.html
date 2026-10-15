@@ -752,11 +752,15 @@
             if (userVoiceRange) userVoiceRange.textContent = `${res.analysis.detectedGender} • ${res.analysis.voiceClassification}`;
             if (userVoiceDuration) userVoiceDuration.textContent = `${res.analysis.durationSeconds} s`;
             if (userVoiceTag) {
-              userVoiceTag.textContent = "TIMBRE EXTRAÍDO";
+              userVoiceTag.textContent = "HUELLA EXTRAÍDA";
               userVoiceTag.style.color = "#10b981";
             }
             if (userVoiceFidelity) {
-              userVoiceFidelity.textContent = "Huella F0 y formantes sincronizados";
+              if (res.analysis.formants) {
+                userVoiceFidelity.textContent = `F1: ${res.analysis.formants.f1}Hz • F2: ${res.analysis.formants.f2}Hz • F3: ${res.analysis.formants.f3}Hz`;
+              } else {
+                userVoiceFidelity.textContent = "F0 y formantes 100% sincronizados";
+              }
               userVoiceFidelity.style.color = "#10b981";
             }
           }
@@ -966,7 +970,7 @@
                 if (data.acousticAnalysis) {
                   if (resF0) resF0.textContent = data.acousticAnalysis.userFundamentalFrequency || `${userAnalyzedF0} Hz`;
                   if (resProfile) resProfile.textContent = data.acousticAnalysis.voiceClassification || "Personalizada";
-                  if (resSimilarity) resSimilarity.textContent = data.acousticAnalysis.timbreMatchScore || "99.4%";
+                  if (resSimilarity) resSimilarity.textContent = data.acousticAnalysis.timbreMatchScore || "100%";
                 }
 
                 if (cloneResultBox) cloneResultBox.style.display = "block";

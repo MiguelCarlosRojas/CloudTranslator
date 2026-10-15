@@ -142,6 +142,7 @@ router.post("/voice-clone/analyze", async (req, res) => {
         durationSeconds: features.durationSec,
         detectedGender: features.gender === "male" ? "Masculina" : "Femenina",
         voiceClassification: features.voiceRange,
+        formants: features.formants,
         sampleSizeBytes: features.sizeBytes,
         timbreBands: features.bandEnergies
       }
