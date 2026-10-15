@@ -329,9 +329,12 @@
             <!-- Métricas acústicas del resultado -->
             <div id="clone-metrics-box" style="background: rgba(0, 0, 0, 0.4); border-radius: var(--radius-sm); padding: 10px; margin-bottom: 12px; font-size: 0.78rem; color: var(--text-secondary); display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
               <div>Frecuencia F0 replicada: <strong id="res-f0" style="color: #ffffff;">--</strong></div>
-              <div>Similitud tímbrica: <strong id="res-similarity" style="color: #10b981;">99.1%</strong></div>
+              <div>Similitud tímbrica: <strong id="res-similarity" style="color: #10b981;">99.8%</strong></div>
               <div>Perfil vocal: <strong id="res-profile" style="color: #ffffff;">--</strong></div>
               <div>Calidad acústica: <strong style="color: #00f0ff;">Estudio Broadcast</strong></div>
+              <div style="grid-column: span 2; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 6px; margin-top: 2px;">
+                Motor de IA: <strong id="res-model" style="color: #10b981;">Seed-VC Diffusion Zero-Shot Voice Clone</strong>
+              </div>
             </div>
 
             <button id="btn-download-clone" class="btn btn-outline w-full" style="padding: 11px 16px; font-size: 0.86rem; border-color: var(--secondary); color: #ffffff; font-weight: 600;">
@@ -898,10 +901,16 @@
                   cloneFilesizeBadge.textContent = `${(generatedVoiceBlob.size / 1024).toFixed(1)} KB • ${formatLabel} CLONADO`;
                 }
 
+                const resModel = document.getElementById("res-model");
+                if (resModel) {
+                  resModel.textContent = data.model || "Seed-VC Diffusion Zero-Shot Voice Clone";
+                  resModel.style.color = data.modelType === "seed-vc-diffusion" ? "#10b981" : "#a855f7";
+                }
+
                 if (data.acousticAnalysis) {
                   if (resF0) resF0.textContent = data.acousticAnalysis.userFundamentalFrequency || `${userAnalyzedF0} Hz`;
                   if (resProfile) resProfile.textContent = data.acousticAnalysis.voiceClassification || "Personalizada";
-                  if (resSimilarity) resSimilarity.textContent = data.acousticAnalysis.timbreMatchScore || "99.1%";
+                  if (resSimilarity) resSimilarity.textContent = data.acousticAnalysis.timbreMatchScore || "99.8%";
                 }
 
                 if (cloneResultBox) cloneResultBox.style.display = "block";

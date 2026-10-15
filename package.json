@@ -24,6 +24,7 @@
   "license": "ISC",
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@gradio/client": "^2.7.1",
     "btch-downloader": "^6.4.0",
     "compression": "^1.8.2",
     "cors": "^2.8.5",
