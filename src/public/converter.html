@@ -152,18 +152,22 @@
     </section>
 
     <!-- Estudio de Conversión Multimedia -->
-    <section id="converter-studio" class="content-box-card" style="border-color: rgba(0, 240, 255, 0.35); box-shadow: var(--shadow-lg);">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
-        <div>
+    <section id="converter-studio" class="studio-wrapper">
+      <div class="studio-header">
+        <div class="studio-title-box">
           <span class="tech-card-tag">[ MEDIA_STUDIO // MP3_MP4_ENGINE ]</span>
-          <h2 style="margin: 6px 0 0;">Estudio de Descarga y Conversión</h2>
+          <h2>
+            <svg class="icon" viewBox="0 0 24 24" style="color: var(--primary);"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="8" cy="12" r="2"/></svg>
+            Estudio de Descarga y Conversión
+          </h2>
+          <p>Convierte enlaces de YouTube, TikTok, Instagram y más en audio MP3 de 320 kbps o video MP4 en alta definición.</p>
         </div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button id="btn-toggle-batch" class="btn btn-outline" style="font-size: 0.8rem; padding: 6px 12px;">
+          <button id="btn-toggle-batch" class="btn btn-outline" style="font-size: 0.8rem; padding: 8px 14px; display: flex; align-items: center; gap: 6px;">
             <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
             Modo Lote (Múltiples Enlaces)
           </button>
-          <button id="btn-paste-clipboard" class="btn btn-outline" style="font-size: 0.8rem; padding: 6px 12px;">
+          <button id="btn-paste-clipboard" class="btn btn-outline" style="font-size: 0.8rem; padding: 8px 14px; display: flex; align-items: center; gap: 6px;">
             <svg class="icon" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
             Pegar Enlace
           </button>
@@ -171,8 +175,11 @@
       </div>
 
       <!-- Selector de Plataformas -->
-      <div style="margin-bottom: 18px;">
-        <span style="display: block; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 8px;">PLATAFORMAS COMPATIBLES (DETECCIÓN AUTOMÁTICA)</span>
+      <div style="margin-bottom: 20px;">
+        <div class="studio-label" style="margin-bottom: 8px;">
+          <span>PLATAFORMAS COMPATIBLES (DETECCIÓN AUTOMÁTICA)</span>
+          <span style="color: var(--primary);">7 PLATAFORMAS</span>
+        </div>
         <div class="platform-chips-container" style="display: flex; gap: 8px; flex-wrap: wrap;">
           <span class="platform-chip active" data-platform="youtube" style="background: rgba(255, 0, 0, 0.15); border: 1px solid rgba(255, 0, 0, 0.4); color: #ff6b6b; padding: 6px 12px; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; cursor: pointer;">
             YouTube / Shorts
@@ -200,9 +207,12 @@
 
       <!-- Entrada de Enlace Único -->
       <div id="single-link-box" style="margin-bottom: 20px;">
-        <label for="input-video-url" style="display: block; font-size: 0.8rem; font-family: var(--font-mono); color: var(--text-secondary); margin-bottom: 8px;">ENLACE DEL VIDEO O CONTENIDO MULTIMEDIA</label>
+        <div class="studio-label" style="margin-bottom: 8px;">
+          <span>ENLACE DEL VIDEO O CONTENIDO MULTIMEDIA</span>
+          <span id="detected-platform-badge" style="color: var(--primary);">DETECCIÓN AUTOMÁTICA</span>
+        </div>
         <div style="position: relative;">
-          <input type="url" id="input-video-url" placeholder="Ejemplo: https://www.youtube.com/watch?v=... o https://www.tiktok.com/@..." value="https://www.youtube.com/watch?v=jNQXAC9IVRw" style="width: 100%; padding: 14px 44px 14px 16px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-card); border-radius: var(--radius-md); color: #ffffff; font-size: 0.95rem; outline: none; transition: all 0.2s ease;">
+          <input type="url" id="input-video-url" class="studio-textarea" placeholder="Ejemplo: https://www.youtube.com/watch?v=... o https://www.tiktok.com/@..." value="https://www.youtube.com/watch?v=jNQXAC9IVRw" style="min-height: 48px; height: 48px; padding: 12px 44px 12px 16px; font-size: 0.95rem; resize: none;">
           <button id="btn-clear-url" title="Limpiar enlace" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; display: flex; align-items: center;">
             <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
@@ -211,21 +221,27 @@
 
       <!-- Entrada en Modo Lote (Oculta por defecto) -->
       <div id="batch-link-box" style="display: none; margin-bottom: 20px;">
-        <label for="input-batch-urls" style="display: block; font-size: 0.8rem; font-family: var(--font-mono); color: var(--text-secondary); margin-bottom: 8px;">LISTA DE ENLACES (UNO POR LÍNEA, HASTA 10 ENLACES)</label>
-        <textarea id="input-batch-urls" rows="4" placeholder="https://www.youtube.com/watch?v=...&#10;https://www.tiktok.com/@...&#10;https://www.instagram.com/reel/..." style="width: 100%; padding: 12px 16px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-card); border-radius: var(--radius-md); color: #ffffff; font-size: 0.9rem; font-family: var(--font-mono); outline: none; resize: vertical;"></textarea>
+        <div class="studio-label" style="margin-bottom: 8px;">
+          <span>LISTA DE ENLACES (UNO POR LÍNEA, HASTA 10 ENLACES)</span>
+          <span style="color: var(--secondary);">MODO LOTE</span>
+        </div>
+        <textarea id="input-batch-urls" class="studio-textarea" rows="4" placeholder="https://www.youtube.com/watch?v=...&#10;https://www.tiktok.com/@...&#10;https://www.instagram.com/reel/..." style="font-family: var(--font-mono);"></textarea>
       </div>
 
       <!-- Configuración de Formato y Calidad (Pestañas de Formato MP3 vs MP4) -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">
+      <div class="studio-controls-row" style="margin-bottom: 24px;">
         <!-- Selector de Formato -->
-        <div>
-          <span style="display: block; font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 8px;">SELECCIONA EL FORMATO DE SALIDA</span>
+        <div class="studio-control-col">
+          <div class="studio-label" style="margin-bottom: 8px;">
+            <span>FORMATO DE SALIDA</span>
+            <span style="color: var(--text-muted);">CODEC MULTIMEDIA</span>
+          </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <button id="btn-format-mp3" class="btn btn-format-tab active" data-format="mp3" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: 1px solid var(--primary); background: rgba(0, 240, 255, 0.12); color: #ffffff; font-weight: 700; border-radius: var(--radius-md); cursor: pointer;">
+            <button id="btn-format-mp3" class="btn btn-format-tab active" data-format="mp3" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: 1px solid var(--primary); background: rgba(0, 240, 255, 0.12); color: #ffffff; font-weight: 700; border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s ease;">
               <svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
               🎵 Audio MP3
             </button>
-            <button id="btn-format-mp4" class="btn btn-format-tab" data-format="mp4" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: 1px solid var(--border-card); background: rgba(15, 17, 24, 0.8); color: var(--text-secondary); font-weight: 700; border-radius: var(--radius-md); cursor: pointer;">
+            <button id="btn-format-mp4" class="btn btn-format-tab" data-format="mp4" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: 1px solid var(--border-subtle); background: rgba(10, 12, 18, 0.95); color: var(--text-secondary); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s ease;">
               <svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
               🎬 Video MP4
             </button>
@@ -233,10 +249,13 @@
         </div>
 
         <!-- Selector de Calidad -->
-        <div>
-          <span style="display: block; font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 8px;">CALIDAD Y TASA DE BITS</span>
+        <div class="studio-control-col">
+          <div class="studio-label" style="margin-bottom: 8px;">
+            <span>CALIDAD Y TASA DE BITS</span>
+            <span id="quality-badge" style="color: var(--primary);">STUDIO MASTER (320 kbps)</span>
+          </div>
           <div class="select-wrapper">
-            <select id="select-quality" aria-label="Seleccionar Calidad" style="width: 100%; padding: 13px 16px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-card); border-radius: var(--radius-md); color: #ffffff; font-size: 0.9rem; outline: none;">
+            <select id="select-quality" class="form-select-custom studio-select" aria-label="Seleccionar Calidad" style="width: 100%; padding: 12px 38px 12px 16px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.9rem; outline: none;">
               <!-- Se puebla dinámicamente según el formato -->
               <option value="320k">320 kbps (Alta Fidelidad / Studio Master)</option>
               <option value="192k">192 kbps (Estándar Recomendado)</option>
@@ -459,6 +478,8 @@
         ]
       };
 
+      const qualityBadge = document.getElementById("quality-badge");
+
       function updateQualityOptions(fmt) {
         selectQuality.innerHTML = "";
         qualityOptions[fmt].forEach(opt => {
@@ -467,6 +488,9 @@
           el.textContent = opt.label;
           selectQuality.appendChild(el);
         });
+        if (qualityBadge) {
+          qualityBadge.textContent = fmt === "mp3" ? "STUDIO MASTER (320 kbps)" : "FULL HD (1080p)";
+        }
       }
 
       // Detener y limpiar reproductores de medios
@@ -551,8 +575,8 @@
         btnFormatMp3.style.color = "#ffffff";
 
         btnFormatMp4.classList.remove("active");
-        btnFormatMp4.style.borderColor = "var(--border-card)";
-        btnFormatMp4.style.background = "rgba(15, 17, 24, 0.8)";
+        btnFormatMp4.style.borderColor = "var(--border-subtle)";
+        btnFormatMp4.style.background = "rgba(10, 12, 18, 0.95)";
         btnFormatMp4.style.color = "var(--text-secondary)";
 
         updateQualityOptions("mp3");
@@ -567,16 +591,20 @@
         btnFormatMp4.style.color = "#ffffff";
 
         btnFormatMp3.classList.remove("active");
-        btnFormatMp3.style.borderColor = "var(--border-card)";
-        btnFormatMp3.style.background = "rgba(15, 17, 24, 0.8)";
+        btnFormatMp3.style.borderColor = "var(--border-subtle)";
+        btnFormatMp3.style.background = "rgba(10, 12, 18, 0.95)";
         btnFormatMp3.style.color = "var(--text-secondary)";
 
         updateQualityOptions("mp4");
       });
 
-      // Si el usuario cambia la calidad o tasa de bits, resetear el mensaje de éxito anterior
+      // Si el usuario cambia la calidad o tasa de bits, resetear el mensaje de éxito anterior y actualizar badge
       selectQuality.addEventListener("change", () => {
         resetProgressBox();
+        if (qualityBadge && selectQuality.selectedOptions.length > 0) {
+          const text = selectQuality.selectedOptions[0].textContent;
+          qualityBadge.textContent = text.split("(")[0].trim().toUpperCase();
+        }
       });
 
       // Si el usuario edita o cambia la URL, resetear el progreso, ocultar resultado previo y parar reproducción
