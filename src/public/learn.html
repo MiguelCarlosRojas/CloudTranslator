@@ -166,33 +166,45 @@
     <!-- Módulo 0: Arquitectura y Toma de Decisiones -->
     <article class="content-box-card">
       <span class="tech-card-tag">[ 00 // ARCHITECTURE_OVERVIEW ]</span>
-      <h2>0. ¿Cómo Funciona la Integración?</h2>
+      <h2>0. ¿Cómo Funciona la Integración en los 4 Pilares?</h2>
       <p>
-        CloudTranslator opera bajo una arquitectura desacoplada y orientada a microservicios. Puedes integrarlo según el escenario de tu aplicación:
+        CloudTranslator opera bajo una arquitectura modular desacoplada de microservicios. Puedes integrar cada uno de los 4 pilares tecnológicos según las necesidades de tu sistema:
       </p>
 
       <div class="table-responsive">
         <table class="docs-table">
           <thead>
             <tr>
-              <th>Enfoque</th>
-              <th>Mecanismo</th>
+              <th>Pilar Tecnológico</th>
+              <th>Mecanismo de Conexión</th>
               <th>Casos de Uso Ideales</th>
               <th>Ventajas Clave</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><strong>Frontend (SDK JS)</strong></td>
-              <td>Inclusión directa de <code>cloud-translator.js</code> en el HTML del cliente.</td>
-              <td>Sitios web estáticos, landings, blogs, paneles SPA donde se requiere traducir la interfaz completa en vivo.</td>
-              <td>Cero backend propio requerido, traduce el DOM sin recargas, maneja cookies automáticamente.</td>
+              <td><strong>Pilar 1: Traductor en la Nube</strong></td>
+              <td>SDK JS (<code>cloud-translator.js</code>) o REST POST <code>/api/translate</code>.</td>
+              <td>Traducción web en tiempo real, localización de catálogos y sistemas multilingües.</td>
+              <td>1 sola consulta HTTP para todo el DOM, persistencia por cookie técnica, 0ms desde memoria RAM.</td>
             </tr>
             <tr>
-              <td><strong>Backend (REST API)</strong></td>
-              <td>Invocación vía HTTP POST a <code>/api/translate</code> desde tu servidor.</td>
-              <td>APIs, generación de correos electrónicos, catálogos en base de datos, tareas asíncronas o microservicios.</td>
-              <td>Control total del flujo de datos, ocultamiento de lógica de negocio, soporte para lotes masivos.</td>
+              <td><strong>Pilar 2: Texto a Voz (TTS)</strong></td>
+              <td>REST POST <code>/api/tts</code> y catálogo GET <code>/api/tts/voices</code>.</td>
+              <td>Audiolibros, asistentes virtuales, accesibilidad auditiva y doblaje dinámico.</td>
+              <td>24 voces humanas neuronales, modulación de velocidad y tono, entrega en buffer WAV / MP3.</td>
+            </tr>
+            <tr>
+              <td><strong>Pilar 3: Clonación de Voz (IA)</strong></td>
+              <td>REST POST <code>/api/voice-clone</code> (multipart/form-data o Base64).</td>
+              <td>Locución personalizada con timbre propio, podcasts sintéticos y agentes de voz corporativos.</td>
+              <td>Extracción bio-acústica de formantes (F0), síntesis de alta fidelidad PCM 16-bit descargable.</td>
+            </tr>
+            <tr>
+              <td><strong>Pilar 4: Conversor Multimedia</strong></td>
+              <td>REST POST <code>/api/media/convert</code> e inspección POST <code>/api/media/info</code>.</td>
+              <td>Extracción de audio de videos, conversión a MP3 hasta 320 kbps y video MP4 hasta 1080p.</td>
+              <td>Soporta YouTube, TikTok sin marca, Instagram, Facebook y Twitter; modo lote de hasta 10 URLs.</td>
             </tr>
           </tbody>
         </table>
@@ -510,15 +522,118 @@ curl -s -X POST "https://cloudtranslator.onrender.com/api/translate" \
   -H "Content-Type: application/json" \
   -d '{"text": "Despliegue completado con éxito", "targetLanguage": "en"}' \
   | jq -r '.translatedText'
-# Salida: Deployment completed successfully</pre>
     </article>
 
-    <!-- Módulo 5: Códigos de Respuesta y Diagnóstico -->
+    <!-- Módulo 5: Integración Pilar 2 - Texto a Voz (TTS) -->
     <article class="content-box-card">
-      <span class="tech-card-tag">[ 05 // STATUS_CODES_TROUBLESHOOTING ]</span>
-      <h2>5. Códigos de Respuesta y Diagnóstico de Errores</h2>
+      <span class="tech-card-tag">[ 05 // TTS_INTEGRATION ]</span>
+      <h2>5. Integración del Pilar 2: Texto a Voz (TTS)</h2>
       <p>
-        El gateway de CloudTranslator emite códigos de estado HTTP estándar acompañados de un mensaje aclaratorio en JSON:
+        Genera locución humana en tiempo real con 24 voces neuronales desde JavaScript o cualquier backend:
+      </p>
+
+      <div class="code-box-header">
+        <span>JAVASCRIPT (FETCH) / SÍNTESIS Y REPRODUCCIÓN DE AUDIO WAV</span>
+        <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-tts')">Copiar</button>
+      </div>
+      <pre class="code-panel" id="code-learn-tts">// 1. Sintetizar y reproducir audio en el navegador
+async function reproducirTexto(texto, voz = "es-ES-AlvaroNeural") {
+  const res = await fetch("https://cloudtranslator.onrender.com/api/tts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      text: texto,
+      voice: voz,
+      rate: 1.0,
+      pitch: 1.0
+    })
+  });
+  
+  const blob = await res.blob();
+  const audioUrl = URL.createObjectURL(blob);
+  const audio = new Audio(audioUrl);
+  audio.play();
+}
+
+// 2. Consultar catálogo de 24 voces disponibles
+fetch("https://cloudtranslator.onrender.com/api/tts/voices")
+  .then(r => r.json())
+  .then(data => console.log("Voces disponibles:", data.voices));</pre>
+    </article>
+
+    <!-- Módulo 6: Integración Pilar 3 - Clonación de Voz con IA -->
+    <article class="content-box-card">
+      <span class="tech-card-tag">[ 06 // VOICE_CLONE_INTEGRATION ]</span>
+      <h2>6. Integración del Pilar 3: Clonación de Voz con IA</h2>
+      <p>
+        Envía una muestra vocal (grabada o archivo) junto al texto a narrar para obtener una réplica tímbrica en PCM 16-bit:
+      </p>
+
+      <div class="code-box-header">
+        <span>NODE.JS (FORMDATA / AXIOS) / CLONACIÓN VOCAL</span>
+        <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-clone')">Copiar</button>
+      </div>
+      <pre class="code-panel" id="code-learn-clone">const axios = require("axios");
+const FormData = require("form-data");
+const fs = require("fs");
+
+async function clonarVoz(rutaAudioMuestra, guionTexto) {
+  const form = new FormData();
+  form.append("sample", fs.createReadStream(rutaAudioMuestra));
+  form.append("text", guionTexto);
+  form.append("stability", "0.75");
+
+  const res = await axios.post("https://cloudtranslator.onrender.com/api/voice-clone", form, {
+    headers: form.getHeaders(),
+    responseType: "arraybuffer"
+  });
+
+  fs.writeFileSync("audio_clonado.wav", res.data);
+  console.log("Audio sintetizado con tu voz guardado en audio_clonado.wav");
+}</pre>
+    </article>
+
+    <!-- Módulo 7: Integración Pilar 4 - Conversor Multimedia (MP3 / MP4) -->
+    <article class="content-box-card">
+      <span class="tech-card-tag">[ 07 // CONVERTER_INTEGRATION ]</span>
+      <h2>7. Integración del Pilar 4: Conversor Multimedia Universal</h2>
+      <p>
+        Extrae audio MP3 (hasta 320 kbps) o video MP4 (hasta 1080p) desde YouTube, TikTok, Instagram Reels, Facebook o Twitter/X:
+      </p>
+
+      <div class="code-box-header">
+        <span>NODE.JS / INSPECCIÓN Y CONVERSIÓN MULTIMEDIA</span>
+        <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-media')">Copiar</button>
+      </div>
+      <pre class="code-panel" id="code-learn-media">// 1. Obtener metadatos y formatos del video
+const infoRes = await fetch("https://cloudtranslator.onrender.com/api/media/info", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" })
+});
+const mediaInfo = await infoRes.json();
+console.log("Título:", mediaInfo.title, "Formatos:", mediaInfo.formats);
+
+// 2. Solicitar conversión a MP3 de alta fidelidad (320 kbps)
+const convertRes = await fetch("https://cloudtranslator.onrender.com/api/media/convert", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    format: "mp3",
+    quality: "320k"
+  })
+});
+const result = await convertRes.json();
+console.log("Enlace de descarga directa:", result.downloadUrl);</pre>
+    </article>
+
+    <!-- Módulo 8: Códigos de Respuesta y Diagnóstico -->
+    <article class="content-box-card">
+      <span class="tech-card-tag">[ 08 // STATUS_CODES_TROUBLESHOOTING ]</span>
+      <h2>8. Códigos de Respuesta y Diagnóstico de Errores</h2>
+      <p>
+        El gateway de CloudTranslator emite códigos de estado HTTP estándar acompañados de un mensaje aclaratorio en JSON para todos los servicios:
       </p>
 
       <div class="table-responsive">
@@ -536,25 +651,25 @@ curl -s -X POST "https://cloudtranslator.onrender.com/api/translate" \
               <td><code>200 OK</code></td>
               <td>Exitoso</td>
               <td>Petición procesada correctamente.</td>
-              <td>Consumir <code>translatedText</code> o <code>translatedTexts</code>.</td>
+              <td>Consumir datos de respuesta (<code>translatedText</code>, buffer binario o <code>downloadUrl</code>).</td>
             </tr>
             <tr>
               <td><code>400 Bad Request</code></td>
               <td>Error de Validación</td>
-              <td>Falta <code>targetLanguage</code> o el cuerpo no contiene <code>text</code> ni <code>texts</code>.</td>
-              <td>Revisar el formato JSON y asegurarse de incluir el encabezado <code>Content-Type: application/json</code>.</td>
+              <td>Faltan parámetros requeridos (ej. texto vacío, muestra ausente o URL no soportada).</td>
+              <td>Revisar el formato JSON / FormData y encabezados correspondientes.</td>
             </tr>
             <tr>
               <td><code>500 Internal Error</code></td>
               <td>Fallo del Motor</td>
-              <td>Problema temporal de comunicación con el motor subyacente.</td>
-              <td>Implementar reintento automático tras 2 o 3 segundos.</td>
+              <td>Problema temporal de procesamiento en el microservicio.</td>
+              <td>Implementar reintento exponencial tras 2 a 3 segundos.</td>
             </tr>
             <tr>
               <td><code>503 Unavailable</code></td>
               <td>Instancia Despertando</td>
-              <td>La máquina gratuita de Render está reactivándose tras suspensión.</td>
-              <td>Esperar 30 segundos y reintentar la solicitud.</td>
+              <td>La máquina en Render está saliendo del modo reposo (cold start).</td>
+              <td>Esperar de 25 a 35 segundos y reintentar la solicitud.</td>
             </tr>
           </tbody>
         </table>
@@ -571,7 +686,7 @@ curl -s -X POST "https://cloudtranslator.onrender.com/api/translate" \
           <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="22" height="22">
           CloudTranslator
         </h4>
-        <p>Ecosistema cloud de procesamiento lingüístico y síntesis vocal de alto rendimiento: traducción neuronal distribuida, Texto a Voz (TTS) y Clonación de Voz por Inteligencia Artificial.</p>
+        <p>Ecosistema cloud de procesamiento lingüístico y multimedia de alto rendimiento: traducción neuronal distribuida (+200 idiomas), Texto a Voz (TTS), Clonación de Voz por IA y Conversor Universal MP3/MP4.</p>
         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
           Microservicio libre en Render • <span class="badge badge-online">ONLINE</span>
         </p>

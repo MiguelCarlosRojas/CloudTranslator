@@ -163,48 +163,87 @@
       </p>
     </div>
 
+    <!-- Sección 1: Preguntas Frecuentes de los 4 Pilares -->
     <article class="content-box-card">
-      <span class="tech-card-tag">[ 01 // PREGUNTAS_FRECUENTES ]</span>
-      <h2>Preguntas Frecuentes (FAQ)</h2>
+      <span class="tech-card-tag">[ 01 // PREGUNTAS_FRECUENTES_4_PILARES ]</span>
+      <h2>Preguntas Frecuentes de los 4 Pilares (FAQ)</h2>
 
-      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">¿Por qué la primera petición demora unos 25 segundos?</h3>
+      <!-- General / Infraestructura -->
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">¿Por qué la primera petición puede tardar entre 25 y 35 segundos?</h3>
       <p>
-        El microservicio opera en la capa en la nube de Render. Cuando no recibe tráfico continuo durante 15 minutos, el servidor entra en modo reposo para optimizar recursos. La primera petición activa el contenedor ("cold start") en aproximadamente 25 segundos, y a partir de ese momento todas las consultas responden de inmediato en menos de 300 ms.
+        El microservicio se ejecuta en el tier en la nube de Render. Si el servidor no recibe tráfico durante 15 minutos continuos, entra en modo reposo automático (sleep). La primera solicitud despierta la máquina virtual ("cold start") en aproximadamente 25 a 35 segundos. Tras reactivarse, todas las consultas responden de inmediato con latencias ultrarrápidas de 150 a 300 ms (o 0 ms si provienen del caché en memoria RAM).
       </p>
 
-      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">¿Cómo optimiza CloudTranslator el consumo de red en mi navegador?</h3>
-      <p>
-        A diferencia de plugins tradicionales que disparan cientos de peticiones HTTP por cada párrafo, el cliente de CloudTranslator recopila todos los textos del DOM, los empaqueta en un arreglo JSON (<code>texts: [...]</code>) y realiza <strong>una única solicitud HTTP</strong> hacia el gateway en la nube.
-      </p>
+      <!-- Pilar 1: Traducción -->
+      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+        <span class="pillar-tag">PILAR 01 // TRADUCTOR EN LA NUBE</span>
+        <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 10px; margin-bottom: 6px;">¿Cómo optimiza CloudTranslator el consumo de red en mi navegador?</h3>
+        <p>
+          A diferencia de scripts tradicionales que disparan cientos de peticiones HTTP por cada párrafo o etiqueta, el SDK de CloudTranslator recorre el árbol DOM mediante <code>TreeWalker</code>, agrupa todos los textos visibles únicos en un solo arreglo JSON (<code>texts: [...]</code>) y realiza <strong>una única solicitud HTTP consolidada</strong> hacia <code>POST /api/translate</code>.
+        </p>
 
-      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">¿Cómo funciona la memoria de traducción en caché?</h3>
-      <p>
-        Las frases traducidas se almacenan en la memoria local del cliente (<code>localStorage</code>) con un hash criptográfico. Si el usuario vuelve a cambiar al mismo idioma, los textos se leen instantáneamente en 0 ms sin generar tráfico hacia el servidor.
-      </p>
+        <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 14px; margin-bottom: 6px;">¿Cómo funciona la memoria de traducción en caché y la persistencia?</h3>
+        <p>
+          CloudTranslator opera con <strong>cero uso de <code>localStorage</code></strong>. Utiliza una memoria caché activa en RAM durante la sesión (Map) tanto en el navegador como en el servidor (caché LRU de hasta 10,000 entradas), respondiendo en 0 ms ante textos repetidos. Para recordar el idioma entre páginas y visitas, emplea la cookie técnica <code>cloud_translator_lang</code> con vigencia de 365 días (<code>SameSite=Lax</code>).
+        </p>
+      </div>
 
-      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">¿Cómo persiste la preferencia del usuario entre sesiones?</h3>
-      <p>
-        Al seleccionar un idioma, se registra la cookie <code>cloud_translator_lang</code> con vigencia de 365 días. Cualquier página del dominio que cargue el SDK restaurará automáticamente el idioma guardado sin intervención manual.
-      </p>
+      <!-- Pilar 2: TTS -->
+      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+        <span class="pillar-tag" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">PILAR 02 // TEXTO A VOZ (TTS)</span>
+        <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 10px; margin-bottom: 6px;">¿Qué opciones de síntesis y voces ofrece el Estudio TTS?</h3>
+        <p>
+          Ofrece un motor híbrido: síntesis instantánea en navegador mediante Web Speech API con modulación de velocidad (rate) y tono (pitch), y un catálogo de <strong>24 voces humanas neuronales</strong> en backend (accesibles en <code>GET /api/tts/voices</code>). Admite generación directa y streaming con descarga forzada en formato binario <code>.wav</code> o <code>.mp3</code>.
+        </p>
+      </div>
+
+      <!-- Pilar 3: Clonación de Voz -->
+      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+        <span class="pillar-tag" style="border-color: rgba(168, 85, 247, 0.4); color: #a855f7;">PILAR 03 // CLONACIÓN DE VOZ CON IA</span>
+        <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 10px; margin-bottom: 6px;">¿Cómo funciona la clonación y qué tipo de muestra requiere?</h3>
+        <p>
+          Puedes grabar directamente tu voz con el micrófono del dispositivo (mediante <code>navigator.mediaDevices.getUserMedia</code>) o cargar un archivo de audio (<code>.wav</code>, <code>.mp3</code>, <code>.ogg</code>, <code>.m4a</code>). El motor bio-acústico extrae los formantes y la frecuencia fundamental (F0) para recrear tu timbre único al sintetizar cualquier guion escrito, permitiendo descargar el archivo de audio generado.
+        </p>
+      </div>
+
+      <!-- Pilar 4: Conversor Multimedia -->
+      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+        <span class="pillar-tag" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171;">PILAR 04 // CONVERSOR MULTIMEDIA (MP3 / MP4)</span>
+        <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 10px; margin-bottom: 6px;">¿Qué plataformas y calidades de conversión están soportadas?</h3>
+        <p>
+          El motor procesa enlaces de <strong>YouTube, TikTok (sin marcas de agua), Instagram Reels, Facebook, Twitter/X, Pinterest</strong> y archivos multimedia directos. Permite extraer Audio en MP3 (320 kbps, 256 kbps, 192 kbps y 128 kbps) o Video en MP4 (1080p Full HD, 720p HD, 480p y 360p). Admite modo individual o conversión masiva por lotes de hasta 10 enlaces simultáneos con streaming binario y descarga directa.
+        </p>
+      </div>
     </article>
 
+    <!-- Sección 2: Diagnóstico y Resolución de Problemas -->
     <article class="content-box-card">
       <span class="tech-card-tag">[ 02 // DIAGNÓSTICO_Y_RESOLUCIÓN ]</span>
-      <h2>Resolución de Problemas (Troubleshooting)</h2>
+      <h2>Resolución de Problemas Reales (Troubleshooting)</h2>
 
-      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">Error HTTP 400: "El idioma objetivo es requerido"</h3>
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">Error HTTP 400: Parámetros de Idioma en Traducción</h3>
       <p>
-        Verifica que el cuerpo JSON de tu petición incluya el campo <code>targetLanguage</code> con un código ISO válido (por ejemplo <code>"targetLanguage": "en"</code> o <code>"fr"</code>). No utilices claves obsoletas como <code>to</code>.
+        El endpoint <code>POST /api/translate</code> admite tanto el alias estándar <code>to</code> como <code>targetLanguage</code> (ej: <code>"to": "en"</code> o <code>"targetLanguage": "fr"</code>). Para el texto, envía <code>text: "cadena"</code> o el arreglo por lotes <code>texts: ["cadena 1", "cadena 2"]</code>.
       </p>
 
-      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">Error HTTP 400: "El texto no puede estar vacío"</h3>
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">Error en Síntesis TTS: "Texto requerido o voz no válida"</h3>
       <p>
-        Debes enviar una cadena no vacía en el parámetro <code>text</code> o una lista con al menos un elemento en <code>texts</code>.
+        En <code>POST /api/tts</code> debes enviar un objeto JSON con <code>text</code> (máximo 5000 caracteres por solicitud) y opcionalmente <code>lang</code> o <code>voice</code>. Consulta las voces disponibles en tiempo real llamando a <code>GET /api/tts/voices</code>.
       </p>
 
-      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">Error de CORS al consumir desde localhost u otro dominio</h3>
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">Error en Clonación de Voz: "Muestra de audio requerida"</h3>
       <p>
-        CloudTranslator tiene habilitado CORS universal (<code>Access-Control-Allow-Origin: *</code>) y métodos <code>GET, POST, OPTIONS</code>. Asegúrate de incluir el header <code>Content-Type: application/json</code> en solicitudes POST.
+        Asegúrate de proporcionar permisos de micrófono en el navegador o subir un archivo de audio legible (mínimo 3 segundos y máximo 10 MB). El endpoint <code>POST /api/voice-clone</code> procesa la muestra mediante <code>multipart/form-data</code> o JSON con <code>sampleBase64</code>.
+      </p>
+
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">Error en Conversor: "URL no soportada o contenido privado"</h3>
+      <p>
+        Verifica que el enlace pertenezca a una de las plataformas compatibles (YouTube, TikTok, Instagram, Facebook, Twitter/X, Pinterest) y que el contenido sea público. Los videos configurados como privados o con restricciones de edad de terceros requieren acceso autenticado no disponible en la API pública.
+      </p>
+
+      <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 18px; margin-bottom: 6px;">Consultas CORS desde otros dominios o aplicaciones móviles</h3>
+      <p>
+        CloudTranslator cuenta con CORS universal abierto (<code>Access-Control-Allow-Origin: *</code>) y gestiona automáticamente las peticiones de verificación <code>OPTIONS</code> devolviendo estado <code>204 No Content</code>.
       </p>
     </article>
 
@@ -230,7 +269,7 @@
           <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="22" height="22">
           CloudTranslator
         </h4>
-        <p>Ecosistema cloud de procesamiento lingüístico y síntesis vocal de alto rendimiento: traducción neuronal distribuida, Texto a Voz (TTS) y Clonación de Voz por Inteligencia Artificial.</p>
+        <p>Ecosistema cloud de procesamiento lingüístico y multimedia de alto rendimiento: traducción neuronal distribuida (+200 idiomas), Texto a Voz (TTS), Clonación de Voz por IA y Conversor Universal MP3/MP4.</p>
         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
           Microservicio libre en Render • <span class="badge badge-online">ONLINE</span>
         </p>

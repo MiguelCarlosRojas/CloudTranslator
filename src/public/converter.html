@@ -239,11 +239,11 @@
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <button id="btn-format-mp3" class="btn btn-format-tab active" data-format="mp3" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: 1px solid var(--primary); background: rgba(0, 240, 255, 0.12); color: #ffffff; font-weight: 700; border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s ease;">
               <svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-              🎵 Audio MP3
+              <span>Audio MP3</span>
             </button>
             <button id="btn-format-mp4" class="btn btn-format-tab" data-format="mp4" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: 1px solid var(--border-subtle); background: rgba(10, 12, 18, 0.95); color: var(--text-secondary); font-weight: 700; border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s ease;">
               <svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
-              🎬 Video MP4
+              <span>Video MP4</span>
             </button>
           </div>
         </div>
@@ -407,11 +407,131 @@
       </div>
     </section>
 
+    <!-- Sección Informativa: Los 4 Pilares del Ecosistema -->
+    <section style="margin-top: 36px;">
+      <div class="section-full-title">
+        <h2>Los 4 Pilares de CloudTranslator</h2>
+        <p>Herramientas especializadas con consolas dedicadas a cada disciplina lingüística, vocal y multimedia.</p>
+      </div>
+
+      <div class="pillars-grid">
+        <!-- Pilar 1 -->
+        <div class="pillar-card">
+          <div class="pillar-header">
+            <div class="pillar-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+            </div>
+            <span class="pillar-tag">PILAR 01 // TEXT</span>
+          </div>
+          <h3>Traductor en la Nube</h3>
+          <p>
+            Traducción por lotes de alta velocidad (+200 idiomas). Nuestro algoritmo agrupa todos los textos del DOM y envía un único arreglo <code>texts: [...]</code> a <code>/api/translate</code>. Persistencia estricta en cookies y 0ms desde memoria RAM.
+          </p>
+          <a href="/translator" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Traductor en la Nube</a>
+        </div>
+
+        <!-- Pilar 2 -->
+        <div class="pillar-card">
+          <div class="pillar-header">
+            <div class="pillar-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            </div>
+            <span class="pillar-tag">PILAR 02 // AUDIO</span>
+          </div>
+          <h3>Texto a Voz Multilingüe (TTS)</h3>
+          <p>
+            Convierte cualquier texto en audio fluido y natural. Selecciona el idioma, elige entre 24 voces humanas neuronales, calibra velocidad y tono en tiempo real con reproductor, ondas sonoras y descarga en formato WAV o MP3.
+          </p>
+          <a href="/tts" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Estudio TTS</a>
+        </div>
+
+        <!-- Pilar 3 -->
+        <div class="pillar-card">
+          <div class="pillar-header">
+            <div class="pillar-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+            </div>
+            <span class="pillar-tag">PILAR 03 // VOICE AI</span>
+          </div>
+          <h3>Clonación de Voz con IA</h3>
+          <p>
+            Graba con micrófono o sube tu archivo de audio. Escucha tu muestra de referencia, edítala o elimínala con un clic, escribe tu guion y descarga el archivo WAV sintetizado recreando tu timbre vocal único.
+          </p>
+          <a href="/voice-clone" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Clonación de Voz</a>
+        </div>
+
+        <!-- Pilar 4 -->
+        <div class="pillar-card">
+          <div class="pillar-header">
+            <div class="pillar-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
+            </div>
+            <span class="pillar-tag">PILAR 04 // MEDIA CONVERTER</span>
+          </div>
+          <h3>Conversor Multimedia (MP3 / MP4)</h3>
+          <p>
+            Pega enlaces de YouTube, TikTok, Instagram Reels, Facebook o Twitter y conviértelos a MP3 (hasta 320 kbps) o video MP4 sin marcas de agua. Detección automática, streaming con rango HTTP y descarga física directa.
+          </p>
+          <a href="/converter" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Conversor MP3/MP4</a>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <!-- Pie de Página -->
+  <!-- Pie de Página Aliniado y Estructurado -->
   <footer>
-    <div id="footer-placeholder"></div>
+    <div id="footer-placeholder">
+      <div class="footer-inner-full">
+        <!-- Columna 1: Brand & Misión -->
+        <div class="footer-col footer-col-brand">
+          <h4>
+            <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="22" height="22">
+            CloudTranslator
+          </h4>
+          <p>Ecosistema cloud de procesamiento lingüístico y multimedia de alto rendimiento: traducción neuronal distribuida (+200 idiomas), Texto a Voz (TTS), Clonación de Voz por IA y Conversor Universal MP3/MP4.</p>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+            Microservicio libre en Render • <span class="badge badge-online">ONLINE</span>
+          </p>
+        </div>
+
+        <!-- Columna 2: Pilares y Servicios -->
+        <div class="footer-col">
+          <h4>Servicios</h4>
+          <ul>
+            <li><a href="/translator">Traductor en la Nube</a></li>
+            <li><a href="/tts">Texto a Voz (TTS)</a></li>
+            <li><a href="/voice-clone">Clonación de Voz IA</a></li>
+            <li><a href="/converter" class="active">Conversor MP3 / MP4</a></li>
+          </ul>
+        </div>
+
+        <!-- Columna 3: Recursos y Herramientas -->
+        <div class="footer-col">
+          <h4>Recursos</h4>
+          <ul>
+            <li><a href="/api">Playground API REST</a></li>
+            <li><a href="/learn">Guías de Integración</a></li>
+            <li><a href="/help">Centro de Ayuda</a></li>
+          </ul>
+        </div>
+
+        <!-- Columna 4: Información Legal -->
+        <div class="footer-col">
+          <h4>Información Legal</h4>
+          <ul>
+            <li><a href="/terms">Términos del Servicio</a></li>
+            <li><a href="/privacy">Política de Privacidad</a></li>
+            <li><a href="/security">Seguridad y Cookies</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom-full">
+        <span>© 2026 CloudTranslator. Todos los derechos reservados.</span>
+        <span>Desarrollado por Miguel Angel Carlos Rojas</span>
+      </div>
+    </div>
   </footer>
 
   <!-- Script del Conversor Multimedia -->

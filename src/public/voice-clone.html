@@ -161,8 +161,9 @@
             </div>
           </div>
         </div>
-        <div style="font-size: 0.78rem; font-family: var(--font-mono); color: #10b981; background: rgba(16, 185, 129, 0.12); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 700;">
-          ⚡ MOTOR DE IA ACTIVO
+        <div style="font-size: 0.78rem; font-family: var(--font-mono); color: #10b981; background: rgba(16, 185, 129, 0.12); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+          <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span>MOTOR DE IA ACTIVO</span>
         </div>
       </div>
 
@@ -383,6 +384,79 @@
     "similarity": "high",
     "audioSampleBase64": "data:audio/wav;base64,..."
   }'</pre>
+      </div>
+    </section>
+
+    <!-- Sección Informativa: Los 4 Pilares del Ecosistema -->
+    <section style="margin-top: 36px;">
+      <div class="section-full-title">
+        <h2>Los 4 Pilares de CloudTranslator</h2>
+        <p>Herramientas especializadas con consolas dedicadas a cada disciplina lingüística, vocal y multimedia.</p>
+      </div>
+
+      <div class="pillars-grid">
+        <!-- Pilar 1 -->
+        <div class="pillar-card">
+          <div class="pillar-header">
+            <div class="pillar-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+            </div>
+            <span class="pillar-tag">PILAR 01 // TEXT</span>
+          </div>
+          <h3>Traductor en la Nube</h3>
+          <p>
+            Traducción por lotes de alta velocidad (+200 idiomas). Nuestro algoritmo agrupa todos los textos del DOM y envía un único arreglo <code>texts: [...]</code> a <code>/api/translate</code>. Persistencia estricta en cookies y 0ms desde memoria RAM.
+          </p>
+          <a href="/translator" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Traductor en la Nube</a>
+        </div>
+
+        <!-- Pilar 2 -->
+        <div class="pillar-card">
+          <div class="pillar-header">
+            <div class="pillar-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            </div>
+            <span class="pillar-tag">PILAR 02 // AUDIO</span>
+          </div>
+          <h3>Texto a Voz Multilingüe (TTS)</h3>
+          <p>
+            Convierte cualquier texto en audio fluido y natural. Selecciona el idioma, elige entre 24 voces humanas neuronales, calibra velocidad y tono en tiempo real con reproductor, ondas sonoras y descarga en formato WAV o MP3.
+          </p>
+          <a href="/tts" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Estudio TTS</a>
+        </div>
+
+        <!-- Pilar 3 -->
+        <div class="pillar-card">
+          <div class="pillar-header">
+            <div class="pillar-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+            </div>
+            <span class="pillar-tag">PILAR 03 // VOICE AI</span>
+          </div>
+          <h3>Clonación de Voz con IA</h3>
+          <p>
+            Graba con micrófono o sube tu archivo de audio. Escucha tu muestra de referencia, edítala o elimínala con un clic, escribe tu guion y descarga el archivo WAV sintetizado recreando tu timbre vocal único.
+          </p>
+          <a href="/voice-clone" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Clonación de Voz</a>
+        </div>
+
+        <!-- Pilar 4 -->
+        <div class="pillar-card">
+          <div class="pillar-header">
+            <div class="pillar-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
+            </div>
+            <span class="pillar-tag">PILAR 04 // MEDIA CONVERTER</span>
+          </div>
+          <h3>Conversor Multimedia (MP3 / MP4)</h3>
+          <p>
+            Pega enlaces de YouTube, TikTok, Instagram Reels, Facebook o Twitter y conviértelos a MP3 (hasta 320 kbps) o video MP4 sin marcas de agua. Detección automática, streaming con rango HTTP y descarga física directa.
+          </p>
+          <a href="/converter" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Conversor MP3/MP4</a>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- Pie de Página Horizontal Alineado -->
@@ -394,7 +468,7 @@
           <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="22" height="22">
           CloudTranslator
         </h4>
-        <p>Ecosistema cloud de procesamiento lingüístico y síntesis vocal de alto rendimiento: traducción neuronal distribuida, Texto a Voz (TTS) y Clonación de Voz por Inteligencia Artificial.</p>
+        <p>Ecosistema cloud de procesamiento lingüístico y multimedia de alto rendimiento: traducción neuronal distribuida (+200 idiomas), Texto a Voz (TTS), Clonación de Voz por IA y Conversor Universal MP3/MP4.</p>
         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
           Microservicio libre en Render • <span class="badge badge-online">ONLINE</span>
         </p>

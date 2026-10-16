@@ -76,6 +76,8 @@ CloudTranslator integra 4 soluciones tecnológicas avanzadas en una arquitectura
 5. **Persistencia Estricta mediante Cookies:** Almacena la elección del idioma en la cookie técnica `cloud_translator_lang` por 365 días (`SameSite=Lax`). Al navegar o recargar, el idioma se aplica automáticamente.
 6. **Compresión HTTP (Gzip / Deflate):** Respuestas comprimidas automáticamente por encima de 512 bytes, reduciendo el ancho de banda transferido.
 7. **CORS Universal Abierto:** Encabezados `Access-Control-Allow-Origin: *` con soporte completo para peticiones preflight (`OPTIONS`), permitiendo la integración desde cualquier frontend (React, Vue, Angular, Svelte, móviles o scripts Vanilla JS).
+8. **Diseño Visual con Iconografía Vectorial SVG (Cero Emojis):** Toda la interfaz de usuario opera con iconos vectoriales SVG limpios con clase estándar `.icon` (`stroke="currentColor"`), eliminando emojis para una experiencia corporativa cristalina y coherente en cualquier pantalla o sistema operativo.
+9. **Procesamiento Efímero y Streaming Binario en Memoria:** Tanto la síntesis TTS como las conversiones de video/audio y clonación espectral se transmiten mediante buffers y streaming HTTP con rangos parciales (`206 Partial Content`), con cero almacenamiento persistente en disco protegiendo la privacidad absoluta del cliente.
 
 ---
 

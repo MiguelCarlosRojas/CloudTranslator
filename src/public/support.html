@@ -182,8 +182,8 @@
       </p>
       <ul style="margin-left: 20px; line-height: 2;">
         <li><strong>Timestamp:</strong> Fecha y hora exacta de la solicitud (formato ISO 8601 o UTC).</li>
-        <li><strong>Endpoint consultado:</strong> Por ejemplo <code>POST /api/translate</code>.</li>
-        <li><strong>Payload enviado:</strong> Cuerpo JSON de la petición (omitiendo información confidencial).</li>
+        <li><strong>Endpoint consultado:</strong> Por ejemplo <code>POST /api/translate</code>, <code>POST /api/tts</code>, <code>POST /api/voice-clone</code> o <code>POST /api/media/convert</code>.</li>
+        <li><strong>Payload enviado:</strong> Cuerpo JSON o datos de la petición (omitiendo información confidencial).</li>
         <li><strong>Código HTTP y mensaje de error:</strong> Respuesta devuelta por el servidor (ej. 400 Bad Request, 500 Internal Error).</li>
         <li><strong>Entorno de ejecución:</strong> Node.js, navegador (Chrome/Firefox/Safari), Python o cURL.</li>
       </ul>
@@ -193,7 +193,7 @@
       <span class="tech-card-tag">[ 03 // SLA_Y_DISPONIBILIDAD ]</span>
       <h2>Niveles de Servicio (SLA)</h2>
       <p>
-        CloudTranslator se encuentra desplegado en la infraestructura en la nube de Render en la región US-East. La tasa de disponibilidad objetivo es del 99.5% con monitoreo constante de salud en el endpoint <code>/api/health</code>.
+        CloudTranslator se encuentra desplegado en la infraestructura en la nube de Render en la región US-East. La tasa de disponibilidad objetivo es del 99.5% con monitoreo constante de salud en el endpoint <code>/api/health</code> para los 4 pilares tecnológicos.
       </p>
     </article>
   </main>
@@ -207,7 +207,7 @@
           <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="22" height="22">
           CloudTranslator
         </h4>
-        <p>Ecosistema cloud de procesamiento lingüístico y síntesis vocal de alto rendimiento: traducción neuronal distribuida, Texto a Voz (TTS) y Clonación de Voz por Inteligencia Artificial.</p>
+        <p>Ecosistema cloud de procesamiento lingüístico y multimedia de alto rendimiento: traducción neuronal distribuida (+200 idiomas), Texto a Voz (TTS), Clonación de Voz por IA y Conversor Universal MP3/MP4.</p>
         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
           Microservicio libre en Render • <span class="badge badge-online">ONLINE</span>
         </p>
