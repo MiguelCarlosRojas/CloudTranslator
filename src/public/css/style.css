@@ -2038,6 +2038,186 @@ footer {
 }
 
 /* ==========================================================================
+   Plataformas Multimedia: Chips de Iconos con Tooltip al Pasar el Mouse
+   ========================================================================== */
+.platform-chips-container {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  position: relative;
+}
+
+.platform-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: rgba(10, 14, 26, 0.85);
+  cursor: pointer;
+  outline: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
+  user-select: none;
+}
+
+.platform-chip .platform-icon,
+.platform-chip svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: block;
+}
+
+.platform-chip:hover {
+  transform: translateY(-3px);
+  z-index: 50;
+}
+
+.platform-chip:hover .platform-icon,
+.platform-chip:hover svg {
+  transform: scale(1.18);
+}
+
+/* Colores específicos de marca por plataforma */
+.platform-chip[data-platform="youtube"] {
+  background: rgba(255, 0, 0, 0.12);
+  border-color: rgba(255, 68, 68, 0.35);
+  color: #ff6b6b;
+}
+.platform-chip[data-platform="youtube"]:hover,
+.platform-chip[data-platform="youtube"].active {
+  background: rgba(255, 0, 0, 0.22);
+  border-color: #ff4444;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(255, 68, 68, 0.45);
+}
+
+.platform-chip[data-platform="tiktok"] {
+  background: rgba(255, 0, 80, 0.12);
+  border-color: rgba(255, 0, 80, 0.35);
+  color: #ff477e;
+}
+.platform-chip[data-platform="tiktok"]:hover,
+.platform-chip[data-platform="tiktok"].active {
+  background: rgba(255, 0, 80, 0.22);
+  border-color: #ff0050;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(255, 0, 80, 0.45);
+}
+
+.platform-chip[data-platform="instagram"] {
+  background: rgba(225, 48, 108, 0.12);
+  border-color: rgba(225, 48, 108, 0.35);
+  color: #f77f00;
+}
+.platform-chip[data-platform="instagram"]:hover,
+.platform-chip[data-platform="instagram"].active {
+  background: rgba(225, 48, 108, 0.22);
+  border-color: #e1306c;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(225, 48, 108, 0.45);
+}
+
+.platform-chip[data-platform="facebook"] {
+  background: rgba(24, 119, 242, 0.12);
+  border-color: rgba(24, 119, 242, 0.35);
+  color: #4dabf7;
+}
+.platform-chip[data-platform="facebook"]:hover,
+.platform-chip[data-platform="facebook"].active {
+  background: rgba(24, 119, 242, 0.22);
+  border-color: #1877f2;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(24, 119, 242, 0.45);
+}
+
+.platform-chip[data-platform="twitter"] {
+  background: rgba(29, 161, 242, 0.12);
+  border-color: rgba(29, 161, 242, 0.35);
+  color: #38bdf8;
+}
+.platform-chip[data-platform="twitter"]:hover,
+.platform-chip[data-platform="twitter"].active {
+  background: rgba(29, 161, 242, 0.22);
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.45);
+}
+
+.platform-chip[data-platform="pinterest"] {
+  background: rgba(189, 8, 28, 0.12);
+  border-color: rgba(189, 8, 28, 0.35);
+  color: #ff8787;
+}
+.platform-chip[data-platform="pinterest"]:hover,
+.platform-chip[data-platform="pinterest"].active {
+  background: rgba(189, 8, 28, 0.22);
+  border-color: #bd081c;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(189, 8, 28, 0.45);
+}
+
+.platform-chip[data-platform="direct"] {
+  background: rgba(0, 240, 255, 0.12);
+  border-color: rgba(0, 240, 255, 0.35);
+  color: var(--primary);
+}
+.platform-chip[data-platform="direct"]:hover,
+.platform-chip[data-platform="direct"].active {
+  background: rgba(0, 240, 255, 0.22);
+  border-color: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.45);
+}
+
+/* Tooltip elegante al pasar el cursor (Hover) */
+.platform-chip .platform-tooltip {
+  position: absolute;
+  bottom: calc(100% + 9px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: rgba(7, 10, 19, 0.96);
+  border: 1px solid var(--border-card);
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  padding: 5px 11px;
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75), 0 0 12px rgba(0, 240, 255, 0.2);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1000;
+}
+
+.platform-chip .platform-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(7, 10, 19, 0.96) transparent transparent transparent;
+}
+
+.platform-chip:hover .platform-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ==========================================================================
    Sección de Donaciones (PayPal & QR Yape)
    ========================================================================== */
 .donations-section {
