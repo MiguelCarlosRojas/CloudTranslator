@@ -285,7 +285,7 @@
       <!-- Índice Rápido para Móvil/Tablet -->
       <div class="docs-mobile-toc-bar">
         <button id="btn-toggle-api-toc" class="btn btn-outline docs-toc-toggle-btn" aria-label="Abrir Índice de Endpoints">
-          <span><svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg> Índice de Endpoints y Métodos</span>
+          <span><svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg> [ API REFERENCE ] Índice de Endpoints</span>
           <span class="toc-badge">G.01 — P.01</span>
         </button>
         <div id="api-mobile-toc-content" class="docs-toc-dropdown" style="display: none; margin-top: 10px; background: rgba(15, 17, 24, 0.95); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 16px;">
@@ -294,13 +294,30 @@
             <li><a href="#sub-base-url" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">1.1 Base URL</a></li>
             <li><a href="#sub-headers" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">1.2 Encabezados Requeridos</a></li>
             <li><a href="#sub-errors" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">1.3 Estructura de Errores</a></li>
+            
             <li><a href="#api-post-translate" style="font-weight: 600;">T.01 // POST /api/translate</a></li>
-            <li><a href="#sub-post-single" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">2.1 Texto Simple (JSON)</a></li>
-            <li><a href="#sub-post-batch" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">2.2 Micro-batch en Lote</a></li>
             <li><a href="#api-get-translate" style="font-weight: 600;">T.02 // GET /api/translate</a></li>
-            <li><a href="#api-get-languages" style="font-weight: 600;">S.01 // GET /api/languages</a></li>
-            <li><a href="#api-get-health" style="font-weight: 600;">S.02 // GET /api/health</a></li>
-            <li><a href="#api-live-console" style="font-weight: 600;">P.01 // Consola Interactiva</a></li>
+            <li><a href="#api-get-languages" style="font-weight: 600;">T.03 // GET /api/languages</a></li>
+            <li><a href="#api-get-ping" style="font-weight: 600;">T.04 // GET /api/ping</a></li>
+            <li><a href="#api-get-health" style="font-weight: 600;">T.05 // GET /api/health</a></li>
+
+            <li><a href="#api-get-voices" style="font-weight: 600;">V.01 // GET /api/tts/voices</a></li>
+            <li><a href="#api-post-tts" style="font-weight: 600;">V.02 // POST /api/tts</a></li>
+            <li><a href="#api-get-tts-stream" style="font-weight: 600;">V.03 // GET /api/tts/stream</a></li>
+            <li><a href="#api-get-tts-download" style="font-weight: 600;">V.04 // GET /api/tts/download</a></li>
+
+            <li><a href="#api-post-voice-clone" style="font-weight: 600;">C.01 // POST /api/voice-clone</a></li>
+            <li><a href="#api-get-vc-stream" style="font-weight: 600;">C.02 // GET /api/voice-clone/stream</a></li>
+            <li><a href="#api-get-vc-download" style="font-weight: 600;">C.03 // GET /api/voice-clone/download</a></li>
+
+            <li><a href="#api-get-media-platforms" style="font-weight: 600;">M.01 // GET /api/media/platforms</a></li>
+            <li><a href="#api-post-media-info" style="font-weight: 600;">M.02 // POST /api/media/info</a></li>
+            <li><a href="#api-post-media-convert" style="font-weight: 600;">M.03 // POST /api/media/convert</a></li>
+            <li><a href="#api-post-media-batch" style="font-weight: 600;">M.04 // POST /api/media/batch</a></li>
+            <li><a href="#api-get-media-stream" style="font-weight: 600;">M.05 // GET /api/media/stream</a></li>
+            <li><a href="#api-get-media-download" style="font-weight: 600;">M.06 // GET /api/media/download</a></li>
+
+            <li><a href="#api-live-console" style="font-weight: 600; color: var(--primary);">P.01 // Consola Interactiva</a></li>
           </ul>
         </div>
       </div>

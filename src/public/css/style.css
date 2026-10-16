@@ -1066,18 +1066,19 @@ body.ct-translating {
   margin: 0;
   position: relative;
   align-items: stretch;
-  min-height: calc(100vh - 72px);
+  min-height: calc(100vh - 64px);
 }
 
 /* Barra Lateral Sticky (Desktop) */
 .docs-sidebar {
-  width: 320px;
-  min-width: 320px;
+  width: 360px;
+  min-width: 360px;
+  max-width: 380px;
   flex-shrink: 0;
   position: sticky;
-  top: 72px;
-  height: calc(100vh - 72px);
-  min-height: calc(100vh - 72px);
+  top: 64px;
+  height: calc(100vh - 64px);
+  min-height: calc(100vh - 64px);
   overflow-y: auto;
   border-right: 1px solid var(--border-subtle);
   background: rgba(6, 9, 18, 0.98);
@@ -1085,32 +1086,49 @@ body.ct-translating {
   z-index: 100;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0;
   -webkit-overflow-scrolling: touch;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.35);
+}
+
+@media (min-width: 1440px) {
+  .docs-sidebar {
+    width: 380px;
+    min-width: 380px;
+  }
 }
 
 .docs-sidebar::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
 }
 .docs-sidebar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+.docs-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.35);
 }
 
 .docs-sidebar-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   width: 100%;
   box-sizing: border-box;
-  padding: 24px 22px 18px 22px;
-  background: rgba(255, 255, 255, 0.03);
+  padding: 24px 24px 18px 24px;
+  background: rgba(8, 11, 20, 0.98);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   gap: 5px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 .docs-sidebar-tag {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   color: var(--primary);
   letter-spacing: 0.08em;
   font-weight: 700;
@@ -1120,19 +1138,20 @@ body.ct-translating {
 }
 
 .docs-sidebar-title {
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: var(--text-white);
   margin: 0;
   line-height: 1.3;
   width: 100%;
+  letter-spacing: -0.01em;
 }
 
 .docs-sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 0 18px 30px 18px;
+  gap: 18px;
+  padding: 18px 20px 48px 20px;
   width: 100%;
   box-sizing: border-box;
   flex: 1;
@@ -1145,94 +1164,108 @@ body.ct-translating {
 
 .docs-group-label {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   color: var(--text-muted);
   letter-spacing: 0.06em;
   font-weight: 700;
   padding: 4px 10px;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
 }
 
 .docs-sidebar-session {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: 10px;
+  padding: 10px 14px;
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
-  font-size: 0.82rem;
+  font-size: 0.86rem;
   font-weight: 600;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
+  border: 1px solid transparent;
+  white-space: nowrap;
 }
 
 .docs-sidebar-session:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-white);
+  border-color: rgba(255, 255, 255, 0.08);
+  transform: translateX(3px);
   text-decoration: none;
 }
 
 .docs-sidebar-session.active {
-  background: rgba(0, 240, 255, 0.08);
+  background: rgba(0, 240, 255, 0.1);
   color: var(--primary);
   font-weight: 700;
+  border-color: rgba(0, 240, 255, 0.3);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.15);
 }
 
 .session-badge {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
-  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.68rem;
+  background: rgba(255, 255, 255, 0.08);
   color: var(--text-muted);
-  padding: 2px 6px;
+  padding: 3px 8px;
   border-radius: 4px;
   border: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+  font-weight: 700;
 }
 
 .docs-sidebar-session.active .session-badge {
   background: var(--primary);
   color: #030712;
   border-color: var(--primary);
+  font-weight: 800;
 }
 
 .docs-sidebar-subsessions {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-left: 14px;
-  padding-left: 10px;
-  border-left: 1px solid var(--border-subtle);
-  margin-top: 4px;
-  margin-bottom: 6px;
+  gap: 3px;
+  margin-left: 18px;
+  padding-left: 14px;
+  border-left: 1.5px solid rgba(255, 255, 255, 0.1);
+  margin-top: 6px;
+  margin-bottom: 8px;
 }
 
 .docs-sidebar-sublink {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
+  gap: 8px;
+  padding: 6px 12px;
   border-radius: var(--radius-xs);
   color: var(--text-muted);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   transition: all 0.2s ease;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .docs-sidebar-sublink:hover {
   color: var(--text-white);
   background: rgba(255, 255, 255, 0.04);
+  transform: translateX(2px);
   text-decoration: none;
 }
 
 .docs-sidebar-sublink.active {
   color: var(--primary);
   font-weight: 600;
-  background: rgba(0, 240, 255, 0.06);
+  background: rgba(0, 240, 255, 0.08);
 }
 
 .sub-num {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   color: var(--text-dim);
+  font-weight: 700;
 }
 
 .docs-sidebar-sublink.active .sub-num {
@@ -1243,8 +1276,9 @@ body.ct-translating {
 .docs-main-content {
   flex: 1;
   min-width: 0;
-  padding: clamp(24px, 4vw, 48px) clamp(20px, 5vw, 64px);
+  padding: clamp(28px, 4vw, 52px) clamp(24px, 5vw, 68px);
   width: 100%;
+  max-width: 1440px;
 }
 
 .docs-section {
@@ -2042,172 +2076,222 @@ footer {
 }
 
 /* ==========================================================================
-   Plataformas Multimedia: Chips de Iconos con Diseño de Marca y Tooltip Hover
+   Plataformas Multimedia: Tarjetas Interactivas con Diseño de Marca Profesional
    ========================================================================== */
 .platform-chips-container {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
   position: relative;
-  padding: 4px 0;
+  padding: 6px 0 10px 0;
+}
+
+@media (min-width: 1200px) {
+  .platform-chips-container {
+    grid-template-columns: repeat(7, 1fr);
+  }
 }
 
 .platform-chip {
   position: relative;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(14, 18, 30, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   cursor: pointer;
   outline: none;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  padding: 0;
+  text-align: left;
   user-select: none;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 
-.platform-chip .platform-icon,
-.platform-chip svg {
-  width: 24px;
-  height: 24px;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+.platform-chip-icon-box {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.platform-chip-icon-box .platform-icon,
+.platform-chip-icon-box svg {
+  width: 18px;
+  height: 18px;
   display: block;
 }
 
-.platform-chip:hover {
-  transform: translateY(-3px) scale(1.08);
-  z-index: 50;
+.platform-chip-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
 }
 
-.platform-chip.active {
-  outline: 2px solid #ffffff;
-  outline-offset: 3px;
-  transform: scale(1.05);
+.platform-chip-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-white);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.2s ease;
 }
+
+.platform-chip-tag {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.02em;
+}
+
+.platform-chip-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.platform-chip:hover {
+  transform: translateY(-3px);
+  background: rgba(20, 26, 44, 0.9);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.platform-chip:hover .platform-chip-icon-box {
+  transform: scale(1.08);
+}
+
+/* Estado Activo Genérico */
+.platform-chip.active {
+  background: rgba(22, 28, 48, 0.95);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.6);
+  transform: translateY(-2px);
+}
+
+.platform-chip.active .platform-chip-name {
+  color: #ffffff;
+}
+
+/* Diseños Específicos por Plataforma en Hover y Activo */
 
 /* 1. YouTube */
-.platform-chip[data-platform="youtube"] {
-  background: linear-gradient(135deg, #ff0000 0%, #c40000 100%);
-  border-color: rgba(255, 68, 68, 0.5);
-}
 .platform-chip[data-platform="youtube"]:hover,
 .platform-chip[data-platform="youtube"].active {
-  box-shadow: 0 6px 22px rgba(255, 0, 0, 0.65);
+  border-color: rgba(255, 0, 0, 0.7);
+  box-shadow: 0 6px 24px rgba(255, 0, 0, 0.45);
+}
+.platform-chip[data-platform="youtube"].active .platform-chip-dot {
+  background: #ff0000;
+  box-shadow: 0 0 10px #ff0000;
+}
+.platform-chip[data-platform="youtube"].active .platform-chip-tag {
+  color: #ff6b6b;
 }
 
 /* 2. TikTok */
-.platform-chip[data-platform="tiktok"] {
-  background: linear-gradient(135deg, #050505 0%, #171717 100%);
-  border-color: rgba(0, 242, 254, 0.45);
-}
 .platform-chip[data-platform="tiktok"]:hover,
 .platform-chip[data-platform="tiktok"].active {
-  border-color: #ff0050;
-  box-shadow: 0 6px 22px rgba(255, 0, 80, 0.55), 0 0 14px rgba(0, 242, 254, 0.45);
+  border-color: rgba(0, 242, 254, 0.7);
+  box-shadow: 0 6px 24px rgba(0, 242, 254, 0.35), 0 0 16px rgba(255, 0, 80, 0.3);
+}
+.platform-chip[data-platform="tiktok"].active .platform-chip-dot {
+  background: #00f2fe;
+  box-shadow: 0 0 10px #00f2fe;
+}
+.platform-chip[data-platform="tiktok"].active .platform-chip-tag {
+  color: #00f2fe;
 }
 
-/* 3. Instagram Reels */
-.platform-chip[data-platform="instagram"] {
-  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-  border-color: rgba(225, 48, 108, 0.5);
-}
+/* 3. Instagram */
 .platform-chip[data-platform="instagram"]:hover,
 .platform-chip[data-platform="instagram"].active {
-  box-shadow: 0 6px 22px rgba(220, 39, 67, 0.65);
+  border-color: rgba(225, 48, 108, 0.7);
+  box-shadow: 0 6px 24px rgba(220, 39, 67, 0.45);
+}
+.platform-chip[data-platform="instagram"].active .platform-chip-dot {
+  background: #e1306c;
+  box-shadow: 0 0 10px #e1306c;
+}
+.platform-chip[data-platform="instagram"].active .platform-chip-tag {
+  color: #f77f00;
 }
 
 /* 4. Facebook */
-.platform-chip[data-platform="facebook"] {
-  background: linear-gradient(135deg, #1877f2 0%, #0c56c2 100%);
-  border-color: rgba(24, 119, 242, 0.5);
-}
 .platform-chip[data-platform="facebook"]:hover,
 .platform-chip[data-platform="facebook"].active {
-  box-shadow: 0 6px 22px rgba(24, 119, 242, 0.65);
+  border-color: rgba(24, 119, 242, 0.7);
+  box-shadow: 0 6px 24px rgba(24, 119, 242, 0.45);
+}
+.platform-chip[data-platform="facebook"].active .platform-chip-dot {
+  background: #1877f2;
+  box-shadow: 0 0 10px #1877f2;
+}
+.platform-chip[data-platform="facebook"].active .platform-chip-tag {
+  color: #60a5fa;
 }
 
 /* 5. Twitter / X */
-.platform-chip[data-platform="twitter"] {
-  background: linear-gradient(135deg, #000000 0%, #1c1c1e 100%);
-  border-color: rgba(255, 255, 255, 0.35);
-}
 .platform-chip[data-platform="twitter"]:hover,
 .platform-chip[data-platform="twitter"].active {
-  border-color: #ffffff;
-  box-shadow: 0 6px 22px rgba(255, 255, 255, 0.45);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.25);
+}
+.platform-chip[data-platform="twitter"].active .platform-chip-dot {
+  background: #ffffff;
+  box-shadow: 0 0 10px #ffffff;
+}
+.platform-chip[data-platform="twitter"].active .platform-chip-tag {
+  color: #e2e8f0;
 }
 
 /* 6. Pinterest */
-.platform-chip[data-platform="pinterest"] {
-  background: linear-gradient(135deg, #e60023 0%, #a30018 100%);
-  border-color: rgba(230, 0, 35, 0.5);
-}
 .platform-chip[data-platform="pinterest"]:hover,
 .platform-chip[data-platform="pinterest"].active {
-  box-shadow: 0 6px 22px rgba(230, 0, 35, 0.65);
+  border-color: rgba(230, 0, 35, 0.7);
+  box-shadow: 0 6px 24px rgba(230, 0, 35, 0.45);
+}
+.platform-chip[data-platform="pinterest"].active .platform-chip-dot {
+  background: #e60023;
+  box-shadow: 0 0 10px #e60023;
+}
+.platform-chip[data-platform="pinterest"].active .platform-chip-tag {
+  color: #f87171;
 }
 
 /* 7. Enlace Directo */
-.platform-chip[data-platform="direct"] {
-  background: linear-gradient(135deg, #00f0ff 0%, #0284c7 100%);
-  border-color: rgba(0, 240, 255, 0.5);
-}
 .platform-chip[data-platform="direct"]:hover,
 .platform-chip[data-platform="direct"].active {
-  box-shadow: 0 6px 22px rgba(0, 240, 255, 0.65);
+  border-color: rgba(0, 240, 255, 0.7);
+  box-shadow: 0 6px 24px rgba(0, 240, 255, 0.45);
 }
-
-/* Tooltip vía CSS attr(data-tooltip) - sin ningún elemento de texto en HTML */
-.platform-chip::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%) translateY(4px);
-  background: rgba(8, 11, 20, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  color: #ffffff;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-  padding: 5px 11px;
-  border-radius: var(--radius-sm);
-  pointer-events: none;
-  opacity: 0;
-  visibility: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 14px rgba(0, 240, 255, 0.25);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  z-index: 1000;
+.platform-chip[data-platform="direct"].active .platform-chip-dot {
+  background: #00f0ff;
+  box-shadow: 0 0 10px #00f0ff;
 }
-
-.platform-chip::before {
-  content: "";
-  position: absolute;
-  bottom: calc(100% + 2px);
-  left: 50%;
-  transform: translateX(-50%) translateY(4px);
-  border-width: 5px;
-  border-style: solid;
-  border-color: rgba(8, 11, 20, 0.96) transparent transparent transparent;
-  pointer-events: none;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  z-index: 1001;
-}
-
-.platform-chip:hover::after,
-.platform-chip:hover::before {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0);
+.platform-chip[data-platform="direct"].active .platform-chip-tag {
+  color: var(--primary);
 }
 
 /* ==========================================================================
@@ -2553,16 +2637,17 @@ footer {
   }
 
   .docs-sidebar {
-    width: 250px;
+    width: 310px;
+    min-width: 310px;
     padding: 0 0 28px 0;
   }
 
   .docs-sidebar-header {
-    padding: 18px 14px 14px 14px;
+    padding: 20px 18px 16px 18px;
   }
 
   .docs-sidebar-nav {
-    padding: 0 10px 16px 10px;
+    padding: 12px 14px 28px 14px;
   }
 
   .docs-main-content {
@@ -2660,14 +2745,33 @@ footer {
   }
 
   .platform-chips-container {
-    overflow-x: auto;
-    padding-bottom: 6px;
-    -webkit-overflow-scrolling: touch;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 
   .platform-chip {
-    white-space: nowrap;
-    flex-shrink: 0;
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .platform-chip-icon-box {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+  }
+
+  .platform-chip-icon-box .platform-icon,
+  .platform-chip-icon-box svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .platform-chip-name {
+    font-size: 0.78rem;
+  }
+
+  .platform-chip-tag {
+    font-size: 0.58rem;
   }
 }
 
