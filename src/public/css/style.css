@@ -1057,28 +1057,31 @@ body.ct-translating {
 }
 
 /* ==========================================================================
-   Diseño de Documentación & API (Layout de 2 Columnas con Sidebar Fluido)
+   Diseño de Documentación & API (Layout de 2 Columnas con Sidebar Lateral Completo)
    ========================================================================== */
 .docs-layout-container {
   display: flex;
   width: 100%;
-  max-width: 1440px;
-  margin: 0 auto;
+  max-width: 100%;
+  margin: 0;
   position: relative;
-  align-items: flex-start;
+  align-items: stretch;
+  min-height: calc(100vh - 72px);
 }
 
 /* Barra Lateral Sticky (Desktop) */
 .docs-sidebar {
-  width: 290px;
+  width: 320px;
+  min-width: 320px;
   flex-shrink: 0;
   position: sticky;
   top: 72px;
-  height: calc(100vh - 84px);
+  height: calc(100vh - 72px);
+  min-height: calc(100vh - 72px);
   overflow-y: auto;
   border-right: 1px solid var(--border-subtle);
-  background: var(--bg-base);
-  padding: 0 0 36px 0;
+  background: rgba(6, 9, 18, 0.98);
+  padding: 0 0 40px 0;
   z-index: 100;
   display: flex;
   flex-direction: column;
@@ -1097,28 +1100,28 @@ body.ct-translating {
 .docs-sidebar-header {
   width: 100%;
   box-sizing: border-box;
-  padding: 24px 20px 18px 20px;
-  background: rgba(255, 255, 255, 0.025);
+  padding: 24px 22px 18px 22px;
+  background: rgba(255, 255, 255, 0.03);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 }
 
 .docs-sidebar-tag {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   color: var(--primary);
   letter-spacing: 0.08em;
   font-weight: 700;
   display: block;
-  margin-bottom: 2px;
+  margin: 0;
   width: 100%;
 }
 
 .docs-sidebar-title {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.05rem;
+  font-weight: 800;
   color: var(--text-white);
   margin: 0;
   line-height: 1.3;
@@ -1129,9 +1132,10 @@ body.ct-translating {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 0 16px 20px 16px;
+  padding: 0 18px 30px 18px;
   width: 100%;
   box-sizing: border-box;
+  flex: 1;
 }
 
 .docs-sidebar-group {
@@ -2038,14 +2042,15 @@ footer {
 }
 
 /* ==========================================================================
-   Plataformas Multimedia: Chips de Iconos con Tooltip al Pasar el Mouse
+   Plataformas Multimedia: Chips de Iconos con Diseño de Marca y Tooltip Hover
    ========================================================================== */
 .platform-chips-container {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   flex-wrap: wrap;
   align-items: center;
   position: relative;
+  padding: 4px 0;
 }
 
 .platform-chip {
@@ -2053,136 +2058,118 @@ footer {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  background: rgba(10, 14, 26, 0.85);
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   cursor: pointer;
   outline: none;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   padding: 0;
   user-select: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
 }
 
 .platform-chip .platform-icon,
 .platform-chip svg {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: block;
 }
 
 .platform-chip:hover {
-  transform: translateY(-3px);
+  transform: translateY(-3px) scale(1.08);
   z-index: 50;
 }
 
-.platform-chip:hover .platform-icon,
-.platform-chip:hover svg {
-  transform: scale(1.18);
+.platform-chip.active {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+  transform: scale(1.05);
 }
 
-/* Colores específicos de marca por plataforma */
+/* 1. YouTube */
 .platform-chip[data-platform="youtube"] {
-  background: rgba(255, 0, 0, 0.12);
-  border-color: rgba(255, 68, 68, 0.35);
-  color: #ff6b6b;
+  background: linear-gradient(135deg, #ff0000 0%, #c40000 100%);
+  border-color: rgba(255, 68, 68, 0.5);
 }
 .platform-chip[data-platform="youtube"]:hover,
 .platform-chip[data-platform="youtube"].active {
-  background: rgba(255, 0, 0, 0.22);
-  border-color: #ff4444;
-  color: #ffffff;
-  box-shadow: 0 0 16px rgba(255, 68, 68, 0.45);
+  box-shadow: 0 6px 22px rgba(255, 0, 0, 0.65);
 }
 
+/* 2. TikTok */
 .platform-chip[data-platform="tiktok"] {
-  background: rgba(255, 0, 80, 0.12);
-  border-color: rgba(255, 0, 80, 0.35);
-  color: #ff477e;
+  background: linear-gradient(135deg, #050505 0%, #171717 100%);
+  border-color: rgba(0, 242, 254, 0.45);
 }
 .platform-chip[data-platform="tiktok"]:hover,
 .platform-chip[data-platform="tiktok"].active {
-  background: rgba(255, 0, 80, 0.22);
   border-color: #ff0050;
-  color: #ffffff;
-  box-shadow: 0 0 16px rgba(255, 0, 80, 0.45);
+  box-shadow: 0 6px 22px rgba(255, 0, 80, 0.55), 0 0 14px rgba(0, 242, 254, 0.45);
 }
 
+/* 3. Instagram Reels */
 .platform-chip[data-platform="instagram"] {
-  background: rgba(225, 48, 108, 0.12);
-  border-color: rgba(225, 48, 108, 0.35);
-  color: #f77f00;
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  border-color: rgba(225, 48, 108, 0.5);
 }
 .platform-chip[data-platform="instagram"]:hover,
 .platform-chip[data-platform="instagram"].active {
-  background: rgba(225, 48, 108, 0.22);
-  border-color: #e1306c;
-  color: #ffffff;
-  box-shadow: 0 0 16px rgba(225, 48, 108, 0.45);
+  box-shadow: 0 6px 22px rgba(220, 39, 67, 0.65);
 }
 
+/* 4. Facebook */
 .platform-chip[data-platform="facebook"] {
-  background: rgba(24, 119, 242, 0.12);
-  border-color: rgba(24, 119, 242, 0.35);
-  color: #4dabf7;
+  background: linear-gradient(135deg, #1877f2 0%, #0c56c2 100%);
+  border-color: rgba(24, 119, 242, 0.5);
 }
 .platform-chip[data-platform="facebook"]:hover,
 .platform-chip[data-platform="facebook"].active {
-  background: rgba(24, 119, 242, 0.22);
-  border-color: #1877f2;
-  color: #ffffff;
-  box-shadow: 0 0 16px rgba(24, 119, 242, 0.45);
+  box-shadow: 0 6px 22px rgba(24, 119, 242, 0.65);
 }
 
+/* 5. Twitter / X */
 .platform-chip[data-platform="twitter"] {
-  background: rgba(29, 161, 242, 0.12);
-  border-color: rgba(29, 161, 242, 0.35);
-  color: #38bdf8;
+  background: linear-gradient(135deg, #000000 0%, #1c1c1e 100%);
+  border-color: rgba(255, 255, 255, 0.35);
 }
 .platform-chip[data-platform="twitter"]:hover,
 .platform-chip[data-platform="twitter"].active {
-  background: rgba(29, 161, 242, 0.22);
-  border-color: #38bdf8;
-  color: #ffffff;
-  box-shadow: 0 0 16px rgba(56, 189, 248, 0.45);
+  border-color: #ffffff;
+  box-shadow: 0 6px 22px rgba(255, 255, 255, 0.45);
 }
 
+/* 6. Pinterest */
 .platform-chip[data-platform="pinterest"] {
-  background: rgba(189, 8, 28, 0.12);
-  border-color: rgba(189, 8, 28, 0.35);
-  color: #ff8787;
+  background: linear-gradient(135deg, #e60023 0%, #a30018 100%);
+  border-color: rgba(230, 0, 35, 0.5);
 }
 .platform-chip[data-platform="pinterest"]:hover,
 .platform-chip[data-platform="pinterest"].active {
-  background: rgba(189, 8, 28, 0.22);
-  border-color: #bd081c;
-  color: #ffffff;
-  box-shadow: 0 0 16px rgba(189, 8, 28, 0.45);
+  box-shadow: 0 6px 22px rgba(230, 0, 35, 0.65);
 }
 
+/* 7. Enlace Directo */
 .platform-chip[data-platform="direct"] {
-  background: rgba(0, 240, 255, 0.12);
-  border-color: rgba(0, 240, 255, 0.35);
-  color: var(--primary);
+  background: linear-gradient(135deg, #00f0ff 0%, #0284c7 100%);
+  border-color: rgba(0, 240, 255, 0.5);
 }
 .platform-chip[data-platform="direct"]:hover,
 .platform-chip[data-platform="direct"].active {
-  background: rgba(0, 240, 255, 0.22);
-  border-color: var(--primary);
-  color: #ffffff;
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.45);
+  box-shadow: 0 6px 22px rgba(0, 240, 255, 0.65);
 }
 
-/* Tooltip elegante al pasar el cursor (Hover) */
-.platform-chip .platform-tooltip {
+/* Tooltip vía CSS attr(data-tooltip) - sin ningún elemento de texto en HTML */
+.platform-chip::after {
+  content: attr(data-tooltip);
   position: absolute;
-  bottom: calc(100% + 9px);
+  bottom: calc(100% + 10px);
   left: 50%;
   transform: translateX(-50%) translateY(4px);
-  background: rgba(7, 10, 19, 0.96);
-  border: 1px solid var(--border-card);
+  background: rgba(8, 11, 20, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
   color: #ffffff;
   font-family: var(--font-mono);
@@ -2195,23 +2182,29 @@ footer {
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75), 0 0 12px rgba(0, 240, 255, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 14px rgba(0, 240, 255, 0.25);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 1000;
 }
 
-.platform-chip .platform-tooltip::after {
+.platform-chip::before {
   content: "";
   position: absolute;
-  top: 100%;
+  bottom: calc(100% + 2px);
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(4px);
   border-width: 5px;
   border-style: solid;
-  border-color: rgba(7, 10, 19, 0.96) transparent transparent transparent;
+  border-color: rgba(8, 11, 20, 0.96) transparent transparent transparent;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1001;
 }
 
-.platform-chip:hover .platform-tooltip {
+.platform-chip:hover::after,
+.platform-chip:hover::before {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
