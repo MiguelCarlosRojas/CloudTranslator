@@ -182,7 +182,7 @@
         </div>
         <div class="platform-chips-container">
           <!-- 1. YouTube -->
-          <button type="button" class="btn platform-chip active" data-platform="youtube" aria-label="YouTube">
+          <button type="button" class="btn platform-chip" data-platform="youtube" aria-label="YouTube">
             <svg class="icon platform-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
             <span>YouTube</span>
           </button>
@@ -232,7 +232,7 @@
           <span id="detected-platform-badge" style="color: var(--primary);">DETECCIÓN AUTOMÁTICA</span>
         </div>
         <div style="position: relative;">
-          <input type="url" id="input-video-url" class="studio-textarea" placeholder="Ejemplo: https://www.youtube.com/watch?v=... o https://www.tiktok.com/@..." value="https://www.youtube.com/watch?v=jNQXAC9IVRw" style="min-height: 48px; height: 48px; padding: 12px 44px 12px 16px; font-size: 0.95rem; resize: none;">
+          <input type="url" id="input-video-url" class="studio-textarea" placeholder="Pega el enlace aquí (YouTube, TikTok, Instagram, Facebook, X, Pinterest...)" value="" style="min-height: 48px; height: 48px; padding: 12px 44px 12px 16px; font-size: 0.95rem; resize: none;">
           <button id="btn-clear-url" title="Limpiar enlace" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; display: flex; align-items: center;">
             <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
@@ -761,29 +761,32 @@
         return null;
       }
 
+      // Sincronizar estado visual de los botones de plataforma según la URL
+      function syncDetectedPlatform(url) {
+        const detected = detectPlatformFromUrl(url);
+        const badge = document.getElementById("detected-platform-badge");
+        document.querySelectorAll(".platform-chip").forEach(c => {
+          if (detected && c.getAttribute("data-platform") === detected) {
+            c.classList.add("active");
+          } else {
+            c.classList.remove("active");
+          }
+        });
+
+        if (detected && platformNames[detected]) {
+          if (badge) badge.textContent = `${platformNames[detected]} DETECTADO`;
+          if (platformHoverLabel) platformHoverLabel.textContent = platformNames[detected];
+        } else {
+          if (badge) badge.textContent = "DETECCIÓN AUTOMÁTICA";
+          if (platformHoverLabel) platformHoverLabel.textContent = "7 PLATAFORMAS";
+        }
+      }
+
       // Si el usuario edita o cambia la URL, resetear el progreso, ocultar resultado previo y sincronizar plataforma
       inputUrl.addEventListener("input", () => {
         resetProgressBox();
         hidePreviousResult();
-        const detected = detectPlatformFromUrl(inputUrl.value);
-        const badge = document.getElementById("detected-platform-badge");
-        if (detected) {
-          document.querySelectorAll(".platform-chip").forEach(c => {
-            if (c.getAttribute("data-platform") === detected) {
-              c.classList.add("active");
-            } else {
-              c.classList.remove("active");
-            }
-          });
-          if (badge && platformNames[detected]) {
-            badge.textContent = `${platformNames[detected]} DETECTADO`;
-          }
-          if (platformHoverLabel && platformNames[detected]) {
-            platformHoverLabel.textContent = platformNames[detected];
-          }
-        } else if (badge) {
-          badge.textContent = "DETECCIÓN AUTOMÁTICA";
-        }
+        syncDetectedPlatform(inputUrl.value);
       });
 
       batchUrls.addEventListener("input", () => {
@@ -796,6 +799,7 @@
         inputUrl.value = "";
         resetProgressBox();
         hidePreviousResult();
+        syncDetectedPlatform("");
         inputUrl.focus();
       });
 
@@ -807,6 +811,7 @@
             inputUrl.value = text.trim();
             resetProgressBox();
             hidePreviousResult();
+            syncDetectedPlatform(inputUrl.value);
             runInspect();
           }
         } catch {
@@ -832,8 +837,7 @@
         }
       });
 
-      // Chips de Plataforma para demostración rápida
-      // Chips de Plataforma para demostración rápida con interacción hover y activa
+      // Chips de Plataforma: Indicadores informativos con hover
       const platformHoverLabel = document.getElementById("platform-hover-label");
       const platformNames = {
         youtube: "YOUTUBE / SHORTS",
@@ -856,33 +860,18 @@
 
         chip.addEventListener("mouseleave", () => {
           if (platformHoverLabel) {
-            const activeChip = document.querySelector(".platform-chip.active");
-            const activePlat = activeChip ? activeChip.getAttribute("data-platform") : null;
-            platformHoverLabel.textContent = (activePlat && platformNames[activePlat]) ? platformNames[activePlat] : "7 PLATAFORMAS";
+            const detected = detectPlatformFromUrl(inputUrl.value);
+            if (detected && platformNames[detected]) {
+              platformHoverLabel.textContent = platformNames[detected];
+            } else {
+              platformHoverLabel.textContent = "7 PLATAFORMAS";
+            }
           }
         });
 
+        // Al hacer clic, simplemente enfocar el campo de enlace sin rellenar ninguna URL por defecto
         chip.addEventListener("click", () => {
-          document.querySelectorAll(".platform-chip").forEach(c => c.classList.remove("active"));
-          chip.classList.add("active");
-          if (platformHoverLabel && platformNames[plat]) {
-            platformHoverLabel.textContent = platformNames[plat];
-          }
-          resetProgressBox();
-          hidePreviousResult();
-          const samples = {
-            youtube: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
-            tiktok: "https://www.tiktok.com/@scout2015/video/6718335390845095173",
-            instagram: "https://www.instagram.com/reel/C3zYyqJv3qC/",
-            facebook: "https://www.facebook.com/watch/?v=10153231379946729",
-            twitter: "https://x.com/OpenAI/status/1758223617180496152",
-            pinterest: "https://www.pinterest.com/pin/687352358399999999/",
-            direct: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
-          };
-          if (samples[plat]) {
-            inputUrl.value = samples[plat];
-            runInspect();
-          }
+          inputUrl.focus();
         });
       });
 
