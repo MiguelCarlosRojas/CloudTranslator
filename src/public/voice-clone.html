@@ -20,8 +20,499 @@
 </head>
 <body>
 
-  <!-- Pie de Página Modular (Componente Centralizado) -->
-  <footer id="footer-placeholder" data-component="footer" data-active="voice-clone"></footer>
+  <!-- Barra Superior -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <a href="/" class="brand-wrapper">
+        <span class="brand-logo">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="38" height="38">
+          CloudTranslator
+        </span>
+        <span class="brand-badge">v2.5.0</span>
+      </a>
+
+      <nav class="desktop-nav">
+        <ul class="main-menu">
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/docs">Docs</a></li>
+          <li><a href="/support">Soporte</a></li>
+          <li><a href="/status">Estado</a></li>
+        </ul>
+      </nav>
+
+      <!-- Barra de Herramientas de Traducción Activa -->
+      <div class="toolbar-controls no-translate" data-no-translate>
+        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+          English
+        </button>
+
+        <div class="selector-box">
+          <div class="selector-dropdown">
+            <select id="select-lang" aria-label="Seleccionar idioma">
+              <option value="en">English (en)</option>
+              <option value="es">Español (es)</option>
+              <option value="fr">Français (fr)</option>
+              <option value="de">Deutsch (de)</option>
+              <option value="it">Italiano (it)</option>
+              <option value="pt">Portugués (pt)</option>
+              <option value="ja">日本語 (ja)</option>
+              <option value="zh-CN">中文 (zh-CN)</option>
+              <option value="ru">Русский (ru)</option>
+            </select>
+          </div>
+          <div class="custom-lang-group">
+            <input type="text" id="input-custom-lang" placeholder="ISO" maxlength="5" title="Código ISO personalizado">
+            <button id="btn-translate-custom" class="btn btn-primary" title="Traducir">GO</button>
+          </div>
+        </div>
+
+        <button id="btn-restore" class="btn btn-outline" title="Restaurar idioma original">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+          Original
+        </button>
+
+        <div id="status-pill" class="status-pill" title="Estado del microservicio">
+          <span class="spinner"></span>
+          <span id="status-text">LISTO</span>
+        </div>
+      </div>
+
+      <!-- Botón Hamburguesa Móvil -->
+      <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Abrir Menú de Navegación">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+
+    <!-- Backdrop para Barra Lateral -->
+    <div id="drawer-backdrop"></div>
+
+    <!-- Barra de Navegación Lateral Móvil -->
+    <aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
+      <div class="drawer-header">
+        <a href="/" class="drawer-brand">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
+          <span>CloudTranslator</span>
+        </a>
+        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+
+      <div class="drawer-body">
+        <div class="drawer-section">
+          <span class="drawer-title">NAVEGACIÓN DEL PORTAL</span>
+          <ul class="drawer-menu">
+            <li><a href="/"><svg class="icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Inicio</a></li>
+            <li><a href="/docs"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Documentación</a></li>
+            <li><a href="/support"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Soporte</a></li>
+            <li><a href="/status"><svg class="icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Estado Servidor</a></li>
+          </ul>
+        </div>
+
+        <div class="drawer-section">
+          <span class="drawer-title">LOS 6 PILARES</span>
+          <ul class="drawer-menu">
+            <li><a href="/translator"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traductor en la Nube</a></li>
+            <li><a href="/tts"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS)</a></li>
+            <li><a href="/voice-clone" class="active"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz (IA)</a></li>
+            <li><a href="/converter"><svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="8" cy="12" r="2"/></svg> Conversor Multimedia (MP3 / MP4)</a></li>
+            <li><a href="/vocal-remover"><svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Separador de Voz (Pilar 05)</a></li>
+            <li><a href="/dj"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg> CloudDJ Mezclador (Pilar 06)</a></li>
+            <li><a href="/donate"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+  </header>
+
+  <main class="full-container">
+
+    <!-- Hero del Pilar 3 -->
+    <section class="hero-full">
+      <span class="hero-tag-glow">PILAR 03 // CLONACIÓN VOCAL POR IA</span>
+      <h1>Estudio de Clonación de Voz con Inteligencia Artificial</h1>
+      <p class="lead">
+        Graba tu voz con el micrófono o sube un archivo de audio. Escucha tu grabación, extrae tu timbre y frecuencia fundamental (F0), escribe lo que desees sintetizar y descarga el audio real generado en formato WAV.
+      </p>
+    </section>
+
+    <!-- ESTUDIO DE CLONACIÓN INTERACTIVO -->
+    <section class="studio-wrapper">
+      <div class="studio-header">
+        <div class="studio-title-box">
+          <h2>
+            <svg class="icon" viewBox="0 0 24 24" style="color: var(--secondary);"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+            Consola de Clonación y Síntesis
+          </h2>
+          <p>Sube tu muestra, escucha tu voz de referencia, escribe el guion deseado y genera la locución clonada.</p>
+        </div>
+        <span class="pillar-tag" style="background: rgba(168, 85, 247, 0.1); color: var(--secondary); border-color: rgba(168, 85, 247, 0.3);">IA BIOMÉTRICA // MOTOR PROPIO 100% AUTÓNOMO</span>
+      </div>
+
+      <!-- Barra de Estado del Motor de IA Propio -->
+      <div class="engine-config-banner" style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: var(--radius-md); padding: 12px 18px; margin-bottom: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 12px; height: 12px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981;" id="engine-status-dot"></div>
+          <div>
+            <div style="font-size: 0.86rem; font-weight: 700; color: #ffffff;">
+              Motor de IA: <span id="current-engine-label" style="color: var(--secondary);">CloudTranslator Bio-Acoustic Voice Clone v3.0</span>
+            </div>
+            <div style="font-size: 0.76rem; color: var(--text-muted);" id="current-engine-desc">
+              IA Biométrica Propia • Tu voz auténtica 100% personalizada • Sin APIs de terceros • Ilimitado
+            </div>
+          </div>
+        </div>
+        <div style="font-size: 0.78rem; font-family: var(--font-mono); color: #10b981; background: rgba(16, 185, 129, 0.12); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+          <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span>MOTOR DE IA ACTIVO</span>
+        </div>
+      </div>
+
+      <div class="studio-grid">
+        <!-- Panel 1: Entrada de la Muestra de Voz del Usuario -->
+        <div class="studio-panel">
+          <div class="studio-label">
+            <span>1. MUESTRA DE VOZ DE REFERENCIA</span>
+            <span id="clone-sample-status">Sin muestra cargada</span>
+          </div>
+
+          <!-- Grabación Directa de Micrófono -->
+          <div id="view-record" style="margin-top: 10px;">
+            <div style="background: rgba(0, 0, 0, 0.4); border: 1px dashed var(--border-subtle); border-radius: var(--radius-md); padding: 20px 16px; text-align: center;">
+              <div id="mic-indicator" style="width: 48px; height: 48px; border-radius: 50%; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--secondary); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: var(--secondary); transition: all 0.3s ease;">
+                <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;" id="record-instructions">
+                Habla con naturalidad durante 4 a 10 segundos leyendo cualquier frase con tu voz normal.
+              </p>
+              
+              <!-- Barra de nivel de entrada en tiempo real -->
+              <div id="mic-meter-container" style="display: none; width: 140px; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; margin: 0 auto 12px; overflow: hidden;">
+                <div id="mic-meter-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #10b981 0%, #a855f7 100%); transition: width 0.1s ease;"></div>
+              </div>
+
+              <div style="display: flex; gap: 10px; justify-content: center; align-items: center;">
+                <button id="btn-start-record" class="btn btn-primary" type="button" onclick="window.startVoiceRecording && window.startVoiceRecording()" style="padding: 10px 22px; font-size: 0.88rem; font-weight: 700; cursor: pointer;">
+                  <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                  Iniciar Grabación
+                </button>
+                <button id="btn-stop-record" class="btn btn-outline" type="button" onclick="window.stopVoiceRecording && window.stopVoiceRecording()" style="padding: 10px 20px; font-size: 0.88rem; display: none; border-color: #ef4444; color: #ef4444; font-weight: 700; cursor: pointer;">
+                  <svg class="icon" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+                  Detener Grabación
+                </button>
+              </div>
+
+              <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px;">
+                <span id="record-timer" style="display: inline-block; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); font-weight: 700;">00:00</span>
+                <span id="record-status-badge" style="display: none; font-size: 0.72rem; padding: 2px 8px; border-radius: 10px; background: rgba(239, 68, 68, 0.2); color: #ef4444; font-weight: 700;">GRABANDO</span>
+              </div>
+
+              <div id="record-error-msg" style="display: none; margin-top: 10px; padding: 8px 12px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-sm); font-size: 0.78rem; color: #fca5a5; line-height: 1.4;"></div>
+            </div>
+          </div>
+
+          <!-- Separador -->
+          <div style="display: flex; align-items: center; gap: 12px; margin: 16px 0 12px;">
+            <div style="flex: 1; height: 1px; background: var(--border-subtle);"></div>
+            <span style="font-size: 0.72rem; font-family: var(--font-mono); color: var(--text-muted); text-transform: uppercase;">O sube tu archivo</span>
+            <div style="flex: 1; height: 1px; background: var(--border-subtle);"></div>
+          </div>
+
+          <!-- Zona Drag and Drop para Subida de Archivo de Audio -->
+          <div id="audio-dropzone" style="background: rgba(8, 10, 18, 0.6); border: 2px dashed rgba(168, 85, 247, 0.4); border-radius: var(--radius-md); padding: 22px 18px; text-align: center; transition: all 0.25s ease; cursor: pointer;">
+            <svg class="icon icon-lg" viewBox="0 0 24 24" style="color: var(--secondary); margin-bottom: 8px; width: 32px; height: 32px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p id="dropzone-text" style="font-size: 0.88rem; color: #ffffff; margin-bottom: 4px; font-weight: 600;">
+              Arrastra tu archivo de voz aquí (.mp3, .wav, .ogg, .m4a)
+            </p>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px;">
+              o haz clic en el botón para seleccionarlo desde tu dispositivo
+            </p>
+            <input type="file" id="input-audio-file" accept="audio/*,.wav,.mp3,.ogg,.m4a,.flac,.aac" style="display: none;">
+            <button id="btn-select-file" class="btn btn-primary" type="button" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; font-size: 0.86rem; font-weight: 700; background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); border-color: #a855f7;">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Subir Archivo de Audio
+            </button>
+          </div>
+
+          <!-- PREESCUCHA DE LA MUESTRA GRABADA / SUBIDA + ANÁLISIS FORENSE -->
+          <div id="sample-preview-container" style="display: none; margin-top: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted);">
+                AUDIO DE REFERENCIA CARGADO
+              </span>
+              <!-- BOTÓN DE BASURA CON TOOLTIP -->
+              <button id="btn-delete-sample" class="btn-icon-danger" title="Eliminar grabación / audio" aria-label="Eliminar grabación / audio">
+                <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                <span class="tooltip-text">Eliminar</span>
+              </button>
+            </div>
+            <div class="sample-player-bar">
+              <audio id="audio-sample-player" controls preload="metadata"></audio>
+            </div>
+
+            <!-- TARJETA DE ANÁLISIS FORENSE EN VIVO -->
+            <div id="user-voice-card" style="margin-top: 10px; background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.25); border-radius: var(--radius-sm); padding: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--secondary); font-weight: 700;">HUELLA VOCAL DETECTADA</span>
+                <span id="user-voice-tag" class="brand-badge" style="background: rgba(168, 85, 247, 0.25); border-color: var(--secondary); font-size: 0.7rem;">CALCULANDO...</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8rem; color: var(--text-secondary);">
+                <div>Frecuencia F0: <strong id="user-voice-f0" style="color: #ffffff;">-- Hz</strong></div>
+                <div>Registro: <strong id="user-voice-range" style="color: #ffffff;">--</strong></div>
+                <div>Duración: <strong id="user-voice-duration" style="color: #ffffff;">-- s</strong></div>
+                <div>Fidelidad tímbrica: <strong id="user-voice-fidelity" style="color: #10b981;">Lista para clonar</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 2: Guion a Sintetizar y Parámetros -->
+        <div class="studio-panel">
+          <div class="studio-label">
+            <span>2. GUION DEL MENSAJE CLONADO</span>
+            <span id="clone-char-count">85 caracteres</span>
+          </div>
+
+          <textarea id="clone-input-script" class="studio-textarea" style="height: 110px;" placeholder="Escribe el mensaje que la voz clonada debe decir...">Esta es mi voz clonada mediante el motor de inteligencia artificial de CloudTranslator.</textarea>
+
+          <div class="studio-controls-row" style="grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="studio-control-col">
+              <label for="clone-lang-select" style="display: block; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;">IDIOMA DE SÍNTESIS</label>
+              <div class="select-wrapper">
+                <select id="clone-lang-select" class="form-select-custom studio-select" style="width: 100%; padding: 10px 32px 10px 14px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.85rem; outline: none;">
+                  <option value="es" selected>Español (es)</option>
+                  <option value="en">English (en)</option>
+                  <option value="fr">Français (fr)</option>
+                  <option value="de">Deutsch (de)</option>
+                  <option value="it">Italiano (it)</option>
+                  <option value="pt">Português (pt)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="studio-control-col">
+              <label for="clone-similarity-select" style="display: block; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;">FIDELIDAD TÍMBRICA</label>
+              <div class="select-wrapper">
+                <select id="clone-similarity-select" class="form-select-custom studio-select" style="width: 100%; padding: 10px 32px 10px 14px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.85rem; outline: none;">
+                  <option value="high" selected>Alta (Formantes Exactos y F0)</option>
+                  <option value="balanced">Equilibrada (Fluidez Adaptativa)</option>
+                  <option value="expressive">Expresiva (Prosodia Dinámica)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="studio-controls-row" style="grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
+            <div class="studio-control-col">
+              <label for="clone-format-select" style="display: block; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;">FORMATO DE SALIDA</label>
+              <div class="select-wrapper">
+                <select id="clone-format-select" class="form-select-custom studio-select" style="width: 100%; padding: 10px 32px 10px 14px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.85rem; outline: none;">
+                  <option value="wav" selected>WAV (PCM Estudio 24kHz)</option>
+                  <option value="mp3">MP3 (320 kbps Ultra HQ)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="studio-control-col">
+              <label for="clone-pitch-select" style="display: block; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;">AJUSTE DE TONO</label>
+              <div class="select-wrapper">
+                <select id="clone-pitch-select" class="form-select-custom studio-select" style="width: 100%; padding: 10px 32px 10px 14px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.85rem; outline: none;">
+                  <option value="1.0" selected>Tono Natural (100% fiel)</option>
+                  <option value="0.95">Ligeramente más grave (-5%)</option>
+                  <option value="0.90">Grave pronunciado (-10%)</option>
+                  <option value="1.05">Ligeramente más agudo (+5%)</option>
+                  <option value="1.10">Agudo pronunciado (+10%)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botón de Generación -->
+          <div style="margin-top: 16px;">
+            <button id="btn-synthesize-clone" class="btn btn-primary w-full" style="padding: 13px 20px; font-weight: 700; background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+              Sintetizar Voz Clonada
+            </button>
+          </div>
+
+          <!-- Resultado Sintetizado y Descarga Real -->
+          <div id="clone-result-box" style="display: none; margin-top: 16px; background: rgba(168, 85, 247, 0.06); border: 1px solid rgba(168, 85, 247, 0.35); border-radius: var(--radius-md); padding: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <span style="font-size: 0.82rem; font-family: var(--font-mono); color: var(--secondary); font-weight: 700;">
+                VOZ CLONADA SINTETIZADA CON ÉXITO
+              </span>
+              <span id="clone-filesize-badge" class="brand-badge" style="background: rgba(168, 85, 247, 0.2); border-color: var(--secondary);">WAV PCM</span>
+            </div>
+
+            <audio id="clone-result-audio" controls style="width: 100%; height: 40px; outline: none; margin-bottom: 12px;"></audio>
+
+            <!-- Métricas acústicas del resultado -->
+            <div id="clone-metrics-box" style="background: rgba(0, 0, 0, 0.4); border-radius: var(--radius-sm); padding: 10px; margin-bottom: 12px; font-size: 0.78rem; color: var(--text-secondary); display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <div>Frecuencia F0 replicada: <strong id="res-f0" style="color: #ffffff;">--</strong></div>
+              <div>Similitud tímbrica: <strong id="res-similarity" style="color: #10b981;">99.8%</strong></div>
+              <div>Perfil vocal: <strong id="res-profile" style="color: #ffffff;">--</strong></div>
+              <div>Calidad acústica: <strong style="color: #00f0ff;">Estudio Broadcast</strong></div>
+              <div style="grid-column: span 2; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 6px; margin-top: 2px;">
+                Motor de IA: <strong id="res-model" style="color: #10b981;">Clonación Biométrica Vocal (Tu Voz 100% Personalizada)</strong>
+              </div>
+            </div>
+
+            <button id="btn-download-clone" class="btn btn-outline w-full" style="padding: 11px 16px; font-size: 0.86rem; border-color: var(--secondary); color: #ffffff; font-weight: 600;">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Descargar Audio Clonado
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Especificación del Endpoint REST -->
+    <section class="content-box-card">
+      <span class="tech-card-tag">[ API_ENDPOINT // VOICE_CLONE ]</span>
+      <h2>Consumo Programático: POST /api/voice-clone</h2>
+      <p>Envía la muestra de audio en base64 y el guion para recibir el archivo de voz sintetizado en formato WAV PCM:</p>
+
+      <div class="code-box-wrapper" style="margin-top: 16px;">
+        <div class="code-box-header">
+          <span>cURL - Síntesis de Clonación de Voz</span>
+          <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.72rem;" onclick="navigator.clipboard.writeText(document.getElementById('code-clone-curl').textContent)">Copiar</button>
+        </div>
+        <pre class="code-panel" id="code-clone-curl">curl -X POST https://cloudtranslator.onrender.com/api/voice-clone \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Mensaje sintetizado con el timbre de voz de referencia",
+    "pitch": 1.0,
+    "similarity": "high",
+    "audioSampleBase64": "data:audio/wav;base64,..."
+  }'</pre>
+      </div>
+    </section>
+
+    <!-- Sección Informativa: Los 4 Pilares del Ecosistema -->
+    <section style="margin-top: 36px;">
+      <div class="section-full-title">
+        <h2>Los 4 Pilares de CloudTranslator</h2>
+        <p>Herramientas especializadas con consolas dedicadas a cada disciplina lingüística, vocal y multimedia.</p>
+      </div>
+
+      <div class="pillars-grid">
+        <!-- Pilar 1 -->
+        <div class="pillar-card">
+          <div class="pillar-header">
+            <div class="pillar-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+            </div>
+            <span class="pillar-tag">PILAR 01 // TEXT</span>
+          </div>
+          <h3>Traductor en la Nube</h3>
+          <p>
+            Traducción por lotes de alta velocidad (+200 idiomas). Nuestro algoritmo agrupa todos los textos del DOM y envía un único arreglo <code>texts: [...]</code> a <code>/api/translate</code>. Persistencia estricta en cookies y 0ms desde memoria RAM.
+          </p>
+          <a href="/translator" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Traductor en la Nube</a>
+        </div>
+
+        <!-- Pilar 2 -->
+        <div class="pillar-card">
+          <div class="pillar-header">
+            <div class="pillar-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            </div>
+            <span class="pillar-tag">PILAR 02 // AUDIO</span>
+          </div>
+          <h3>Texto a Voz Multilingüe (TTS)</h3>
+          <p>
+            Convierte cualquier texto en audio fluido y natural. Selecciona el idioma, elige entre 24 voces humanas neuronales, calibra velocidad y tono en tiempo real con reproductor, ondas sonoras y descarga en formato WAV o MP3.
+          </p>
+          <a href="/tts" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Estudio TTS</a>
+        </div>
+
+        <!-- Pilar 3 -->
+        <div class="pillar-card">
+          <div class="pillar-header">
+            <div class="pillar-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+            </div>
+            <span class="pillar-tag">PILAR 03 // VOICE AI</span>
+          </div>
+          <h3>Clonación de Voz con IA</h3>
+          <p>
+            Graba con micrófono o sube tu archivo de audio. Escucha tu muestra de referencia, edítala o elimínala con un clic, escribe tu guion y descarga el archivo WAV sintetizado recreando tu timbre vocal único.
+          </p>
+          <a href="/voice-clone" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Clonación de Voz</a>
+        </div>
+
+        <!-- Pilar 4 -->
+        <div class="pillar-card">
+          <div class="pillar-header">
+            <div class="pillar-icon-box">
+              <svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
+            </div>
+            <span class="pillar-tag">PILAR 04 // MEDIA CONVERTER</span>
+          </div>
+          <h3>Conversor Multimedia (MP3 / MP4)</h3>
+          <p>
+            Pega enlaces de YouTube, TikTok, Instagram Reels, Facebook o Twitter y conviértelos a MP3 (hasta 320 kbps) o video MP4 sin marcas de agua. Detección automática, streaming con rango HTTP y descarga física directa.
+          </p>
+          <a href="/converter" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Conversor MP3/MP4</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Pie de Página Horizontal Alineado -->
+  <footer>
+    <div class="footer-inner-full">
+      <!-- Columna 1: Brand & Misión -->
+      <div class="footer-col footer-col-brand">
+        <h4>
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="22" height="22">
+          CloudTranslator
+        </h4>
+        <p>Ecosistema cloud de procesamiento lingüístico y multimedia de alto rendimiento: traducción neuronal distribuida (+200 idiomas), Texto a Voz (TTS), Clonación de Voz por IA y Conversor Universal MP3/MP4.</p>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+          Microservicio libre en Render • <span class="badge badge-online">ONLINE</span>
+        </p>
+      </div>
+
+      <!-- Columna 2: Pilares y Servicios -->
+      <div class="footer-col">
+        <h4>Servicios</h4>
+        <ul>
+          <li><a href="/translator">Traductor en la Nube</a></li>
+          <li><a href="/tts">Texto a Voz (TTS)</a></li>
+          <li><a href="/voice-clone" class="active">Clonación de Voz IA</a></li>
+          <li><a href="/converter">Conversor MP3 / MP4</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 3: Recursos y Herramientas -->
+      <div class="footer-col">
+        <h4>Recursos</h4>
+        <ul>
+          <li><a href="/api">API REST</a></li>
+          <li><a href="/learn">Guías de Integración</a></li>
+          <li><a href="/help">Centro de Ayuda</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 4: Información Legal -->
+      <div class="footer-col">
+        <h4>Información Legal</h4>
+        <ul>
+          <li><a href="/terms">Términos del Servicio</a></li>
+          <li><a href="/privacy">Política de Privacidad</a></li>
+          <li><a href="/security">Seguridad y Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom-full">
+      <span>© 2026 CloudTranslator. Todos los derechos reservados.</span>
+      <span>Desarrollado por Miguel Angel Carlos Rojas</span>
+    </div>
+  </footer>
 
   <script src="/js/cloud-translator.js"></script>
   <script>

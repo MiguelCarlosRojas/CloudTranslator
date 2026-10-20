@@ -244,7 +244,392 @@
 </head>
 <body>
 
-  <!-- Pie de Página Modular (Componente Centralizado) -->
+  <!-- Barra Superior -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <a href="/" class="brand-wrapper">
+        <span class="brand-logo">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="38" height="38">
+          CloudTranslator
+        </span>
+        <span class="brand-badge">v2.5.0</span>
+      </a>
+
+      <nav class="desktop-nav">
+        <ul class="main-menu">
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/docs">Docs</a></li>
+          <li><a href="/support">Soporte</a></li>
+          <li><a href="/status">Estado</a></li>
+        </ul>
+      </nav>
+
+      <!-- Barra de Herramientas de Traducción Activa -->
+      <div class="toolbar-controls no-translate" data-no-translate>
+        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+          English
+        </button>
+
+        <div class="selector-box">
+          <div class="selector-dropdown">
+            <select id="select-lang" aria-label="Seleccionar idioma">
+              <option value="en">English (en)</option>
+              <option value="es">Español (es)</option>
+              <option value="fr">Français (fr)</option>
+              <option value="de">Deutsch (de)</option>
+              <option value="it">Italiano (it)</option>
+              <option value="pt">Portugués (pt)</option>
+              <option value="ja">日本語 (ja)</option>
+              <option value="zh-CN">中文 (zh-CN)</option>
+              <option value="ru">Русский (ru)</option>
+            </select>
+          </div>
+          <div class="custom-lang-group">
+            <input type="text" id="input-custom-lang" placeholder="ISO" maxlength="5" title="Código ISO personalizado">
+            <button id="btn-translate-custom" class="btn btn-primary" title="Traducir">GO</button>
+          </div>
+        </div>
+
+        <button id="btn-restore" class="btn btn-outline" title="Restaurar idioma original">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+          Original
+        </button>
+
+        <div id="status-pill" class="status-pill" title="Estado del microservicio">
+          <span class="spinner"></span>
+          <span id="status-text">LISTO</span>
+        </div>
+      </div>
+
+      <!-- Botón Hamburguesa Móvil -->
+      <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Abrir Menú de Navegación">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+
+    <!-- Backdrop para Barra Lateral -->
+    <div id="drawer-backdrop"></div>
+
+    <!-- Barra de Navegación Lateral Móvil -->
+    <aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
+      <div class="drawer-header">
+        <a href="/" class="drawer-brand">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
+          <span>CloudTranslator</span>
+        </a>
+        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+
+      <div class="drawer-body">
+        <div class="drawer-section">
+          <span class="drawer-title">LOS 6 PILARES</span>
+          <ul class="drawer-menu">
+            <li><a href="/translator"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traductor en la Nube</a></li>
+            <li><a href="/tts"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS)</a></li>
+            <li><a href="/voice-clone"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz (IA)</a></li>
+            <li><a href="/converter"><svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="8" cy="12" r="2"/></svg> Conversor Multimedia</a></li>
+            <li><a href="/vocal-remover" class="active"><svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Separador de Voz (Pilar 05)</a></li>
+            <li><a href="/dj"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg> CloudDJ Mezclador (Pilar 06)</a></li>
+            <li><a href="/donate"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+  </header>
+
+  <main class="full-container">
+
+    <!-- Hero de la Página -->
+    <section class="hero-full">
+      <div class="hero-split">
+        <div class="hero-split-content">
+          <span class="hero-tag-glow">PILAR 05 // SEPARADOR DE VOZ E INSTRUMENTAL</span>
+          <h1 style="font-size: clamp(2rem, 4.2vw, 3rem); font-weight: 800;">Separar Voz y Música de Cualquier Canción</h1>
+          <p class="lead">
+            Elimina o aísla la voz para dejar solo la <strong>pista instrumental (Karaoke)</strong> o extrae la <strong>voz pura (Acapella)</strong>. Pega enlaces de <strong>YouTube, TikTok, Instagram, Facebook, Twitter/X</strong> o sube archivos locales de audio y video. Escucha y descarga cada pista por separado en alta definición.
+          </p>
+          <div class="hero-actions">
+            <a href="#splitter-studio" class="btn btn-primary">Comenzar Separación</a>
+            <a href="/dj" class="btn btn-outline">Abrir en CloudDJ</a>
+            <a href="/converter" class="btn btn-outline">Conversor de Video</a>
+          </div>
+        </div>
+
+        <div class="hero-split-media">
+          <div class="hero-logo-wrapper">
+            <div class="hero-logo-glow" style="background: radial-gradient(circle, rgba(255, 0, 123, 0.35) 0%, rgba(0, 240, 255, 0.2) 60%, transparent 80%);"></div>
+            <img src="/img/logo.png" alt="CloudTranslator Stems" class="hero-logo-big" width="290" height="290">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Estudio de Separación Multimedia -->
+    <section id="splitter-studio" class="studio-wrapper" style="margin-top: 10px; margin-bottom: 40px;">
+      
+      <!-- Pestañas de Modo de Entrada -->
+      <div class="stem-mode-tabs">
+        <button id="tab-mode-url" type="button" class="stem-tab-btn active">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Pegar Enlace Multimedia (YouTube, TikTok, etc.)
+        </button>
+        <button id="tab-mode-file" type="button" class="stem-tab-btn">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Subir Archivo de Audio o Video
+        </button>
+      </div>
+
+      <!-- Selector de Plataformas con Iconos y Detección Automática (Idéntico a Conversor) -->
+      <div id="platforms-selector-box" style="margin-bottom: 20px;">
+        <div class="studio-label" style="margin-bottom: 10px;">
+          <span>PLATAFORMAS COMPATIBLES (DETECCIÓN AUTOMÁTICA)</span>
+          <span id="platform-hover-label" style="color: var(--primary); font-weight: 700; transition: color 0.2s ease;">7 PLATAFORMAS</span>
+        </div>
+        <div class="platform-chips-container">
+          <!-- 1. YouTube -->
+          <button type="button" class="btn platform-chip" data-platform="youtube" aria-label="YouTube">
+            <svg class="icon platform-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            <span>YouTube</span>
+          </button>
+
+          <!-- 2. TikTok -->
+          <button type="button" class="btn platform-chip" data-platform="tiktok" aria-label="TikTok">
+            <svg class="icon platform-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 3 15.68 6.34 6.34 0 0 0 9.34 22a6.34 6.34 0 0 0 6.34-6.32V8.75a8.18 8.18 0 0 0 4.79 1.52V6.82a4.85 4.85 0 0 1-.88-.13z"/></svg>
+            <span>TikTok</span>
+          </button>
+
+          <!-- 3. Instagram -->
+          <button type="button" class="btn platform-chip" data-platform="instagram" aria-label="Instagram">
+            <svg class="icon platform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+            <span>Instagram</span>
+          </button>
+
+          <!-- 4. Facebook -->
+          <button type="button" class="btn platform-chip" data-platform="facebook" aria-label="Facebook">
+            <svg class="icon platform-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            <span>Facebook</span>
+          </button>
+
+          <!-- 5. Twitter / X -->
+          <button type="button" class="btn platform-chip" data-platform="twitter" aria-label="Twitter / X">
+            <svg class="icon platform-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            <span>Twitter / X</span>
+          </button>
+
+          <!-- 6. Pinterest -->
+          <button type="button" class="btn platform-chip" data-platform="pinterest" aria-label="Pinterest">
+            <svg class="icon platform-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.66 19.31c-.04-.84-.08-2.14.02-3.06l.72-3.05s-.18-.37-.18-.92c0-.86.5-1.5 1.13-1.5.53 0 .79.4.79.88 0 .54-.34 1.34-.52 2.08-.15.62.31 1.13.92 1.13 1.1 0 1.95-1.16 1.95-2.84 0-1.48-1.07-2.52-2.59-2.52-1.77 0-2.8 1.33-2.8 2.7 0 .53.21 1.11.46 1.42.05.06.06.12.04.18l-.17.72c-.03.11-.1.15-.22.1-1.02-.47-1.65-1.96-1.65-3.15 0-2.57 1.86-4.92 5.38-4.92 2.82 0 5.02 2.01 5.02 4.7 0 2.8-1.77 5.06-4.22 5.06-.82 0-1.6-.43-1.87-.93l-.51 1.94c-.18.71-.68 1.6-1.01 2.15A10 10 0 1 0 12 2z"/></svg>
+            <span>Pinterest</span>
+          </button>
+
+          <!-- 7. Enlace Directo -->
+          <button type="button" class="btn platform-chip" data-platform="direct" aria-label="Enlace Directo">
+            <svg class="icon platform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span>Enlace Directo</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel 1: Entrada por Enlace URL -->
+      <div id="panel-url" style="margin-bottom: 20px;">
+        <div class="studio-label" style="margin-bottom: 8px;">
+          <span>ENLACE DE LA CANCIÓN O VIDEO</span>
+          <span id="detected-platform-badge" style="color: var(--primary);">DETECCIÓN AUTOMÁTICA</span>
+        </div>
+        <div style="position: relative;">
+          <input type="url" id="input-media-url" class="studio-textarea" placeholder="Pega el enlace aquí (YouTube, TikTok, Instagram, Facebook, X, etc.)" value="" style="min-height: 48px; height: 48px; padding: 12px 44px 12px 16px; font-size: 0.95rem; resize: none;">
+          <button id="btn-clear-url" type="button" title="Limpiar enlace" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; display: flex; align-items: center;">
+            <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel 2: Entrada por Archivo Local -->
+      <div id="panel-file" style="display: none; margin-bottom: 20px;">
+        <div class="studio-label" style="margin-bottom: 8px;">
+          <span>SUBIR ARCHIVO MULTIMEDIA (.MP3, .WAV, .M4A, .MP4, ETC.)</span>
+          <span style="color: var(--secondary);">HASTA 50 MB</span>
+        </div>
+        <div id="drop-zone" class="drop-zone">
+          <svg class="icon" style="width: 48px; height: 48px; stroke: var(--primary); margin-bottom: 12px;" viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <h3 id="drop-zone-title" style="margin: 0 0 6px 0; font-size: 1.15rem;">Arrastra y suelta tu archivo aquí</h3>
+          <p id="drop-zone-desc" style="color: var(--text-muted); margin: 0 0 14px 0; font-size: 0.88rem;">O haz clic para examinar desde tu dispositivo (hasta 50 MB)</p>
+          <span class="btn btn-outline" style="pointer-events: none;">Seleccionar Archivo</span>
+          <input type="file" id="file-input" accept="audio/*,video/*" style="display: none;">
+        </div>
+        <div id="file-info-badge" style="display: none; margin-top: 12px; align-items: center; justify-content: space-between; background: rgba(0, 240, 255, 0.08); padding: 10px 16px; border-radius: var(--radius-md); border: 1px solid rgba(0, 240, 255, 0.3);">
+          <span id="file-info-name" style="font-weight: 700; color: #ffffff;">cancion.mp3</span>
+          <button id="btn-remove-file" type="button" class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255,77,77,0.4); padding: 4px 12px; font-size: 0.8rem;">Eliminar</button>
+        </div>
+      </div>
+
+      <!-- Barra de Configuración y Botón de Acción en una Fila (Diseño Conversor) -->
+      <div class="studio-controls-row" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; align-items: end; margin-bottom: 24px;">
+        <div class="studio-control-col">
+          <div class="studio-label" style="margin-bottom: 8px;">
+            <span>CALIDAD Y TASA DE BITS</span>
+            <span id="quality-badge" style="color: var(--primary);">STUDIO MASTER (320 kbps)</span>
+          </div>
+          <div class="select-wrapper">
+            <select id="select-quality" class="form-select-custom studio-select" aria-label="Seleccionar Calidad" style="width: 100%; height: 46px; padding: 0 38px 0 16px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.9rem; outline: none;">
+              <option value="320k">320 kbps (Alta Fidelidad / Studio Master)</option>
+              <option value="192k">192 kbps (Estándar Recomendado)</option>
+              <option value="128k">128 kbps (Ahorro de Datos)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="studio-control-col">
+          <div class="studio-label" style="margin-bottom: 8px;">
+            <span>ACCIÓN MULTIMEDIA</span>
+            <span style="color: var(--primary);">EXTRACCIÓN DE STEMS</span>
+          </div>
+          <button id="btn-process-split" type="button" class="btn btn-primary" style="width: 100%; height: 46px; padding: 0 18px; font-weight: 700; font-size: 0.95rem; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg class="icon" style="width: 17px; height: 17px;" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            <span id="btn-split-text">Separar Voz e Instrumental</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Barra de Progreso Dinámico -->
+      <div id="progress-box" style="display: none; margin-bottom: 24px; background: rgba(10, 12, 18, 0.8); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.85rem;">
+          <span id="progress-status" style="color: var(--primary); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+            <span class="spinner" style="display: inline-block; width: 14px; height: 14px;"></span>
+            Procesando audio maestro...
+          </span>
+          <span id="progress-percent" style="font-family: var(--font-mono); color: var(--text-white); font-weight: 700;">0%</span>
+        </div>
+        <div style="width: 100%; height: 8px; background: rgba(255, 255, 255, 0.08); border-radius: var(--radius-full); overflow: hidden;">
+          <div id="progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #ff007b, var(--primary)); transition: width 0.4s ease;"></div>
+        </div>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- RESULTADO: ESTUDIO DE REPRODUCCIÓN DUAL & DESCARGAS SEPARADAS             -->
+      <!-- ========================================================================= -->
+      <div id="result-box" style="display: none; background: rgba(15, 17, 24, 0.95); border: 1px solid rgba(0, 240, 255, 0.4); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-glow);">
+        
+        <!-- Cabecera de la Pista Procesada -->
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
+          <img id="res-thumb" src="/img/logo.png" alt="Cover" style="width: 64px; height: 64px; border-radius: 10px; object-fit: cover; border: 1px solid var(--border-subtle);">
+          <div style="flex: 1; min-width: 200px;">
+            <h3 id="res-title" style="margin: 0 0 6px 0; font-size: 1.2rem; font-weight: 800; line-height: 1.4;">Título de la Canción</h3>
+            <div style="display: flex; gap: 10px; align-items: center; font-size: 0.82rem; color: var(--text-muted); flex-wrap: wrap;">
+              <span id="res-platform" style="background: rgba(255, 255, 255, 0.08); padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">MULTIMEDIA</span>
+              <span id="res-duration">00:00</span>
+              <span id="res-stem-badge" style="color: var(--primary); display: inline-flex; align-items: center; gap: 4px;">
+                <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polyline points="20 6 9 17 4 12"/></svg>
+                DEMUCS v4 AI // 2 STEMS
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selector Interactivo de Modo de Escucha (Solo Instrumental / Solo Voz / Ambos) -->
+        <div style="margin-bottom: 18px;">
+          <div class="studio-label" style="margin-bottom: 8px;">
+            <span>MODO DE ESCUCHA INTERACTIVO</span>
+            <span id="current-listen-label" style="color: var(--primary); font-weight: 700;">SOLO INSTRUMENTAL</span>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button id="btn-mode-inst" type="button" class="btn mode-listen-btn active">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              <span>Solo Instrumental (Karaoke)</span>
+            </button>
+            <button id="btn-mode-voc" type="button" class="btn mode-listen-btn mode-voc">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+              <span>Solo Voz (Acapella)</span>
+            </button>
+            <button id="btn-mode-both" type="button" class="btn mode-listen-btn">
+              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+              <span>Ambos (Sincronizado)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Barra Maestra de Reproducción Sincronizada -->
+        <div class="master-player-bar">
+          <button id="btn-master-play" type="button" class="btn-stem-play" title="Reproducir / Pausar Audio">
+            <svg id="master-play-icon" class="icon" style="width: 20px; height: 20px;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+          <div style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">
+              <span>TIEMPO: <strong id="time-current" style="color: #fff;">00:00</strong></span>
+              <span>DURACIÓN: <strong id="time-total" style="color: #fff;">00:00</strong></span>
+            </div>
+            <input type="range" id="master-scrubber" min="0" max="100" value="0" style="width: 100%; cursor: pointer;">
+          </div>
+        </div>
+
+        <!-- CANAL 1: PISTA INSTRUMENTAL (KARAOKE) -->
+        <div class="stem-channel-card instrumental">
+          <div class="channel-header">
+            <div>
+              <span class="channel-badge instrumental">
+                <svg class="icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                Pista Instrumental (Karaoke / Sin Voz)
+              </span>
+              <span id="inst-size" style="font-size: 0.8rem; color: var(--text-muted); margin-left: 8px;">320 kbps</span>
+            </div>
+            
+            <div class="channel-controls">
+              <div class="volume-slider-box">
+                <svg class="icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                <input type="range" id="vol-inst" class="volume-slider" min="0" max="1" step="0.05" value="1" title="Volumen Instrumental">
+                <span id="vol-inst-text" style="font-size: 0.75rem; font-weight: 700; width: 34px;">100%</span>
+              </div>
+              <button id="btn-mute-inst" type="button" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem;" title="Silenciar Instrumental">Mute</button>
+              <a id="btn-dl-inst" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;" download>
+                <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Descargar Instrumental
+              </a>
+            </div>
+          </div>
+
+          <div id="viz-inst" class="wave-visualizer instrumental"></div>
+        </div>
+
+        <!-- CANAL 2: VOZ AISLADA (ACAPELLA) -->
+        <div class="stem-channel-card vocals">
+          <div class="channel-header">
+            <div>
+              <span class="channel-badge vocals">
+                <svg class="icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+                Voz Aislada (Acapella / Solo Voz)
+              </span>
+              <span id="voc-size" style="font-size: 0.8rem; color: var(--text-muted); margin-left: 8px;">320 kbps</span>
+            </div>
+
+            <div class="channel-controls">
+              <div class="volume-slider-box">
+                <svg class="icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                <input type="range" id="vol-voc" class="volume-slider" min="0" max="1" step="0.05" value="1" title="Volumen Vocal">
+                <span id="vol-voc-text" style="font-size: 0.75rem; font-weight: 700; width: 34px;">100%</span>
+              </div>
+              <button id="btn-mute-voc" type="button" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem;" title="Silenciar Voz">Mute</button>
+              <a id="btn-dl-voc" class="btn" style="background: linear-gradient(135deg, #ff007b, #c026d3); color: #fff; padding: 8px 18px; font-size: 0.85rem; border: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;" download>
+                <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Descargar Solo Voz
+              </a>
+            </div>
+          </div>
+
+          <div id="viz-voc" class="wave-visualizer vocals"></div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Componente Modular: Pie de Página -->
   <footer id="footer-placeholder" data-component="footer" data-active="vocal-remover"></footer>
 
   <!-- Audio elements ocultos para sincronización -->

@@ -20,8 +20,236 @@
 </head>
 <body>
 
-  <!-- Pie de Página Modular (Componente Centralizado) -->
-  <footer id="footer-placeholder" data-component="footer" data-active="support"></footer>
+  <!-- Barra Superior -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <a href="/" class="brand-wrapper">
+        <span class="brand-logo">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="38" height="38">
+          CloudTranslator
+        </span>
+        <span class="brand-badge">v2.5.0</span>
+      </a>
+
+      <nav class="desktop-nav">
+        <ul class="main-menu">
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/docs">Docs</a></li>
+          <li><a href="/support" class="active">Soporte</a></li>
+          <li><a href="/status">Estado</a></li>
+        </ul>
+      </nav>
+
+      <!-- Barra de Herramientas de Traducción Activa (Protegida contra corrupción visual) -->
+      <div class="toolbar-controls no-translate" data-no-translate>
+        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+          English
+        </button>
+
+        <div class="selector-box">
+          <div class="selector-dropdown">
+            <select id="select-lang" aria-label="Seleccionar idioma">
+              <option value="en">English (en)</option>
+              <option value="es">Español (es)</option>
+              <option value="fr">Français (fr)</option>
+              <option value="de">Deutsch (de)</option>
+              <option value="it">Italiano (it)</option>
+              <option value="pt">Portugués (pt)</option>
+              <option value="ja">日本語 (ja)</option>
+              <option value="zh-CN">中文 (zh-CN)</option>
+              <option value="ru">Русский (ru)</option>
+            </select>
+          </div>
+          <div class="custom-lang-group">
+            <input type="text" id="input-custom-lang" placeholder="ISO" maxlength="5" title="Código ISO personalizado (ej: ja, zh, ru, it)">
+            <button id="btn-translate-custom" class="btn btn-primary" title="Traducir">GO</button>
+          </div>
+        </div>
+
+        <button id="btn-restore" class="btn btn-outline" title="Restaurar idioma original">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+          Original
+        </button>
+
+        <div id="status-pill" class="status-pill" title="Estado del microservicio">
+          <span class="spinner"></span>
+          <span id="status-text">LISTO</span>
+        </div>
+      </div>
+
+      <!-- Botón Hamburguesa Móvil -->
+      <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Abrir Menú de Navegación">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+
+    <!-- Backdrop para Barra Lateral -->
+    <div id="drawer-backdrop"></div>
+
+    <!-- Barra de Navegación Lateral Móvil (Lateral Sliding Sidebar) -->
+    <aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
+      <div class="drawer-header">
+        <a href="/" class="drawer-brand">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
+          <span>CloudTranslator</span>
+        </a>
+        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+
+      <div class="drawer-body">
+        <div class="drawer-section">
+          <span class="drawer-title">NAVEGACIÓN DEL PORTAL</span>
+          <ul class="drawer-menu">
+            <li><a href="/"><svg class="icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Inicio</a></li>
+            <li><a href="/docs"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Documentación</a></li>
+            <li><a href="/support" class="active"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Soporte</a></li>
+            <li><a href="/status"><svg class="icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Estado Servidor</a></li>
+          </ul>
+        </div>
+
+        <div class="drawer-section">
+          <span class="drawer-title">LOS 4 PILARES</span>
+          <ul class="drawer-menu">
+            <li><a href="/translator"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traductor en la Nube</a></li>
+            <li><a href="/tts"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS)</a></li>
+            <li><a href="/voice-clone"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz (IA)</a></li>
+            <li><a href="/converter"><svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="8" cy="12" r="2"/></svg> Conversor Multimedia (MP3 / MP4)</a></li>
+            <li><a href="/donate"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
+          </ul>
+        </div>
+
+        <div class="drawer-section">
+          <span class="drawer-title">CENTRO DE TRADUCCIÓN</span>
+          <div class="drawer-toolbar">
+            <button class="btn btn-english w-full" onclick="window.translator && window.translator.translateToEnglish()">
+              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traducir a English
+            </button>
+            <div class="drawer-select-group">
+              <select class="drawer-select" onchange="if(window.translator){ if(this.value==='es') window.translator.restoreOriginal(); else window.translator.translatePage(this.value); }">
+                <option value="es">Español (es) - Original</option>
+                <option value="en">English (en)</option>
+                <option value="fr">Français (fr)</option>
+                <option value="de">Deutsch (de)</option>
+                <option value="it">Italiano (it)</option>
+                <option value="pt">Portugués (pt)</option>
+                <option value="ja">日本語 (ja)</option>
+                <option value="zh-CN">中文 (zh-CN)</option>
+                <option value="ru">Русский (ru)</option>
+              </select>
+            </div>
+            <button class="btn btn-outline w-full" onclick="window.translator && window.translator.restoreOriginal()">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg> Restaurar Original
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="drawer-footer">
+        <span>CloudTranslator v2.5.0</span>
+        <span>Soporte</span>
+      </div>
+    </aside>
+  </header>
+
+  <main class="full-container">
+    <div class="hero-full">
+      <span class="hero-tag-glow">[ CANALES DE INGENIERÍA E INCIDENCIAS ]</span>
+      <h1>Soporte Técnico de CloudTranslator</h1>
+      <p class="lead">
+        Mesa de ayuda técnica para desarrolladores y administradores de sistemas. Para preguntas frecuentes o guías rápidas de autoservicio, consulta el <a href="/help" style="color: #ffffff; text-decoration: underline;">Centro de Ayuda</a>.
+      </p>
+    </div>
+
+    <article class="content-box-card">
+      <span class="tech-card-tag">[ 01 // CONTACT_CHANNELS ]</span>
+      <h2>Canales de Contacto Directo con Ingeniería</h2>
+      <ul style="margin-left: 20px; line-height: 2.2;">
+        <li><strong>Correo directo de ingeniería:</strong> <a href="mailto:isakiangel6@gmail.com">isakiangel6@gmail.com</a></li>
+        <li><strong>Seguimiento de incidencias (GitHub Issues):</strong> <a href="https://github.com/MiguelCarlosRojas/CloudTranslator/issues" target="_blank">github.com/MiguelCarlosRojas/CloudTranslator/issues</a></li>
+        <li><strong>Repositorio oficial del proyecto:</strong> <a href="https://github.com/MiguelCarlosRojas/CloudTranslator" target="_blank">github.com/MiguelCarlosRojas/CloudTranslator</a></li>
+        <li><strong>Monitor operativo en tiempo real:</strong> <a href="/status">Consultar métricas y latencia de CloudTranslator</a></li>
+      </ul>
+    </article>
+
+    <article class="content-box-card">
+      <span class="tech-card-tag">[ 02 // REPORTE_DE_INCIDENCIAS ]</span>
+      <h2>Protocolo para Reporte de Fallos</h2>
+      <p>
+        Para agilizar la resolución de incidencias en producción, incluye la siguiente información al enviar un reporte técnico:
+      </p>
+      <ul style="margin-left: 20px; line-height: 2;">
+        <li><strong>Timestamp:</strong> Fecha y hora exacta de la solicitud (formato ISO 8601 o UTC).</li>
+        <li><strong>Endpoint consultado:</strong> Por ejemplo <code>POST /api/translate</code>, <code>POST /api/tts</code>, <code>POST /api/voice-clone</code> o <code>POST /api/media/convert</code>.</li>
+        <li><strong>Payload enviado:</strong> Cuerpo JSON o datos de la petición (omitiendo información confidencial).</li>
+        <li><strong>Código HTTP y mensaje de error:</strong> Respuesta devuelta por el servidor (ej. 400 Bad Request, 500 Internal Error).</li>
+        <li><strong>Entorno de ejecución:</strong> Node.js, navegador (Chrome/Firefox/Safari), Python o cURL.</li>
+      </ul>
+    </article>
+
+    <article class="content-box-card">
+      <span class="tech-card-tag">[ 03 // SLA_Y_DISPONIBILIDAD ]</span>
+      <h2>Niveles de Servicio (SLA)</h2>
+      <p>
+        CloudTranslator se encuentra desplegado en la infraestructura en la nube de Render en la región US-East. La tasa de disponibilidad objetivo es del 99.5% con monitoreo constante de salud en el endpoint <code>/api/health</code> para los 4 pilares tecnológicos.
+      </p>
+    </article>
+  </main>
+
+  <!-- Pie de Página Aliniado y Estructurado -->
+  <footer>
+    <div class="footer-inner-full">
+      <!-- Columna 1: Brand & Misión -->
+      <div class="footer-col footer-col-brand">
+        <h4>
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="22" height="22">
+          CloudTranslator
+        </h4>
+        <p>Ecosistema cloud de procesamiento lingüístico y multimedia de alto rendimiento: traducción neuronal distribuida (+200 idiomas), Texto a Voz (TTS), Clonación de Voz por IA y Conversor Universal MP3/MP4.</p>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+          Microservicio libre en Render • <span class="badge badge-online">ONLINE</span>
+        </p>
+      </div>
+
+      <!-- Columna 2: Pilares y Servicios -->
+      <div class="footer-col">
+        <h4>Servicios</h4>
+        <ul>
+          <li><a href="/translator">Traductor en la Nube</a></li>
+          <li><a href="/tts">Texto a Voz (TTS)</a></li>
+          <li><a href="/voice-clone">Clonación de Voz IA</a></li>
+          <li><a href="/converter">Conversor MP3 / MP4</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 3: Recursos y Herramientas -->
+      <div class="footer-col">
+        <h4>Recursos</h4>
+        <ul>
+          <li><a href="/api">API REST</a></li>
+          <li><a href="/learn">Guías de Integración</a></li>
+          <li><a href="/help">Centro de Ayuda</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 4: Información Legal -->
+      <div class="footer-col">
+        <h4>Información Legal</h4>
+        <ul>
+          <li><a href="/terms">Términos del Servicio</a></li>
+          <li><a href="/privacy">Política de Privacidad</a></li>
+          <li><a href="/security">Seguridad y Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom-full">
+      <span>© 2026 CloudTranslator. Todos los derechos reservados.</span>
+      <span>Desarrollado por Miguel Angel Carlos Rojas</span>
+    </div>
+  </footer>
 
   <script src="/js/cloud-translator.js"></script>
   <script>
