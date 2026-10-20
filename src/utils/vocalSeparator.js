@@ -3,7 +3,7 @@
  * Pilar 05: Extracción y División de Stems de Audio (Vocal vs Instrumental / Karaoke)
  * a partir de Enlaces de Plataformas Multimedia (YouTube, TikTok, etc.) o Archivos Subidos.
  * 
- * Procesamiento nativo con FFmpeg mediante cancelación de fase estereofónica DSP de alta fidelidad.
+ * Procesamiento de alta precisión mediante descomposición espectral STFT en Python y respaldo DSP.
  */
 
 const fs = require("fs");
@@ -68,7 +68,7 @@ if (cleanupInterval.unref) {
 }
 
 /**
- * Separación neuronal con Demucs v4 (Meta AI) para aislamiento acústico perfecto de stems
+ * Separación neuronal con Demucs v4 para aislamiento acústico de stems
  */
 async function separateWithDemucsAI(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate = "320k") {
   if (!GradioClient) {
@@ -149,23 +149,98 @@ async function separateWithDemucsAI(inputAudioPath, outInstrumentalPath, outVoca
   }
 }
 
+
+const STFT_PY_PATH = path.join(__dirname, "stft_separator.py");
+
+/**
+ * Separación espectral STFT en Python (numpy / soundfile)
+ * Proporciona aislamiento acústico preciso del canal central para vocales y sustracción completa en instrumental.
+ */
+async function separateWithPythonSTFT(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate = "320k") {
+  logger.info("Separador: Ejecutando motor STFT espectral de alta resolución...");
+
+  const tempInWav = path.join(STEMS_CACHE_DIR, `temp_stft_in_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.wav`);
+  const tempInstWav = path.join(STEMS_CACHE_DIR, `temp_stft_inst_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.wav`);
+  const tempVocWav = path.join(STEMS_CACHE_DIR, `temp_stft_voc_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.wav`);
+
+  try {
+    // 1. Decodificar audio de entrada a WAV 44.1kHz 16-bit estéreo para procesamiento numérico
+    await new Promise((res, rej) => {
+      const ff = spawn(ffmpegPath, [
+        "-y",
+        "-i", inputAudioPath,
+        "-ar", "44100",
+        "-ac", "2",
+        tempInWav
+      ]);
+      ff.on("close", code => code === 0 ? res() : rej(new Error(`Error ffmpeg wav in: code ${code}`)));
+      ff.on("error", rej);
+    });
+
+    // 2. Ejecutar procesamiento numérico STFT con Python
+    await new Promise((res, rej) => {
+      const py = spawn("python", [STFT_PY_PATH, tempInWav, tempInstWav, tempVocWav]);
+      let pyErr = "";
+      py.stderr.on("data", d => { pyErr += d.toString(); });
+      py.on("close", code => {
+        if (code === 0 && fs.existsSync(tempInstWav) && fs.existsSync(tempVocWav)) {
+          res();
+        } else {
+          rej(new Error(`Error en separador STFT Python (code ${code}): ${pyErr.slice(-200)}`));
+        }
+      });
+      py.on("error", rej);
+    });
+
+    // 3. Codificar stems a MP3 de alta resolución
+    await Promise.all([
+      new Promise((res, rej) => {
+        const ff = spawn(ffmpegPath, [
+          "-y",
+          "-i", tempInstWav,
+          "-c:a", "libmp3lame",
+          "-b:a", bitrate,
+          "-id3v2_version", "3",
+          outInstrumentalPath
+        ]);
+        ff.on("close", code => code === 0 ? res() : rej(new Error(`Error ffmpeg instrumental: code ${code}`)));
+        ff.on("error", rej);
+      }),
+      new Promise((res, rej) => {
+        const ff = spawn(ffmpegPath, [
+          "-y",
+          "-i", tempVocWav,
+          "-c:a", "libmp3lame",
+          "-b:a", bitrate,
+          "-id3v2_version", "3",
+          outVocalsPath
+        ]);
+        ff.on("close", code => code === 0 ? res() : rej(new Error(`Error ffmpeg vocals: code ${code}`)));
+        ff.on("error", rej);
+      })
+    ]);
+
+    logger.info("Separador STFT: Pistas de voz e instrumental aisladas exitosamente.");
+  } finally {
+    try { if (fs.existsSync(tempInWav)) fs.unlinkSync(tempInWav); } catch {}
+    try { if (fs.existsSync(tempInstWav)) fs.unlinkSync(tempInstWav); } catch {}
+    try { if (fs.existsSync(tempVocWav)) fs.unlinkSync(tempVocWav); } catch {}
+  }
+}
+
+
 /**
  * Fallback DSP con supresión espectral de fase y compuerta acústica en caso de desconexión
  */
 async function separateWithDSPFallback(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate = "320k") {
-  logger.info("Separador: Ejecutando motor DSP de alta resolución con cancelación de fase...");
+  logger.info("Separador: Ejecutando motor DSP de respaldo con cancelación de fase...");
 
-  // Filtro simultáneo de doble salida con sustracción de fase estéreo:
-  // 1. [out_inst]: Pista Instrumental limpia (Karaoke) eliminando la voz central.
-  // 2. [out_voc]: Voz Aislada (Acapella) mediante sustracción de fase pura del acompañamiento (Master - Instrumental).
   const filterComplex = 
-    '[0:a]aformat=channel_layouts=stereo,asplit=2[full_orig][for_inst];' +
-    '[for_inst]asplit=3[lows][highs][mids];' +
-    '[lows]lowpass=f=180[bass];' +
-    '[highs]highpass=f=6000[air];' +
-    '[mids]bandpass=f=2200:width_type=h:w=5000,pan=stereo|c0=0.5*c0-0.5*c1|c1=0.5*c1-0.5*c0[karaoke_mid];' +
-    '[bass][karaoke_mid][air]amix=inputs=3:weights=1 1 1:dropout_transition=0,volume=1.4,asplit=2[out_inst][inst_for_sub];' +
-    '[full_orig][inst_for_sub]amix=inputs=2:weights=1.2 -1.0:dropout_transition=0,bandpass=f=1800:width_type=h:w=3600,agate=threshold=0.03:ratio=3:range=0.05:attack=10:release=120,volume=2.4[out_voc]';
+    '[0:a]aformat=channel_layouts=stereo,asplit=3[in_side][in_low][in_voc];' +
+    '[in_side]pan=stereo|c0=0.5*c0-0.5*c1|c1=0.5*c1-0.5*c0[inst_side];' +
+    '[in_low]lowpass=f=140:poles=2[sub_bass];' +
+    '[inst_side][sub_bass]amix=inputs=2:weights=1.4 1:dropout_transition=0,volume=1.3[out_inst];' +
+    '[in_voc]pan=stereo|c0=0.5*c0+0.5*c1|c1=0.5*c0+0.5*c1,highpass=f=200:poles=2,lowpass=f=5000:poles=2,equalizer=f=2200:t=q:w=1.2:g=5,agate=threshold=0.035:ratio=4:range=0.03:attack=10:release=100,volume=1.6[out_voc]';
 
   return new Promise((resolve, reject) => {
     const ff = spawn(ffmpegPath, [
@@ -202,7 +277,7 @@ async function separateWithDSPFallback(inputAudioPath, outInstrumentalPath, outV
 
 /**
  * Separa un archivo de audio estéreo en Instrumental (sin voz) y Vocals (solo voz)
- * Utiliza IA Neuronal Demucs v4 de forma primordial y conmuta a DSP en caso de desconexión.
+ * Utiliza el motor STFT espectral de alta resolución con respaldo Demucs AI / DSP.
  */
 function separateAudioChannels(inputAudioPath, outInstrumentalPath, outVocalsPath, quality = "320k") {
   return new Promise(async (resolve, reject) => {
@@ -210,13 +285,19 @@ function separateAudioChannels(inputAudioPath, outInstrumentalPath, outVocalsPat
       const bitrateMap = { "320k": "320k", "192k": "192k", "128k": "128k" };
       const bitrate = bitrateMap[quality] || "320k";
 
-      let aiSuccess = false;
+      let engineUsed = "STFT Spectral Decomposition (High-Def)";
       try {
-        await separateWithDemucsAI(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate);
-        aiSuccess = true;
-      } catch (aiErr) {
-        logger.warn(`Separación con IA Demucs no disponible o fallida (${aiErr.message}). Conmutando a motor DSP de alta resolución...`);
-        await separateWithDSPFallback(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate);
+        await separateWithPythonSTFT(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate);
+      } catch (stftErr) {
+        logger.warn(`Motor STFT local no disponible (${stftErr.message}). Probando Demucs AI / DSP...`);
+        try {
+          await separateWithDemucsAI(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate);
+          engineUsed = "Demucs v4 Neural AI";
+        } catch (aiErr) {
+          logger.warn(`Demucs AI no disponible (${aiErr.message}). Usando motor DSP de respaldo...`);
+          await separateWithDSPFallback(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate);
+          engineUsed = "Resilient High-Def DSP";
+        }
       }
 
       // Extraer duración
@@ -238,7 +319,7 @@ function separateAudioChannels(inputAudioPath, outInstrumentalPath, outVocalsPat
       } catch {}
 
       resolve({
-        engine: aiSuccess ? "Demucs v4 Neural AI" : "Resilient High-Def DSP",
+        engine: engineUsed,
         instrumentalSize: fs.statSync(outInstrumentalPath).size,
         vocalsSize: fs.statSync(outVocalsPath).size,
         duration,

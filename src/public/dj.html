@@ -624,17 +624,9 @@
         </div>
       </div>
 
-      <!-- Botones de Acción de Carga y Cola (Estilo Conversor) -->
-      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-        <button id="btn-load-to-deck-a" type="button" class="btn btn-primary" style="flex: 1; min-width: 170px; height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;" title="Cargar inmediatamente al Deck A">
-          <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          <span>Cargar al Deck A</span>
-        </button>
-        <button id="btn-load-to-deck-b" type="button" class="btn" style="flex: 1; min-width: 170px; height: 44px; background: linear-gradient(135deg, #ff007b 0%, #d60064 100%); border: 1px solid #ff007b; color: #fff; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: var(--radius-md); box-shadow: 0 4px 16px rgba(255, 0, 123, 0.35); cursor: pointer;" title="Cargar inmediatamente al Deck B">
-          <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          <span>Cargar al Deck B</span>
-        </button>
-        <button id="btn-add-to-queue" type="button" class="btn btn-outline" style="flex: 1; min-width: 170px; height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;" title="Añadir a la lista de lo que va después">
+      <!-- Botón de Acción Añadir a la Cola (Diseño Primario) -->
+      <div>
+        <button id="btn-add-to-queue" type="button" class="btn btn-primary" style="width: 100%; height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-weight: 700; font-size: 0.98rem;" title="Añadir a la lista de lo que va después">
           <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           <span>Añadir a la Cola</span>
         </button>
@@ -1314,19 +1306,6 @@
         }
       }
 
-      if (btnLoadToDeckA) {
-        btnLoadToDeckA.addEventListener("click", () => {
-          const u = inputUpNext.value.trim();
-          if (u) {
-            fetchMediaAndAdd(u, "A");
-            inputUpNext.value = "";
-            syncDetectedPlatform("");
-          } else {
-            alert("Pega un enlace antes de pulsar Cargar al Deck A");
-          }
-        });
-      }
-
       if (btnAddQueue) {
         btnAddQueue.addEventListener("click", () => {
           const u = inputUpNext.value.trim();
@@ -1336,19 +1315,6 @@
             syncDetectedPlatform("");
           } else {
             alert("Pega un enlace antes de pulsar Añadir a la Cola");
-          }
-        });
-      }
-
-      if (btnLoadToDeckB) {
-        btnLoadToDeckB.addEventListener("click", () => {
-          const u = inputUpNext.value.trim();
-          if (u) {
-            fetchMediaAndAdd(u, "B");
-            inputUpNext.value = "";
-            syncDetectedPlatform("");
-          } else {
-            alert("Pega un enlace antes de pulsar Cargar al Deck B");
           }
         });
       }
