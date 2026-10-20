@@ -1099,8 +1099,49 @@
         updateCrossfader(document.getElementById("crossfader").value);
       }
 
-      // Cola de Pistas ("Lo que va a ir después") - Inicia limpia sin pistas demo
-      let djQueue = [];
+      // =========================================================================
+      // COLA DE REPRODUCCIÓN PERSISTENTE EN COOKIES Y LOCALSTORAGE
+      // No se eliminan solas las pistas; persisten incluso al cerrar la página
+      // =========================================================================
+
+      function saveQueue() {
+        try {
+          localStorage.setItem("cloudtranslator_dj_queue", JSON.stringify(djQueue));
+          const compact = djQueue.slice(0, 35).map(t => ({
+            id: t.id,
+            title: t.title,
+            artist: t.artist,
+            platform: t.platform,
+            duration: t.duration,
+            url: t.url,
+            streamUrl: t.streamUrl || null
+          }));
+          document.cookie = `dj_queue=${encodeURIComponent(JSON.stringify(compact))}; Path=/; Max-Age=31536000; SameSite=Lax`;
+        } catch (e) {
+          console.warn("Error guardando cola DJ:", e);
+        }
+      }
+
+      function loadSavedQueue() {
+        try {
+          const local = localStorage.getItem("cloudtranslator_dj_queue");
+          if (local) {
+            const parsed = JSON.parse(local);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+          const cookieMatch = document.cookie.match(/(?:^|; )dj_queue=([^;]*)/);
+          if (cookieMatch) {
+            const parsed = JSON.parse(decodeURIComponent(cookieMatch[1]));
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {
+          console.warn("Error leyendo cola guardada:", e);
+        }
+        return [];
+      }
+
+      let djQueue = loadSavedQueue();
+      let currentQueueTrackIndex = -1;
 
       function updateQueueCounter() {
         const counterEl = document.getElementById("queue-counter");
@@ -1128,8 +1169,8 @@
             <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
               <span style="font-weight: 800; font-size: 0.95rem; color: var(--primary); width: 24px;">#${index + 1}</span>
               <div style="min-width: 0;">
-                <div style="font-weight: 700; font-size: 0.95rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.title}</div>
-                <div style="font-size: 0.78rem; color: var(--text-muted);">${item.artist} &bull; ${item.platform} &bull; ${item.duration}</div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.title}">${item.title}</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">${item.artist} &bull; ${item.platform} &bull; <span style="color: var(--primary);">${item.duration}</span></div>
               </div>
             </div>
 
@@ -1163,11 +1204,13 @@
         const temp = djQueue[index];
         djQueue[index] = djQueue[target];
         djQueue[target] = temp;
+        saveQueue();
         renderQueue();
       };
 
       window.removeQueueItem = (id) => {
         djQueue = djQueue.filter(i => i.id !== id);
+        saveQueue();
         renderQueue();
       };
 
@@ -1175,6 +1218,7 @@
       if (btnClearQueue) {
         btnClearQueue.addEventListener("click", () => {
           djQueue = [];
+          saveQueue();
           renderQueue();
         });
       }
@@ -1182,8 +1226,6 @@
       // Añadir pista desde campo "Colocar Pista Siguiente"
       const inputUpNext = document.getElementById("input-up-next-url");
       const btnAddQueue = document.getElementById("btn-add-to-queue");
-      const btnLoadToDeckA = document.getElementById("btn-load-to-deck-a");
-      const btnLoadToDeckB = document.getElementById("btn-load-to-deck-b");
       const btnClearUpNext = document.getElementById("btn-clear-up-next");
       const platformHoverLabel = document.getElementById("platform-hover-label");
       const detectedPlatformBadge = document.getElementById("detected-platform-badge");
@@ -1234,6 +1276,13 @@
         inputUpNext.addEventListener("input", () => {
           syncDetectedPlatform(inputUpNext.value);
         });
+        inputUpNext.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            const u = inputUpNext.value.trim();
+            if (u) addTrackInstant(u);
+          }
+        });
       }
 
       if (btnClearUpNext) {
@@ -1250,87 +1299,96 @@
         });
       });
 
-      async function fetchMediaAndAdd(url, targetDeck = null) {
+      // =========================================================================
+      // AÑADIDO FLASH EN 1 MILISEGUNDO (SIN ESPERAR CONVERSIÓN NI BLOQUEAR UI)
+      // =========================================================================
+      function addTrackInstant(url) {
         if (!url || !url.trim()) {
           alert("Por favor ingresa una URL válida de YouTube, TikTok u otra plataforma soportada.");
           return;
         }
 
         const cleanUrl = url.trim();
-        const placeholderId = "q_" + Date.now();
+        const detected = detectPlatformFromUrl(cleanUrl) || "direct";
+        const platformName = platformNames[detected] || "Multimedia";
+
+        // Título Inteligente Instantáneo (0 milisegundos)
+        let smartTitle = `${platformName} Audio Track`;
+        if (detected === "youtube") {
+          const ytMatch = cleanUrl.match(/(?:v=|\/shorts\/|\/live\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+          smartTitle = ytMatch ? `YouTube Track [${ytMatch[1]}]` : "Pista de YouTube";
+        } else if (detected === "tiktok") {
+          const ttMatch = cleanUrl.match(/\/video\/(\d+)/);
+          smartTitle = ttMatch ? `TikTok Viral [${ttMatch[1].slice(-6)}]` : "TikTok Audio";
+        } else if (detected === "instagram") {
+          const igMatch = cleanUrl.match(/\/(?:reel|reels|p)\/([a-zA-Z0-9_-]+)/);
+          smartTitle = igMatch ? `Instagram Reel [${igMatch[1]}]` : "Instagram Audio";
+        } else if (detected === "direct") {
+          const fname = cleanUrl.split("/").pop().split("?")[0];
+          smartTitle = fname ? decodeURIComponent(fname) : "Pista de Audio Directo";
+        }
+
+        const trackId = "q_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
         const newItem = {
-          id: placeholderId,
-          title: "Analizando enlace...",
-          artist: "Cargando audio",
-          platform: "Multimedia",
-          duration: "--:--",
-          url: cleanUrl
+          id: trackId,
+          title: smartTitle,
+          artist: platformName,
+          platform: platformName,
+          duration: "Listo",
+          url: cleanUrl,
+          streamUrl: null
         };
 
-        if (!targetDeck) {
-          djQueue.push(newItem);
-          renderQueue();
+        // INSERCIÓN FLASH EN 0.1 MILISEGUNDOS
+        djQueue.push(newItem);
+        saveQueue();
+        renderQueue();
+
+        // Limpiar entrada de inmediato
+        if (inputUpNext) {
+          inputUpNext.value = "";
+          syncDetectedPlatform("");
         }
 
-        try {
-          const res = await fetch("/api/media/convert", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ url: cleanUrl, format: "mp3", quality: "320k" })
-          });
-          const data = await res.json();
-
-          if (data.status === "success") {
+        // Enriquecer metadatos reales en segundo plano (asíncrono sin bloquear)
+        fetch("/api/media/info", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: cleanUrl })
+        })
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.status === "success" && data.title) {
             newItem.title = data.title;
-            newItem.artist = data.author || "Artista";
-            newItem.platform = data.platform;
-            newItem.duration = data.duration;
-            newItem.streamUrl = data.streamUrl;
-
-            if (targetDeck === "B") {
-              loadTrackToDeck(newItem, "B");
-            } else if (targetDeck === "A") {
-              loadTrackToDeck(newItem, "A");
-            } else {
-              renderQueue();
-            }
-          } else {
-            alert(data.error || "No se pudo cargar la canción.");
-            djQueue = djQueue.filter(i => i.id !== placeholderId);
+            if (data.author) newItem.artist = data.author;
+            if (data.duration) newItem.duration = data.duration;
+            saveQueue();
             renderQueue();
           }
-        } catch (err) {
-          alert("Error de conexión: " + err.message);
-          djQueue = djQueue.filter(i => i.id !== placeholderId);
-          renderQueue();
-        }
+        })
+        .catch(() => {});
       }
 
       if (btnAddQueue) {
         btnAddQueue.addEventListener("click", () => {
           const u = inputUpNext.value.trim();
           if (u) {
-            fetchMediaAndAdd(u, null);
-            inputUpNext.value = "";
-            syncDetectedPlatform("");
+            addTrackInstant(u);
           } else {
             alert("Pega un enlace antes de pulsar Añadir a la Cola");
           }
         });
       }
 
-      window.loadQueueItemToDeck = async (id, deck) => {
+      window.loadQueueItemToDeck = (id, deck) => {
         const item = djQueue.find(i => i.id === id);
         if (!item) return;
-
-        if (item.streamUrl) {
-          loadTrackToDeck(item, deck);
-        } else {
-          await fetchMediaAndAdd(item.url, deck);
-        }
+        const idx = djQueue.findIndex(i => i.id === id);
+        if (idx !== -1) currentQueueTrackIndex = idx;
+        loadTrackToDeck(item, deck);
       };
 
-      function loadTrackToDeck(item, deck) {
+      async function loadTrackToDeck(item, deck) {
         initWebAudio();
         const titleEl = document.getElementById(`deck-${deck.toLowerCase()}-title`);
         const artistEl = document.getElementById(`deck-${deck.toLowerCase()}-artist`);
@@ -1340,8 +1398,52 @@
         if (titleEl) titleEl.textContent = item.title;
         if (artistEl) artistEl.textContent = `${item.artist} (${item.platform})`;
         if (durEl) durEl.textContent = item.duration;
-        audio.src = item.streamUrl || item.url;
-        audio.load();
+
+        // Si ya tiene URL de streaming lista
+        if (item.streamUrl) {
+          audio.src = item.streamUrl;
+          audio.load();
+          return;
+        }
+
+        // Si es enlace directo de audio mp3/wav
+        if (item.url && item.url.match(/\.(mp3|wav|ogg|m4a|aac)(\?.*)?$/i)) {
+          item.streamUrl = item.url;
+          saveQueue();
+          audio.src = item.url;
+          audio.load();
+          return;
+        }
+
+        // Transcodificación bajo demanda al cargarse en el deck
+        if (titleEl) titleEl.textContent = `Cargando audio: ${item.title}...`;
+        try {
+          const res = await fetch("/api/media/convert", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: item.url, format: "mp3", quality: "320k" })
+          });
+          const data = await res.json();
+          if (data && data.status === "success" && data.streamUrl) {
+            item.streamUrl = data.streamUrl;
+            if (data.title) item.title = data.title;
+            if (data.duration) item.duration = data.duration;
+            saveQueue();
+            renderQueue();
+
+            if (titleEl) titleEl.textContent = item.title;
+            if (artistEl) artistEl.textContent = `${item.artist} (${item.platform})`;
+            if (durEl) durEl.textContent = item.duration;
+            audio.src = data.streamUrl;
+            audio.load();
+          } else {
+            if (titleEl) titleEl.textContent = item.title;
+            alert(data.error || "No se pudo transcodificar el audio de esta pista.");
+          }
+        } catch (err) {
+          if (titleEl) titleEl.textContent = item.title;
+          console.warn("Error cargando pista al deck:", err);
+        }
       }
 
       // Controles Deck A
@@ -1437,10 +1539,10 @@
         updatePlayAState(false);
         autoTransitioningToB = false;
 
-        // Auto-DJ Infinito: Cargar siguiente pista de la cola en Deck A para que quede listo
+        // Auto-DJ Infinito: Cargar siguiente pista de la cola en Deck A sin eliminarla
         if (isAutoDJ && djQueue.length > 0) {
-          const nextTrack = djQueue.shift();
-          renderQueue();
+          currentQueueTrackIndex = (currentQueueTrackIndex + 1) % djQueue.length;
+          const nextTrack = djQueue[currentQueueTrackIndex];
           loadTrackToDeck(nextTrack, "A");
         }
       });
@@ -1539,10 +1641,10 @@
         updatePlayBState(false);
         autoTransitioningToA = false;
 
-        // Auto-DJ Infinito: Cargar siguiente pista de la cola en Deck B para que quede listo
+        // Auto-DJ Infinito: Cargar siguiente pista de la cola en Deck B sin eliminarla
         if (isAutoDJ && djQueue.length > 0) {
-          const nextTrack = djQueue.shift();
-          renderQueue();
+          currentQueueTrackIndex = (currentQueueTrackIndex + 1) % djQueue.length;
+          const nextTrack = djQueue[currentQueueTrackIndex];
           loadTrackToDeck(nextTrack, "B");
         }
       });
