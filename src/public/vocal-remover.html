@@ -1342,12 +1342,32 @@
         btnDlVoc.setAttribute("download", data.vocals.filename);
 
         // Configurar botones de copia directa
+        function triggerCopyFeedback(btn) {
+          if (!btn) return;
+          const origHtml = btn.innerHTML;
+          const origBg = btn.style.background;
+          const origColor = btn.style.color;
+          const origBorder = btn.style.borderColor;
+          btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" style="stroke: #000; width: 16px; height: 16px;"><polyline points="20 6 9 17 4 12"/></svg> <span>¡Enlace Copiado!</span>`;
+          btn.style.background = "var(--primary)";
+          btn.style.color = "#000000";
+          btn.style.borderColor = "var(--primary)";
+          btn.style.fontWeight = "700";
+          setTimeout(() => {
+            btn.innerHTML = origHtml;
+            btn.style.background = origBg;
+            btn.style.color = origColor;
+            btn.style.borderColor = origBorder;
+            btn.style.fontWeight = "";
+          }, 2000);
+        }
+
         const btnCopyStreamInst = document.getElementById("btn-copy-stream-inst");
         if (btnCopyStreamInst) {
           btnCopyStreamInst.onclick = () => {
             const downloadFull = window.location.origin + data.instrumental.downloadUrl;
             navigator.clipboard.writeText(downloadFull);
-            alert("Enlace directo copiado al portapapeles.");
+            triggerCopyFeedback(btnCopyStreamInst);
           };
         }
 
@@ -1356,7 +1376,7 @@
           btnCopyStreamVoc.onclick = () => {
             const downloadFull = window.location.origin + data.vocals.downloadUrl;
             navigator.clipboard.writeText(downloadFull);
-            alert("Enlace directo copiado al portapapeles.");
+            triggerCopyFeedback(btnCopyStreamVoc);
           };
         }
 
@@ -1418,7 +1438,7 @@
           btnCopyActive.onclick = () => {
             const downloadFull = window.location.origin + targetStem.downloadUrl;
             navigator.clipboard.writeText(downloadFull);
-            alert("Enlace directo copiado al portapapeles.");
+            triggerCopyFeedback(btnCopyActive);
           };
         }
       }

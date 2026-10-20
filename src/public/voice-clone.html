@@ -1155,7 +1155,22 @@
 
             const downloadFull = targetUrl.startsWith("http") ? targetUrl : window.location.origin + targetUrl;
             navigator.clipboard.writeText(downloadFull);
-            alert("Enlace directo copiado al portapapeles.");
+            const origHtml = btnCopyStreamClone.innerHTML;
+            const origBg = btnCopyStreamClone.style.background;
+            const origColor = btnCopyStreamClone.style.color;
+            const origBorder = btnCopyStreamClone.style.borderColor;
+            btnCopyStreamClone.innerHTML = `<svg class="icon" viewBox="0 0 24 24" style="stroke: #000; width: 16px; height: 16px;"><polyline points="20 6 9 17 4 12"/></svg> <span>¡Enlace Copiado!</span>`;
+            btnCopyStreamClone.style.background = "var(--primary)";
+            btnCopyStreamClone.style.color = "#000000";
+            btnCopyStreamClone.style.borderColor = "var(--primary)";
+            btnCopyStreamClone.style.fontWeight = "700";
+            setTimeout(() => {
+              btnCopyStreamClone.innerHTML = origHtml;
+              btnCopyStreamClone.style.background = origBg;
+              btnCopyStreamClone.style.color = origColor;
+              btnCopyStreamClone.style.borderColor = origBorder;
+              btnCopyStreamClone.style.fontWeight = "";
+            }, 2000);
           };
         }
 

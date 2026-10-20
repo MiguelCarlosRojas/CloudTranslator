@@ -988,7 +988,22 @@
         btnCopyStream.onclick = () => {
           const downloadFull = window.location.origin + item.downloadUrl;
           navigator.clipboard.writeText(downloadFull);
-          alert("Enlace directo copiado al portapapeles.");
+          const origHtml = btnCopyStream.innerHTML;
+          const origBg = btnCopyStream.style.background;
+          const origColor = btnCopyStream.style.color;
+          const origBorder = btnCopyStream.style.borderColor;
+          btnCopyStream.innerHTML = `<svg class="icon" viewBox="0 0 24 24" style="stroke: #000; width: 16px; height: 16px;"><polyline points="20 6 9 17 4 12"/></svg> <span>¡Enlace Copiado!</span>`;
+          btnCopyStream.style.background = "var(--primary)";
+          btnCopyStream.style.color = "#000000";
+          btnCopyStream.style.borderColor = "var(--primary)";
+          btnCopyStream.style.fontWeight = "700";
+          setTimeout(() => {
+            btnCopyStream.innerHTML = origHtml;
+            btnCopyStream.style.background = origBg;
+            btnCopyStream.style.color = origColor;
+            btnCopyStream.style.borderColor = origBorder;
+            btnCopyStream.style.fontWeight = "";
+          }, 2000);
         };
 
         if (item.format === "mp4") {

@@ -946,7 +946,22 @@
           if (targetUrl) {
             const downloadFull = targetUrl.startsWith("http") ? targetUrl : window.location.origin + targetUrl;
             navigator.clipboard.writeText(downloadFull);
-            alert("Enlace directo copiado al portapapeles.");
+            const origHtml = ttsBtnCopyStream.innerHTML;
+            const origBg = ttsBtnCopyStream.style.background;
+            const origColor = ttsBtnCopyStream.style.color;
+            const origBorder = ttsBtnCopyStream.style.borderColor;
+            ttsBtnCopyStream.innerHTML = `<svg class="icon" viewBox="0 0 24 24" style="stroke: #000; width: 16px; height: 16px;"><polyline points="20 6 9 17 4 12"/></svg> <span>¡Enlace Copiado!</span>`;
+            ttsBtnCopyStream.style.background = "var(--primary)";
+            ttsBtnCopyStream.style.color = "#000000";
+            ttsBtnCopyStream.style.borderColor = "var(--primary)";
+            ttsBtnCopyStream.style.fontWeight = "700";
+            setTimeout(() => {
+              ttsBtnCopyStream.innerHTML = origHtml;
+              ttsBtnCopyStream.style.background = origBg;
+              ttsBtnCopyStream.style.color = origColor;
+              ttsBtnCopyStream.style.borderColor = origBorder;
+              ttsBtnCopyStream.style.fontWeight = "";
+            }, 2000);
           } else {
             alert("No se pudo obtener el enlace directo.");
           }
