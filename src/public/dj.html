@@ -192,28 +192,75 @@
       flex-wrap: wrap;
     }
     .btn-cue, .btn-play-deck, .btn-sync {
-      padding: 10px 18px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 800;
-      border: 1px solid var(--border-subtle);
-      background: rgba(255, 255, 255, 0.05);
-      color: #fff;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
+      gap: 7px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border: none;
+      outline: none;
+      white-space: nowrap;
     }
-    .btn-play-deck.active {
-      background: #10b981;
-      border-color: #10b981;
-      color: #000;
-      box-shadow: 0 0 14px rgba(16, 185, 129, 0.5);
+    .deck-a .btn-play-deck {
+      background: var(--primary-gradient);
+      color: #030712;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.35);
     }
-    .btn-cue:active {
-      background: #f59e0b;
-      color: #000;
+    .deck-a .btn-play-deck:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.55);
+      color: #030712;
+    }
+    .deck-a .btn-play-deck.active {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #030712;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+    }
+    .deck-a .btn-cue, .deck-a .btn-sync {
+      background: rgba(0, 240, 255, 0.12);
+      border: 1px solid rgba(0, 240, 255, 0.45);
+      color: var(--primary);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    }
+    .deck-a .btn-cue:hover, .deck-a .btn-sync:hover {
+      background: var(--primary-gradient);
+      border-color: transparent;
+      color: #030712;
+      transform: translateY(-1px);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+    }
+    
+    .deck-b .btn-play-deck {
+      background: linear-gradient(135deg, #ff007b 0%, #c026d3 100%);
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(255, 0, 123, 0.35);
+    }
+    .deck-b .btn-play-deck:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 25px rgba(255, 0, 123, 0.55);
+      color: #ffffff;
+    }
+    .deck-b .btn-play-deck.active {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #030712;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+    }
+    .deck-b .btn-cue, .deck-b .btn-sync {
+      background: rgba(255, 0, 123, 0.12);
+      border: 1px solid rgba(255, 0, 123, 0.45);
+      color: #ff007b;
+      box-shadow: 0 0 10px rgba(255, 0, 123, 0.2);
+    }
+    .deck-b .btn-cue:hover, .deck-b .btn-sync:hover {
+      background: linear-gradient(135deg, #ff007b 0%, #c026d3 100%);
+      border-color: transparent;
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 0 20px rgba(255, 0, 123, 0.5);
     }
     .queue-card {
       background: rgba(14, 18, 30, 0.85);
@@ -248,46 +295,44 @@
 
     /* Estilos de Botones de la Cola DJ */
     .btn-queue-deck-a {
-      background: rgba(0, 240, 255, 0.1);
-      border: 1px solid rgba(0, 240, 255, 0.35);
-      color: var(--primary);
+      background: var(--primary-gradient);
+      color: #030712;
       font-size: 0.78rem;
       font-weight: 700;
-      padding: 6px 14px;
+      padding: 7px 15px;
       border-radius: var(--radius-sm);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      transition: all 0.2s ease;
-      letter-spacing: 0.02em;
+      gap: 6px;
+      border: none;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
     }
     .btn-queue-deck-a:hover {
-      background: var(--primary);
-      color: #030712;
-      box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
       transform: translateY(-1px);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+      color: #030712;
     }
     .btn-queue-deck-b {
-      background: rgba(255, 0, 123, 0.1);
-      border: 1px solid rgba(255, 0, 123, 0.35);
-      color: #ff007b;
+      background: linear-gradient(135deg, #ff007b 0%, #c026d3 100%);
+      color: #ffffff;
       font-size: 0.78rem;
       font-weight: 700;
-      padding: 6px 14px;
+      padding: 7px 15px;
       border-radius: var(--radius-sm);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      transition: all 0.2s ease;
-      letter-spacing: 0.02em;
+      gap: 6px;
+      border: none;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 12px rgba(255, 0, 123, 0.35);
     }
     .btn-queue-deck-b:hover {
-      background: #ff007b;
-      color: #ffffff;
-      box-shadow: 0 0 12px rgba(255, 0, 123, 0.4);
       transform: translateY(-1px);
+      box-shadow: 0 0 20px rgba(255, 0, 123, 0.6);
+      color: #ffffff;
     }
     .btn-queue-nav {
       background: rgba(255, 255, 255, 0.05);
@@ -467,9 +512,9 @@
       align-items: center;
       justify-content: space-between;
       background: rgba(0, 0, 0, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 8px;
-      padding: 6px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
       margin: 8px 0;
       font-size: 0.78rem;
     }
@@ -482,27 +527,40 @@
     .deck-a .bpm-display { color: var(--primary); }
     .deck-b .bpm-display { color: #ff007b; }
     .btn-tap {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      color: #fff;
-      font-size: 0.72rem;
-      font-weight: 800;
-      padding: 4px 10px;
-      border-radius: 6px;
+      border: none;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
       cursor: pointer;
-      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .btn-tap:hover {
-      background: rgba(255, 255, 255, 0.18);
+    .deck-a .btn-tap {
+      background: var(--primary-gradient);
+      color: #030712;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
+    }
+    .deck-a .btn-tap:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+      color: #030712;
+    }
+    .deck-b .btn-tap {
+      background: linear-gradient(135deg, #ff007b 0%, #c026d3 100%);
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(255, 0, 123, 0.35);
+    }
+    .deck-b .btn-tap:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 20px rgba(255, 0, 123, 0.6);
+      color: #ffffff;
     }
     .btn-tap:active {
-      transform: scale(0.92);
-      background: var(--primary);
-      color: #000;
-    }
-    .deck-b .btn-tap:active {
-      background: #ff007b;
-      color: #fff;
+      transform: translateY(1px);
     }
 
     /* Pads de Hot Cues (1 - 4) */
@@ -527,46 +585,56 @@
       gap: 6px;
     }
     .btn-hot-cue {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 6px;
-      padding: 7px 4px;
-      color: var(--text-muted);
-      font-size: 0.7rem;
-      font-weight: 800;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: var(--radius-sm);
+      padding: 8px 4px;
+      color: var(--text-secondary);
+      font-size: 0.74rem;
+      font-weight: 700;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 3px;
-      transition: all 0.15s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       user-select: none;
     }
     .btn-hot-cue:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.12);
       color: #fff;
-      border-color: rgba(255, 255, 255, 0.25);
-    }
-    .btn-hot-cue.pad-set {
-      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
     }
     .deck-a .btn-hot-cue.pad-set {
-      border-color: var(--primary);
-      background: rgba(0, 240, 255, 0.18);
-      box-shadow: 0 0 10px rgba(0, 240, 255, 0.35);
+      background: var(--primary-gradient) !important;
+      color: #030712 !important;
+      border: none !important;
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.5) !important;
+      transform: translateY(-1px);
+    }
+    .deck-a .btn-hot-cue.pad-set .hot-cue-time {
+      color: #030712;
+      font-weight: 800;
     }
     .deck-b .btn-hot-cue.pad-set {
-      border-color: #ff007b;
-      background: rgba(255, 0, 123, 0.18);
-      box-shadow: 0 0 10px rgba(255, 0, 123, 0.35);
+      background: linear-gradient(135deg, #ff007b 0%, #c026d3 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      box-shadow: 0 0 16px rgba(255, 0, 123, 0.5) !important;
+      transform: translateY(-1px);
+    }
+    .deck-b .btn-hot-cue.pad-set .hot-cue-time {
+      color: #ffffff;
+      font-weight: 800;
     }
     .btn-hot-cue:active {
-      transform: scale(0.93);
+      transform: translateY(1px);
     }
     .hot-cue-time {
-      font-size: 0.62rem;
+      font-size: 0.65rem;
       font-family: monospace;
-      opacity: 0.85;
+      opacity: 0.9;
     }
 
     /* Auto-Loop / Beat Looping */
@@ -586,37 +654,51 @@
     .loop-btn-grid {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
-      gap: 4px;
+      gap: 5px;
     }
     .btn-loop {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       color: var(--text-secondary);
-      font-size: 0.72rem;
-      font-weight: 800;
-      padding: 6px 2px;
-      border-radius: 6px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 7px 2px;
+      border-radius: var(--radius-sm);
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .btn-loop:hover {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.14);
       color: #fff;
+      transform: translateY(-1px);
     }
-    .btn-loop.active-loop {
-      background: #10b981 !important;
-      border-color: #10b981 !important;
-      color: #000 !important;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
-      font-weight: 900;
+    .deck-a .btn-loop.active-loop {
+      background: var(--primary-gradient) !important;
+      border: none !important;
+      color: #030712 !important;
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.5) !important;
+      font-weight: 800;
+      transform: translateY(-1px);
+    }
+    .deck-b .btn-loop.active-loop {
+      background: linear-gradient(135deg, #ff007b 0%, #c026d3 100%) !important;
+      border: none !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 16px rgba(255, 0, 123, 0.5) !important;
+      font-weight: 800;
+      transform: translateY(-1px);
     }
     .btn-loop-exit {
+      background: rgba(244, 63, 94, 0.12);
       color: #f43f5e;
-      border-color: rgba(244, 63, 94, 0.3);
+      border: 1px solid rgba(244, 63, 94, 0.35);
     }
     .btn-loop-exit:hover {
-      background: #f43f5e;
+      background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
       color: #fff;
+      border-color: transparent;
+      box-shadow: 0 0 14px rgba(244, 63, 94, 0.5);
+      transform: translateY(-1px);
     }
 
     /* Stereo LED VU Meter */
@@ -709,7 +791,7 @@
       margin-top: 2px;
     }
 
-    /* DJ Sampler FX Pads */
+    /* DJ Sampler FX Pads (Diseño Primario Profesional Sin Emojis) */
     .sampler-section {
       width: 100%;
       margin-top: 14px;
@@ -717,47 +799,77 @@
       border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
     .sampler-title {
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       font-weight: 800;
       color: var(--text-muted);
       text-align: center;
       display: block;
-      letter-spacing: 0.06em;
-      margin-bottom: 8px;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
     }
     .sampler-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 6px;
+      gap: 8px;
       width: 100%;
     }
     .btn-sampler {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #fff;
-      font-size: 0.72rem;
-      font-weight: 800;
-      padding: 8px 6px;
-      border-radius: 8px;
+      height: 42px;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      font-weight: 700;
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
-      transition: all 0.15s ease;
+      gap: 8px;
+      border: none;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       user-select: none;
+      letter-spacing: 0.03em;
+    }
+    .btn-sampler .icon {
+      width: 16px;
+      height: 16px;
+    }
+    .btn-sampler:hover {
+      transform: translateY(-1px);
     }
     .btn-sampler:active, .btn-sampler.fired {
-      transform: scale(0.95);
+      transform: translateY(1px) scale(0.97);
     }
-    .btn-sampler.s-horn { border-color: #f59e0b; color: #fbbf24; }
-    .btn-sampler.s-horn:active, .btn-sampler.s-horn.fired { background: #f59e0b; color: #000; box-shadow: 0 0 14px #f59e0b; }
-    .btn-sampler.s-siren { border-color: #00f0ff; color: #00f0ff; }
-    .btn-sampler.s-siren:active, .btn-sampler.s-siren.fired { background: #00f0ff; color: #000; box-shadow: 0 0 14px #00f0ff; }
-    .btn-sampler.s-drop { border-color: #a855f7; color: #c084fc; }
-    .btn-sampler.s-drop:active, .btn-sampler.s-drop.fired { background: #a855f7; color: #fff; box-shadow: 0 0 14px #a855f7; }
-    .btn-sampler.s-brake { border-color: #ef4444; color: #f87171; }
-    .btn-sampler.s-brake:active, .btn-sampler.s-brake.fired { background: #ef4444; color: #fff; box-shadow: 0 0 14px #ef4444; }
+    .btn-sampler.s-horn {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #030712;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.35);
+    }
+    .btn-sampler.s-horn:hover {
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.6);
+    }
+    .btn-sampler.s-siren {
+      background: var(--primary-gradient);
+      color: #030712;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.35);
+    }
+    .btn-sampler.s-siren:hover {
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
+    }
+    .btn-sampler.s-drop {
+      background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.35);
+    }
+    .btn-sampler.s-drop:hover {
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.6);
+    }
+    .btn-sampler.s-brake {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.35);
+    }
+    .btn-sampler.s-brake:hover {
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
+    }
 
   </style>
 </head>
@@ -1096,8 +1208,8 @@
           <div style="text-align: center; width: 100%;">
             <span style="font-weight: 800; font-size: 0.78rem; letter-spacing: 0.1em; color: var(--text-muted);">MASTER MIXER</span>
             <div style="margin: 8px 0;">
-              <button id="btn-auto-dj" class="btn" style="width: 100%; font-size: 0.8rem; background: rgba(0, 240, 255, 0.15); border: 1px solid var(--primary); color: #fff; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
-                <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <button id="btn-auto-dj" class="btn btn-primary" style="width: 100%; height: 42px; font-size: 0.84rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                <svg class="icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                 <span>Auto-DJ: ACTIVADO</span>
               </button>
             </div>
@@ -1207,16 +1319,20 @@
             <span class="sampler-title">DJ SAMPLER FX (PADS DE DISPARO)</span>
             <div class="sampler-grid">
               <button type="button" class="btn-sampler s-horn" id="btn-fx-horn" title="Disparo de Air Horn clásico de club">
-                <span>📢 AIR HORN</span>
+                <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                <span>AIR HORN</span>
               </button>
               <button type="button" class="btn-sampler s-siren" id="btn-fx-siren" title="Sirena Dub Láser con modulación interactiva">
-                <span>🚨 LASER SIREN</span>
+                <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span>LASER SIREN</span>
               </button>
               <button type="button" class="btn-sampler s-drop" id="btn-fx-drop" title="Golpe de Subgrave 808 Club Drop">
-                <span>💣 808 DROP</span>
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+                <span>808 DROP</span>
               </button>
               <button type="button" class="btn-sampler s-brake" id="btn-fx-brake" title="Frenado de motor de vinilo (Turntable Brake)">
-                <span>🛑 VINYL BRAKE</span>
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><rect width="6" height="6" x="9" y="9" rx="1"/></svg>
+                <span>VINYL BRAKE</span>
               </button>
             </div>
           </div>
@@ -2528,8 +2644,18 @@
       const btnAutoDJ = document.getElementById("btn-auto-dj");
       btnAutoDJ.addEventListener("click", () => {
         isAutoDJ = !isAutoDJ;
-        btnAutoDJ.innerHTML = `<svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> <span>Auto-DJ: ${isAutoDJ ? "ACTIVADO" : "DESACTIVADO"}</span>`;
-        btnAutoDJ.style.background = isAutoDJ ? "rgba(0, 240, 255, 0.15)" : "rgba(255, 255, 255, 0.05)";
+        btnAutoDJ.innerHTML = `<svg class="icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> <span>Auto-DJ: ${isAutoDJ ? "ACTIVADO" : "DESACTIVADO"}</span>`;
+        if (isAutoDJ) {
+          btnAutoDJ.className = "btn btn-primary";
+          btnAutoDJ.style.background = "";
+          btnAutoDJ.style.color = "";
+          btnAutoDJ.style.boxShadow = "";
+        } else {
+          btnAutoDJ.className = "btn";
+          btnAutoDJ.style.background = "rgba(255, 255, 255, 0.08)";
+          btnAutoDJ.style.color = "var(--text-secondary)";
+          btnAutoDJ.style.boxShadow = "none";
+        }
       });
 
       // Controles Color FX Filter (Deck A y Deck B)
