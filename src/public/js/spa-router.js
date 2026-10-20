@@ -116,6 +116,15 @@
       document.body.innerHTML = doc.body.innerHTML;
       document.body.classList.remove("spa-transitioning");
 
+      // Renderizar componentes modulares (Encabezado / Pie de Página) en la nueva página
+      if (window.CloudComponents && typeof window.CloudComponents.init === "function") {
+        try {
+          window.CloudComponents.init();
+        } catch (compErr) {
+          console.warn("[SPA Router] Error al inicializar componentes:", compErr);
+        }
+      }
+
       // Actualizar historial del navegador
       if (push) {
         window.history.pushState({ spa: true, url: url }, doc.title, url);

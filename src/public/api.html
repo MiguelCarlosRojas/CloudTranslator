@@ -260,9 +260,31 @@
           </a>
         </div>
 
-        <!-- Grupo 6: Consola Interactiva -->
+        <!-- Grupo 6: Pilar 5 - Separador de Voz e Instrumental -->
         <div class="docs-sidebar-group">
-          <span class="docs-group-label">06 / Pruebas en Vivo</span>
+          <span class="docs-group-label">06 / Pilar 5: Separador de Voz</span>
+          <a href="#api-post-separator-process" class="docs-sidebar-session" data-target="api-post-separator-process">
+            <span class="session-badge">S.01</span> POST /api/separator/process
+          </a>
+          <a href="#api-get-separator-stream" class="docs-sidebar-session" data-target="api-get-separator-stream">
+            <span class="session-badge">S.02</span> GET /api/separator/stream
+          </a>
+          <a href="#api-get-separator-download" class="docs-sidebar-session" data-target="api-get-separator-download">
+            <span class="session-badge">S.03</span> GET /api/separator/download
+          </a>
+        </div>
+
+        <!-- Grupo 7: Pilar 6 - CloudDJ Mezclador en Vivo -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">07 / Pilar 6: CloudDJ Mezclador</span>
+          <a href="#api-dj-architecture" class="docs-sidebar-session" data-target="api-dj-architecture">
+            <span class="session-badge">D.01</span> Motor Web Audio &amp; DJ
+          </a>
+        </div>
+
+        <!-- Grupo 8: Consola Interactiva -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">08 / Pruebas en Vivo</span>
           <a href="#api-live-console" class="docs-sidebar-session" data-target="api-live-console">
             <span class="session-badge">P.01</span> Consola Interactiva
           </a>
@@ -1006,6 +1028,110 @@
       </section>
 
       <!-- SECCIÓN 06: CONSOLA INTERACTIVA EN VIVO -->
+      
+      <!-- ========================================== -->
+      <!-- GRUPO 06: ENDPOINTS PILAR 5 - SEPARADOR DE VOZ -->
+      <!-- ========================================== -->
+      <section id="api-post-separator-process" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ S.01 // SEPARATOR_PROCESS ]</span>
+          <h2>POST /api/separator/process</h2>
+          <p>Separa la voz de la pista instrumental a partir de una URL o un archivo codificado en Base64.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <span class="badge" style="background: #ffffff; color: #000000; font-weight: 700;">POST</span>
+            <code style="font-size: 0.95rem; color: #ffffff;">https://cloudtranslator.onrender.com/api/separator/process</code>
+          </div>
+          <p style="margin-bottom: 14px;"><strong>Encabezados:</strong> <code>Content-Type: application/json</code></p>
+
+          <h4 style="color: #ffffff; font-size: 0.9rem; margin-bottom: 6px;">Cuerpo de la Petición (JSON):</h4>
+          <pre class="code-panel">{
+  "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+  "quality": "lossless"
+}</pre>
+
+          <h4 style="color: #ffffff; font-size: 0.9rem; margin-top: 14px; margin-bottom: 6px;">Respuesta Exitosa (200 OK):</h4>
+          <pre class="code-panel">{
+  "status": "success",
+  "id": "sep_1713589200_a1b2c",
+  "title": "Canción Analizada",
+  "duration": 214,
+  "engine": "Demucs v4 Neural AI (Zero-Bleed)",
+  "vocalsStreamUrl": "/api/separator/stream?id=sep_1713589200_a1b2c&type=vocals",
+  "instrumentalStreamUrl": "/api/separator/stream?id=sep_1713589200_a1b2c&type=instrumental",
+  "vocalsDownloadUrl": "/api/separator/download?id=sep_1713589200_a1b2c&type=vocals",
+  "instrumentalDownloadUrl": "/api/separator/download?id=sep_1713589200_a1b2c&type=instrumental"
+}</pre>
+        </article>
+      </section>
+
+      <section id="api-get-separator-stream" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ S.02 // SEPARATOR_STREAM ]</span>
+          <h2>GET /api/separator/stream</h2>
+          <p>Transmite en streaming con rango HTTP 206 la pista vocal o instrumental aislada.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <span class="badge" style="background: #ffffff; color: #000000; font-weight: 700;">GET</span>
+            <code style="font-size: 0.95rem; color: #ffffff;">https://cloudtranslator.onrender.com/api/separator/stream?id=[ID]&amp;type=[vocals|instrumental]</code>
+          </div>
+          <p><strong>Parámetros de consulta (Query Params):</strong></p>
+          <ul style="color: var(--text-secondary); padding-left: 20px; line-height: 1.8;">
+            <li><code>id</code> (requerido): Identificador del proceso devuelto por <code>/api/separator/process</code>.</li>
+            <li><code>type</code> (requerido): <code>vocals</code> para voz pura o <code>instrumental</code> para pista instrumental.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section id="api-get-separator-download" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ S.03 // SEPARATOR_DOWNLOAD ]</span>
+          <h2>GET /api/separator/download</h2>
+          <p>Descarga directa del stem en formato MP3 puro con metadatos y encabezado de archivo adjunto.</p>
+        </div>
+
+        <article class="content-box-card">
+          <div class="code-box-header">
+            <span>Comando cURL (GET /api/separator/download)</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-sep-dl')">Copiar cURL</button>
+          </div>
+          <pre class="code-panel" id="curl-get-sep-dl">curl -L -O "https://cloudtranslator.onrender.com/api/separator/download?id=sep_1713589200_a1b2c&type=vocals"</pre>
+        </article>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- GRUPO 07: ENDPOINTS PILAR 6 - CLOUDDJ -->
+      <!-- ========================================== -->
+      <section id="api-dj-architecture" class="docs-section">
+        <div class="section-full-title">
+          <span class="tech-card-tag">[ D.01 // DJ_INTEGRATION ]</span>
+          <h2>Motor Web Audio &amp; Ingesta para CloudDJ</h2>
+          <p>Especificación de ruteo y preparación de pistas para la consola de mezcla dual y cola secuencial.</p>
+        </div>
+
+        <article class="content-box-card">
+          <p style="margin-bottom: 14px;">
+            Las pistas del CloudDJ se preparan utilizando <code>POST /api/media/convert</code> con formato MP3 y 320 kbps. El reproductor utiliza streaming HTTP 206 y nodos Web Audio API con ecualización de 3 bandas paramétricas (Low, Mid, High), control de crossfader de energía constante y scratch en tiempo real.
+          </p>
+
+          <div class="code-box-header">
+            <span>Petición cURL para precargar pista en consola DJ</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-dj-track-prep')">Copiar</button>
+          </div>
+          <pre class="code-panel" id="curl-dj-track-prep">curl -X POST https://cloudtranslator.onrender.com/api/media/convert \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+    "format": "mp3",
+    "quality": "320k"
+  }'</pre>
+        </article>
+      </section>
+
       <section id="api-live-console" class="docs-section">
         <div class="section-full-title">
           <span class="tech-card-tag">[ P.01 // API_PLAYGROUND ]</span>
@@ -1056,57 +1182,7 @@
   </div>
 
   <!-- Pie de Página Aliniado y Estructurado -->
-  <footer>
-    <div class="footer-inner-full">
-      <!-- Columna 1: Brand & Misión -->
-      <div class="footer-col footer-col-brand">
-        <h4>
-          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="22" height="22">
-          CloudTranslator
-        </h4>
-        <p>Ecosistema cloud de procesamiento lingüístico y multimedia de alto rendimiento: traducción neuronal distribuida (+200 idiomas), Texto a Voz (TTS), Clonación de Voz por IA y Conversor Universal MP3/MP4.</p>
-        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
-          Microservicio libre en Render • <span class="badge badge-online">ONLINE</span>
-        </p>
-      </div>
-
-      <!-- Columna 2: Pilares y Servicios -->
-      <div class="footer-col">
-        <h4>Servicios</h4>
-        <ul>
-          <li><a href="/translator">Traductor en la Nube</a></li>
-          <li><a href="/tts">Texto a Voz (TTS)</a></li>
-          <li><a href="/voice-clone">Clonación de Voz IA</a></li>
-          <li><a href="/converter">Conversor MP3 / MP4</a></li>
-        </ul>
-      </div>
-
-      <!-- Columna 3: Recursos y Herramientas -->
-      <div class="footer-col">
-        <h4>Recursos</h4>
-        <ul>
-          <li><a href="/api" class="active">API REST</a></li>
-          <li><a href="/learn">Guías de Integración</a></li>
-          <li><a href="/help">Centro de Ayuda</a></li>
-        </ul>
-      </div>
-
-      <!-- Columna 4: Información Legal -->
-      <div class="footer-col">
-        <h4>Información Legal</h4>
-        <ul>
-          <li><a href="/terms">Términos del Servicio</a></li>
-          <li><a href="/privacy">Política de Privacidad</a></li>
-          <li><a href="/security">Seguridad y Cookies</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="footer-bottom-full">
-      <span>© 2026 CloudTranslator. Todos los derechos reservados.</span>
-      <span>Desarrollado por Miguel Angel Carlos Rojas</span>
-    </div>
-  </footer>
+  <footer id="footer-placeholder" data-component="footer" data-active="api"></footer>
 
   <script src="/js/cloud-translator.js"></script>
   <script>

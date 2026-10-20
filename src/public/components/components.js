@@ -350,27 +350,63 @@
     },
 
     /**
+     * Renderiza encabezados si están vacíos o requieren actualización
+     */
+    renderHeaders() {
+      const headerContainers = document.querySelectorAll("[data-component='header'], #header-placeholder");
+      headerContainers.forEach(container => {
+        if (!container.innerHTML.trim() || !container.querySelector(".header-inner-full")) {
+          const activeNav = container.getAttribute("data-active") || "home";
+          container.innerHTML = this.getHeaderHTML(activeNav);
+          container.className = "header-full no-translate";
+          container.setAttribute("data-no-translate", "");
+        }
+      });
+    },
+
+    /**
+     * Renderiza pies de página si están vacíos o requieren actualización
+     */
+    renderFooters() {
+      const footerContainers = document.querySelectorAll("[data-component='footer'], #footer-placeholder, footer.main-footer[data-component='footer']");
+      footerContainers.forEach(container => {
+        if (!container.innerHTML.trim() || !container.querySelector(".footer-inner-full")) {
+          const activePage = container.getAttribute("data-active") || "";
+          container.innerHTML = this.getFooterHTML(activePage);
+          container.className = "footer-full";
+        }
+      });
+    },
+
+    /**
+     * Observador de mutaciones para garantizar renderizado inmediato en SPAs y cambios dinámicos
+     */
+    initObserver() {
+      if (window._cloudComponentsObserver) return;
+      const target = document.body || document.documentElement;
+      if (!target) return;
+      const observer = new MutationObserver(() => {
+        const emptyFooter = document.querySelector("[data-component='footer']:empty, #footer-placeholder:empty");
+        const emptyHeader = document.querySelector("[data-component='header']:empty, #header-placeholder:empty");
+        if (emptyFooter || emptyHeader) {
+          this.renderHeaders();
+          this.renderFooters();
+        }
+      });
+      observer.observe(target, { childList: true, subtree: true });
+      window._cloudComponentsObserver = observer;
+    },
+
+    /**
      * Auto-inyecta encabezado, pie de página y decora controles si existen
      */
     init() {
-      const headerContainers = document.querySelectorAll("[data-component='header'], #header-placeholder");
-      headerContainers.forEach(container => {
-        const activeNav = container.getAttribute("data-active") || "home";
-        container.innerHTML = this.getHeaderHTML(activeNav);
-        container.className = "header-full no-translate";
-        container.setAttribute("data-no-translate", "");
-      });
-
-      const footerContainers = document.querySelectorAll("[data-component='footer'], #footer-placeholder, footer.main-footer[data-component='footer']");
-      footerContainers.forEach(container => {
-        const activePage = container.getAttribute("data-active") || "";
-        container.innerHTML = this.getFooterHTML(activePage);
-        container.className = "footer-full";
-      });
-
+      this.renderHeaders();
+      this.renderFooters();
       this.decorateSelects();
       this.initDrawerEvents();
       this.initQrModalEvents();
+      this.initObserver();
     }
   };
 
