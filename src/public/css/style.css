@@ -1066,19 +1066,20 @@ body.ct-translating {
   margin: 0;
   position: relative;
   align-items: stretch;
-  min-height: calc(100vh - 64px);
+  height: calc(100vh - 64px);
+  max-height: calc(100vh - 64px);
+  overflow: hidden;
 }
 
-/* Barra Lateral Sticky (Desktop) */
+/* Barra Lateral Fija (Desktop) */
 .docs-sidebar {
   width: 360px;
   min-width: 360px;
   max-width: 380px;
   flex-shrink: 0;
-  position: sticky;
-  top: 64px;
-  height: calc(100vh - 64px);
-  min-height: calc(100vh - 64px);
+  position: relative;
+  top: 0;
+  height: 100%;
   overflow-y: auto;
   border-right: 1px solid var(--border-subtle);
   background: rgba(6, 9, 18, 0.98);
@@ -1272,13 +1273,30 @@ body.ct-translating {
   color: var(--primary);
 }
 
-/* Contenido Principal de Documentación (Libre de Desplazamiento Bloqueado) */
+/* Contenido Principal de Documentación (Panel Fijo con Scroll Independiente) */
 .docs-main-content {
   flex: 1;
   min-width: 0;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: clamp(28px, 4vw, 52px) clamp(24px, 5vw, 68px);
   width: 100%;
-  max-width: 1440px;
+  max-width: 100%;
+  scroll-behavior: smooth;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.docs-main-content::-webkit-scrollbar {
+  width: 6px;
+}
+.docs-main-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+.docs-main-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.4);
 }
 
 .docs-section {

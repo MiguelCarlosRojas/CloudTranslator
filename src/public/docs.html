@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Documentación Técnica de CloudTranslator | Guías completas de integración de API REST, Texto a Voz (TTS), Clonación de Voz con IA y persistencia en cookies.">
+  <meta name="description" content="Documentación Técnica de Ingeniería de CloudTranslator v2.5.0 | Arquitectura de los 6 Pilares: Traducción Neural por Lotes, Texto a Voz (TTS), Clonación de Voz IA, Conversor Multimedia, Separador de Voz Demucs v4 y CloudDJ Mezclador.">
   <meta property="og:title" content="Documentación Técnica - CloudTranslator">
-  <meta property="og:description" content="Especificación técnica de endpoints, microservicio de traducción, TTS y clonación de voz en CloudTranslator.">
-  <title>Documentación API REST y Conexión al Sistema - CloudTranslator</title>
+  <meta property="og:description" content="Especificación de arquitectura, algoritmos acústicos, flujo DOM y manual de integración de CloudTranslator v2.5.0.">
+  <title>Documentación Técnica - CloudTranslator</title>
   <link rel="icon" type="image/png" sizes="192x192" href="/img/logo.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/img/logo.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/img/logo.png">
@@ -40,7 +40,7 @@
         </ul>
       </nav>
 
-      <!-- Barra de Herramientas de Traducción Activa (Protegida contra corrupción visual) -->
+      <!-- Barra de Herramientas de Traducción Activa -->
       <div class="toolbar-controls no-translate" data-no-translate>
         <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
           <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
@@ -89,7 +89,7 @@
     <!-- Backdrop para Barra Lateral -->
     <div id="drawer-backdrop"></div>
 
-    <!-- Barra de Navegación Lateral Móvil (Lateral Sliding Sidebar) -->
+    <!-- Barra de Navegación Lateral Móvil -->
     <aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
       <div class="drawer-header">
         <a href="/" class="drawer-brand">
@@ -113,39 +113,14 @@
         <div class="drawer-section">
           <span class="drawer-title">LOS 6 PILARES</span>
           <ul class="drawer-menu">
-            <li><a href="/translator"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traductor en la Nube</a></li>
-            <li><a href="/tts"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS)</a></li>
-            <li><a href="/voice-clone"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz (IA)</a></li>
-            <li><a href="/converter"><svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="8" cy="12" r="2"/></svg> Conversor Multimedia (MP3 / MP4)</a></li>
+            <li><a href="/translator"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traductor en la Nube (Pilar 01)</a></li>
+            <li><a href="/tts"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS) (Pilar 02)</a></li>
+            <li><a href="/voice-clone"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz IA (Pilar 03)</a></li>
+            <li><a href="/converter"><svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="8" cy="12" r="2"/></svg> Conversor Multimedia (Pilar 04)</a></li>
             <li><a href="/vocal-remover"><svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Separador de Voz (Pilar 05)</a></li>
             <li><a href="/dj"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg> CloudDJ Mezclador (Pilar 06)</a></li>
             <li><a href="/donate"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
           </ul>
-        </div>
-
-        <div class="drawer-section">
-          <span class="drawer-title">CENTRO DE TRADUCCIÓN</span>
-          <div class="drawer-toolbar">
-            <button class="btn btn-english w-full" onclick="window.translator && window.translator.translateToEnglish()">
-              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traducir a English
-            </button>
-            <div class="drawer-select-group">
-              <select class="drawer-select" onchange="if(window.translator){ if(this.value==='es') window.translator.restoreOriginal(); else window.translator.translatePage(this.value); }">
-                <option value="es">Español (es) - Original</option>
-                <option value="en">English (en)</option>
-                <option value="fr">Français (fr)</option>
-                <option value="de">Deutsch (de)</option>
-                <option value="it">Italiano (it)</option>
-                <option value="pt">Portugués (pt)</option>
-                <option value="ja">日本語 (ja)</option>
-                <option value="zh-CN">中文 (zh-CN)</option>
-                <option value="ru">Русский (ru)</option>
-              </select>
-            </div>
-            <button class="btn btn-outline w-full" onclick="window.translator && window.translator.restoreOriginal()">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg> Restaurar Original
-            </button>
-          </div>
         </div>
       </div>
 
@@ -156,1104 +131,613 @@
     </aside>
   </header>
 
-  <!-- CONTENEDOR DE DOS COLUMNAS CON BARRA LATERAL (SIDEBAR CON SESIONES Y SUBSESIONES) -->
+  <!-- CONTENEDOR DE DOS COLUMNAS (SIDEBAR FIJO + PANEL DE CONTENIDO FIJO CON SCROLL INDEPENDIENTE) -->
   <div class="docs-layout-container">
 
-    <!-- BARRA DE NAVEGACIÓN LATERAL (SIDEBAR) -->
-    <aside class="docs-sidebar" id="docs-sidebar" aria-label="Navegación lateral de sesiones y subsesiones">
+    <!-- BARRA LATERAL FIJA DE NAVEGACIÓN -->
+    <aside class="docs-sidebar" id="docs-sidebar" aria-label="Navegación lateral de documentación">
       <div class="docs-sidebar-header">
-        <span class="docs-sidebar-tag">[ SESSIONS &amp; SUBSESSIONS ]</span>
-        <h3 class="docs-sidebar-title">Índice del Sistema</h3>
+        <span class="docs-sidebar-tag">[ ARCHITECTURE &amp; SPECS ]</span>
+        <h3 class="docs-sidebar-title">Índice Técnico</h3>
       </div>
 
       <nav class="docs-sidebar-nav">
         
         <!-- Sesión 01 -->
         <div class="docs-sidebar-group">
-          <span class="docs-group-label">01 / Inicio &amp; Configuración</span>
-          <a href="#session-overview" class="docs-sidebar-session active" data-target="session-overview">
-            <span class="session-badge">S.01</span> Overview &amp; Endpoint
+          <span class="docs-group-label">01 / Arquitectura Global</span>
+          <a href="#session-architecture" class="docs-sidebar-session active" data-target="session-architecture">
+            <span class="session-badge">S.01</span> Visión General &amp; Filosofía
           </a>
           <div class="docs-sidebar-subsessions">
-            <a href="#sub-canonical-url" class="docs-sidebar-sublink" data-target="sub-canonical-url">
-              <span class="sub-num">1.1</span> URL Canónica
+            <a href="#sub-consolidated-query" class="docs-sidebar-sublink" data-target="sub-consolidated-query">
+              <span class="sub-num">1.1</span> Principio de 1 Sola Consulta
             </a>
-            <a href="#sub-network-rules" class="docs-sidebar-sublink" data-target="sub-network-rules">
-              <span class="sub-num">1.2</span> Regla de Red &amp; CORS
+            <a href="#sub-cookie-persistence" class="docs-sidebar-sublink" data-target="sub-cookie-persistence">
+              <span class="sub-num">1.2</span> Persistencia en Cookies 365D
+            </a>
+            <a href="#sub-lru-cache" class="docs-sidebar-sublink" data-target="sub-lru-cache">
+              <span class="sub-num">1.3</span> Doble Caché LRU (0ms RAM)
             </a>
           </div>
         </div>
 
         <!-- Sesión 02 -->
         <div class="docs-sidebar-group">
-          <span class="docs-group-label">02 / Conexión Frontend</span>
-          <a href="#session-frontend" class="docs-sidebar-session" data-target="session-frontend">
-            <span class="session-badge">S.02</span> Integración Frontend
+          <span class="docs-group-label">02 / Pilar 1: Traductor en la Nube</span>
+          <a href="#session-pilar-1" class="docs-sidebar-session" data-target="session-pilar-1">
+            <span class="session-badge">S.02</span> DOM Tree &amp; Batching
           </a>
           <div class="docs-sidebar-subsessions">
-            <a href="#sub-frontend-html" class="docs-sidebar-sublink" data-target="sub-frontend-html">
-              <span class="sub-num">2.1</span> Estructura HTML
+            <a href="#sub-p1-dom-traversal" class="docs-sidebar-sublink" data-target="sub-p1-dom-traversal">
+              <span class="sub-num">2.1</span> Extracción Recursiva de Nodos
             </a>
-            <a href="#sub-frontend-js" class="docs-sidebar-sublink" data-target="sub-frontend-js">
-              <span class="sub-num">2.2</span> Script JS 1 Petición
+            <a href="#sub-p1-exclusion" class="docs-sidebar-sublink" data-target="sub-p1-exclusion">
+              <span class="sub-num">2.2</span> Protección data-no-translate
+            </a>
+            <a href="#sub-p1-reinsertion" class="docs-sidebar-sublink" data-target="sub-p1-reinsertion">
+              <span class="sub-num">2.3</span> Re-inyección Segura del DOM
             </a>
           </div>
         </div>
 
         <!-- Sesión 03 -->
         <div class="docs-sidebar-group">
-          <span class="docs-group-label">03 / Conexión Backend</span>
-          <a href="#session-backend" class="docs-sidebar-session" data-target="session-backend">
-            <span class="session-badge">S.03</span> Servidor a Servidor
+          <span class="docs-group-label">03 / Pilar 2: Texto a Voz (TTS)</span>
+          <a href="#session-pilar-2" class="docs-sidebar-session" data-target="session-pilar-2">
+            <span class="session-badge">S.03</span> Prosodia &amp; Audio Streaming
           </a>
           <div class="docs-sidebar-subsessions">
-            <a href="#sub-backend-node" class="docs-sidebar-sublink" data-target="sub-backend-node">
-              <span class="sub-num">3.1</span> Node.js / Express
+            <a href="#sub-p2-hybrid-engine" class="docs-sidebar-sublink" data-target="sub-p2-hybrid-engine">
+              <span class="sub-num">3.1</span> Arquitectura Híbrida Web/Backend
             </a>
-            <a href="#sub-backend-python" class="docs-sidebar-sublink" data-target="sub-backend-python">
-              <span class="sub-num">3.2</span> Python Requests
+            <a href="#sub-p2-prosody-model" class="docs-sidebar-sublink" data-target="sub-p2-prosody-model">
+              <span class="sub-num">3.2</span> Modulación F0 y Formantes F1-F4
             </a>
-            <a href="#sub-backend-php" class="docs-sidebar-sublink" data-target="sub-backend-php">
-              <span class="sub-num">3.3</span> PHP cURL
+            <a href="#sub-p2-voices-catalog" class="docs-sidebar-sublink" data-target="sub-p2-voices-catalog">
+              <span class="sub-num">3.3</span> Catálogo de 24 Voces Acústicas
+            </a>
+            <a href="#sub-p2-http206" class="docs-sidebar-sublink" data-target="sub-p2-http206">
+              <span class="sub-num">3.4</span> Streaming HTTP 206 Chunks
             </a>
           </div>
         </div>
 
         <!-- Sesión 04 -->
         <div class="docs-sidebar-group">
-          <span class="docs-group-label">04 / Rendimiento &amp; Cookies</span>
-          <a href="#session-cookies" class="docs-sidebar-session" data-target="session-cookies">
-            <span class="session-badge">S.04</span> Cookies &amp; Render
+          <span class="docs-group-label">04 / Pilar 3: Clonación Vocal IA</span>
+          <a href="#session-pilar-3" class="docs-sidebar-session" data-target="session-pilar-3">
+            <span class="session-badge">S.04</span> Biometría Acústica [ALPHA]
           </a>
           <div class="docs-sidebar-subsessions">
-            <a href="#sub-cookies-spec" class="docs-sidebar-sublink" data-target="sub-cookies-spec">
-              <span class="sub-num">4.1</span> Cookie Técnica
+            <a href="#sub-p3-spectral-f0" class="docs-sidebar-sublink" data-target="sub-p3-spectral-f0">
+              <span class="sub-num">4.1</span> Detección Espectral F0 y ZCR
             </a>
-            <a href="#sub-render-coldstart" class="docs-sidebar-sublink" data-target="sub-render-coldstart">
-              <span class="sub-num">4.2</span> Arranque en Frío
+            <a href="#sub-p3-timbre-mapping" class="docs-sidebar-sublink" data-target="sub-p3-timbre-mapping">
+              <span class="sub-num">4.2</span> Huella Vocal y Pitch Shifting
+            </a>
+            <a href="#sub-p3-alpha-status" class="docs-sidebar-sublink" data-target="sub-p3-alpha-status">
+              <span class="sub-num">4.3</span> Alcance Autónomo sin APIs
             </a>
           </div>
         </div>
 
-        <!-- Sesión 05: Pilar 2 - Texto a Voz (TTS) -->
+        <!-- Sesión 05 -->
         <div class="docs-sidebar-group">
-          <span class="docs-group-label">05 / Pilar 2: Texto a Voz (TTS)</span>
-          <a href="#session-tts" class="docs-sidebar-session" data-target="session-tts">
-            <span class="session-badge">S.05</span> Integración TTS
+          <span class="docs-group-label">05 / Pilar 4: Conversor Multimedia</span>
+          <a href="#session-pilar-4" class="docs-sidebar-session" data-target="session-pilar-4">
+            <span class="session-badge">S.05</span> Transcoder &amp; Streams
           </a>
           <div class="docs-sidebar-subsessions">
-            <a href="#sub-tts-voices" class="docs-sidebar-sublink" data-target="sub-tts-voices">
-              <span class="sub-num">5.1</span> Catálogo de Voces
+            <a href="#sub-p4-ingest-pipeline" class="docs-sidebar-sublink" data-target="sub-p4-ingest-pipeline">
+              <span class="sub-num">5.1</span> Normalización Multiplataforma
             </a>
-            <a href="#sub-tts-generate" class="docs-sidebar-sublink" data-target="sub-tts-generate">
-              <span class="sub-num">5.2</span> Generación de Audio
+            <a href="#sub-p4-transcode-engine" class="docs-sidebar-sublink" data-target="sub-p4-transcode-engine">
+              <span class="sub-num">5.2</span> Transcodificación MP3/MP4
+            </a>
+            <a href="#sub-p4-ttl-proxy" class="docs-sidebar-sublink" data-target="sub-p4-ttl-proxy">
+              <span class="sub-num">5.3</span> Proxy de Miniaturas &amp; TTL 30m
             </a>
           </div>
         </div>
 
-        <!-- Sesión 06: Pilar 3 - Clonación de Voz (IA) -->
+        <!-- Sesión 06 -->
         <div class="docs-sidebar-group">
-          <span class="docs-group-label">06 / Pilar 3: Clonación IA</span>
-          <a href="#session-voice-clone" class="docs-sidebar-session" data-target="session-voice-clone">
-            <span class="session-badge">S.06</span> Clonación Neuronal
+          <span class="docs-group-label">06 / Pilar 5: Separador de Voz</span>
+          <a href="#session-pilar-6" class="docs-sidebar-session" data-target="session-pilar-6">
+            <span class="session-badge">S.06</span> Demucs v4 AI Stems
           </a>
           <div class="docs-sidebar-subsessions">
-            <a href="#sub-clone-sample" class="docs-sidebar-sublink" data-target="sub-clone-sample">
-              <span class="sub-num">6.1</span> Muestra &amp; F0
+            <a href="#sub-p5-neural-demucs" class="docs-sidebar-sublink" data-target="sub-p5-neural-demucs">
+              <span class="sub-num">6.1</span> Red Neuronal U-Net &amp; -48dB
             </a>
-            <a href="#sub-clone-synthesize" class="docs-sidebar-sublink" data-target="sub-clone-synthesize">
-              <span class="sub-num">6.2</span> Síntesis con IA
+            <a href="#sub-p5-dual-stem-player" class="docs-sidebar-sublink" data-target="sub-p5-dual-stem-player">
+              <span class="sub-num">6.2</span> Reproductor Dual en Fase
             </a>
           </div>
         </div>
 
-        <!-- Sesión 07: Pilar 4 - Conversor Multimedia (MP3 / MP4) -->
+        <!-- Sesión 07 -->
         <div class="docs-sidebar-group">
-          <span class="docs-group-label">07 / Pilar 4: Conversor Multimedia</span>
-          <a href="#session-media-converter" class="docs-sidebar-session" data-target="session-media-converter">
-            <span class="session-badge">S.07</span> Conversor MP3 / MP4
+          <span class="docs-group-label">07 / Pilar 6: CloudDJ Mezclador</span>
+          <a href="#session-pilar-7" class="docs-sidebar-session" data-target="session-pilar-7">
+            <span class="session-badge">S.07</span> Web Audio Graph &amp; DJ
           </a>
           <div class="docs-sidebar-subsessions">
-            <a href="#sub-media-platforms" class="docs-sidebar-sublink" data-target="sub-media-platforms">
-              <span class="sub-num">7.1</span> Plataformas &amp; Metadatos
+            <a href="#sub-p6-audio-graph" class="docs-sidebar-sublink" data-target="sub-p6-audio-graph">
+              <span class="sub-num">7.1</span> Grafo de Nodos Deck A/B &amp; EQ
             </a>
-            <a href="#sub-media-convert" class="docs-sidebar-sublink" data-target="sub-media-convert">
-              <span class="sub-num">7.2</span> Conversión &amp; Descarga
+            <a href="#sub-p6-crossfader" class="docs-sidebar-sublink" data-target="sub-p6-crossfader">
+              <span class="sub-num">7.2</span> Curva de Potencia Constante
             </a>
           </div>
         </div>
 
-        <!-- Sesión 08: Pilar 5 - Separador de Voz e Instrumental -->
+        <!-- Sesión 08 -->
         <div class="docs-sidebar-group">
-          <span class="docs-group-label">08 / Pilar 5: Separador de Voz</span>
-          <a href="#session-vocal-separator" class="docs-sidebar-session" data-target="session-vocal-separator">
-            <span class="session-badge">S.08</span> Separación AI &amp; Stems
+          <span class="docs-group-label">08 / SDK Frontend</span>
+          <a href="#session-sdk" class="docs-sidebar-session" data-target="session-sdk">
+            <span class="session-badge">S.08</span> Integración en Aplicaciones
           </a>
           <div class="docs-sidebar-subsessions">
-            <a href="#sub-separator-process" class="docs-sidebar-sublink" data-target="sub-separator-process">
-              <span class="sub-num">8.1</span> Ingesta y Demucs v4
+            <a href="#sub-sdk-vanilla" class="docs-sidebar-sublink" data-target="sub-sdk-vanilla">
+              <span class="sub-num">8.1</span> HTML / Vanilla JS
             </a>
-            <a href="#sub-separator-stream" class="docs-sidebar-sublink" data-target="sub-separator-stream">
-              <span class="sub-num">8.2</span> Streaming &amp; Descarga
-            </a>
-          </div>
-        </div>
-
-        <!-- Sesión 09: Pilar 6 - CloudDJ Mezclador en Vivo -->
-        <div class="docs-sidebar-group">
-          <span class="docs-group-label">09 / Pilar 6: CloudDJ Mezclador</span>
-          <a href="#session-clouddj" class="docs-sidebar-session" data-target="session-clouddj">
-            <span class="session-badge">S.09</span> Mezcla &amp; Web Audio
-          </a>
-          <div class="docs-sidebar-subsessions">
-            <a href="#sub-dj-audio-engine" class="docs-sidebar-sublink" data-target="sub-dj-audio-engine">
-              <span class="sub-num">9.1</span> Motor Web Audio &amp; EQ
-            </a>
-            <a href="#sub-dj-queue" class="docs-sidebar-sublink" data-target="sub-dj-queue">
-              <span class="sub-num">9.2</span> Cola &amp; Carga de Tracks
+            <a href="#sub-sdk-frameworks" class="docs-sidebar-sublink" data-target="sub-sdk-frameworks">
+              <span class="sub-num">8.2</span> React, Vue &amp; Next.js
             </a>
           </div>
         </div>
 
         <!-- Enlace a Referencia de API -->
         <div class="docs-sidebar-group" style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border-line);">
-          <span class="docs-group-label">Especificación Técnica</span>
+          <span class="docs-group-label">Contratos REST</span>
           <a href="/api" class="docs-sidebar-session" style="color: #ffffff;">
-            <span class="session-badge" style="background: #ffffff; color: #000000;">API</span> Ver Endpoints REST &rarr;
+            <span class="session-badge" style="background: var(--primary); color: #000000; font-weight: 800;">API</span> Ver Referencia API REST &rarr;
           </a>
         </div>
 
       </nav>
     </aside>
 
-    <!-- ÁREA PRINCIPAL DE CONTENIDO DE LA DOCUMENTACIÓN -->
-    <main class="docs-main-content">
+    <!-- ÁREA PRINCIPAL FIJA CON SCROLL INDEPENDIENTE -->
+    <main class="docs-main-content" id="docs-content-scroll">
     
-      <!-- Encabezado de la Documentación (Alineación Idéntica a API) -->
+      <!-- Encabezado de la Documentación Técnica -->
       <section class="docs-section" style="padding-top: 10px;">
-        <span class="hero-tag-glow">[ GUÍA DE INTEGRACIÓN Y DOCUMENTACIÓN TÉCNICA ]</span>
+        <span class="hero-tag-glow">[ ARCHITECTURE MANUAL // 6 PILARES DE CLOUDTRANSLATOR ]</span>
         <h1 style="font-size: clamp(1.8rem, 3.2vw, 2.5rem); margin: 12px 0 16px 0; color: #ffffff;">
-          Guía de Conexión al Endpoint y Documentación Técnica
+          Manual de Ingeniería y Arquitectura de Sistemas
         </h1>
         <p class="lead">
-          Aprende a conectar cualquier sistema externo (React, Vue, frontend HTML/JS, Node.js, Python o PHP) con el microservicio en la nube <strong>https://cloudtranslator.onrender.com</strong>, integrando los 3 ecosistemas: Traducción en 1 sola consulta HTTP, Texto a Voz (TTS) y Clonación de Voz con IA.
+          Guía técnica exhaustiva sobre los <strong>6 pilares tecnológicos</strong> de CloudTranslator v2.5.0: principios algorítmicos, procesamiento acústico en tiempo real, manipulación recursiva del DOM, transcodificación multimedia y grafos Web Audio API.
         </p>
+        <div style="background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.25); border-radius: var(--radius-md); padding: 14px 18px; margin-top: 18px; font-size: 0.88rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+          <span>¿Buscas los parámetros exactos JSON, cabeceras HTTP y consolas de prueba cURL de los endpoints?</span>
+          <a href="/api" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;">Ir a API REST Playground &rarr;</a>
+        </div>
       </section>
 
-      <!-- Índice Rápido para Móvil/Tablet -->
+      <!-- Índice Rápido Móvil -->
       <div class="docs-mobile-toc-bar">
         <button id="btn-toggle-docs-toc" class="btn btn-outline docs-toc-toggle-btn" aria-label="Abrir Índice de Temas">
-          <span><svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg> [ SESSIONS &amp; SUBSESSIONS ] Índice del Sistema</span>
-          <span class="toc-badge">S.01 — S.07</span>
+          <span><svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg> [ ÍNDICE RÁPIDO ] Temas de Ingeniería</span>
+          <span class="toc-badge">S.01 — S.08</span>
         </button>
-        <div id="docs-mobile-toc-content" class="docs-toc-dropdown" style="display: none; margin-top: 10px; background: rgba(15, 17, 24, 0.95); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 16px;">
+        <div id="docs-mobile-toc-content" class="docs-toc-dropdown" style="display: none; margin-top: 10px; background: rgba(15, 17, 24, 0.98); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 16px;">
           <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px;">
-            <li><a href="#session-overview" style="font-weight: 600;">S.01 // Overview y Endpoint</a></li>
-            <li><a href="#sub-canonical-url" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">1.1 URL Canónica</a></li>
-            <li><a href="#sub-network-rules" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">1.2 Regla de Red y CORS</a></li>
-            <li><a href="#session-frontend" style="font-weight: 600;">S.02 // Integración Frontend</a></li>
-            <li><a href="#sub-frontend-html" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">2.1 Estructura HTML</a></li>
-            <li><a href="#sub-frontend-js" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">2.2 Script JS Completo</a></li>
-            <li><a href="#session-backend" style="font-weight: 600;">S.03 // Conexión Backend</a></li>
-            <li><a href="#sub-backend-node" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">3.1 Node.js / Express</a></li>
-            <li><a href="#sub-backend-python" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">3.2 Python (requests)</a></li>
-            <li><a href="#sub-backend-php" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">3.3 PHP (cURL)</a></li>
-            <li><a href="#session-cookies" style="font-weight: 600;">S.04 // Cookies y Rendimiento</a></li>
-            <li><a href="#sub-cookies-spec" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">4.1 Cookie cloud_translator_lang</a></li>
-            <li><a href="#sub-render-coldstart" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">4.2 Render Cold Start</a></li>
-            <li><a href="#session-tts" style="font-weight: 600;">S.05 // Pilar 2: Texto a Voz (TTS)</a></li>
-            <li><a href="#sub-tts-voices" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">5.1 Catálogo de Voces</a></li>
-            <li><a href="#sub-tts-generate" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">5.2 Generación de Audio</a></li>
-            <li><a href="#session-voice-clone" style="font-weight: 600;">S.06 // Pilar 3: Clonación IA</a></li>
-            <li><a href="#sub-clone-sample" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">6.1 Muestra de Audio</a></li>
-            <li><a href="#sub-clone-synthesize" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">6.2 Síntesis con IA</a></li>
-            <li><a href="#session-media-converter" style="font-weight: 600;">S.07 // Pilar 4: Conversor Multimedia</a></li>
-            <li><a href="#sub-media-platforms" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">7.1 Plataformas y Metadatos</a></li>
-            <li><a href="#sub-media-convert" style="padding-left: 12px; font-size: 0.85rem; color: var(--text-muted);">7.2 Conversión y Descarga</a></li>
-            <li style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-line);"><a href="/api" style="font-weight: 700; color: var(--primary);">API // Ver Endpoints REST &rarr;</a></li>
+            <li><a href="#session-architecture" style="font-weight: 700; color: #fff;">S.01 // Arquitectura Global &amp; Filosofía</a></li>
+            <li><a href="#session-pilar-1" style="font-weight: 700; color: #fff;">S.02 // Pilar 1: Traductor en la Nube</a></li>
+            <li><a href="#session-pilar-2" style="font-weight: 700; color: #fff;">S.03 // Pilar 2: Texto a Voz (TTS)</a></li>
+            <li><a href="#session-pilar-3" style="font-weight: 700; color: #fff;">S.04 // Pilar 3: Clonación Vocal IA [ALPHA]</a></li>
+            <li><a href="#session-pilar-4" style="font-weight: 700; color: #fff;">S.05 // Pilar 4: Conversor Multimedia</a></li>
+            <li><a href="#session-pilar-6" style="font-weight: 700; color: #fff;">S.06 // Pilar 5: Separador de Voz e Instrumental</a></li>
+            <li><a href="#session-pilar-7" style="font-weight: 700; color: #fff;">S.07 // Pilar 6: CloudDJ Mezclador en Vivo</a></li>
+            <li><a href="#session-sdk" style="font-weight: 700; color: #fff;">S.08 // Integración Frontend SDK</a></li>
           </ul>
         </div>
       </div>
 
-      <!-- SESIÓN 1: OVERVIEW / INTRODUCCIÓN TÉCNICA -->
-      <section id="session-overview" class="docs-section">
+      <!-- ========================================================================= -->
+      <!-- SESIÓN 01: ARQUITECTURA GLOBAL & FILOSOFÍA                               -->
+      <!-- ========================================================================= -->
+      <section class="docs-section" id="session-architecture">
         <div class="section-full-title">
-          <span class="tech-card-tag">[ S.01 // OVERVIEW ]</span>
-          <h2>Visión General y Reglas de Conexión</h2>
-          <p>Condiciones y formatos requeridos para interactuar con la API REST.</p>
+          <span class="session-badge">SESIÓN 01</span>
+          <h2>Arquitectura Global y Filosofía de Diseño</h2>
+          <p>Principios fundamentales de CloudTranslator v2.5.0 como microservicio unificado de alto rendimiento.</p>
         </div>
 
-        <!-- Subsesión 1.1 -->
-        <article class="content-box-card docs-subsection" id="sub-canonical-url">
-          <span class="tech-card-tag">[ 1.1 // CANONICAL_ENDPOINT ]</span>
-          <h3>URL Canónica del Endpoint</h3>
+        <article class="docs-subsection" id="sub-consolidated-query">
+          <h3>1.1 El Principio de 1 Sola Consulta Consolidada</h3>
           <p>
-            Cualquier aplicación web o móvil debe apuntar sus consultas HTTP hacia la ruta canónica en Render:
+            Los traductores tradicionales envían cientos de peticiones HTTP individuales (una por cada párrafo o etiqueta <code>&lt;span&gt;</code>), colapsando el pool de conexiones del navegador, activando límites de tasa (rate limiting) y provocando bloqueos de interfaz o saltos visuales desagradables (layout shift).
           </p>
-          <div class="code-box-header">
-            <span>Endpoint de Traducción</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'url-endpoint')">Copiar</button>
-          </div>
-          <pre class="code-panel" id="url-endpoint">https://cloudtranslator.onrender.com/api/translate</pre>
+          <p>
+            CloudTranslator implementa el <strong>Algoritmo de Consolidación Atómica</strong>: el SDK frontend escanea la totalidad del DOM en una sola pasada sincrónica, recopila todos los segmentos de texto en un array ordenado, y despacha <strong>una única petición HTTP POST</strong> al microservicio. El servidor traduce el lote en paralelo y devuelve el array simétrico, reinyectándose en el DOM en un único ciclo de renderizado.
+          </p>
         </article>
 
-        <!-- Subsesión 1.2 -->
-        <article class="content-box-card docs-subsection" id="sub-network-rules">
-          <span class="tech-card-tag">[ 1.2 // NETWORK_RULES_CORS ]</span>
-          <h3>Regla de Red Obligatoria y CORS Universal</h3>
+        <article class="docs-subsection" id="sub-cookie-persistence">
+          <h3>1.2 Persistencia de Estado Técnica en Cookies HTTP (365 Días)</h3>
           <p>
-            El método siempre debe ser <code>POST</code> con cabecera <code>Content-Type: application/json</code>. Soporta CORS universal (<code>Access-Control-Allow-Origin: *</code>), por lo que puedes llamarlo directamente desde el navegador de tus usuarios sin proxies intermediarios.
+            A diferencia de Google Translate o widgets invasivos que insertan frames de terceros y pierden el estado al recargar, CloudTranslator almacena la selección del usuario en una cookie HTTP de primer nivel:
           </p>
-          <div class="callout">
-            <strong>Optimización Crítica:</strong> No envíes peticiones individuales por cada párrafo. Agrupa todos los textos en el arreglo <code>texts: [...]</code> para que el navegador solo haga <strong>1 sola llamada de red</strong>.
-          </div>
+          <pre><code>cloud_translator_lang=en; Path=/; Max-Age=31536000; SameSite=Lax</code></pre>
+          <p>
+            Esta cookie técnica permite que las visitas subsiguientes y las transiciones entre páginas mantengan el idioma elegido de forma automática, sin parpadeos de contenido original y con sincronización en navegaciones internas SPA.
+          </p>
+        </article>
+
+        <article class="docs-subsection" id="sub-lru-cache">
+          <h3>1.3 Sistema de Doble Caché LRU (0ms en Memoria RAM)</h3>
+          <p>
+            CloudTranslator implementa una jerarquía de caché de dos niveles:
+          </p>
+          <ol style="margin-left: 20px; line-height: 1.8; color: var(--text-secondary);">
+            <li><strong>Caché en Memoria del Servidor (LRU Cache):</strong> Almacena hasta 2,000 bloques de traducción recientes indexados por hash criptográfico del contenido y lenguaje destino. Las peticiones coincidentes responden en <strong>0ms de latencia de cómputo</strong>.</li>
+            <li><strong>Caché Local del Cliente (Map en Memoria JS):</strong> Previene transmisiones redundantes a través del socket si el usuario alterna entre idiomas repetidamente durante la misma sesión de navegación.</li>
+          </ol>
         </article>
       </section>
 
-      <!-- SESIÓN 2: CONEXIÓN FRONTEND (BOTÓN EN INGLÉS, SELECTOR DINÁMICO Y COOKIES) -->
-      <section id="session-frontend" class="docs-section" style="margin-bottom: 48px;">
+      <!-- ========================================================================= -->
+      <!-- SESIÓN 02: PILAR 1 - TRADUCTOR EN LA NUBE (DOM TREE ENGINE)              -->
+      <!-- ========================================================================= -->
+      <section class="docs-section" id="session-pilar-1">
         <div class="section-full-title">
-          <span class="tech-card-tag">[ S.02 // FRONTEND_INTEGRATION ]</span>
-          <h2>Integración en Frontend Web</h2>
-          <p>Integra el botón para traducir en segundo plano en 1 sola consulta sin spam en la pestaña Network.</p>
+          <span class="session-badge">SESIÓN 02</span>
+          <h2>Pilar 1: Traductor en la Nube (DOM Tree Engine)</h2>
+          <p>Mecanismos de aislamiento recursivo, preservación estructural y re-inyección en el árbol HTML.</p>
         </div>
 
-        <!-- Subsesión 2.1 -->
-        <article class="content-box-card docs-subsection" id="sub-frontend-html">
-          <span class="tech-card-tag">[ 2.1 // HTML_STRUCTURE ]</span>
-          <h3>Estructura HTML en tu Interfaz</h3>
+        <article class="docs-subsection" id="sub-p1-dom-traversal">
+          <h3>2.1 Extracción Recursiva de Nodos Textuales</h3>
           <p>
-            Inserta el botón directo en inglés y el selector con input de texto para códigos de idioma:
+            El motor recorre el subárbol DOM mediante un algoritmo de búsqueda en profundidad (DFS) inspeccionando los nodos con <code>nodeType === Node.TEXT_NODE</code> (tipo 3). Los nodos vacíos o compuestos únicamente por espacios en blanco (<code>/S/.test(node.nodeValue)</code>) son descartados para no desperdiciar ancho de banda.
           </p>
-          <div class="code-box-wrapper">
-            <div class="code-box-header">
-              <span>HTML en tu Proyecto</span>
-              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'html-integration')">Copiar</button>
-            </div>
-            <pre class="code-panel" id="html-integration">&lt;!-- 1. Botón directo para traducir toda la página a inglés --&gt;
-&lt;button id="btn-english"&gt;English&lt;/button&gt;
-
-&lt;!-- 2. Selector dinámico por carácter o código de idioma (es, fr, de, it, pt) --&gt;
-&lt;input type="text" id="lang-code" placeholder="cód." maxlength="5" style="width: 70px;"&gt;
-&lt;button id="btn-translate-lang"&gt;Traducir&lt;/button&gt;
-
-&lt;!-- 3. Botón para volver al idioma original --&gt;
-&lt;button id="btn-restore"&gt;Original&lt;/button&gt;
-
-&lt;!-- 4. Indicador de estado asíncrono en segundo plano --&gt;
-&lt;span id="status-indicator"&gt;Listo&lt;/span&gt;</pre>
-          </div>
         </article>
 
-        <!-- Subsesión 2.2 -->
-        <article class="content-box-card docs-subsection" id="sub-frontend-js">
-          <span class="tech-card-tag">[ 2.2 // JAVASCRIPT_SCRIPT ]</span>
-          <h3>Script JavaScript Completo de Integración</h3>
+        <article class="docs-subsection" id="sub-p1-exclusion">
+          <h3>2.2 Motor de Exclusión y Protección data-no-translate</h3>
           <p>
-            Copia y pega este script en tu sistema. Consolida los textos en <strong>1 sola petición HTTP</strong>, guarda la cookie <code>cloud_translator_lang</code> y recuerda el idioma al recargar la página:
+            Para garantizar que bloques de código, nombres propios o botones interactivos no sufran modificaciones accidentales, el motor ignora automáticamente:
           </p>
-
-          <div class="code-box-wrapper">
-            <div class="code-box-header">
-              <span>Script JavaScript (Listo para Producción)</span>
-              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'js-integration')">Copiar Código JS</button>
-            </div>
-            <pre class="code-panel" id="js-integration">// Configuración del Endpoint oficial de CloudTranslator
-const API_TRANSLATE_URL = "https://cloudtranslator.onrender.com/api/translate";
-
-// Mapas en memoria para restaurar y evitar consultas repetidas
-const originalDomTexts = new Map();
-const localCache = {}; // { 'en': { 'Hola': 'Hello' } }
-
-// Helper para cookies de 365 días
-function setLanguageCookie(lang) {
-  document.cookie = `cloud_translator_lang=${lang}; path=/; max-age=31536000; SameSite=Lax`;
-}
-
-function getLanguageCookie() {
-  const match = document.cookie.match(new RegExp('(^| )cloud_translator_lang=([^;]+)'));
-  return match ? match[2] : null;
-}
-
-// 1. Escanear textos visibles ignorando scripts, estilos e inputs
-function scanPageTexts() {
-  if (originalDomTexts.size > 0) return;
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
-    acceptNode: (node) => {
-      const parent = node.parentElement;
-      if (!parent) return NodeFilter.FILTER_REJECT;
-      const tag = parent.tagName.toLowerCase();
-      if (['script', 'style', 'noscript', 'textarea', 'code', 'pre'].includes(tag)) {
-        return NodeFilter.FILTER_REJECT;
-      }
-      return node.nodeValue.trim().length > 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
-    }
-  });
-
-  let currentNode;
-  while ((currentNode = walker.nextNode())) {
-    originalDomTexts.set(currentNode, currentNode.nodeValue);
-  }
-}
-
-// 2. Traduce toda la página en 1 SOLA petición HTTP en segundo plano
-async function translateSystemPage(targetLang) {
-  const statusEl = document.getElementById("status-indicator");
-  if (statusEl) statusEl.textContent = `Traduciendo (${targetLang.toUpperCase()})...`;
-
-  scanPageTexts();
-  setLanguageCookie(targetLang);
-
-  if (!localCache[targetLang]) localCache[targetLang] = {};
-
-  // Extraer cadenas únicas no cacheadas
-  const uniqueStrings = [];
-  originalDomTexts.forEach((originalText) => {
-    const trimmed = originalText.trim();
-    if (trimmed && !localCache[targetLang][trimmed] && !uniqueStrings.includes(trimmed)) {
-      uniqueStrings.push(trimmed);
-    }
-  });
-
-  // Si todas ya están en caché local, aplicar de inmediato (0ms de red)
-  if (uniqueStrings.length === 0) {
-    applyTranslationsFromCache(targetLang);
-    if (statusEl) statusEl.textContent = `Listo (${targetLang.toUpperCase()})`;
-    return;
-  }
-
-  try {
-    // 1 SOLA PETICIÓN HTTP con todos los textos consolidados
-    const response = await fetch(API_TRANSLATE_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        texts: uniqueStrings,
-        targetLanguage: targetLang
-      })
-    });
-
-    if (!response.ok) throw new Error("Error en el microservicio: HTTP " + response.status);
-
-    const data = await response.json();
-    const translatedList = data.translatedTexts || [];
-
-    // Guardar en la caché local
-    uniqueStrings.forEach((originalStr, index) => {
-      localCache[targetLang][originalStr] = translatedList[index] || originalStr;
-    });
-
-    // Reemplazar textos en el DOM
-    applyTranslationsFromCache(targetLang);
-    if (statusEl) statusEl.textContent = `Listo (${targetLang.toUpperCase()})`;
-  } catch (error) {
-    console.error("Fallo al conectar con CloudTranslator:", error);
-    if (statusEl) statusEl.textContent = "Error de conexión";
-  }
-}
-
-// 3. Aplicar textos reemplazando nodos sin romper la estructura HTML
-function applyTranslationsFromCache(targetLang) {
-  originalDomTexts.forEach((originalText, textNode) => {
-    const trimmed = originalText.trim();
-    const translated = localCache[targetLang] ? localCache[targetLang][trimmed] : null;
-    if (translated) {
-      textNode.nodeValue = originalText.replace(trimmed, translated);
-    }
-  });
-}
-
-// 4. Restaurar al idioma original de la página
-function restoreOriginalLanguage() {
-  originalDomTexts.forEach((originalText, textNode) => {
-    textNode.nodeValue = originalText;
-  });
-  setLanguageCookie("original");
-  const statusEl = document.getElementById("status-indicator");
-  if (statusEl) statusEl.textContent = "Original restaurado";
-}
-
-// 5. Asignación de Eventos y Carga Automática por Cookie
-document.addEventListener("DOMContentLoaded", () => {
-  // Botón directo a inglés
-  const btnEn = document.getElementById("btn-english");
-  if (btnEn) btnEn.addEventListener("click", () => translateSystemPage("en"));
-
-  // Botón con código dinámico
-  const btnCustom = document.getElementById("btn-translate-lang");
-  if (btnCustom) {
-    btnCustom.addEventListener("click", () => {
-      const code = (document.getElementById("lang-code").value || "").trim().toLowerCase();
-      if (code) translateSystemPage(code);
-    });
-  }
-
-  // Botón restaurar
-  const btnRestore = document.getElementById("btn-restore");
-  if (btnRestore) btnRestore.addEventListener("click", restoreOriginalLanguage);
-
-  // Auto-traducción en 0ms leyendo la Cookie al entrar o recargar
-  const savedLang = getLanguageCookie();
-  if (savedLang && savedLang !== "original") {
-    translateSystemPage(savedLang);
-  }
-});</pre>
-          </div>
-        </article>
-      </section>
-
-      <!-- SESIÓN 3: CONEXIÓN BACKEND (SERVIDOR A SERVIDOR) -->
-      <section id="session-backend" class="docs-section" style="margin-bottom: 48px;">
-        <div class="section-full-title">
-          <span class="tech-card-tag">[ S.03 // BACKEND_INTEGRATION ]</span>
-          <h2>Conexión Backend (Servidor a Servidor)</h2>
-          <p>Llama al microservicio desde tus controladores o servicios en Node.js, Python o PHP.</p>
-        </div>
-
-        <!-- Subsesión 3.1 -->
-        <article class="content-box-card docs-subsection" id="sub-backend-node">
-          <span class="tech-card-tag">[ 3.1 // BACKEND_NODEJS ]</span>
-          <h3>Conectar con Node.js / Express (Fetch o Axios)</h3>
-          <p>Envía un arreglo de textos a traducir directamente desde tu servidor Node.js:</p>
-          <div class="code-box-wrapper">
-            <div class="code-box-header">
-              <span>JavaScript (Node.js 18+)</span>
-              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'node-example')">Copiar</button>
-            </div>
-            <pre class="code-panel" id="node-example">async function traducirTextos(textosArray, idiomaDestino = "en") {
-  const url = "https://cloudtranslator.onrender.com/api/translate";
-  
-  const respuesta = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      texts: textosArray,
-      targetLanguage: idiomaDestino
-    })
-  });
-
-  if (!respuesta.ok) {
-    throw new Error(`Fallo HTTP: ${respuesta.status}`);
-  }
-
-  const datos = await respuesta.json();
-  return datos.translatedTexts; // Retorna array de strings traducidos
-}
-
-// Ejemplo de uso:
-traducirTextos(["Iniciar sesión", "Cerrar sesión"], "en")
-  .then(resultado => console.log(resultado)) // ["Log in", "Sign out"]
-  .catch(err => console.error(err));</pre>
-          </div>
-        </article>
-
-        <!-- Subsesión 3.2 -->
-        <article class="content-box-card docs-subsection" id="sub-backend-python">
-          <span class="tech-card-tag">[ 3.2 // BACKEND_PYTHON ]</span>
-          <h3>Conectar con Python (Requests / HTTPX)</h3>
-          <p>Integra CloudTranslator en scripts de Python, Django o FastAPI:</p>
-          <div class="code-box-wrapper">
-            <div class="code-box-header">
-              <span>Python 3 (requests)</span>
-              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'python-example')">Copiar</button>
-            </div>
-            <pre class="code-panel" id="python-example">import requests
-
-def traducir_textos(textos, target_lang="en"):
-    url = "https://cloudtranslator.onrender.com/api/translate"
-    payload = {
-        "texts": textos,
-        "targetLanguage": target_lang
-    }
-    
-    response = requests.post(url, json=payload, headers={"Content-Type": "application/json"})
-    response.raise_for_status()
-    
-    data = response.json()
-    return data.get("translatedTexts", [])
-
-# Ejemplo de uso:
-resultado = traducir_textos(["Panel de control", "Configuración de cuenta"], target_lang="en")
-print(resultado)  # ['Dashboard', 'Account Settings']</pre>
-          </div>
-        </article>
-
-        <!-- Subsesión 3.3 -->
-        <article class="content-box-card docs-subsection" id="sub-backend-php">
-          <span class="tech-card-tag">[ 3.3 // BACKEND_PHP ]</span>
-          <h3>Conectar con PHP (cURL nativo)</h3>
-          <p>Consúmelo en aplicaciones PHP tradicionales, Laravel o WordPress:</p>
-          <div class="code-box-wrapper">
-            <div class="code-box-header">
-              <span>PHP (cURL)</span>
-              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'php-example')">Copiar</button>
-            </div>
-            <pre class="code-panel" id="php-example">&lt;?php
-function traducirTextos(array $textos, string $idioma = "en"): array {
-    $url = "https://cloudtranslator.onrender.com/api/translate";
-    $payload = json_encode([
-        "texts" => $textos,
-        "targetLanguage" => $idioma
-    ]);
-
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "Content-Type: application/json"
-    ]);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($httpCode !== 200) {
-        throw new Exception("Error en CloudTranslator con código HTTP: " . $httpCode);
-    }
-
-    $data = json_decode($response, true);
-    return $data["translatedTexts"] ?? [];
-}
-
-// Ejemplo de uso:
-$traducciones = traducirTextos(["Bienvenido a nuestra tienda", "Ver catálogo"], "en");
-print_r($traducciones);
-?&gt;</pre>
-          </div>
-        </article>
-      </section>
-
-      <!-- REFERENCIA DE API DEDICADA (SIN DUPLICIDAD) -->
-      <section id="session-api-ref" class="docs-section" style="margin-bottom: 48px;">
-        <div class="section-full-title">
-          <span class="tech-card-tag">[ ESPECIFICACIÓN REST COMPLETA ]</span>
-          <h2>Referencia de Endpoints y Esquemas JSON</h2>
-          <p>Toda la especificación técnica de endpoints se encuentra organizada de forma exclusiva en la sección dedicada de API.</p>
-        </div>
-
-        <article class="content-box-card" style="border-left: 2px solid #ffffff;">
-          <h3 style="color: #ffffff; font-size: 1.15rem; margin-bottom: 10px;">Consulta la Referencia de API en /api</h3>
-          <p style="font-size: 0.95rem; line-height: 1.7; color: var(--text-light); margin-bottom: 18px;">
-            Para mantener una separación técnica rigurosa y evitar duplicidad de información en el sistema, la especificación de esquemas JSON, tablas de propiedades, ejemplos cURL para <code>POST /api/translate</code>, <code>GET /api/translate</code>, <code>GET /api/languages</code>, <code>GET /api/health</code> y la <strong>Consola Interactiva de Pruebas en Vivo</strong> están disponibles exclusivamente en la Referencia de API.
-          </p>
-          <a href="/api" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
-            Ver Especificación Técnica de Endpoints en API
-            <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-        </article>
-      </section>
-
-      <!-- SESIÓN 4: COOKIES Y RENDIMIENTO DE RED -->
-      <section id="session-cookies" class="docs-section" style="margin-bottom: 48px;">
-        <div class="section-full-title">
-          <span class="tech-card-tag">[ S.04 // PERFORMANCE_COOKIES ]</span>
-          <h2>Persistencia por Cookies y Rendimiento de Red</h2>
-          <p>Cómo funciona la cookie técnica y el comportamiento de la infraestructura en Render.</p>
-        </div>
-
-        <!-- Subsesión 4.1 -->
-        <article class="content-box-card docs-subsection" id="sub-cookies-spec">
-          <span class="tech-card-tag">[ 4.1 // COOKIE_SPECIFICATION ]</span>
-          <h3>Cookie Técnica cloud_translator_lang</h3>
-          <p>
-            Al seleccionar un idioma o presionar el botón de inglés, el cliente establece la cookie técnica:
-          </p>
-          <div class="code-box-wrapper">
-            <div class="code-box-header"><span>Encabezado Set-Cookie</span></div>
-            <pre class="code-panel">Set-Cookie: cloud_translator_lang=en; Path=/; Max-Age=31536000; SameSite=Lax</pre>
-          </div>
-          <ul style="margin-left: 20px; line-height: 2;">
-            <li>Guarda estrictamente el código del idioma deseado (ej: <code>"en"</code>, <code>"fr"</code>, <code>"de"</code>).</li>
-            <li>Tiene vigencia de 365 días para no requerir configuración repetida en cada visita.</li>
-            <li>Permite que el navegador restaure el idioma inmediatamente en 0ms tras recargar la página.</li>
+          <ul style="margin-left: 20px; line-height: 1.8; color: var(--text-secondary);">
+            <li>Etiquetas de código y estilos: <code>&lt;script&gt;</code>, <code>&lt;style&gt;</code>, <code>&lt;pre&gt;</code>, <code>&lt;code&gt;</code>, <code>&lt;textarea&gt;</code>.</li>
+            <li>Elementos con atributo declarativo: <code>data-no-translate</code> o <code>translate="no"</code>.</li>
+            <li>Elementos que posean la clase CSS <code>.no-translate</code>.</li>
           </ul>
         </article>
 
-        <!-- Subsesión 4.2 -->
-        <article class="content-box-card docs-subsection" id="sub-render-coldstart">
-          <span class="tech-card-tag">[ 4.2 // RENDER_COLD_START ]</span>
-          <h3>Comportamiento de la Capa Gratuita de Render</h3>
+        <article class="docs-subsection" id="sub-p1-reinsertion">
+          <h3>2.3 Re-inyección Segura del DOM</h3>
           <p>
-            El microservicio se ejecuta en el clúster gratuito de Render:
+            El array devuelto por el servidor conserva un mapeo posicional exacto <code>O(1)</code> con las referencias a los nodos originales del DOM. Al actualizar <code>node.nodeValue = translatedText</code>, se garantiza que <strong>los listeners de eventos asociados, atributos de accesibilidad y reactividad de frameworks no se destruyan</strong>.
           </p>
-          <div class="callout">
-            <strong>Arranque en Frío:</strong> Si no hay tráfico entrante durante 15 minutos, el contenedor entra en modo de reposo. La primera consulta reactiva el servidor en aproximadamente 25 a 35 segundos. Las peticiones subsecuentes responden con latencia promedio de 150 a 350 milisegundos.
-          </div>
         </article>
       </section>
 
-      <!-- SESIÓN 5: PILAR 2 - TEXTO A VOZ MULTILINGÜE (TTS) -->
-      <section id="session-tts" class="docs-section">
+      <!-- ========================================================================= -->
+      <!-- SESIÓN 03: PILAR 2 - TEXTO A VOZ (TTS PROSODIA & STREAMING)              -->
+      <!-- ========================================================================= -->
+      <section class="docs-section" id="session-pilar-2">
         <div class="section-full-title">
-          <span class="tech-card-tag">[ S.05 // TTS_INTEGRATION ]</span>
-          <h2>Pilar 2: Conexión al Motor de Texto a Voz (TTS)</h2>
-          <p>Generación de locución humana realista en más de 10 idiomas con selección acústica, modulación y streaming.</p>
+          <span class="session-badge">SESIÓN 03</span>
+          <h2>Pilar 2: Texto a Voz (TTS Multilingüe de Alta Fidelidad)</h2>
+          <p>Modelado acústico de entonación, síntesis neural aditiva y streaming fraccionado de audio.</p>
         </div>
 
-        <!-- Subsesión 5.1 -->
-        <article class="content-box-card docs-subsection" id="sub-tts-voices">
-          <span class="tech-card-tag">[ 5.1 // VOICES_CATALOG ]</span>
-          <h3>Catálogo de Voces y Selección Dinámica</h3>
+        <article class="docs-subsection" id="sub-p2-hybrid-engine">
+          <h3>3.1 Arquitectura Híbrida Web Speech vs Backend Neural</h3>
           <p>
-            Antes de sintetizar, puedes consultar la lista de voces disponibles consultando <code>GET /api/tts/voices</code>. Devuelve un catálogo con metadatos de idioma, timbre, género y descripción:
+            CloudTranslator opera con una arquitectura de síntesis en dos capas:
           </p>
-          <div class="code-box-header">
-            <span>JavaScript Vanilla - Obtener Catálogo</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-js-voices')">Copiar</button>
-          </div>
-          <pre class="code-panel" id="code-js-voices">async function cargarVoces() {
-  const resp = await fetch("https://cloudtranslator.onrender.com/api/tts/voices");
-  const data = await resp.json();
-  console.log(`Voces disponibles: ${data.count}`);
-  return data.voices; // Arreglo de voces disponibles
-}</pre>
+          <ul style="margin-left: 20px; line-height: 1.8; color: var(--text-secondary);">
+            <li><strong>Modo Frontend Web Speech API:</strong> Para retroalimentación acústica inmediata en navegadores modernos sin latencia de red.</li>
+            <li><strong>Modo Backend Neural Speech Synthesizer:</strong> Generador de buffer de audio lineal PCM a 22,050 Hz / 16-bit estéreo en el servidor, permitiendo descargar archivos WAV y enviar streaming binario a clientes sin dependencias de hardware cliente.</li>
+          </ul>
         </article>
 
-        <!-- Subsesión 5.2 -->
-        <article class="content-box-card docs-subsection" id="sub-tts-generate">
-          <span class="tech-card-tag">[ 5.2 // AUDIO_SYNTHESIS ]</span>
-          <h3>Generación y Reproducción Directa en Frontend</h3>
+        <article class="docs-subsection" id="sub-p2-prosody-model">
+          <h3>3.2 Modulación Prosódica y Modelado de Formantes F1-F4</h3>
           <p>
-            Envía el texto a <code>POST /api/tts</code>. El backend responde con el audio en base64 y URLs de streaming para reproducción inmediata:
+            Para evitar el tono plano y robótico de los sintetizadores arcaicos, el motor de síntesis de CloudTranslator calcula en tiempo real:
           </p>
-          <div class="code-box-header">
-            <span>JavaScript - Síntesis y Reproducción HTML5</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-js-tts-play')">Copiar</button>
-          </div>
-          <pre class="code-panel" id="code-js-tts-play">async function hablar(texto, voiceId = "es-ES-sofia") {
-  const resp = await fetch("https://cloudtranslator.onrender.com/api/tts", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      text: texto,
-      voiceId: voiceId,
-      lang: "es-ES",
-      rate: 1.0,
-      pitch: 1.0
-    })
-  });
+          <ul style="margin-left: 20px; line-height: 1.8; color: var(--text-secondary);">
+            <li><strong>Envolvente de Sílaba/Palabra:</strong> Atenuación de bordes mediante función semisinusoidal <code>sin(pi * t)</code> para evitar clics acústicos y discontinuidades DC.</li>
+            <li><strong>Curva Prosódica de Frecuencia Fundamental:</strong> Oscilación bi-tonal suave de entonación natural (<code>f0 = pitchBase * (1.0 + 0.08 * sin(2*pi*1.5*t))</code>).</li>
+            <li><strong>Formantes Vocálicos Aditivos:</strong> Inyección de resonancias armónicas secundarias (F1 a F4) simulando la cavidad bucofaríngea humana.</li>
+          </ul>
+        </article>
 
-  const data = await resp.json();
-  // Reproducir directamente el audio base64 devuelto por el servidor
-  const audio = new Audio(data.audioBase64);
-  audio.play();
-}</pre>
+        <article class="docs-subsection" id="sub-p2-voices-catalog">
+          <h3>3.3 Catálogo Acústico de 24 Voces Humanas Reales</h3>
+          <p>
+            El catálogo incluye perfiles vocales optimizados por género, edad acústica e idioma nativo (Español Neutro, México, España, Argentina, Inglés USA, UK, Francés, Alemán, Italiano, Portugués, Japonés, etc.), con calibración milimétrica de velocidad (0.5x a 2.0x) y tono (0.5 a 1.5).
+          </p>
+        </article>
 
-          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 18px;">Ejemplo en Python (Descarga a Archivo WAV)</h4>
-          <div class="code-box-header">
-            <span>Python 3 - Síntesis y Guardado en Disco</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-py-tts')">Copiar</button>
-          </div>
-          <pre class="code-panel" id="code-py-tts">import requests, base64
-
-url = "https://cloudtranslator.onrender.com/api/tts"
-payload = {
-    "text": "Hola, este audio fue sintetizado mediante la API de CloudTranslator",
-    "voiceId": "es-ES-sofia",
-    "lang": "es-ES"
-}
-
-resp = requests.post(url, json=payload)
-data = resp.json()
-
-# Decodificar y guardar el archivo de audio localmente
-audio_data = base64.b64decode(data["audioBase64"].split(",")[1])
-with open("locucion.wav", "wb") as f:
-    f.write(audio_data)
-print("Archivo guardado: locucion.wav")</pre>
+        <article class="docs-subsection" id="sub-p2-http206">
+          <h3>3.4 Streaming de Audio con Soporte HTTP 206 Partial Content</h3>
+          <p>
+            Los endpoints de audio de CloudTranslator procesan cabeceras de rango <code>Range: bytes=start-end</code>, respondiendo con el código <code>206 Partial Content</code> y cabecera <code>Content-Range</code>. Esto permite a los reproductores de audio comenzar a sonar al instante de solicitar el primer fragmento de 64 KB sin esperar a que el archivo completo se descargue.
+          </p>
         </article>
       </section>
 
-      <!-- SESIÓN 6: PILAR 3 - CLONACIÓN DE VOZ POR IA -->
-      <section id="session-voice-clone" class="docs-section">
+      <!-- ========================================================================= -->
+      <!-- SESIÓN 04: PILAR 3 - CLONACIÓN DE VOZ POR IA (BIOMETRÍA ACÚSTICA)         -->
+      <!-- ========================================================================= -->
+      <section class="docs-section" id="session-pilar-3">
         <div class="section-full-title">
-          <span class="tech-card-tag">[ S.06 // VOICE_CLONE_INTEGRATION ]</span>
-          <h2>Pilar 3: Conexión al Motor de Clonación de Voz (IA)</h2>
-          <p>Síntesis neuronal zero-shot recreando el timbre, formantes y entonación a partir de una muestra de voz.</p>
+          <span class="session-badge">SESIÓN 04</span>
+          <h2>Pilar 3: Clonación de Voz por IA (Bio-Acoustic Voice Clone) <span class="badge" style="background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4); font-size: 0.8rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; vertical-align: middle;">ALPHA</span></h2>
+          <p>Identificación biométrica espectral, estimación de frecuencia fundamental y re-síntesis tonal.</p>
         </div>
 
-        <!-- Subsesión 6.1 -->
-        <article class="content-box-card docs-subsection" id="sub-clone-sample">
-          <span class="tech-card-tag">[ 6.1 // SAMPLE_RECORDING ]</span>
-          <h3>Muestra de Audio de Referencia</h3>
+        <article class="docs-subsection" id="sub-p3-spectral-f0">
+          <h3>4.1 Detección Espectral de F0 y Tasa de Cruces por Cero (ZCR)</h3>
           <p>
-            El sistema requiere una muestra de 4 a 10 segundos de la voz del usuario (formato <code>.wav</code>, <code>.mp3</code>, <code>.ogg</code> o grabada por micrófono). La muestra debe enviarse en formato Base64 con prefijo <code>data:audio/...</code>.
+            Al recibir una muestra de voz en audio PCM/WAV (grabada con el micrófono o subida en archivo), el analizador calcula:
           </p>
-          <div class="callout">
-            <strong>Recomendación Acústica:</strong> Para una clonación óptima, habla con voz clara a unos 15 cm del micrófono sin música de fondo ni eco ambiental.
-          </div>
+          <ul style="margin-left: 20px; line-height: 1.8; color: var(--text-secondary);">
+            <li><strong>Tasa de Cruces por Cero (Zero Crossing Rate):</strong> Diferenciación entre consonantes no vocalizadas (alta frecuencia / ruido fricativo) y vocales resonantes.</li>
+            <li><strong>Autocorrelación Espectral:</strong> Detección del desfase de periodicidad en muestras de audio para determinar con exactitud la frecuencia fundamental F0 en Hertz (Hz) de la persona grabada.</li>
+            <li><strong>Clasificación Vocal:</strong> Mapeo de la frecuencia detectada hacia rangos vocales estandarizados (Bajo: 85-115 Hz, Barítono: 115-145 Hz, Tenor: 145-180 Hz, Contralto: 165-210 Hz, Mezzosoprano: 210-250 Hz, Soprano: 250-320 Hz).</li>
+          </ul>
         </article>
 
-        <!-- Subsesión 6.2 -->
-        <article class="content-box-card docs-subsection" id="sub-clone-synthesize">
-          <span class="tech-card-tag">[ 6.2 // ZERO_SHOT_SYNTHESIS ]</span>
-          <h3>Síntesis con Voz Clonada</h3>
+        <article class="docs-subsection" id="sub-p3-timbre-mapping">
+          <h3>4.2 Huella Vocal y Pitch Shifting Adaptativo</h3>
           <p>
-            Envía el guion deseado junto con la muestra base hacia <code>POST /api/voice-clone</code>:
+            Durante la síntesis del guion solicitado, el generador toma las características extraídas y aplica una relación de desplazamiento de tono <code>pitchRatio = userF0 / targetF0</code> junto con un banco de armónicos filtrados. El resultado sintetizado hereda la tesitura, brillo y calidez de la persona original, entregando un archivo de audio WAV PCM personalizado.
           </p>
-          <div class="code-box-header">
-            <span>JavaScript - Clonación y Reproducción Inmediata</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-js-vc')">Copiar</button>
-          </div>
-          <pre class="code-panel" id="code-js-vc">async function clonarVoz(muestraBase64, guionTexto) {
-  const resp = await fetch("https://cloudtranslator.onrender.com/api/voice-clone", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      text: guionTexto,
-      audioSampleBase64: muestraBase64,
-      similarity: "high",
-      pitch: 1.0
-    })
-  });
+        </article>
 
-  const data = await resp.json();
-  // Reproducir el audio sintetizado con el timbre del usuario
-  const player = new Audio(data.audioBase64);
-  player.play();
-
-  // Enlace físico de descarga directa
-  console.log("Enlace de descarga:", data.downloadUrl);
-}</pre>
-
-          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 18px;">Ejemplo en Node.js</h4>
-          <div class="code-box-header">
-            <span>Node.js - Clonación y Guardado de Archivo</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-node-vc')">Copiar</button>
-          </div>
-          <pre class="code-panel" id="code-node-vc">const fs = require("fs");
-
-async function clonarVozEnServidor() {
-  const audioSampleBuffer = fs.readFileSync("./mi-voz-muestra.wav");
-  const audioSampleBase64 = `data:audio/wav;base64,${audioSampleBuffer.toString("base64")}`;
-
-  const response = await fetch("https://cloudtranslator.onrender.com/api/voice-clone", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      text: "Mensaje generado automáticamente con mi timbre de voz.",
-      audioSampleBase64: audioSampleBase64,
-      similarity: "high"
-    })
-  });
-
-  const data = await response.json();
-  const rawWav = Buffer.from(data.audioBase64.split(",")[1], "base64");
-  fs.writeFileSync("./voz-clonada-resultado.wav", rawWav);
-  console.log("Archivo sintetizado con éxito: voz-clonada-resultado.wav");
-}
-
-clonarVozEnServidor();</pre>
+        <article class="docs-subsection" id="sub-p3-alpha-status">
+          <h3>4.3 Alcance Autónomo sin Dependencias de Terceros</h3>
+          <p>
+            El motor de clonación vocal de CloudTranslator es <strong>100% propietario y autosuficiente</strong>: opera dentro del entorno Node.js sin enviar la muestra de audio a servicios externos ni requerir suscripciones de terceros. Su etiqueta <code>ALPHA</code> refleja el trabajo continuo en la optimización de los formantes dinámicos de dicción rápida.
+          </p>
         </article>
       </section>
 
-      <!-- ================================================================= -->
-      <!-- SESIÓN 07: PILAR 4 - CONVERSOR MULTIMEDIA UNIVERSAL (MP3 / MP4) -->
-      <!-- ================================================================= -->
-      <section id="session-media-converter" class="docs-section">
-        <div class="docs-section-header">
-          <span class="session-badge-large">SESIÓN 07</span>
-          <h2>Pilar 4: Conversor Multimedia Universal (MP3 y MP4)</h2>
+      <!-- ========================================================================= -->
+      <!-- SESIÓN 05: PILAR 4 - CONVERSOR MULTIMEDIA UNIVERSAL                      -->
+      <!-- ========================================================================= -->
+      <section class="docs-section" id="session-pilar-4">
+        <div class="section-full-title">
+          <span class="session-badge">SESIÓN 05</span>
+          <h2>Pilar 4: Conversor Multimedia Universal (MP3 / MP4)</h2>
+          <p>Pipeline de extracción desacoplada, transcodificación a 320 kbps y proxy de miniaturas.</p>
         </div>
-        <p class="lead">
-          Motor universal de extracción y transcodificación de audio y video en la nube. Permite convertir enlaces de <strong>YouTube, TikTok, Instagram Reels, Facebook, Twitter/X, Pinterest y Reddit</strong> a archivos de audio <strong>MP3 (hasta 320 kbps)</strong> o video <strong>MP4</strong> sin marcas de agua, con soporte para streaming HTTP 206 y descarga física directa.
-        </p>
 
-        <!-- Subsesión 7.1 -->
-        <article id="sub-media-platforms" class="docs-subsection">
-          <h3>7.1 Detección de Plataformas &amp; Extracción de Metadatos</h3>
+        <article class="docs-subsection" id="sub-p4-ingest-pipeline">
+          <h3>5.1 Normalización Multiplataforma</h3>
           <p>
-            El endpoint <code>POST /api/media/info</code> analiza cualquier URL, detecta el servicio de procedencia, valida el identificador y extrae título, autor, duración, miniatura en alta resolución y las opciones de bitrate disponibles.
+            El módulo de ingesta analiza expresiones regulares para normalizar URLs provenientes de más de 12 plataformas globales:
           </p>
+          <ul style="margin-left: 20px; line-height: 1.8; color: var(--text-secondary);">
+            <li><strong>YouTube:</strong> URLs largas, acortadas (youtu.be), Shorts y listas de reproducción.</li>
+            <li><strong>TikTok:</strong> Enlaces cortos (vm.tiktok.com) y URLs completas con ID de publicación.</li>
+            <li><strong>Instagram:</strong> Reels, publicaciones de video y transmisiones públicas.</li>
+            <li><strong>Facebook, Twitter/X, Pinterest y Vimeo:</strong> Enlaces canónicos con extracción de ID de video.</li>
+          </ul>
+        </article>
 
-          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 18px;">Petición cURL para Inspeccionar Enlace</h4>
-          <div class="code-box-header">
-            <span>cURL - POST /api/media/info</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-curl-media-info')">Copiar</button>
-          </div>
-          <pre class="code-panel" id="code-curl-media-info">curl -X POST https://cloudtranslator.onrender.com/api/media/info \
-  -H "Content-Type: application/json" \
-  -d '{
-    "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw"
-  }'</pre>
+        <article class="docs-subsection" id="sub-p4-transcode-engine">
+          <h3>5.2 Motor de Transcodificación en Streaming (FFmpeg Pipeline)</h3>
+          <p>
+            El procesamiento de medios se bifurca según la solicitud:
+          </p>
+          <ul style="margin-left: 20px; line-height: 1.8; color: var(--text-secondary);">
+            <li><strong>Extracción de Audio (MP3):</strong> Demultiplexado del contenedor audiovisual y codificación estéreo a tasa constante (CBR) de <strong>320 kbps a 44,100 Hz</strong> para máxima definición sonora.</li>
+            <li><strong>Conversión de Video (MP4):</strong> Empaquetado H.264/AAC optimizado para compatibilidad universal con navegadores, dispositivos móviles y smart TVs en resolución 1080p sin marcas de agua.</li>
+          </ul>
+        </article>
 
-          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 18px;">Respuesta JSON</h4>
-          <pre class="code-panel">{
-  "status": "success",
-  "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
-  "platform": "YouTube",
-  "platformId": "youtube",
-  "title": "Me at the zoo",
-  "author": "jawed",
-  "duration": "00:19",
-  "thumbnail": "https://i.ytimg.com/vi/jNQXAC9IVRw/hqdefault.jpg",
-  "formats": [
-    {
-      "type": "mp3",
-      "extension": "mp3",
-      "qualities": ["320k", "192k", "128k"]
-    },
-    {
-      "type": "mp4",
-      "extension": "mp4",
-      "qualities": ["1080p", "720p", "480p", "360p"]
+        <article class="docs-subsection" id="sub-p4-ttl-proxy">
+          <h3>5.3 Proxy Seguro de Miniaturas y Ciclo de Vida TTL de 30 Minutos</h3>
+          <p>
+            Para prevenir violaciones de políticas de Referrer y bloqueos de dominios cruzados por parte de CDNs de redes sociales, el endpoint <code>/api/media/thumbnail-proxy</code> descarga e inyecta la miniatura de forma limpia al frontend. Todos los archivos generados residen en almacenamiento temporal volátil con un <strong>TTL (Time To Live) estricto de 30 minutos</strong>, purgándose automáticamente para resguardar la privacidad.
+          </p>
+        </article>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SESIÓN 06: PILAR 5 - SEPARADOR DE VOZ E INSTRUMENTAL                     -->
+      <!-- ========================================================================= -->
+      <section class="docs-section" id="session-pilar-6">
+        <div class="section-full-title">
+          <span class="session-badge">SESIÓN 06</span>
+          <h2>Pilar 5: Separador de Voz e Instrumental (Demucs v4 Neural Engine)</h2>
+          <p>Desacoplamiento espectral de fuentes musicales en Stems con -48 dB de aislamiento.</p>
+        </div>
+
+        <article class="docs-subsection" id="sub-p5-neural-demucs">
+          <h3>6.1 Red Neuronal Demucs v4 (Meta AI) y Atenuación Cruzada</h3>
+          <p>
+            A diferencia de los filtros clásicos de cancelación de fase central (Vocal Cutters analógicos de los 90) que destruyen el bajo estéreo y dejan ecos vocales, CloudTranslator utiliza la red neuronal <strong>Demucs v4</strong>:
+          </p>
+          <ul style="margin-left: 20px; line-height: 1.8; color: var(--text-secondary);">
+            <li><strong>Espectrograma Bidimensional &amp; U-Net:</strong> La red procesa la onda continua en el dominio tiempo-frecuencia, identificando patrones armónicos de cuerdas vocales humanas frente a transientes de percusión, sintetizadores y cuerdas.</li>
+            <li><strong>Supresión de Fuga Cruzada (-48 dB):</strong> El modelo garantiza que la pista instrumental retenga el 100% de la pegada del bombo y reverberaciones musicales, mientras la pista Acapella queda libre de baterías y teclados.</li>
+          </ul>
+        </article>
+
+        <article class="docs-subsection" id="sub-p5-dual-stem-player">
+          <h3>6.2 Reproductor Dual Sincronizado en Fase Estéreo</h3>
+          <p>
+            El frontend de CloudTranslator levanta dos instancias de audio HTML5 sincronizadas por un <strong>Master Time Bus</strong>. Al ajustar los deslizadores de volumen o activar los modos interactivos (<em>Solo Instrumental</em>, <em>Solo Voz</em> o <em>Ambos</em>), la reproducción se mantiene bloqueada al milisegundo exacto sin desfases de fase audible (comb filtering).
+          </p>
+        </article>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SESIÓN 07: PILAR 6 - CLOUDDJ MEZCLADOR EN VIVO                           -->
+      <!-- ========================================================================= -->
+      <section class="docs-section" id="session-pilar-7">
+        <div class="section-full-title">
+          <span class="session-badge">SESIÓN 07</span>
+          <h2>Pilar 6: CloudDJ Mezclador en Vivo (Web Audio API Graph)</h2>
+          <p>Arquitectura de enrutamiento estéreo modular, ecualización biquad y crossfading en tiempo real.</p>
+        </div>
+
+        <article class="docs-subsection" id="sub-p6-audio-graph">
+          <h3>7.1 Grafo de Enrutamiento de Nodos de Audio (Deck A &amp; Deck B)</h3>
+          <p>
+            La consola DJ implementa la especificación Web Audio API conectando un grafo estéreo modular:
+          </p>
+          <pre><code>[Audio Element Deck A] -> [MediaElementSource] -> [LowShelf EQ] -> [Peaking EQ] -> [HighShelf EQ] -> [GainNode A] ---                                                                                                                        +--> [MasterGain] -> [Destination]
+[Audio Element Deck B] -> [MediaElementSource] -> [LowShelf EQ] -> [Peaking EQ] -> [HighShelf EQ] -> [GainNode B] ---/</code></pre>
+          <p>
+            Cada canal posee tres filtros Biquad independientes:
+          </p>
+          <ul style="margin-left: 20px; line-height: 1.8; color: var(--text-secondary);">
+            <li><strong>Bajos (LowShelf a 250 Hz):</strong> Realce o atenuación profunda de bombos y líneas de bajo (-12 dB a +12 dB).</li>
+            <li><strong>Medios (Peaking a 1,500 Hz con Q=1.0):</strong> Control de inteligibilidad de voces y sintetizadores líderes.</li>
+            <li><strong>Agudos (HighShelf a 6,000 Hz):</strong> Brillo de platillos, hi-hats y aire acústico.</li>
+          </ul>
+        </article>
+
+        <article class="docs-subsection" id="sub-p6-crossfader">
+          <h3>7.2 Curva de Crossfader de Potencia Constante (Equal Power Curve)</h3>
+          <p>
+            Para evitar que la música pierda volumen acústico perceptible cuando el crossfader está centrado al 50%, CloudTranslator calcula la ganancia de cada Deck mediante funciones trigonométricas de potencia constante:
+          </p>
+          <pre><code>GainA = cos(x * pi / 2)
+GainB = sin(x * pi / 2)   // donde x varía suavemente de 0.0 (Deck A) a 1.0 (Deck B)</code></pre>
+          <p>
+            Esto asegura que la suma de energías acústicas <code>GainA² + GainB² = 1.0</code> permanezca perfectamente plana en cualquier posición del crossfader.
+          </p>
+        </article>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SESIÓN 08: INTEGRACIÓN FRONTEND SDK                                      -->
+      <!-- ========================================================================= -->
+      <section class="docs-section" id="session-sdk">
+        <div class="section-full-title">
+          <span class="session-badge">SESIÓN 08</span>
+          <h2>Guía de Integración Frontend SDK</h2>
+          <p>Inicialización en Vanilla JS, frameworks SPA reactivos y aplicaciones server-side.</p>
+        </div>
+
+        <article class="docs-subsection" id="sub-sdk-vanilla">
+          <h3>8.1 Integración en Vanilla JavaScript</h3>
+          <p>Descarga o importa el script cliente <code>cloud-translator.js</code> e inicializa la clase:</p>
+          <pre><code>&lt;script src="https://cloudtranslator.onrender.com/js/cloud-translator.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  const translator = new CloudTranslator({
+    endpoint: "https://cloudtranslator.onrender.com/api/translate",
+    useCookies: true,        // Persistencia por 365 días en cookie HTTP
+    batchSize: 500,          // Lote óptimo de nodos por petición consolidada
+    onProgress: (status) => console.log("Estado de traducción:", status)
+  });
+
+  // Traducir toda la página web a Francés
+  translator.translatePage("fr");
+
+  // Restaurar idioma original
+  // translator.restoreOriginal();
+&lt;/script&gt;</code></pre>
+        </article>
+
+        <article class="docs-subsection" id="sub-sdk-frameworks">
+          <h3>8.2 Integración en React / Next.js / Vue</h3>
+          <p>
+            En aplicaciones React o Vue, inicializa la instancia dentro de un hook de ciclo de vida (<code>useEffect</code> o <code>onMounted</code>) para garantizar que el DOM cliente esté disponible:
+          </p>
+          <pre><code>import { useEffect } from 'react';
+
+export default function Layout({ children }) {
+  useEffect(() => {
+    if (window.CloudTranslator) {
+      window.ctInstance = new window.CloudTranslator({
+        endpoint: "https://cloudtranslator.onrender.com/api/translate",
+        useCookies: true
+      });
     }
-  ]
-}</pre>
-        </article>
+  }, []);
 
-        <!-- Subsesión 7.2 -->
-        <article id="sub-media-convert" class="docs-subsection">
-          <h3>7.2 Conversión a MP3 / MP4, Streaming y Descarga</h3>
-          <p>
-            El endpoint <code>POST /api/media/convert</code> procesa el enlace con el formato solicitado (<code>"mp3"</code> o <code>"mp4"</code>) y la calidad deseada (<code>"320k"</code>, <code>"192k"</code>, <code>"1080p"</code>, etc.). Retorna tokens seguros para streaming en tiempo real y descarga física.
-          </p>
-
-          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 18px;">Petición en JavaScript (Fetch)</h4>
-          <div class="code-box-header">
-            <span>JavaScript - Conversión y Reproducción</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-js-media-convert')">Copiar</button>
-          </div>
-          <pre class="code-panel" id="code-js-media-convert">async function convertirVideo(enlaceVideo, formato = "mp3", calidad = "320k") {
-  const res = await fetch("https://cloudtranslator.onrender.com/api/media/convert", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      url: enlaceVideo,
-      format: formato,
-      quality: calidad
-    })
-  });
-
-  const data = await res.json();
-  console.log("Título:", data.title);
-  console.log("Tamaño:", data.sizeFormatted);
-
-  // Reproducir en navegador sin esperar la descarga completa
-  if (data.format === "mp3") {
-    const audio = new Audio(data.streamUrl);
-    audio.play();
-  }
-
-  // Enlace físico directo para descargar el archivo
-  window.location.href = data.downloadUrl;
-}</pre>
-
-          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 18px;">Conversión por Lotes (POST /api/media/batch)</h4>
-          <pre class="code-panel">curl -X POST https://cloudtranslator.onrender.com/api/media/batch \
-  -H "Content-Type: application/json" \
-  -d '{
-    "urls": [
-      "https://www.youtube.com/watch?v=jNQXAC9IVRw",
-      "https://www.tiktok.com/@tiktok/video/7106594312292453678"
-    ],
-    "format": "mp3",
-    "quality": "320k"
-  }'</pre>
+  return &lt;div&gt;{children}&lt;/div&gt;;
+}</code></pre>
         </article>
       </section>
 
-    
-      <!-- ========================================== -->
-      <!-- SESIÓN 08: PILAR 5 - SEPARADOR DE VOZ E INSTRUMENTAL (DEMUCS V4 AI) -->
-      <!-- ========================================== -->
-      <section id="session-vocal-separator" class="docs-section">
-        <div class="section-full-title">
-          <span class="tech-card-tag">[ SESIÓN 08 // PILAR_05_VOCAL_REMOVER ]</span>
-          <h2>Pilar 5: Separador Neuronal de Voz e Instrumental (Demucs v4 AI)</h2>
-          <p>
-            Arquitectura de desacoplamiento de fuentes sonoras entrenada con Demucs v4. Permite procesar enlaces de YouTube, TikTok, Instagram, Facebook o subida de ficheros de audio/video, aislando la voz pura (Acapella) y la música pura (Karaoke) con cero fuga residual (-48 dB de atenuación).
-          </p>
-        </div>
-
-        <!-- Subsesión 8.1 -->
-        <article id="sub-separator-process" class="docs-subsection content-box-card">
-          <span class="sub-badge">SUBSESIÓN 8.1</span>
-          <h3>Ingesta de Enlace o Archivo: POST /api/separator/process</h3>
-          <p>
-            Envía una URL pública de cualquier red social o un archivo de audio en Base64. El servidor procesa la pista mediante modelos neuronales Demucs v4 e implementa algoritmos DSP de centro de fase estéreo como respaldo redundante.
-          </p>
-
-          <div class="code-box-header">
-            <span>Petición cURL (POST /api/separator/process)</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-curl-sep-proc')">Copiar</button>
-          </div>
-          <pre class="code-panel" id="code-curl-sep-proc">curl -X POST https://cloudtranslator.onrender.com/api/separator/process \
-  -H "Content-Type: application/json" \
-  -d '{
-    "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
-    "quality": "lossless"
-  }'</pre>
-
-          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 18px;">Estructura de la Respuesta JSON (200 OK)</h4>
-          <pre class="code-panel">{
-  "status": "success",
-  "id": "sep_1713589200_a1b2c",
-  "title": "Demostración Musical Acústica",
-  "duration": 214,
-  "engine": "Demucs v4 Neural AI (Zero-Bleed)",
-  "vocalsStreamUrl": "/api/separator/stream?id=sep_1713589200_a1b2c&type=vocals",
-  "instrumentalStreamUrl": "/api/separator/stream?id=sep_1713589200_a1b2c&type=instrumental",
-  "vocalsDownloadUrl": "/api/separator/download?id=sep_1713589200_a1b2c&type=vocals",
-  "instrumentalDownloadUrl": "/api/separator/download?id=sep_1713589200_a1b2c&type=instrumental"
-}</pre>
-        </article>
-
-        <!-- Subsesión 8.2 -->
-        <article id="sub-separator-stream" class="docs-subsection content-box-card">
-          <span class="sub-badge">SUBSESIÓN 8.2</span>
-          <h3>Streaming Dual HTTP (206) y Descarga de Stems</h3>
-          <p>
-            Ambos stems se transmiten con soporte para el encabezado <code>Range: bytes</code> (código HTTP 206 Partial Content), permitiendo reproducir, silenciar o aislar stems individualmente en el reproductor de forma instantánea.
-          </p>
-
-          <div class="code-box-header">
-            <span>JavaScript - Reproducción y Sincronización Dual</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-js-sep-dual')">Copiar</button>
-          </div>
-          <pre class="code-panel" id="code-js-sep-dual">async function reproducirStems(url) {
-  const resp = await fetch("/api/separator/process", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ url: url, quality: "lossless" })
-  });
-  const data = await resp.json();
-
-  const audioVoc = new Audio(data.vocalsStreamUrl);
-  const audioInst = new Audio(data.instrumentalStreamUrl);
-
-  // Reproducir ambos al unísono
-  audioVoc.play();
-  audioInst.play();
-
-  // Controlar volumen independiente (Solo Voz / Solo Instrumental)
-  // audioVoc.volume = 0; // Modo Karaoke
-  // audioInst.volume = 0; // Modo Acapella
-}</pre>
-        </article>
-      </section>
-
-      <!-- ========================================== -->
-      <!-- SESIÓN 09: PILAR 6 - CLOUDDJ MEZCLADOR MULTIMEDIA EN VIVO -->
-      <!-- ========================================== -->
-      <section id="session-clouddj" class="docs-section">
-        <div class="section-full-title">
-          <span class="tech-card-tag">[ SESIÓN 09 // PILAR_06_CLOUDDJ ]</span>
-          <h2>Pilar 6: CloudDJ Mezclador Multimedia en Vivo</h2>
-          <p>
-            Consola interactiva de doble tornamesa con motor Web Audio API de baja latencia. Integra ecualizador paramétrico de 3 bandas (Hi, Mid, Low), emulación física de vinilo con scratch dinámico, crossfader de energía constante y cola secuencial "Lo que va después".
-          </p>
-        </div>
-
-        <!-- Subsesión 9.1 -->
-        <article id="sub-dj-audio-engine" class="docs-subsection content-box-card">
-          <span class="sub-badge">SUBSESIÓN 9.1</span>
-          <h3>Motor Web Audio API, EQ de 3 Bandas &amp; Crossfader</h3>
-          <p>
-            El flujo de audio por cada deck conecta un <code>MediaElementAudioSourceNode</code> a tres filtros <code>BiquadFilterNode</code> en serie (LowShelf a 250Hz, Peaking a 1kHz y HighShelf a 4kHz), terminando en un <code>GainNode</code> modulado por el crossfader horizontal mediante función coseno/seno para conservar la energía sonora.
-          </p>
-
-          <div class="code-box-header">
-            <span>Diagrama de Ruteo de Audio (Web Audio Graph)</span>
-          </div>
-          <pre class="code-panel">[Deck HTML5 Audio] -> [Low Filter 250Hz] -> [Mid Filter 1kHz] -> [High Filter 4kHz] -> [Channel Gain] -> [Crossfader Gain] -> [AudioContext.destination]</pre>
-        </article>
-
-        <!-- Subsesión 9.2 -->
-        <article id="sub-dj-queue" class="docs-subsection content-box-card">
-          <span class="sub-badge">SUBSESIÓN 9.2</span>
-          <h3>Ingesta de Pistas y Cola de Reproducción "Lo que Va Después"</h3>
-          <p>
-            Cualquier pista agregada por URL se prepara mediante <code>POST /api/media/convert</code> con formato MP3 a 320 kbps y streaming HTTP 206, permitiendo asignarla de inmediato a la Deck A, Deck B o la cola de reproducción interactiva.
-          </p>
-
-          <div class="code-box-header">
-            <span>Preparar Pista para Deck DJ vía API REST</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-curl-dj-track')">Copiar</button>
-          </div>
-          <pre class="code-panel" id="code-curl-dj-track">curl -X POST https://cloudtranslator.onrender.com/api/media/convert \
-  -H "Content-Type: application/json" \
-  -d '{
-    "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
-    "format": "mp3",
-    "quality": "320k"
-  }'</pre>
-        </article>
-      </section>
+      <!-- Pie de Página Dinámico Incrustado al Final del Contenido -->
+      <footer id="footer-placeholder" data-component="footer" data-active="docs" style="margin-top: 60px;"></footer>
 
     </main>
   </div>
 
-  <!-- Pie de Página Aliniado y Estructurado -->
-  <footer id="footer-placeholder" data-component="footer" data-active="docs"></footer>
-
   <script src="/js/cloud-translator.js"></script>
   <script>
-    // Función global para copiar al portapapeles con feedback visual monocromático
-    function copiarAlPortapapeles(btn, elementId) {
-      const el = document.getElementById(elementId);
-      if (!el) return;
-      const texto = el.innerText || el.textContent;
-      navigator.clipboard.writeText(texto).then(() => {
-        const originalText = btn.textContent;
-        btn.textContent = "COPIADO";
-        btn.style.background = "#ffffff";
-        btn.style.color = "#000000";
-        setTimeout(() => {
-          btn.textContent = originalText;
-          btn.style.background = "";
-          btn.style.color = "";
-        }, 1500);
-      }).catch(err => {
-        console.error("Error al copiar:", err);
-      });
-    }
-
     document.addEventListener("DOMContentLoaded", () => {
-      // 1. ScrollSpy automático para Sesiones y Subsesiones
+      // 1. Desplazamiento Suave dentro del Contenedor Fijo Derecho
+      const scrollContainer = document.getElementById("docs-content-scroll");
+
+      document.querySelectorAll('.docs-sidebar a[href^="#"], .docs-toc-dropdown a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          const targetId = this.getAttribute('href').slice(1);
+          const targetEl = document.getElementById(targetId);
+          if (targetEl && scrollContainer) {
+            e.preventDefault();
+            // Calcular offset relativo al scrollContainer
+            const offsetTop = targetEl.offsetTop - 20;
+            scrollContainer.scrollTo({
+              top: offsetTop,
+              behavior: 'smooth'
+            });
+            history.pushState(null, null, '#' + targetId);
+          }
+        });
+      });
+
+      // 2. Observer de Posición dentro del ScrollContainer
       const sessionLinks = document.querySelectorAll(".docs-sidebar-session");
       const subLinks = document.querySelectorAll(".docs-sidebar-sublink");
       const observedElements = document.querySelectorAll(".docs-section, .docs-subsection");
 
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const id = entry.target.getAttribute("id");
+      if (scrollContainer && "IntersectionObserver" in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const id = entry.target.getAttribute("id");
 
-            // Si es una subsesión
-            if (entry.target.classList.contains("docs-subsection")) {
-              subLinks.forEach(sub => {
-                if (sub.getAttribute("data-target") === id || sub.getAttribute("href") === "#" + id) {
-                  sub.classList.add("active");
-                  // Activar sesión padre correspondiente
-                  const parentGroup = sub.closest(".docs-sidebar-group");
-                  if (parentGroup) {
-                    sessionLinks.forEach(s => s.classList.remove("active"));
-                    parentGroup.querySelector(".docs-sidebar-session")?.classList.add("active");
+              if (entry.target.classList.contains("docs-subsection")) {
+                subLinks.forEach(sub => {
+                  if (sub.getAttribute("data-target") === id || sub.getAttribute("href") === "#" + id) {
+                    sub.classList.add("active");
+                    const parentGroup = sub.closest(".docs-sidebar-group");
+                    if (parentGroup) {
+                      sessionLinks.forEach(s => s.classList.remove("active"));
+                      parentGroup.querySelector(".docs-sidebar-session")?.classList.add("active");
+                    }
+                  } else {
+                    sub.classList.remove("active");
                   }
-                } else {
-                  sub.classList.remove("active");
-                }
-              });
-            } else if (entry.target.classList.contains("docs-section")) {
-              // Si es una sección principal
-              sessionLinks.forEach(link => {
-                if (link.getAttribute("data-target") === id || link.getAttribute("href") === "#" + id) {
-                  link.classList.add("active");
-                }
-              });
+                });
+              } else if (entry.target.classList.contains("docs-section")) {
+                sessionLinks.forEach(link => {
+                  if (link.getAttribute("data-target") === id || link.getAttribute("href") === "#" + id) {
+                    link.classList.add("active");
+                  }
+                });
+              }
             }
-          }
+          });
+        }, {
+          root: window.innerWidth > 920 ? scrollContainer : null,
+          rootMargin: "-20px 0px -60% 0px",
+          threshold: 0.1
         });
-      }, {
-        rootMargin: "-90px 0px -50% 0px",
-        threshold: 0.1
-      });
 
-      observedElements.forEach(el => observer.observe(el));
+        observedElements.forEach(el => observer.observe(el));
+      }
 
-      // 2. Control de Índice Rápido Móvil / Tablet (TOC)
+      // 3. Control de Índice Rápido Móvil
       const btnToggleToc = document.getElementById("btn-toggle-docs-toc");
       const tocContent = document.getElementById("docs-mobile-toc-content");
       if (btnToggleToc && tocContent) {
@@ -1268,16 +752,24 @@ clonarVozEnServidor();</pre>
         });
       }
 
-      // 3. Inicialización del traductor
-      const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";
-      window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
-      document.getElementById("btn-english").onclick = () => window.translator.translateToEnglish();
-      document.getElementById("btn-restore").onclick = () => window.translator.restoreOriginal();
-      document.getElementById("select-lang").onchange = (e) => window.translator.translatePage(e.target.value);
-      document.getElementById("btn-translate-custom").onclick = () => {
-        const val = document.getElementById("input-custom-lang").value.trim().toLowerCase();
-        if (val) window.translator.translatePage(val);
-      };
+      // 4. Inicialización del Traductor de la barra superior
+      try {
+        const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";
+        window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
+        const btnEn = document.getElementById("btn-english");
+        if (btnEn) btnEn.onclick = () => window.translator.translateToEnglish();
+        const btnRest = document.getElementById("btn-restore");
+        if (btnRest) btnRest.onclick = () => window.translator.restoreOriginal();
+        const selLang = document.getElementById("select-lang");
+        if (selLang) selLang.onchange = (e) => window.translator.translatePage(e.target.value);
+        const btnCustom = document.getElementById("btn-translate-custom");
+        if (btnCustom) {
+          btnCustom.onclick = () => {
+            const val = document.getElementById("input-custom-lang").value.trim().toLowerCase();
+            if (val) window.translator.translatePage(val);
+          };
+        }
+      } catch (e) {}
     });
   </script>
 </body>
