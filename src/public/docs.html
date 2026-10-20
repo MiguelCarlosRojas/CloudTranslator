@@ -301,7 +301,7 @@
     </aside>
 
     <!-- ÁREA PRINCIPAL FIJA CON SCROLL INDEPENDIENTE -->
-    <main class="docs-main-content" id="docs-content-scroll">
+    <main class="docs-main-content">
     
       <!-- Encabezado de la Documentación Técnica -->
       <section class="docs-section" style="padding-top: 10px;">
@@ -666,76 +666,53 @@ export default function Layout({ children }) {
         </article>
       </section>
 
-      <!-- Pie de Página Dinámico Incrustado al Final del Contenido -->
-      <footer id="footer-placeholder" data-component="footer" data-active="docs" style="margin-top: 60px;"></footer>
-
     </main>
   </div>
+
+  <!-- Pie de Página Aliniado y Estructurado -->
+  <footer id="footer-placeholder" data-component="footer" data-active="docs"></footer>
 
   <script src="/js/cloud-translator.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // 1. Desplazamiento Suave dentro del Contenedor Fijo Derecho
-      const scrollContainer = document.getElementById("docs-content-scroll");
-
-      document.querySelectorAll('.docs-sidebar a[href^="#"], .docs-toc-dropdown a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-          const targetId = this.getAttribute('href').slice(1);
-          const targetEl = document.getElementById(targetId);
-          if (targetEl && scrollContainer) {
-            e.preventDefault();
-            // Calcular offset relativo al scrollContainer
-            const offsetTop = targetEl.offsetTop - 20;
-            scrollContainer.scrollTo({
-              top: offsetTop,
-              behavior: 'smooth'
-            });
-            history.pushState(null, null, '#' + targetId);
-          }
-        });
-      });
-
-      // 2. Observer de Posición dentro del ScrollContainer
+      // 1. ScrollSpy para el sidebar de la documentación
       const sessionLinks = document.querySelectorAll(".docs-sidebar-session");
       const subLinks = document.querySelectorAll(".docs-sidebar-sublink");
       const observedElements = document.querySelectorAll(".docs-section, .docs-subsection");
 
-      if (scrollContainer && "IntersectionObserver" in window) {
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              const id = entry.target.getAttribute("id");
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute("id");
 
-              if (entry.target.classList.contains("docs-subsection")) {
-                subLinks.forEach(sub => {
-                  if (sub.getAttribute("data-target") === id || sub.getAttribute("href") === "#" + id) {
-                    sub.classList.add("active");
-                    const parentGroup = sub.closest(".docs-sidebar-group");
-                    if (parentGroup) {
-                      sessionLinks.forEach(s => s.classList.remove("active"));
-                      parentGroup.querySelector(".docs-sidebar-session")?.classList.add("active");
-                    }
-                  } else {
-                    sub.classList.remove("active");
+            if (entry.target.classList.contains("docs-subsection")) {
+              subLinks.forEach(sub => {
+                if (sub.getAttribute("data-target") === id || sub.getAttribute("href") === "#" + id) {
+                  sub.classList.add("active");
+                  const parentGroup = sub.closest(".docs-sidebar-group");
+                  if (parentGroup) {
+                    sessionLinks.forEach(s => s.classList.remove("active"));
+                    parentGroup.querySelector(".docs-sidebar-session")?.classList.add("active");
                   }
-                });
-              } else if (entry.target.classList.contains("docs-section")) {
-                sessionLinks.forEach(link => {
-                  if (link.getAttribute("data-target") === id || link.getAttribute("href") === "#" + id) {
-                    link.classList.add("active");
-                  }
-                });
-              }
+                } else {
+                  sub.classList.remove("active");
+                }
+              });
+            } else if (entry.target.classList.contains("docs-section")) {
+              sessionLinks.forEach(link => {
+                if (link.getAttribute("data-target") === id || link.getAttribute("href") === "#" + id) {
+                  link.classList.add("active");
+                }
+              });
             }
-          });
-        }, {
-          root: window.innerWidth > 920 ? scrollContainer : null,
-          rootMargin: "-20px 0px -60% 0px",
-          threshold: 0.1
+          }
         });
+      }, {
+        rootMargin: "-90px 0px -50% 0px",
+        threshold: 0.1
+      });
 
-        observedElements.forEach(el => observer.observe(el));
-      }
+      observedElements.forEach(el => observer.observe(el));
 
       // 3. Control de Índice Rápido Móvil
       const btnToggleToc = document.getElementById("btn-toggle-docs-toc");
