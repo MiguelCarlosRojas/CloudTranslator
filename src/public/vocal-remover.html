@@ -23,21 +23,26 @@
       gap: 12px;
       margin-bottom: 24px;
       border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 12px;
+      padding-bottom: 14px;
+      flex-wrap: wrap;
     }
     .stem-tab-btn {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       padding: 10px 20px;
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       font-size: 0.9rem;
       font-weight: 700;
       cursor: pointer;
-      background: rgba(18, 22, 34, 0.6);
+      background: rgba(18, 22, 34, 0.7);
       border: 1px solid var(--border-subtle);
       color: var(--text-secondary);
       transition: all 0.25s ease;
+    }
+    .stem-tab-btn:hover {
+      border-color: var(--border-focus);
+      color: #ffffff;
     }
     .stem-tab-btn.active {
       background: rgba(0, 240, 255, 0.12);
@@ -60,7 +65,7 @@
       box-shadow: 0 0 24px rgba(0, 240, 255, 0.15);
     }
     .stem-channel-card {
-      background: rgba(14, 18, 30, 0.85);
+      background: rgba(14, 18, 30, 0.9);
       border: 1px solid var(--border-subtle);
       border-radius: 14px;
       padding: 20px;
@@ -68,6 +73,7 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
       position: relative;
       overflow: hidden;
+      transition: border-color 0.2s ease;
     }
     .stem-channel-card.vocals {
       border-left: 4px solid #ff007b;
@@ -80,7 +86,7 @@
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
       margin-bottom: 14px;
     }
     .channel-badge {
@@ -90,7 +96,7 @@
       font-size: 0.78rem;
       font-weight: 800;
       letter-spacing: 0.08em;
-      padding: 4px 12px;
+      padding: 5px 12px;
       border-radius: 20px;
       text-transform: uppercase;
     }
@@ -107,7 +113,7 @@
     .channel-controls {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
       flex-wrap: wrap;
     }
     .volume-slider-box {
@@ -121,7 +127,7 @@
     }
     .volume-slider {
       -webkit-appearance: none;
-      width: 110px;
+      width: 100px;
       height: 6px;
       border-radius: 3px;
       background: rgba(255, 255, 255, 0.2);
@@ -129,8 +135,8 @@
     }
     .volume-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 15px;
+      height: 15px;
       border-radius: 50%;
       background: var(--primary);
       cursor: pointer;
@@ -181,7 +187,7 @@
       border: 1px solid var(--border-subtle);
       border-radius: 12px;
       padding: 14px 20px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
     .btn-stem-play {
       width: 46px;
@@ -196,9 +202,43 @@
       cursor: pointer;
       box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
       transition: transform 0.2s ease;
+      flex-shrink: 0;
     }
     .btn-stem-play:hover {
       transform: scale(1.08);
+    }
+    .mode-listen-btn {
+      flex: 1;
+      min-width: 150px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 16px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      background: rgba(10, 12, 18, 0.9);
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+    }
+    .mode-listen-btn:hover {
+      border-color: var(--border-focus);
+      color: #ffffff;
+    }
+    .mode-listen-btn.active {
+      border-color: var(--primary);
+      background: rgba(0, 240, 255, 0.15);
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.25);
+    }
+    .mode-listen-btn.active.mode-voc {
+      border-color: #ff007b;
+      background: rgba(255, 0, 123, 0.15);
+      box-shadow: 0 0 14px rgba(255, 0, 123, 0.25);
     }
   </style>
 </head>
@@ -218,10 +258,9 @@
       <nav class="desktop-nav">
         <ul class="main-menu">
           <li><a href="/">Inicio</a></li>
-          <li><a href="/converter">Conversor</a></li>
-          <li><a href="/vocal-remover" class="active">Separador Voz</a></li>
-          <li><a href="/dj">CloudDJ</a></li>
           <li><a href="/docs">Docs</a></li>
+          <li><a href="/support">Soporte</a></li>
+          <li><a href="/status">Estado</a></li>
         </ul>
       </nav>
 
@@ -310,7 +349,7 @@
           <span class="hero-tag-glow">PILAR 05 // SEPARADOR DE VOZ E INSTRUMENTAL</span>
           <h1 style="font-size: clamp(2rem, 4.2vw, 3rem); font-weight: 800;">Separar Voz y Música de Cualquier Canción</h1>
           <p class="lead">
-            Elimina o aísla la voz para dejar solo la <strong>pista instrumental (Karaoke)</strong> o extrae la <strong>voz pura (Acapella)</strong>. Pega enlaces de <strong>YouTube, TikTok, Instagram</strong> o sube archivos locales de audio y video. Escucha y descarga cada pista por separado en alta definición.
+            Elimina o aísla la voz para dejar solo la <strong>pista instrumental (Karaoke)</strong> o extrae la <strong>voz pura (Acapella)</strong>. Pega enlaces de <strong>YouTube, TikTok, Instagram, Facebook, Twitter/X</strong> o sube archivos locales de audio y video. Escucha y descarga cada pista por separado en alta definición.
           </p>
           <div class="hero-actions">
             <a href="#splitter-studio" class="btn btn-primary">Comenzar Separación</a>
@@ -329,44 +368,91 @@
     </section>
 
     <!-- Estudio de Separación Multimedia -->
-    <section id="splitter-studio" class="translator-card" style="margin-top: 10px; margin-bottom: 40px;">
+    <section id="splitter-studio" class="studio-wrapper" style="margin-top: 10px; margin-bottom: 40px;">
       
       <!-- Pestañas de Modo de Entrada -->
       <div class="stem-mode-tabs">
-        <button id="tab-mode-url" class="stem-tab-btn active">
+        <button id="tab-mode-url" type="button" class="stem-tab-btn active">
           <svg class="icon" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
           Pegar Enlace Multimedia (YouTube, TikTok, etc.)
         </button>
-        <button id="tab-mode-file" class="stem-tab-btn">
+        <button id="tab-mode-file" type="button" class="stem-tab-btn">
           <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           Subir Archivo de Audio o Video
         </button>
       </div>
 
+      <!-- Selector de Plataformas con Iconos y Detección Automática (Idéntico a Conversor) -->
+      <div id="platforms-selector-box" style="margin-bottom: 20px;">
+        <div class="studio-label" style="margin-bottom: 10px;">
+          <span>PLATAFORMAS COMPATIBLES (DETECCIÓN AUTOMÁTICA)</span>
+          <span id="platform-hover-label" style="color: var(--primary); font-weight: 700; transition: color 0.2s ease;">7 PLATAFORMAS</span>
+        </div>
+        <div class="platform-chips-container">
+          <!-- 1. YouTube -->
+          <button type="button" class="btn platform-chip" data-platform="youtube" aria-label="YouTube">
+            <svg class="icon platform-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            <span>YouTube</span>
+          </button>
+
+          <!-- 2. TikTok -->
+          <button type="button" class="btn platform-chip" data-platform="tiktok" aria-label="TikTok">
+            <svg class="icon platform-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 3 15.68 6.34 6.34 0 0 0 9.34 22a6.34 6.34 0 0 0 6.34-6.32V8.75a8.18 8.18 0 0 0 4.79 1.52V6.82a4.85 4.85 0 0 1-.88-.13z"/></svg>
+            <span>TikTok</span>
+          </button>
+
+          <!-- 3. Instagram -->
+          <button type="button" class="btn platform-chip" data-platform="instagram" aria-label="Instagram">
+            <svg class="icon platform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+            <span>Instagram</span>
+          </button>
+
+          <!-- 4. Facebook -->
+          <button type="button" class="btn platform-chip" data-platform="facebook" aria-label="Facebook">
+            <svg class="icon platform-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            <span>Facebook</span>
+          </button>
+
+          <!-- 5. Twitter / X -->
+          <button type="button" class="btn platform-chip" data-platform="twitter" aria-label="Twitter / X">
+            <svg class="icon platform-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            <span>Twitter / X</span>
+          </button>
+
+          <!-- 6. Pinterest -->
+          <button type="button" class="btn platform-chip" data-platform="pinterest" aria-label="Pinterest">
+            <svg class="icon platform-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.66 19.31c-.04-.84-.08-2.14.02-3.06l.72-3.05s-.18-.37-.18-.92c0-.86.5-1.5 1.13-1.5.53 0 .79.4.79.88 0 .54-.34 1.34-.52 2.08-.15.62.31 1.13.92 1.13 1.1 0 1.95-1.16 1.95-2.84 0-1.48-1.07-2.52-2.59-2.52-1.77 0-2.8 1.33-2.8 2.7 0 .53.21 1.11.46 1.42.05.06.06.12.04.18l-.17.72c-.03.11-.1.15-.22.1-1.02-.47-1.65-1.96-1.65-3.15 0-2.57 1.86-4.92 5.38-4.92 2.82 0 5.02 2.01 5.02 4.7 0 2.8-1.77 5.06-4.22 5.06-.82 0-1.6-.43-1.87-.93l-.51 1.94c-.18.71-.68 1.6-1.01 2.15A10 10 0 1 0 12 2z"/></svg>
+            <span>Pinterest</span>
+          </button>
+
+          <!-- 7. Enlace Directo -->
+          <button type="button" class="btn platform-chip" data-platform="direct" aria-label="Enlace Directo">
+            <svg class="icon platform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span>Enlace Directo</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Panel 1: Entrada por Enlace URL -->
-      <div id="panel-url">
-        <label for="input-media-url" class="field-label">
-          ENLACE DE LA CANCIÓN O VIDEO
-          <span style="font-weight: 400; text-transform: none; color: var(--text-muted);">(YouTube, TikTok, Instagram, Facebook, X, etc.)</span>
-        </label>
-        <div class="input-with-actions" style="margin-bottom: 20px;">
-          <input type="url" id="input-media-url" class="text-input" placeholder="https://www.youtube.com/watch?v=... o enlace de TikTok">
-          <div class="input-actions-group">
-            <button id="btn-paste-url" class="action-btn" title="Pegar del portapapeles">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1"/></svg>
-              Pegar
-            </button>
-            <button id="btn-clear-url" class="action-btn" title="Limpiar enlace">
-              <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              Limpiar
-            </button>
-          </div>
+      <div id="panel-url" style="margin-bottom: 20px;">
+        <div class="studio-label" style="margin-bottom: 8px;">
+          <span>ENLACE DE LA CANCIÓN O VIDEO</span>
+          <span id="detected-platform-badge" style="color: var(--primary);">DETECCIÓN AUTOMÁTICA</span>
+        </div>
+        <div style="position: relative;">
+          <input type="url" id="input-media-url" class="studio-textarea" placeholder="Pega el enlace aquí (YouTube, TikTok, Instagram, Facebook, X, etc.)" value="" style="min-height: 48px; height: 48px; padding: 12px 44px 12px 16px; font-size: 0.95rem; resize: none;">
+          <button id="btn-clear-url" type="button" title="Limpiar enlace" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; display: flex; align-items: center;">
+            <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
         </div>
       </div>
 
       <!-- Panel 2: Entrada por Archivo Local -->
       <div id="panel-file" style="display: none; margin-bottom: 20px;">
-        <label class="field-label">SUBIR ARCHIVO MULTIMEDIA (.MP3, .WAV, .M4A, .MP4, ETC.)</label>
+        <div class="studio-label" style="margin-bottom: 8px;">
+          <span>SUBIR ARCHIVO MULTIMEDIA (.MP3, .WAV, .M4A, .MP4, ETC.)</span>
+          <span style="color: var(--secondary);">HASTA 50 MB</span>
+        </div>
         <div id="drop-zone" class="drop-zone">
           <svg class="icon" style="width: 48px; height: 48px; stroke: var(--primary); margin-bottom: 12px;" viewBox="0 0 24 24">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
@@ -376,36 +462,50 @@
           <span class="btn btn-outline" style="pointer-events: none;">Seleccionar Archivo</span>
           <input type="file" id="file-input" accept="audio/*,video/*" style="display: none;">
         </div>
-        <div id="file-info-badge" style="display: none; margin-top: 12px; align-items: center; justify-content: space-between; background: rgba(0, 240, 255, 0.08); padding: 10px 16px; border-radius: 8px; border: 1px solid rgba(0, 240, 255, 0.3);">
+        <div id="file-info-badge" style="display: none; margin-top: 12px; align-items: center; justify-content: space-between; background: rgba(0, 240, 255, 0.08); padding: 10px 16px; border-radius: var(--radius-md); border: 1px solid rgba(0, 240, 255, 0.3);">
           <span id="file-info-name" style="font-weight: 700; color: #ffffff;">cancion.mp3</span>
-          <button id="btn-remove-file" class="action-btn" style="color: #ff4d4d;">Eliminar</button>
+          <button id="btn-remove-file" type="button" class="btn btn-outline" style="color: #ff4d4d; border-color: rgba(255,77,77,0.4); padding: 4px 12px; font-size: 0.8rem;">Eliminar</button>
         </div>
       </div>
 
-      <!-- Barra de Configuración y Botón de Acción -->
-      <div style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
-        <div style="flex: 1; min-width: 220px;">
-          <label for="select-quality" class="field-label">CALIDAD DE RENDERIZADO DE STEMS</label>
-          <select id="select-quality" class="text-input" style="padding: 10px 14px;">
-            <option value="320k">320 kbps (Alta Fidelidad / Studio Master)</option>
-            <option value="192k">192 kbps (Estándar Recomendado)</option>
-            <option value="128k">128 kbps (Ahorro de Datos)</option>
-          </select>
+      <!-- Barra de Configuración y Botón de Acción en una Fila (Diseño Conversor) -->
+      <div class="studio-controls-row" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; align-items: end; margin-bottom: 24px;">
+        <div class="studio-control-col">
+          <div class="studio-label" style="margin-bottom: 8px;">
+            <span>CALIDAD Y TASA DE BITS</span>
+            <span id="quality-badge" style="color: var(--primary);">STUDIO MASTER (320 kbps)</span>
+          </div>
+          <div class="select-wrapper">
+            <select id="select-quality" class="form-select-custom studio-select" aria-label="Seleccionar Calidad" style="width: 100%; height: 46px; padding: 0 38px 0 16px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.9rem; outline: none;">
+              <option value="320k">320 kbps (Alta Fidelidad / Studio Master)</option>
+              <option value="192k">192 kbps (Estándar Recomendado)</option>
+              <option value="128k">128 kbps (Ahorro de Datos)</option>
+            </select>
+          </div>
         </div>
 
-        <button id="btn-process-split" class="btn btn-primary" style="height: 48px; padding: 0 28px; font-weight: 800; letter-spacing: 0.04em;">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-          <span id="btn-split-text">Separar Voz e Instrumental</span>
-        </button>
+        <div class="studio-control-col">
+          <div class="studio-label" style="margin-bottom: 8px;">
+            <span>ACCIÓN MULTIMEDIA</span>
+            <span style="color: var(--primary);">EXTRACCIÓN DE STEMS</span>
+          </div>
+          <button id="btn-process-split" type="button" class="btn btn-primary" style="width: 100%; height: 46px; padding: 0 18px; font-weight: 700; font-size: 0.95rem; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg class="icon" style="width: 17px; height: 17px;" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            <span id="btn-split-text">Separar Voz e Instrumental</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Caja de Progreso Dinámico -->
-      <div id="progress-box" style="display: none; margin-top: 24px; padding: 18px; background: rgba(0, 0, 0, 0.45); border-radius: 10px; border: 1px solid rgba(0, 240, 255, 0.2);">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.88rem; font-weight: 700;">
-          <span id="progress-status"><span class="spinner"></span> Procesando audio maestro...</span>
-          <span id="progress-percent" style="color: var(--primary);">0%</span>
+      <!-- Barra de Progreso Dinámico -->
+      <div id="progress-box" style="display: none; margin-bottom: 24px; background: rgba(10, 12, 18, 0.8); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.85rem;">
+          <span id="progress-status" style="color: var(--primary); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+            <span class="spinner" style="display: inline-block; width: 14px; height: 14px;"></span>
+            Procesando audio maestro...
+          </span>
+          <span id="progress-percent" style="font-family: var(--font-mono); color: var(--text-white); font-weight: 700;">0%</span>
         </div>
-        <div style="width: 100%; height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden;">
+        <div style="width: 100%; height: 8px; background: rgba(255, 255, 255, 0.08); border-radius: var(--radius-full); overflow: hidden;">
           <div id="progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #ff007b, var(--primary)); transition: width 0.4s ease;"></div>
         </div>
       </div>
@@ -413,30 +513,55 @@
       <!-- ========================================================================= -->
       <!-- RESULTADO: ESTUDIO DE REPRODUCCIÓN DUAL & DESCARGAS SEPARADAS             -->
       <!-- ========================================================================= -->
-      <div id="result-box" style="display: none; margin-top: 32px; border-top: 1px solid var(--border-subtle); padding-top: 28px;">
+      <div id="result-box" style="display: none; background: rgba(15, 17, 24, 0.95); border: 1px solid rgba(0, 240, 255, 0.4); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-glow);">
         
         <!-- Cabecera de la Pista Procesada -->
-        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
           <img id="res-thumb" src="/img/logo.png" alt="Cover" style="width: 64px; height: 64px; border-radius: 10px; object-fit: cover; border: 1px solid var(--border-subtle);">
           <div style="flex: 1; min-width: 200px;">
-            <h3 id="res-title" style="margin: 0 0 4px 0; font-size: 1.25rem; font-weight: 800;">Título de la Canción</h3>
-            <div style="display: flex; gap: 10px; align-items: center; font-size: 0.82rem; color: var(--text-muted);">
-              <span id="res-platform" style="background: rgba(255, 255, 255, 0.08); padding: 2px 8px; border-radius: 4px;">MULTIMEDIA</span>
+            <h3 id="res-title" style="margin: 0 0 6px 0; font-size: 1.2rem; font-weight: 800; line-height: 1.4;">Título de la Canción</h3>
+            <div style="display: flex; gap: 10px; align-items: center; font-size: 0.82rem; color: var(--text-muted); flex-wrap: wrap;">
+              <span id="res-platform" style="background: rgba(255, 255, 255, 0.08); padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">MULTIMEDIA</span>
               <span id="res-duration">00:00</span>
-              <span style="color: var(--primary);">✓ 2 STEMS GENERADOS</span>
+              <span style="color: var(--primary); display: inline-flex; align-items: center; gap: 4px;">
+                <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polyline points="20 6 9 17 4 12"/></svg>
+                2 STEMS GENERADOS
+              </span>
             </div>
+          </div>
+        </div>
+
+        <!-- Selector Interactivo de Modo de Escucha (Solo Instrumental / Solo Voz / Ambos) -->
+        <div style="margin-bottom: 18px;">
+          <div class="studio-label" style="margin-bottom: 8px;">
+            <span>MODO DE ESCUCHA INTERACTIVO</span>
+            <span id="current-listen-label" style="color: var(--primary); font-weight: 700;">SOLO INSTRUMENTAL</span>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button id="btn-mode-inst" type="button" class="btn mode-listen-btn active">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              <span>Solo Instrumental (Karaoke)</span>
+            </button>
+            <button id="btn-mode-voc" type="button" class="btn mode-listen-btn mode-voc">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+              <span>Solo Voz (Acapella)</span>
+            </button>
+            <button id="btn-mode-both" type="button" class="btn mode-listen-btn">
+              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+              <span>Ambos (Sincronizado)</span>
+            </button>
           </div>
         </div>
 
         <!-- Barra Maestra de Reproducción Sincronizada -->
         <div class="master-player-bar">
-          <button id="btn-master-play" class="btn-stem-play" title="Reproducir / Pausar Ambos Canales">
+          <button id="btn-master-play" type="button" class="btn-stem-play" title="Reproducir / Pausar Audio">
             <svg id="master-play-icon" class="icon" style="width: 20px; height: 20px;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           </button>
           <div style="flex: 1;">
             <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">
-              <span>TIEMPO TRANSCURRIDO: <strong id="time-current" style="color: #fff;">00:00</strong></span>
-              <span>DURACIÓN TOTAL: <strong id="time-total" style="color: #fff;">00:00</strong></span>
+              <span>TIEMPO: <strong id="time-current" style="color: #fff;">00:00</strong></span>
+              <span>DURACIÓN: <strong id="time-total" style="color: #fff;">00:00</strong></span>
             </div>
             <input type="range" id="master-scrubber" min="0" max="100" value="0" style="width: 100%; cursor: pointer;">
           </div>
@@ -459,18 +584,15 @@
                 <input type="range" id="vol-inst" class="volume-slider" min="0" max="1" step="0.05" value="1" title="Volumen Instrumental">
                 <span id="vol-inst-text" style="font-size: 0.75rem; font-weight: 700; width: 34px;">100%</span>
               </div>
-              <button id="btn-mute-inst" class="action-btn" title="Silenciar Instrumental">Mute</button>
-              <button id="btn-solo-inst" class="action-btn" title="Solo Instrumental">Solo</button>
-              <a id="btn-dl-inst" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.85rem;" download>
+              <button id="btn-mute-inst" type="button" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem;" title="Silenciar Instrumental">Mute</button>
+              <a id="btn-dl-inst" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;" download>
                 <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Descargar Instrumental
               </a>
             </div>
           </div>
 
-          <div id="viz-inst" class="wave-visualizer instrumental">
-            <!-- Barras de onda generadas dinámicamente -->
-          </div>
+          <div id="viz-inst" class="wave-visualizer instrumental"></div>
         </div>
 
         <!-- CANAL 2: VOZ AISLADA (ACAPELLA) -->
@@ -490,18 +612,15 @@
                 <input type="range" id="vol-voc" class="volume-slider" min="0" max="1" step="0.05" value="1" title="Volumen Vocal">
                 <span id="vol-voc-text" style="font-size: 0.75rem; font-weight: 700; width: 34px;">100%</span>
               </div>
-              <button id="btn-mute-voc" class="action-btn" title="Silenciar Voz">Mute</button>
-              <button id="btn-solo-voc" class="action-btn" title="Solo Voz">Solo</button>
-              <a id="btn-dl-voc" class="btn" style="background: linear-gradient(135deg, #ff007b, #c026d3); color: #fff; padding: 8px 18px; font-size: 0.85rem; border: none; font-weight: 700;" download>
+              <button id="btn-mute-voc" type="button" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem;" title="Silenciar Voz">Mute</button>
+              <a id="btn-dl-voc" class="btn" style="background: linear-gradient(135deg, #ff007b, #c026d3); color: #fff; padding: 8px 18px; font-size: 0.85rem; border: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;" download>
                 <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Descargar Solo Voz
               </a>
             </div>
           </div>
 
-          <div id="viz-voc" class="wave-visualizer vocals">
-            <!-- Barras de onda generadas dinámicamente -->
-          </div>
+          <div id="viz-voc" class="wave-visualizer vocals"></div>
         </div>
 
       </div>
@@ -510,11 +629,8 @@
 
   </main>
 
-  <footer class="main-footer">
-    <div class="footer-bottom" style="text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 0.88rem;">
-      CloudTranslator &copy; 2026 &bull; Pilar 05: Separador de Voz e Instrumental con DSP Nativo &bull; Desarrollado por Miguel Angel Carlos Rojas
-    </div>
-  </footer>
+  <!-- Componente Modular: Pie de Página -->
+  <footer id="footer-placeholder" data-component="footer" data-active="vocal-remover"></footer>
 
   <!-- Audio elements ocultos para sincronización -->
   <audio id="audio-inst" preload="auto"></audio>
@@ -527,6 +643,7 @@
       const tabFile = document.getElementById("tab-mode-file");
       const panelUrl = document.getElementById("panel-url");
       const panelFile = document.getElementById("panel-file");
+      const platformsBox = document.getElementById("platforms-selector-box");
 
       let currentMode = "url";
       let selectedFileBase64 = null;
@@ -538,6 +655,7 @@
         tabFile.classList.remove("active");
         panelUrl.style.display = "block";
         panelFile.style.display = "none";
+        if (platformsBox) platformsBox.style.display = "block";
       });
 
       tabFile.addEventListener("click", () => {
@@ -546,12 +664,13 @@
         tabUrl.classList.remove("active");
         panelFile.style.display = "block";
         panelUrl.style.display = "none";
+        if (platformsBox) platformsBox.style.display = "none";
       });
 
-      // Drag and drop
+      // Manejo de archivo local
       const dropZone = document.getElementById("drop-zone");
       const fileInput = document.getElementById("file-input");
-      const fileBadge = document.getElementById("file-info-badge");
+      const fileInfo = document.getElementById("file-info-badge");
       const fileNameEl = document.getElementById("file-info-name");
       const btnRemoveFile = document.getElementById("btn-remove-file");
 
@@ -561,24 +680,19 @@
       dropZone.addEventListener("drop", (e) => {
         e.preventDefault();
         dropZone.classList.remove("dragover");
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-          handleFile(e.dataTransfer.files[0]);
-        }
+        if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
       });
-      fileInput.addEventListener("change", (e) => {
-        if (e.target.files && e.target.files[0]) {
-          handleFile(e.target.files[0]);
-        }
+
+      fileInput.addEventListener("change", () => {
+        if (fileInput.files.length) handleFile(fileInput.files[0]);
       });
 
       function handleFile(file) {
-        if (file.size > 50 * 1024 * 1024) {
-          alert("El archivo excede el límite máximo de 50 MB.");
-          return;
-        }
+        if (!file) return;
         selectedFileName = file.name;
-        fileNameEl.textContent = `${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)`;
-        fileBadge.style.display = "flex";
+        fileNameEl.textContent = file.name;
+        fileInfo.style.display = "flex";
+        dropZone.style.display = "none";
 
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -591,25 +705,79 @@
         selectedFileBase64 = null;
         selectedFileName = "";
         fileInput.value = "";
-        fileBadge.style.display = "none";
+        fileInfo.style.display = "none";
+        dropZone.style.display = "block";
       });
 
-      // Pegar y Limpiar
+      // Detección automática de plataformas
       const inputUrl = document.getElementById("input-media-url");
-      const btnPaste = document.getElementById("btn-paste-url");
       const btnClear = document.getElementById("btn-clear-url");
+      const platformHoverLabel = document.getElementById("platform-hover-label");
+      const detectedPlatformBadge = document.getElementById("detected-platform-badge");
 
-      btnPaste.addEventListener("click", async () => {
-        try {
-          const txt = await navigator.clipboard.readText();
-          if (txt) inputUrl.value = txt.trim();
-        } catch { inputUrl.focus(); }
+      const platformNames = {
+        youtube: "YouTube",
+        tiktok: "TikTok",
+        instagram: "Instagram",
+        facebook: "Facebook",
+        twitter: "Twitter / X",
+        pinterest: "Pinterest",
+        direct: "Enlace Directo"
+      };
+
+      function detectPlatformFromUrl(url) {
+        const u = (url || "").trim().toLowerCase();
+        if (!u) return null;
+        if (u.includes("youtube.com") || u.includes("youtu.be")) return "youtube";
+        if (u.includes("tiktok.com")) return "tiktok";
+        if (u.includes("instagram.com")) return "instagram";
+        if (u.includes("facebook.com") || u.includes("fb.watch")) return "facebook";
+        if (u.includes("twitter.com") || u.includes("x.com")) return "twitter";
+        if (u.includes("pinterest.com") || u.includes("pin.it")) return "pinterest";
+        if (u.startsWith("http://") || u.startsWith("https://")) return "direct";
+        return null;
+      }
+
+      function syncDetectedPlatform(url) {
+        const detected = detectPlatformFromUrl(url);
+        document.querySelectorAll(".platform-chip").forEach(c => {
+          if (detected && c.getAttribute("data-platform") === detected) {
+            c.classList.add("active");
+          } else {
+            c.classList.remove("active");
+          }
+        });
+
+        if (detected && platformNames[detected]) {
+          if (detectedPlatformBadge) detectedPlatformBadge.textContent = `${platformNames[detected]} DETECTADO`;
+          if (platformHoverLabel) platformHoverLabel.textContent = platformNames[detected];
+        } else {
+          if (detectedPlatformBadge) detectedPlatformBadge.textContent = "DETECCIÓN AUTOMÁTICA";
+          if (platformHoverLabel) platformHoverLabel.textContent = "7 PLATAFORMAS";
+        }
+      }
+
+      inputUrl.addEventListener("input", () => {
+        syncDetectedPlatform(inputUrl.value);
       });
-      btnClear.addEventListener("click", () => { inputUrl.value = ""; inputUrl.focus(); });
+
+      btnClear.addEventListener("click", () => {
+        inputUrl.value = "";
+        syncDetectedPlatform("");
+        inputUrl.focus();
+      });
+
+      // Clic en chips de plataforma solo enfoca el campo de texto (sin rellenar URL por defecto)
+      document.querySelectorAll(".platform-chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+          inputUrl.focus();
+        });
+      });
 
       // Generar barras decorativas para visualizadores
       ["viz-inst", "viz-voc"].forEach(id => {
         const box = document.getElementById(id);
+        if (!box) return;
         for (let i = 0; i < 45; i++) {
           const bar = document.createElement("div");
           bar.className = "wave-bar";
@@ -620,7 +788,6 @@
 
       // Procesar Separación
       const btnProcess = document.getElementById("btn-process-split");
-      const btnText = document.getElementById("btn-split-text");
       const progressBox = document.getElementById("progress-box");
       const progressBar = document.getElementById("progress-bar");
       const progressPercent = document.getElementById("progress-percent");
@@ -658,14 +825,14 @@
         progressBox.style.display = "block";
         progressBar.style.width = "20%";
         progressPercent.textContent = "20%";
-        progressStatus.innerHTML = `<span class="spinner"></span> Extrayendo audio maestro de alta fidelidad...`;
+        progressStatus.innerHTML = `<span class="spinner" style="display: inline-block; width: 14px; height: 14px;"></span> Extrayendo audio maestro de alta fidelidad...`;
 
         try {
           setTimeout(() => {
             if (progressBar.style.width === "20%") {
               progressBar.style.width = "55%";
               progressPercent.textContent = "55%";
-              progressStatus.innerHTML = `<span class="spinner"></span> Ejecutando cancelación de fase y división de acapella...`;
+              progressStatus.innerHTML = `<span class="spinner" style="display: inline-block; width: 14px; height: 14px;"></span> Ejecutando cancelación estereofónica de fase y separación de acapella...`;
             }
           }, 1200);
 
@@ -680,7 +847,7 @@
           progressPercent.textContent = "100%";
 
           if (data.status === "success") {
-            progressStatus.textContent = "¡Separación completada con éxito!";
+            progressStatus.textContent = "Separación completada con éxito";
             displaySeparationResult(data);
           } else {
             alert(data.error || "No se pudo procesar la separación.");
@@ -716,10 +883,65 @@
         audioInst.load();
         audioVoc.load();
 
+        // Modo por defecto al renderizar: Solo Instrumental
+        applyListeningMode("inst");
+
         resultBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }
 
-      // Controles del Reproductor Dual Sincronizado
+      // Selector Interactivo de Modo de Escucha: Solo Instrumental / Solo Voz / Ambos
+      const btnModeInst = document.getElementById("btn-mode-inst");
+      const btnModeVoc = document.getElementById("btn-mode-voc");
+      const btnModeBoth = document.getElementById("btn-mode-both");
+      const currentListenLabel = document.getElementById("current-listen-label");
+
+      const volInst = document.getElementById("vol-inst");
+      const volVoc = document.getElementById("vol-voc");
+      const volInstText = document.getElementById("vol-inst-text");
+      const volVocText = document.getElementById("vol-voc-text");
+      const btnMuteInst = document.getElementById("btn-mute-inst");
+      const btnMuteVoc = document.getElementById("btn-mute-voc");
+
+      function applyListeningMode(mode) {
+        btnModeInst.classList.remove("active");
+        btnModeVoc.classList.remove("active");
+        btnModeBoth.classList.remove("active");
+
+        if (mode === "inst") {
+          btnModeInst.classList.add("active");
+          currentListenLabel.textContent = "SOLO INSTRUMENTAL (KARAOKE)";
+          audioInst.muted = false;
+          audioVoc.muted = true;
+          btnMuteInst.textContent = "Mute";
+          btnMuteInst.style.color = "";
+          btnMuteVoc.textContent = "Silenciado";
+          btnMuteVoc.style.color = "#ff4d4d";
+        } else if (mode === "voc") {
+          btnModeVoc.classList.add("active");
+          currentListenLabel.textContent = "SOLO VOZ (ACAPELLA)";
+          audioVoc.muted = false;
+          audioInst.muted = true;
+          btnMuteVoc.textContent = "Mute";
+          btnMuteVoc.style.color = "";
+          btnMuteInst.textContent = "Silenciado";
+          btnMuteInst.style.color = "#ff4d4d";
+        } else if (mode === "both") {
+          btnModeBoth.classList.add("active");
+          currentListenLabel.textContent = "AMBOS SINCRONIZADOS";
+          audioInst.muted = false;
+          audioVoc.muted = false;
+          btnMuteInst.textContent = "Mute";
+          btnMuteInst.style.color = "";
+          btnMuteVoc.textContent = "Mute";
+          btnMuteVoc.style.color = "";
+        }
+      }
+
+      btnModeInst.addEventListener("click", () => applyListeningMode("inst"));
+      btnModeVoc.addEventListener("click", () => applyListeningMode("voc"));
+      btnModeBoth.addEventListener("click", () => applyListeningMode("both"));
+
+      // Controles del Reproductor Sincronizado
       const btnMasterPlay = document.getElementById("btn-master-play");
       const masterIcon = document.getElementById("master-play-icon");
       const masterScrubber = document.getElementById("master-scrubber");
@@ -748,7 +970,6 @@
           audioVoc.pause();
           updateMasterPlayState(false);
         } else {
-          // Sincronizar tiempo exacto
           audioVoc.currentTime = audioInst.currentTime;
           Promise.all([audioInst.play(), audioVoc.play()]).then(() => {
             updateMasterPlayState(true);
@@ -756,7 +977,7 @@
         }
       });
 
-      // Actualizar barra de progreso
+      // Actualizar tiempo y scrubber
       audioInst.addEventListener("timeupdate", () => {
         if (!audioInst.duration) return;
         const pct = (audioInst.currentTime / audioInst.duration) * 100;
@@ -777,16 +998,7 @@
         updateMasterPlayState(false);
       });
 
-      // Controles de Volumen y Mute / Solo
-      const volInst = document.getElementById("vol-inst");
-      const volVoc = document.getElementById("vol-voc");
-      const volInstText = document.getElementById("vol-inst-text");
-      const volVocText = document.getElementById("vol-voc-text");
-      const btnMuteInst = document.getElementById("btn-mute-inst");
-      const btnMuteVoc = document.getElementById("btn-mute-voc");
-      const btnSoloInst = document.getElementById("btn-solo-inst");
-      const btnSoloVoc = document.getElementById("btn-solo-voc");
-
+      // Faders de volumen individuales
       volInst.addEventListener("input", () => {
         audioInst.volume = volInst.value;
         volInstText.textContent = `${Math.round(volInst.value * 100)}%`;
@@ -807,24 +1019,6 @@
         audioVoc.muted = !audioVoc.muted;
         btnMuteVoc.textContent = audioVoc.muted ? "Desmutear" : "Mute";
         btnMuteVoc.style.color = audioVoc.muted ? "#ff4d4d" : "";
-      });
-
-      btnSoloInst.addEventListener("click", () => {
-        audioInst.muted = false;
-        audioVoc.muted = true;
-        btnMuteInst.textContent = "Mute";
-        btnMuteInst.style.color = "";
-        btnMuteVoc.textContent = "Desmutear";
-        btnMuteVoc.style.color = "#ff4d4d";
-      });
-
-      btnSoloVoc.addEventListener("click", () => {
-        audioVoc.muted = false;
-        audioInst.muted = true;
-        btnMuteVoc.textContent = "Mute";
-        btnMuteVoc.style.color = "";
-        btnMuteInst.textContent = "Desmutear";
-        btnMuteInst.style.color = "#ff4d4d";
       });
     });
   </script>

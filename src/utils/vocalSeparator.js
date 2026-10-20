@@ -68,12 +68,19 @@ function separateAudioChannels(inputAudioPath, outInstrumentalPath, outVocalsPat
       const bitrateMap = { "320k": "320k", "192k": "192k", "128k": "128k" };
       const bitrate = bitrateMap[quality] || "320k";
 
-      // Pipeline 1: Instrumental / Karaoke (Elimina la voz central mediante cancelación estereofónica DSP)
+      // Pipeline 1: Instrumental / Karaoke (Elimina la voz central mediante cancelación estereofónica DSP de 3 bandas)
       const pInstrumental = new Promise((res, rej) => {
+        const instFilter = '[0:a]aformat=channel_layouts=stereo,asplit=3[low][mid][high];' +
+          '[low]lowpass=f=180[bass];' +
+          '[mid]highpass=f=180,lowpass=f=6800,pan=stereo|c0=0.5*c0-0.5*c1|c1=0.5*c1-0.5*c0[inst_mid];' +
+          '[high]highpass=f=6800[treble];' +
+          '[bass][inst_mid][treble]amix=inputs=3:dropout_transition=0,volume=2.6[out]';
+
         const ffInst = spawn(ffmpegPath, [
           "-y",
           "-i", inputAudioPath,
-          "-af", "stereotools=mlev=0.015625:slev=1.35:softclip=1,volume=1.3",
+          "-filter_complex", instFilter,
+          "-map", "[out]",
           "-c:a", "libmp3lame",
           "-b:a", bitrate,
           "-id3v2_version", "3",
@@ -92,12 +99,19 @@ function separateAudioChannels(inputAudioPath, outInstrumentalPath, outVocalsPat
         ffInst.on("error", rej);
       });
 
-      // Pipeline 2: Acapella / Vocales (Aísla el canal central y filtra armónicos vocales humanos)
+      // Pipeline 2: Acapella / Vocales (Aísla el canal central, cancela instrumentos laterales y realza frecuencias vocales)
       const pVocals = new Promise((res, rej) => {
+        const vocFilter = '[0:a]aformat=channel_layouts=stereo,asplit=2[mid_in][side_in];' +
+          '[mid_in]pan=stereo|c0=0.5*c0+0.5*c1|c1=0.5*c0+0.5*c1[mid];' +
+          '[side_in]pan=stereo|c0=0.5*c0-0.5*c1|c1=0.5*c1-0.5*c0[side];' +
+          '[side]volume=-1[side_inv];' +
+          '[mid][side_inv]amix=inputs=2:dropout_transition=0,highpass=f=140,lowpass=f=7500,equalizer=f=1000:t=q:w=1.5:g=3,equalizer=f=3000:t=q:w=1.5:g=4,volume=3.0[out]';
+
         const ffVoc = spawn(ffmpegPath, [
           "-y",
           "-i", inputAudioPath,
-          "-af", "stereotools=slev=0.015625:mlev=1.6:softclip=1,highpass=f=120,lowpass=f=7500,volume=1.4",
+          "-filter_complex", vocFilter,
+          "-map", "[out]",
           "-c:a", "libmp3lame",
           "-b:a", bitrate,
           "-id3v2_version", "3",
