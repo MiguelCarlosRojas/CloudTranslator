@@ -2307,15 +2307,17 @@ footer {
 }
 
 .badge-paypal {
-  background: rgba(0, 112, 186, 0.18);
+  background: transparent;
   color: #38bdf8;
-  border: 1px solid rgba(0, 112, 186, 0.4);
+  border: none;
+  padding: 0;
 }
 
 .badge-yape {
-  background: rgba(116, 34, 132, 0.2);
+  background: transparent;
   color: #d946ef;
-  border: 1px solid rgba(116, 34, 132, 0.45);
+  border: none;
+  padding: 0;
 }
 
 /* Cuadro QR al 100% de Ancho con Efecto Glow */

@@ -35,6 +35,45 @@ function withTimeout(promise, ms = 4500) {
   ]);
 }
 
+/**
+ * Consulta de alta disponibilidad a espejos de extracción para YouTube
+ */
+async function fetchYouTubeStreams(normalizedUrl) {
+  const mirrors = [
+    "https://backend1.tioo.eu.org",
+    "https://backend2.tioo.eu.org",
+    "https://backend3.tioo.eu.org",
+    "https://backend4.tioo.eu.org"
+  ];
+
+  // Intento en paralelo a los espejos
+  const attempts = mirrors.map(async (host) => {
+    try {
+      const res = await axios.get(`${host}/youtube?url=${encodeURIComponent(normalizedUrl)}`, {
+        timeout: 9000
+      });
+      if (res.data && (res.data.mp4 || res.data.mp3)) {
+        return res.data;
+      }
+    } catch {}
+    return null;
+  });
+
+  const results = await Promise.all(attempts);
+  const valid = results.find(r => r && (r.mp4 || r.mp3));
+  if (valid) return valid;
+
+  // Fallback con la librería directa
+  try {
+    const directRes = await btch.youtube(normalizedUrl);
+    if (directRes && (directRes.mp4 || directRes.mp3)) {
+      return directRes;
+    }
+  } catch {}
+
+  return null;
+}
+
 // Directorio de almacenamiento en caché para medios convertidos físicamente
 const MEDIA_CACHE_DIR = path.join(__dirname, "../../data/media_cache");
 try {
@@ -426,10 +465,10 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
       }
     }
 
-    // 1.2 Obtener streams multimedia desde btch.youtube
+    // 1.2 Obtener streams multimedia desde espejos de alta disponibilidad
     try {
-      const ytRes = await btch.youtube(normalized);
-      if (ytRes && ytRes.status) {
+      const ytRes = await fetchYouTubeStreams(normalized);
+      if (ytRes) {
         if (ytRes.title && (!info.title || info.title.startsWith("YouTube Video"))) info.title = ytRes.title;
         if (ytRes.author && (info.author === "Desconocido" || info.author === "YouTube Creator")) info.author = ytRes.author;
         if (ytRes.thumbnail) info.thumbnail = ytRes.thumbnail;
@@ -449,7 +488,7 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
         }
       }
     } catch (err) {
-      logger.warn(`btch.youtube no disponible para ${normalized}: ${err.message}`);
+      logger.warn(`Error al obtener streams de YouTube para ${normalized}: ${err.message}`);
     }
 
     // 1.3 Complementar metadatos mediante oEmbed si es necesario
