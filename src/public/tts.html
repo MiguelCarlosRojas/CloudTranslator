@@ -251,10 +251,15 @@
             </button>
           </div>
 
-          <div style="margin-top: 14px;">
-            <button id="tts-btn-download" class="btn btn-outline w-full" style="padding: 10px 16px; font-size: 0.85rem;">
+          <!-- Acciones de Descarga y Compartir -->
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px;">
+            <button id="tts-btn-download" class="btn btn-primary" style="padding: 10px 18px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
               <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Descargar Audio Generado (MP3 / WAV)
+              Descargar
+            </button>
+            <button id="tts-btn-copy-stream" class="btn btn-outline" style="padding: 10px 16px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+              <svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              Copiar Enlace Directo
             </button>
           </div>
           <audio id="backend-audio-player" preload="auto" style="display: none;"></audio>
@@ -444,6 +449,7 @@
       const ttsBtnPause = document.getElementById("tts-btn-pause");
       const ttsBtnStop = document.getElementById("tts-btn-stop");
       const ttsBtnDownload = document.getElementById("tts-btn-download");
+      const ttsBtnCopyStream = document.getElementById("tts-btn-copy-stream");
       const ttsStatusLabel = document.getElementById("tts-status-label");
       const ttsTimeLabel = document.getElementById("tts-time-label");
       const ttsBars = document.getElementById("tts-bars-container");
@@ -480,7 +486,8 @@
           ttsRate,
           ttsPitch,
           ttsBtnPlay,
-          ttsBtnDownload
+          ttsBtnDownload,
+          ttsBtnCopyStream
         ];
 
         lockableElements.forEach(el => {
@@ -826,7 +833,8 @@
           }
 
           ttsBtnDownload.disabled = true;
-          ttsBtnDownload.textContent = "Generando audio en el backend...";
+          const origDownloadHtml = ttsBtnDownload.innerHTML;
+          ttsBtnDownload.innerHTML = `<span class="spinner" style="display:inline-block;width:14px;height:14px;margin-right:6px;"></span> Descargando...`;
 
           try {
             let audioData = lastGeneratedAudio;
@@ -843,6 +851,9 @@
                 })
               });
               audioData = await resp.json();
+              if (audioData.status === "success") {
+                lastGeneratedAudio = audioData;
+              }
             }
 
             if (audioData && audioData.audioBase64) {
@@ -865,18 +876,71 @@
               document.body.removeChild(a);
               setTimeout(() => URL.revokeObjectURL(url), 2000);
 
-              ttsBtnDownload.textContent = "¡Descarga completada!";
+              ttsBtnDownload.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ¡Descargado!`;
               setTimeout(() => {
-                ttsBtnDownload.textContent = "Descargar Audio Generado (MP3 / WAV)";
+                ttsBtnDownload.innerHTML = origDownloadHtml;
                 ttsBtnDownload.disabled = false;
-              }, 2500);
+              }, 2000);
             } else {
               throw new Error("No se pudo obtener el buffer de audio");
             }
           } catch (e) {
             alert("Error al descargar audio: " + e.message);
             ttsBtnDownload.disabled = false;
-            ttsBtnDownload.textContent = "Descargar Audio Generado (MP3 / WAV)";
+            ttsBtnDownload.innerHTML = origDownloadHtml;
+          }
+        });
+      }
+
+      // Copiar Enlace Directo
+      if (ttsBtnCopyStream) {
+        ttsBtnCopyStream.addEventListener("click", async () => {
+          const text = (ttsInput.value || "").trim();
+          if (!text) {
+            alert("Escribe un texto antes de copiar el enlace directo.");
+            return;
+          }
+
+          const origCopyHtml = ttsBtnCopyStream.innerHTML;
+          ttsBtnCopyStream.innerHTML = `<span class="spinner" style="display:inline-block;width:14px;height:14px;margin-right:6px;"></span> Obteniendo...`;
+
+          try {
+            let audioData = lastGeneratedAudio;
+            if (!audioData || audioData.text !== text) {
+              const resp = await fetch("/api/tts", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  text,
+                  voiceId: ttsVoice.value,
+                  lang: ttsLang.value.slice(0, 2),
+                  rate: parseFloat(ttsRate.value) || 1.0,
+                  pitch: parseFloat(ttsPitch.value) || 1.0
+                })
+              });
+              audioData = await resp.json();
+              if (audioData.status === "success") {
+                lastGeneratedAudio = audioData;
+              }
+            }
+
+            let fullUrl = "";
+            if (audioData && audioData.streamUrl) {
+              fullUrl = audioData.streamUrl.startsWith("http") ? audioData.streamUrl : window.location.origin + audioData.streamUrl;
+            } else if (audioData && audioData.downloadUrl) {
+              fullUrl = audioData.downloadUrl.startsWith("http") ? audioData.downloadUrl : window.location.origin + audioData.downloadUrl;
+            } else {
+              fullUrl = window.location.origin + `/api/tts/stream?text=${encodeURIComponent(text)}&voiceId=${encodeURIComponent(ttsVoice.value)}`;
+            }
+
+            await navigator.clipboard.writeText(fullUrl);
+            ttsBtnCopyStream.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ¡Enlace Copiado!`;
+            setTimeout(() => {
+              ttsBtnCopyStream.innerHTML = origCopyHtml;
+            }, 2000);
+          } catch (e) {
+            alert("Error al copiar el enlace directo: " + e.message);
+            ttsBtnCopyStream.innerHTML = origCopyHtml;
           }
         });
       }

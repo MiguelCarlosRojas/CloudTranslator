@@ -633,19 +633,32 @@
       <!-- ========================================================================= -->
       <div id="result-box" style="display: none; background: rgba(15, 17, 24, 0.95); border: 1px solid rgba(0, 240, 255, 0.4); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-glow);">
         
-        <!-- Cabecera de la Pista Procesada -->
-        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
-          <img id="res-thumb" src="/img/logo.png" alt="Cover" style="width: 64px; height: 64px; border-radius: 10px; object-fit: cover; border: 1px solid var(--border-subtle);">
-          <div style="flex: 1; min-width: 200px;">
-            <h3 id="res-title" style="margin: 0 0 6px 0; font-size: 1.2rem; font-weight: 800; line-height: 1.4;">Título de la Canción</h3>
-            <div style="display: flex; gap: 10px; align-items: center; font-size: 0.82rem; color: var(--text-muted); flex-wrap: wrap;">
-              <span id="res-platform" style="background: rgba(255, 255, 255, 0.08); padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">MULTIMEDIA</span>
-              <span id="res-duration">00:00</span>
-              <span id="res-stem-badge" style="color: var(--primary); display: inline-flex; align-items: center; gap: 4px;">
-                <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polyline points="20 6 9 17 4 12"/></svg>
-                DEMUCS v4 AI // 2 STEMS
-              </span>
+        <!-- Cabecera de la Pista Procesada con Acciones -->
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 16px; min-width: 240px; flex: 1;">
+            <img id="res-thumb" src="/img/logo.png" alt="Cover" style="width: 64px; height: 64px; border-radius: 10px; object-fit: cover; border: 1px solid var(--border-subtle);">
+            <div>
+              <h3 id="res-title" style="margin: 0 0 6px 0; font-size: 1.2rem; font-weight: 800; line-height: 1.4;">Título de la Canción</h3>
+              <div style="display: flex; gap: 10px; align-items: center; font-size: 0.82rem; color: var(--text-muted); flex-wrap: wrap;">
+                <span id="res-platform" style="background: rgba(255, 255, 255, 0.08); padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">MULTIMEDIA</span>
+                <span id="res-duration">00:00</span>
+                <span id="res-stem-badge" style="color: var(--primary); display: inline-flex; align-items: center; gap: 4px;">
+                  <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polyline points="20 6 9 17 4 12"/></svg>
+                  DEMUCS v4 AI // 2 STEMS
+                </span>
+              </div>
             </div>
+          </div>
+          <!-- Acciones de Descarga y Compartir -->
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a id="btn-dl-active" href="#" class="btn btn-primary" download style="padding: 10px 18px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Descargar
+            </a>
+            <button id="btn-copy-stream-active" type="button" class="btn btn-outline" style="padding: 10px 16px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+              <svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              Copiar Enlace Directo
+            </button>
           </div>
         </div>
 
@@ -703,10 +716,14 @@
                 <span id="vol-inst-text" style="font-size: 0.75rem; font-weight: 700; width: 34px;">100%</span>
               </div>
               <button id="btn-mute-inst" type="button" class="btn btn-icon-mute" title="Mute" aria-label="Mute"><svg class="icon mute-icon" viewBox="0 0 24 24" style="width: 17px; height: 17px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg><span class="tooltip-text" id="tt-mute-inst">Mute</span></button>
-              <a id="btn-dl-inst" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;" download>
+              <a id="btn-dl-inst" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;" download>
                 <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Descargar Instrumental
+                Descargar
               </a>
+              <button id="btn-copy-stream-inst" type="button" class="btn btn-outline" style="padding: 8px 14px; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                <svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                Copiar Enlace Directo
+              </button>
             </div>
           </div>
 
@@ -733,8 +750,12 @@
               <button id="btn-mute-voc" type="button" class="btn btn-icon-mute" title="Mute" aria-label="Mute"><svg class="icon mute-icon" viewBox="0 0 24 24" style="width: 17px; height: 17px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg><span class="tooltip-text" id="tt-mute-voc">Mute</span></button>
               <a id="btn-dl-voc" class="btn" style="background: linear-gradient(135deg, #ff007b, #c026d3); color: #fff; padding: 8px 18px; font-size: 0.85rem; border: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;" download>
                 <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Descargar Solo Voz
+                Descargar
               </a>
+              <button id="btn-copy-stream-voc" type="button" class="btn btn-outline" style="padding: 8px 14px; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                <svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                Copiar Enlace Directo
+              </button>
             </div>
           </div>
 
@@ -1314,6 +1335,9 @@
         audioInst.src = data.instrumental.streamUrl;
         audioVoc.src = data.vocals.streamUrl;
 
+        // Almacenar datos globales de separación para descargas y enlaces
+        window.currentSeparationData = data;
+
         // Configurar botones de descarga directa
         const btnDlInst = document.getElementById("btn-dl-inst");
         btnDlInst.href = data.instrumental.downloadUrl;
@@ -1322,6 +1346,40 @@
         const btnDlVoc = document.getElementById("btn-dl-voc");
         btnDlVoc.href = data.vocals.downloadUrl;
         btnDlVoc.setAttribute("download", data.vocals.filename);
+
+        // Configurar botones de copia directa
+        const btnCopyStreamInst = document.getElementById("btn-copy-stream-inst");
+        if (btnCopyStreamInst) {
+          btnCopyStreamInst.onclick = async () => {
+            const fullUrl = window.location.origin + data.instrumental.downloadUrl;
+            try {
+              await navigator.clipboard.writeText(fullUrl);
+              const origHtml = btnCopyStreamInst.innerHTML;
+              btnCopyStreamInst.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ¡Enlace Copiado!`;
+              setTimeout(() => { btnCopyStreamInst.innerHTML = origHtml; }, 2000);
+            } catch (err) {
+              alert("Enlace: " + fullUrl);
+            }
+          };
+        }
+
+        const btnCopyStreamVoc = document.getElementById("btn-copy-stream-voc");
+        if (btnCopyStreamVoc) {
+          btnCopyStreamVoc.onclick = async () => {
+            const fullUrl = window.location.origin + data.vocals.downloadUrl;
+            try {
+              await navigator.clipboard.writeText(fullUrl);
+              const origHtml = btnCopyStreamVoc.innerHTML;
+              btnCopyStreamVoc.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ¡Enlace Copiado!`;
+              setTimeout(() => { btnCopyStreamVoc.innerHTML = origHtml; }, 2000);
+            } catch (err) {
+              alert("Enlace: " + fullUrl);
+            }
+          };
+        }
+
+        // Configurar botón de descarga y enlace activo de cabecera
+        updateActiveDownloadButtons();
 
         audioInst.load();
         audioVoc.load();
@@ -1363,7 +1421,34 @@
         }
       }
 
+      function updateActiveDownloadButtons(mode) {
+        if (!window.currentSeparationData) return;
+        const btnDlActive = document.getElementById("btn-dl-active");
+        const btnCopyActive = document.getElementById("btn-copy-stream-active");
+        const isVoc = (mode === "voc");
+        const targetStem = isVoc ? window.currentSeparationData.vocals : window.currentSeparationData.instrumental;
+
+        if (btnDlActive) {
+          btnDlActive.href = targetStem.downloadUrl;
+          btnDlActive.setAttribute("download", targetStem.filename);
+        }
+        if (btnCopyActive) {
+          btnCopyActive.onclick = async () => {
+            const fullUrl = window.location.origin + targetStem.downloadUrl;
+            try {
+              await navigator.clipboard.writeText(fullUrl);
+              const origHtml = btnCopyActive.innerHTML;
+              btnCopyActive.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ¡Enlace Copiado!`;
+              setTimeout(() => { btnCopyActive.innerHTML = origHtml; }, 2000);
+            } catch (err) {
+              alert("Enlace: " + fullUrl);
+            }
+          };
+        }
+      }
+
       function applyListeningMode(mode) {
+        updateActiveDownloadButtons(mode);
         btnModeInst.classList.remove("active");
         btnModeVoc.classList.remove("active");
         btnModeBoth.classList.remove("active");

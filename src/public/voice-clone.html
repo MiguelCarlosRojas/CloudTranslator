@@ -363,10 +363,17 @@
               </div>
             </div>
 
-            <button id="btn-download-clone" class="btn btn-outline w-full" style="padding: 11px 16px; font-size: 0.86rem; border-color: var(--secondary); color: #ffffff; font-weight: 600;">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Descargar Audio Clonado
-            </button>
+            <!-- Acciones de Descarga y Compartir -->
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+              <button id="btn-download-clone" class="btn btn-primary" style="padding: 10px 18px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Descargar
+              </button>
+              <button id="btn-copy-stream-clone" class="btn btn-outline" style="padding: 10px 16px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                <svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                Copiar Enlace Directo
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1034,6 +1041,7 @@
 
               if (data.audioBase64 || data.streamUrl) {
                 let resultUrl = data.streamUrl;
+                window.lastCloneStreamUrl = data.streamUrl || data.downloadUrl || null;
                 if (data.audioBase64) {
                   const base64Data = data.audioBase64.includes(",") ? data.audioBase64.split(",")[1] : data.audioBase64;
                   const byteCharacters = atob(base64Data);
@@ -1097,7 +1105,7 @@
               btnSynthesizeClone.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Sintetizar Voz Clonada`;
         }
 
-        // Descarga física directa
+        // Acciones: Descarga física y Copiar Enlace Directo
         const btnDownloadClone = document.getElementById("btn-download-clone");
         if (btnDownloadClone) {
           btnDownloadClone.onclick = () => {
@@ -1116,10 +1124,39 @@
             document.body.removeChild(a);
             setTimeout(() => URL.revokeObjectURL(downloadUrl), 2000);
 
-            btnDownloadClone.textContent = `¡Archivo .${ext.toUpperCase()} Descargado!`;
+            const origHtml = btnDownloadClone.innerHTML;
+            btnDownloadClone.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ¡Descargado!`;
             setTimeout(() => {
-              btnDownloadClone.textContent = `Descargar Audio Clonado (.${ext.toUpperCase()})`;
-            }, 2500);
+              btnDownloadClone.innerHTML = origHtml;
+            }, 2000);
+          };
+        }
+
+        const btnCopyStreamClone = document.getElementById("btn-copy-stream-clone");
+        if (btnCopyStreamClone) {
+          btnCopyStreamClone.onclick = async () => {
+            if (!generatedVoiceBlob) {
+              alert("Primero sintetiza una voz para poder copiar su enlace directo.");
+              return;
+            }
+
+            const origCopyHtml = btnCopyStreamClone.innerHTML;
+            try {
+              let directUrl = "";
+              if (window.lastCloneStreamUrl) {
+                directUrl = window.lastCloneStreamUrl.startsWith("http") ? window.lastCloneStreamUrl : window.location.origin + window.lastCloneStreamUrl;
+              } else {
+                directUrl = window.location.origin + "/api/voice-clone/stream";
+              }
+              await navigator.clipboard.writeText(directUrl);
+              btnCopyStreamClone.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ¡Enlace Copiado!`;
+              setTimeout(() => {
+                btnCopyStreamClone.innerHTML = origCopyHtml;
+              }, 2000);
+            } catch (err) {
+              alert("Error al copiar enlace: " + err.message);
+              btnCopyStreamClone.innerHTML = origCopyHtml;
+            }
           };
         }
 

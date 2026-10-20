@@ -985,10 +985,18 @@
         btnDownload.setAttribute("download", item.filename || `media.${item.format}`);
         btnDownload.removeAttribute("target");
 
-        btnCopyStream.onclick = () => {
+        btnCopyStream.onclick = async () => {
           const downloadFull = window.location.origin + item.downloadUrl;
-          navigator.clipboard.writeText(downloadFull);
-          alert("Enlace directo copiado al portapapeles.");
+          try {
+            await navigator.clipboard.writeText(downloadFull);
+            const origCopyHtml = btnCopyStream.innerHTML;
+            btnCopyStream.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ¡Enlace Copiado!`;
+            setTimeout(() => {
+              btnCopyStream.innerHTML = origCopyHtml;
+            }, 2000);
+          } catch (e) {
+            alert("Enlace directo copiado: " + downloadFull);
+          }
         };
 
         if (item.format === "mp4") {
