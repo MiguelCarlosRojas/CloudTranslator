@@ -130,15 +130,26 @@
 
     <!-- Hero del Pilar 2 -->
     <section class="hero-full">
-      <span class="hero-tag-glow">PILAR 02 // SÍNTESIS VOCAL (TTS)</span>
-      <h1>Estudio de Texto a Voz (TTS Multilingüe)</h1>
-      <p class="lead">
-        Convierte cualquier texto o guion en audio natural de alta fidelidad. Personaliza el idioma, selecciona el timbre de voz, ajusta velocidad y tono en tiempo real con reproductor y ecualizador visual.
-      </p>
-      <div class="hero-actions">
-        <a href="#tts-studio" class="btn btn-primary">Iniciar Síntesis de Voz</a>
-        <a href="/api#api-post-tts" class="btn btn-outline">Probar en API REST</a>
-        <a href="/docs#session-tts" class="btn btn-outline">Docs Técnicos</a>
+      <div class="hero-split">
+        <div class="hero-split-content">
+          <span class="hero-tag-glow">PILAR 02 // SÍNTESIS VOCAL (TTS)</span>
+          <h1 style="font-size: clamp(2rem, 4.4vw, 3rem); font-weight: 800;">Estudio de Texto a Voz (TTS Multilingüe)</h1>
+          <p class="lead">
+            Convierte cualquier texto o guion en audio natural de alta fidelidad. Personaliza el idioma, selecciona el timbre de voz, ajusta velocidad y tono en tiempo real con reproductor y ecualizador visual.
+          </p>
+          <div class="hero-actions">
+            <a href="#tts-studio" class="btn btn-primary">Iniciar Síntesis de Voz</a>
+            <a href="/api#api-post-tts" class="btn btn-outline">Probar en API REST</a>
+            <a href="/docs#session-tts" class="btn btn-outline">Docs Técnicos</a>
+          </div>
+        </div>
+
+        <div class="hero-split-media">
+          <div class="hero-logo-wrapper">
+            <div class="hero-logo-glow" style="background: radial-gradient(circle, rgba(0, 240, 255, 0.4) 0%, rgba(168, 85, 247, 0.25) 60%, transparent 80%);"></div>
+            <img src="/img/logo.png" alt="CloudTranslator TTS" class="hero-logo-big" width="290" height="290">
+          </div>
+        </div>
       </div>
     </section>
 
@@ -460,6 +471,7 @@
       let lastGeneratedAudio = null;
       let playStartTime = 0;
       let timerInterval = null;
+      let isStoppingPlayback = false;
 
       function updateCharCount() {
         if (ttsInput && ttsCharCount) {
@@ -469,7 +481,8 @@
       if (ttsInput) ttsInput.addEventListener("input", updateCharCount);
 
       function stopCurrentPlayback() {
-        if (audioPlayer && (!audioPlayer.paused || audioPlayer.currentTime > 0)) {
+        if (audioPlayer) {
+          isStoppingPlayback = true;
           audioPlayer.pause();
           audioPlayer.currentTime = 0;
           setStatus("DETENIDO", false);
@@ -715,11 +728,19 @@
 
       // Eventos del Audio Player HTML5 con bloqueo automático
       audioPlayer.addEventListener("play", () => {
+        isStoppingPlayback = false;
         setStatus("REPRODUCIENDO", true);
         startTimer();
         setTTSPlaybackLock(true);
       });
       audioPlayer.addEventListener("pause", () => {
+        if (isStoppingPlayback) {
+          isStoppingPlayback = false;
+          setStatus("DETENIDO", false);
+          stopTimer();
+          setTTSPlaybackLock(false);
+          return;
+        }
         setStatus("PAUSADO", false);
         if (timerInterval) clearInterval(timerInterval);
         setTTSPlaybackLock(false);
@@ -815,11 +836,7 @@
 
       if (ttsBtnStop) {
         ttsBtnStop.addEventListener("click", () => {
-          audioPlayer.pause();
-          audioPlayer.currentTime = 0;
-          setStatus("DETENIDO", false);
-          stopTimer();
-          setTTSPlaybackLock(false);
+          stopCurrentPlayback();
         });
       }
 
