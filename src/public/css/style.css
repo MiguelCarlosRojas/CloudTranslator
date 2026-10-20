@@ -1059,6 +1059,14 @@ body.ct-translating {
 /* ==========================================================================
    Diseño de Documentación & API (Layout de 2 Columnas con Sidebar Lateral Completo)
    ========================================================================== */
+@media (min-width: 993px) {
+  body:has(.docs-layout-container) {
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+  }
+}
+
 .docs-layout-container {
   display: flex;
   width: 100%;
@@ -1066,19 +1074,20 @@ body.ct-translating {
   margin: 0;
   position: relative;
   align-items: stretch;
-  min-height: calc(100vh - 64px);
+  height: calc(100vh - 64px);
+  max-height: calc(100vh - 64px);
+  overflow: hidden;
 }
 
-/* Barra Lateral Sticky (Desktop) */
+/* Barra Lateral Sticky / Fija a la Izquierda (Desktop) */
 .docs-sidebar {
   width: 360px;
   min-width: 360px;
   max-width: 380px;
   flex-shrink: 0;
-  position: sticky;
-  top: 64px;
-  height: calc(100vh - 64px);
-  min-height: calc(100vh - 64px);
+  position: relative;
+  height: 100%;
+  max-height: 100%;
   overflow-y: auto;
   border-right: 1px solid var(--border-subtle);
   background: rgba(6, 9, 18, 0.98);
@@ -1273,12 +1282,43 @@ body.ct-translating {
 }
 
 /* Contenido Principal de Documentación (Libre de Desplazamiento Bloqueado) */
+/* Contenido Principal de Documentación & API: Posición Fija con Scroll Interno Propio */
 .docs-main-content {
   flex: 1;
   min-width: 0;
-  padding: clamp(28px, 4vw, 52px) clamp(24px, 5vw, 68px);
+  height: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  padding: clamp(28px, 4vw, 52px) clamp(24px, 5vw, 68px) 0 clamp(24px, 5vw, 68px);
   width: 100%;
   max-width: 1440px;
+  display: flex;
+  flex-direction: column;
+}
+
+.docs-main-content > footer {
+  margin-top: 64px;
+  margin-left: calc(-1 * clamp(24px, 5vw, 68px));
+  margin-right: calc(-1 * clamp(24px, 5vw, 68px));
+  width: calc(100% + 2 * clamp(24px, 5vw, 68px));
+}
+
+.docs-main-content::-webkit-scrollbar {
+  width: 8px;
+}
+.docs-main-content::-webkit-scrollbar-track {
+  background: rgba(3, 6, 12, 0.7);
+}
+.docs-main-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+}
+.docs-main-content::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
 }
 
 .docs-section {
@@ -2638,6 +2678,9 @@ footer {
   /* Documentación en Móvil: Sidebar se transforma en Índice Desplegable */
   .docs-layout-container {
     flex-direction: column;
+    height: auto;
+    max-height: none;
+    overflow: visible;
   }
 
   .docs-sidebar {
@@ -2649,9 +2692,19 @@ footer {
   }
 
   .docs-main-content {
-    padding: 20px 16px;
+    padding: 20px 16px 0 16px;
     width: 100%;
     min-width: 0;
+    height: auto;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .docs-main-content > footer {
+    margin-left: -16px;
+    margin-right: -16px;
+    width: calc(100% + 32px);
+    margin-top: 40px;
   }
 
   .docs-section,

@@ -666,16 +666,19 @@ export default function Layout({ children }) {
         </article>
       </section>
 
+      <!-- Pie de Página Integrado al Final del Contenedor de Scroll Interno -->
+      <footer id="footer-placeholder" data-component="footer" data-active="docs"></footer>
+
     </main>
   </div>
-
-  <!-- Pie de Página Aliniado y Estructurado -->
-  <footer id="footer-placeholder" data-component="footer" data-active="docs"></footer>
 
   <script src="/js/cloud-translator.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // 1. ScrollSpy para el sidebar de la documentación
+      const scrollContainer = document.querySelector(".docs-main-content");
+      const isDesktop = window.innerWidth > 992;
+
+      // 1. ScrollSpy para el sidebar de la documentación con observación del scroll interno
       const sessionLinks = document.querySelectorAll(".docs-sidebar-session");
       const subLinks = document.querySelectorAll(".docs-sidebar-sublink");
       const observedElements = document.querySelectorAll(".docs-section, .docs-subsection");
@@ -708,11 +711,49 @@ export default function Layout({ children }) {
           }
         });
       }, {
-        rootMargin: "-90px 0px -50% 0px",
+        root: isDesktop ? scrollContainer : null,
+        rootMargin: "-20px 0px -60% 0px",
         threshold: 0.1
       });
 
       observedElements.forEach(el => observer.observe(el));
+
+      // 2. Navegación suave dentro del panel fijo con barra de desplazamiento interna
+      function scrollToTarget(targetId) {
+        if (!targetId) return;
+        const targetEl = document.getElementById(targetId.replace(/^#/, ''));
+        if (!targetEl) return;
+        if (scrollContainer && window.innerWidth > 992) {
+          const containerRect = scrollContainer.getBoundingClientRect();
+          const targetRect = targetEl.getBoundingClientRect();
+          const targetScrollTop = scrollContainer.scrollTop + (targetRect.top - containerRect.top) - 24;
+          scrollContainer.scrollTo({
+            top: targetScrollTop,
+            behavior: "smooth"
+          });
+        } else {
+          targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
+
+      document.querySelectorAll('.docs-sidebar a[href^="#"], .docs-mobile-toc-bar a[href^="#"], .docs-main-content a[href^="#"]').forEach(link => {
+        link.addEventListener("click", (e) => {
+          const href = link.getAttribute("href");
+          if (href && href.startsWith("#") && href.length > 1) {
+            e.preventDefault();
+            scrollToTarget(href);
+            if (history.pushState) {
+              history.pushState(null, null, href);
+            }
+          }
+        });
+      });
+
+      if (window.location.hash && window.location.hash.length > 1) {
+        setTimeout(() => {
+          scrollToTarget(window.location.hash);
+        }, 150);
+      }
 
       // 3. Control de Índice Rápido Móvil
       const btnToggleToc = document.getElementById("btn-toggle-docs-toc");
