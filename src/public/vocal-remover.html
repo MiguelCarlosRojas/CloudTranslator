@@ -279,6 +279,60 @@
       background: rgba(255, 0, 123, 0.15);
       box-shadow: 0 0 14px rgba(255, 0, 123, 0.25);
     }
+  
+    .btn-icon-mute {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 38px;
+      height: 38px;
+      min-width: 38px;
+      padding: 0;
+      border-radius: var(--radius-md);
+      background: rgba(10, 12, 18, 0.9);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-icon-mute:hover {
+      border-color: var(--primary);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+    .btn-icon-mute.is-muted {
+      background: rgba(239, 68, 68, 0.16);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #ef4444;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.25);
+    }
+    .btn-icon-mute .tooltip-text {
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: rgba(10, 14, 22, 0.98);
+      color: #ffffff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border-subtle);
+      white-space: nowrap;
+      pointer-events: none;
+      transition: all 0.2s ease;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+    .btn-icon-mute:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
   </style>
 </head>
 <body>
@@ -648,7 +702,7 @@
                 <input type="range" id="vol-inst" class="volume-slider" min="0" max="1" step="0.05" value="1" title="Volumen Instrumental">
                 <span id="vol-inst-text" style="font-size: 0.75rem; font-weight: 700; width: 34px;">100%</span>
               </div>
-              <button id="btn-mute-inst" type="button" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem;" title="Silenciar Instrumental">Mute</button>
+              <button id="btn-mute-inst" type="button" class="btn btn-icon-mute" title="Mute" aria-label="Mute"><svg class="icon mute-icon" viewBox="0 0 24 24" style="width: 17px; height: 17px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg><span class="tooltip-text" id="tt-mute-inst">Mute</span></button>
               <a id="btn-dl-inst" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;" download>
                 <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Descargar Instrumental
@@ -676,7 +730,7 @@
                 <input type="range" id="vol-voc" class="volume-slider" min="0" max="1" step="0.05" value="1" title="Volumen Vocal">
                 <span id="vol-voc-text" style="font-size: 0.75rem; font-weight: 700; width: 34px;">100%</span>
               </div>
-              <button id="btn-mute-voc" type="button" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem;" title="Silenciar Voz">Mute</button>
+              <button id="btn-mute-voc" type="button" class="btn btn-icon-mute" title="Mute" aria-label="Mute"><svg class="icon mute-icon" viewBox="0 0 24 24" style="width: 17px; height: 17px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg><span class="tooltip-text" id="tt-mute-voc">Mute</span></button>
               <a id="btn-dl-voc" class="btn" style="background: linear-gradient(135deg, #ff007b, #c026d3); color: #fff; padding: 8px 18px; font-size: 0.85rem; border: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;" download>
                 <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Descargar Solo Voz
@@ -758,7 +812,7 @@
       </div>
     </section>
 
-    <!-- Sección Informativa: Los 6 Pilares del Ecosistema -->
+        <!-- Sección Informativa: Los 6 Pilares del Ecosistema -->
     <section style="margin-top: 36px;">
       <div class="section-full-title">
         <h2>Los 6 Pilares de CloudTranslator</h2>
@@ -804,7 +858,7 @@
             </div>
             <span class="pillar-tag">PILAR 03 // VOICE AI</span>
           </div>
-          <h3>Clonación de Voz con IA</h3>
+          <h3>Clonación de Voz con IA <span class="badge" style="background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4); font-size: 0.68rem; font-weight: 800; padding: 2px 7px; border-radius: 4px; vertical-align: middle; letter-spacing: 0.05em; margin-left: 6px;">ALPHA</span></h3>
           <p>
             Graba con micrófono o sube tu archivo de audio. Escucha tu muestra de referencia, edítala o elimínala con un clic, escribe tu guion y descarga el archivo WAV sintetizado recreando tu timbre vocal único.
           </p>
@@ -1291,6 +1345,24 @@
       const btnMuteInst = document.getElementById("btn-mute-inst");
       const btnMuteVoc = document.getElementById("btn-mute-voc");
 
+      const volIconActive = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>`;
+      const volIconMuted = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>`;
+
+      function updateMuteButtonState(btn, isMuted) {
+        const ttId = btn.id === "btn-mute-inst" ? "tt-mute-inst" : "tt-mute-voc";
+        if (isMuted) {
+          btn.classList.add("is-muted");
+          btn.setAttribute("title", "Silenciado");
+          btn.setAttribute("aria-label", "Silenciado");
+          btn.innerHTML = `<svg class="icon mute-icon" viewBox="0 0 24 24" style="width: 17px; height: 17px;">${volIconMuted}</svg><span class="tooltip-text" id="${ttId}">Silenciado</span>`;
+        } else {
+          btn.classList.remove("is-muted");
+          btn.setAttribute("title", "Mute");
+          btn.setAttribute("aria-label", "Mute");
+          btn.innerHTML = `<svg class="icon mute-icon" viewBox="0 0 24 24" style="width: 17px; height: 17px;">${volIconActive}</svg><span class="tooltip-text" id="${ttId}">Mute</span>`;
+        }
+      }
+
       function applyListeningMode(mode) {
         btnModeInst.classList.remove("active");
         btnModeVoc.classList.remove("active");
@@ -1301,28 +1373,22 @@
           currentListenLabel.textContent = "SOLO INSTRUMENTAL (KARAOKE)";
           audioInst.muted = false;
           audioVoc.muted = true;
-          btnMuteInst.textContent = "Mute";
-          btnMuteInst.style.color = "";
-          btnMuteVoc.textContent = "Silenciado";
-          btnMuteVoc.style.color = "#ff4d4d";
+          updateMuteButtonState(btnMuteInst, false);
+          updateMuteButtonState(btnMuteVoc, true);
         } else if (mode === "voc") {
           btnModeVoc.classList.add("active");
           currentListenLabel.textContent = "SOLO VOZ (ACAPELLA)";
           audioVoc.muted = false;
           audioInst.muted = true;
-          btnMuteVoc.textContent = "Mute";
-          btnMuteVoc.style.color = "";
-          btnMuteInst.textContent = "Silenciado";
-          btnMuteInst.style.color = "#ff4d4d";
+          updateMuteButtonState(btnMuteInst, true);
+          updateMuteButtonState(btnMuteVoc, false);
         } else if (mode === "both") {
           btnModeBoth.classList.add("active");
           currentListenLabel.textContent = "AMBOS SINCRONIZADOS";
           audioInst.muted = false;
           audioVoc.muted = false;
-          btnMuteInst.textContent = "Mute";
-          btnMuteInst.style.color = "";
-          btnMuteVoc.textContent = "Mute";
-          btnMuteVoc.style.color = "";
+          updateMuteButtonState(btnMuteInst, false);
+          updateMuteButtonState(btnMuteVoc, false);
         }
       }
 
@@ -1411,17 +1477,15 @@
         volVocText.textContent = `${volVoc.value}%`;
       });
 
-      // Botones de Mute individuales
+      // Botones de Mute individuales con icono y tooltip
       btnMuteInst.addEventListener("click", () => {
         audioInst.muted = !audioInst.muted;
-        btnMuteInst.textContent = audioInst.muted ? "Silenciado" : "Mute";
-        btnMuteInst.style.color = audioInst.muted ? "#ff4d4d" : "";
+        updateMuteButtonState(btnMuteInst, audioInst.muted);
       });
 
       btnMuteVoc.addEventListener("click", () => {
         audioVoc.muted = !audioVoc.muted;
-        btnMuteVoc.textContent = audioVoc.muted ? "Silenciado" : "Mute";
-        btnMuteVoc.style.color = audioVoc.muted ? "#ff4d4d" : "";
+        updateMuteButtonState(btnMuteVoc, audioVoc.muted);
       });
 
       // Inicialización del traductor
