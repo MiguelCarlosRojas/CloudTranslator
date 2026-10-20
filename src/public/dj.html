@@ -29,7 +29,7 @@
     }
     .dj-decks-grid {
       display: grid;
-      grid-template-columns: 1fr 280px 1fr;
+      grid-template-columns: 1fr 310px 1fr;
       gap: 20px;
       align-items: stretch;
     }
@@ -428,6 +428,337 @@
       box-shadow: 0 0 14px rgba(0, 240, 255, 0.6) !important;
     }
 
+    /* Formas de Onda y Espectro en Vivo */
+    .deck-waveform-container {
+      position: relative;
+      width: 100%;
+      height: 48px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      margin: 10px 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .deck-waveform {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .waveform-badge {
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.65);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Barra de BPM y Tap Tempo */
+    .bpm-control-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 6px 12px;
+      margin: 8px 0;
+      font-size: 0.78rem;
+    }
+    .bpm-display {
+      font-weight: 800;
+      font-size: 1.05rem;
+      font-family: monospace;
+      letter-spacing: 0.04em;
+    }
+    .deck-a .bpm-display { color: var(--primary); }
+    .deck-b .bpm-display { color: #ff007b; }
+    .btn-tap {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-tap:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+    .btn-tap:active {
+      transform: scale(0.92);
+      background: var(--primary);
+      color: #000;
+    }
+    .deck-b .btn-tap:active {
+      background: #ff007b;
+      color: #fff;
+    }
+
+    /* Pads de Hot Cues (1 - 4) */
+    .hot-cues-section {
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .hot-cues-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      letter-spacing: 0.05em;
+    }
+    .hot-cues-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+    .btn-hot-cue {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      padding: 7px 4px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .btn-hot-cue:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .btn-hot-cue.pad-set {
+      color: #fff;
+    }
+    .deck-a .btn-hot-cue.pad-set {
+      border-color: var(--primary);
+      background: rgba(0, 240, 255, 0.18);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.35);
+    }
+    .deck-b .btn-hot-cue.pad-set {
+      border-color: #ff007b;
+      background: rgba(255, 0, 123, 0.18);
+      box-shadow: 0 0 10px rgba(255, 0, 123, 0.35);
+    }
+    .btn-hot-cue:active {
+      transform: scale(0.93);
+    }
+    .hot-cue-time {
+      font-size: 0.62rem;
+      font-family: monospace;
+      opacity: 0.85;
+    }
+
+    /* Auto-Loop / Beat Looping */
+    .loop-section {
+      margin-top: 10px;
+    }
+    .loop-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      letter-spacing: 0.05em;
+    }
+    .loop-btn-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+    }
+    .btn-loop {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-secondary);
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 6px 2px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-loop:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+    .btn-loop.active-loop {
+      background: #10b981 !important;
+      border-color: #10b981 !important;
+      color: #000 !important;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+      font-weight: 900;
+    }
+    .btn-loop-exit {
+      color: #f43f5e;
+      border-color: rgba(244, 63, 94, 0.3);
+    }
+    .btn-loop-exit:hover {
+      background: #f43f5e;
+      color: #fff;
+    }
+
+    /* Stereo LED VU Meter */
+    .vu-meter-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.45);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      margin: 8px 0;
+    }
+    .vu-channel {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+    .vu-label {
+      font-size: 0.68rem;
+      font-weight: 800;
+      width: 14px;
+      text-align: center;
+    }
+    .vu-bars-row {
+      display: flex;
+      gap: 3px;
+    }
+    .vu-led {
+      width: 8px;
+      height: 14px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.08);
+      transition: background 0.08s ease, box-shadow 0.08s ease;
+    }
+    .vu-led.active-green {
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+    .vu-led.active-yellow {
+      background: #f59e0b;
+      box-shadow: 0 0 6px #f59e0b;
+    }
+    .vu-led.active-red {
+      background: #ef4444;
+      box-shadow: 0 0 8px #ef4444;
+    }
+
+    /* Pioneer Color FX Filter Knobs */
+    .filter-controls-row {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      gap: 10px;
+      margin: 8px 0;
+      padding: 8px 10px;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .filter-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+    .filter-col label {
+      font-size: 0.66rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+    .filter-slider {
+      width: 100%;
+      cursor: pointer;
+      height: 6px;
+      border-radius: 3px;
+      accent-color: var(--primary);
+    }
+    .filter-slider-b {
+      accent-color: #ff007b;
+    }
+    .filter-value-text {
+      font-size: 0.65rem;
+      font-weight: 700;
+      font-family: monospace;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* DJ Sampler FX Pads */
+    .sampler-section {
+      width: 100%;
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .sampler-title {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-align: center;
+      display: block;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+    .sampler-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      width: 100%;
+    }
+    .btn-sampler {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 8px 6px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .btn-sampler:active, .btn-sampler.fired {
+      transform: scale(0.95);
+    }
+    .btn-sampler.s-horn { border-color: #f59e0b; color: #fbbf24; }
+    .btn-sampler.s-horn:active, .btn-sampler.s-horn.fired { background: #f59e0b; color: #000; box-shadow: 0 0 14px #f59e0b; }
+    .btn-sampler.s-siren { border-color: #00f0ff; color: #00f0ff; }
+    .btn-sampler.s-siren:active, .btn-sampler.s-siren.fired { background: #00f0ff; color: #000; box-shadow: 0 0 14px #00f0ff; }
+    .btn-sampler.s-drop { border-color: #a855f7; color: #c084fc; }
+    .btn-sampler.s-drop:active, .btn-sampler.s-drop.fired { background: #a855f7; color: #fff; box-shadow: 0 0 14px #a855f7; }
+    .btn-sampler.s-brake { border-color: #ef4444; color: #f87171; }
+    .btn-sampler.s-brake:active, .btn-sampler.s-brake.fired { background: #ef4444; color: #fff; box-shadow: 0 0 14px #ef4444; }
+
   </style>
 </head>
 <body>
@@ -654,7 +985,7 @@
           </div>
 
           <!-- Tornamesa Vinilo Deck A -->
-          <div class="turntable-wrapper" id="turntable-a" title="Arrastra para hacer scratch">
+          <div class="turntable-wrapper" id="turntable-a" title="Arrastra para hacer scratch interactivo">
             <div class="vinyl-platter" id="platter-a">
               <div class="vinyl-label">DECK A</div>
             </div>
@@ -663,6 +994,12 @@
               <circle cx="44" cy="4" r="5" fill="#444"/>
               <rect x="10" y="66" width="8" height="6" fill="#00f0ff"/>
             </svg>
+          </div>
+
+          <!-- Visualizador de Forma de Onda y Espectro Deck A -->
+          <div class="deck-waveform-container" title="Visualizador en tiempo real de onda sonora y frecuencias">
+            <canvas id="waveform-a" class="deck-waveform" width="380" height="48"></canvas>
+            <span class="waveform-badge">ESPECTRO &bull; VIBRACIÓN</span>
           </div>
 
           <!-- Tiempo y Scrubber Deck A -->
@@ -674,8 +1011,20 @@
             <input type="range" id="scrubber-a" min="0" max="100" value="0" style="width: 100%; cursor: pointer;">
           </div>
 
-          <!-- Faders de Pitch y Controles Deck A -->
-          <div style="margin-top: 14px;">
+          <!-- Barra de BPM & Tap Tempo Deck A -->
+          <div class="bpm-control-bar">
+            <div>
+              <span style="font-size: 0.65rem; color: var(--text-muted); display: block; font-weight: 700;">TEMPO / BPM</span>
+              <span id="deck-a-bpm" class="bpm-display">128.0 BPM</span>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button id="btn-tap-a" type="button" class="btn-tap" title="Pulsa rítmicamente para calcular BPM">TAP</button>
+              <button id="btn-reset-pitch-a" type="button" class="btn-tap" title="Restablecer velocidad a 0.0%">0%</button>
+            </div>
+          </div>
+
+          <!-- Fader de Pitch Deck A -->
+          <div style="margin-top: 6px;">
             <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem;">
               <span>VELOCIDAD / PITCH:</span>
               <span id="pitch-a-text" style="color: var(--primary); font-weight: 700;">0.0%</span>
@@ -683,6 +1032,7 @@
             <input type="range" id="pitch-a" min="-16" max="16" value="0" step="0.5" style="width: 100%;">
           </div>
 
+          <!-- Controles Principales Deck A -->
           <div class="deck-btn-row">
             <button id="btn-cue-a" class="btn-cue btn-icon-with-tooltip" aria-label="CUE">
               <svg class="icon cue-icon" viewBox="0 0 24 24"><polygon points="11 19 2 12 11 5 11 19"/><polygon points="22 19 13 12 22 5 22 19"/></svg>
@@ -697,6 +1047,48 @@
               <span class="deck-tooltip-text">SYNC (Sincronizar BPM y Tempo)</span>
             </button>
           </div>
+
+          <!-- Hot Cues Pads 1 - 4 Deck A -->
+          <div class="hot-cues-section">
+            <div class="hot-cues-header">
+              <span>HOT CUES (PADS 1 - 4)</span>
+              <span style="font-size: 0.62rem; color: var(--text-muted); font-weight: normal;">Clic: fijar/saltar &bull; Clic der.: borrar</span>
+            </div>
+            <div class="hot-cues-grid">
+              <button type="button" class="btn-hot-cue" id="cue-a-1" data-deck="A" data-index="0" title="Hot Cue 1 (Clic derecho para borrar)">
+                <span>CUE 1</span>
+                <span class="hot-cue-time">--:--</span>
+              </button>
+              <button type="button" class="btn-hot-cue" id="cue-a-2" data-deck="A" data-index="1" title="Hot Cue 2 (Clic derecho para borrar)">
+                <span>CUE 2</span>
+                <span class="hot-cue-time">--:--</span>
+              </button>
+              <button type="button" class="btn-hot-cue" id="cue-a-3" data-deck="A" data-index="2" title="Hot Cue 3 (Clic derecho para borrar)">
+                <span>CUE 3</span>
+                <span class="hot-cue-time">--:--</span>
+              </button>
+              <button type="button" class="btn-hot-cue" id="cue-a-4" data-deck="A" data-index="3" title="Hot Cue 4 (Clic derecho para borrar)">
+                <span>CUE 4</span>
+                <span class="hot-cue-time">--:--</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Auto-Loop / Beat Looping Deck A -->
+          <div class="loop-section">
+            <div class="loop-header">
+              <span>BEAT LOOPING</span>
+              <span id="loop-a-badge" style="font-size: 0.64rem; font-weight: 700; color: var(--text-muted);">OFF</span>
+            </div>
+            <div class="loop-btn-grid">
+              <button type="button" class="btn-loop btn-loop-a" data-deck="A" data-beats="0.5">1/2</button>
+              <button type="button" class="btn-loop btn-loop-a" data-deck="A" data-beats="1">1</button>
+              <button type="button" class="btn-loop btn-loop-a" data-deck="A" data-beats="2">2</button>
+              <button type="button" class="btn-loop btn-loop-a" data-deck="A" data-beats="4">4</button>
+              <button type="button" class="btn-loop btn-loop-a" data-deck="A" data-beats="8">8</button>
+              <button type="button" class="btn-loop btn-loop-exit" id="btn-loop-a-exit" data-deck="A" title="Salir del bucle">EXIT</button>
+            </div>
+          </div>
         </div>
 
         <!-- =================== MEZCLADOR CENTRAL =================== -->
@@ -708,6 +1100,46 @@
                 <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                 <span>Auto-DJ: ACTIVADO</span>
               </button>
+            </div>
+          </div>
+
+          <!-- Medidor Stereo LED VU Meter -->
+          <div class="vu-meter-container" title="Medidores de Potencia y Nivel Estéreo Master">
+            <div class="vu-channel">
+              <span class="vu-label" style="color: var(--primary);">A</span>
+              <div class="vu-bars-row" id="vu-leds-a">
+                <div class="vu-led"></div>
+                <div class="vu-led"></div>
+                <div class="vu-led"></div>
+                <div class="vu-led"></div>
+                <div class="vu-led"></div>
+              </div>
+            </div>
+            <div style="width: 1px; height: 16px; background: rgba(255,255,255,0.15);"></div>
+            <div class="vu-channel">
+              <div class="vu-bars-row" id="vu-leds-b">
+                <div class="vu-led"></div>
+                <div class="vu-led"></div>
+                <div class="vu-led"></div>
+                <div class="vu-led"></div>
+                <div class="vu-led"></div>
+              </div>
+              <span class="vu-label" style="color: #ff007b;">B</span>
+            </div>
+          </div>
+
+          <!-- Color FX Filter Knobs (LPF / HPF) -->
+          <div class="filter-controls-row" title="Filtro de Color DJ (Giro a la Izq = Low Pass / Giro a la Der = High Pass)">
+            <div class="filter-col">
+              <label>COLOR FILTER A</label>
+              <input type="range" id="filter-a" class="filter-slider" min="-100" max="100" value="0">
+              <span id="filter-a-val" class="filter-value-text">FLAT</span>
+            </div>
+            <div style="width: 1px; background: rgba(255,255,255,0.1); margin: 0 4px;"></div>
+            <div class="filter-col">
+              <label>COLOR FILTER B</label>
+              <input type="range" id="filter-b" class="filter-slider filter-slider-b" min="-100" max="100" value="0">
+              <span id="filter-b-val" class="filter-value-text">FLAT</span>
             </div>
           </div>
 
@@ -769,6 +1201,25 @@
               <button id="btn-fade-right" class="btn-fade-preset" style="flex: 1;">Fade B</button>
             </div>
           </div>
+
+          <!-- DJ Sampler FX Pads de Disparo -->
+          <div class="sampler-section">
+            <span class="sampler-title">DJ SAMPLER FX (PADS DE DISPARO)</span>
+            <div class="sampler-grid">
+              <button type="button" class="btn-sampler s-horn" id="btn-fx-horn" title="Disparo de Air Horn clásico de club">
+                <span>📢 AIR HORN</span>
+              </button>
+              <button type="button" class="btn-sampler s-siren" id="btn-fx-siren" title="Sirena Dub Láser con modulación interactiva">
+                <span>🚨 LASER SIREN</span>
+              </button>
+              <button type="button" class="btn-sampler s-drop" id="btn-fx-drop" title="Golpe de Subgrave 808 Club Drop">
+                <span>💣 808 DROP</span>
+              </button>
+              <button type="button" class="btn-sampler s-brake" id="btn-fx-brake" title="Frenado de motor de vinilo (Turntable Brake)">
+                <span>🛑 VINYL BRAKE</span>
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- =================== DECK B (DERECHA / SIGUIENTE) =================== -->
@@ -785,7 +1236,7 @@
           </div>
 
           <!-- Tornamesa Vinilo Deck B -->
-          <div class="turntable-wrapper" id="turntable-b" title="Arrastra para hacer scratch">
+          <div class="turntable-wrapper" id="turntable-b" title="Arrastra para hacer scratch interactivo">
             <div class="vinyl-platter" id="platter-b">
               <div class="vinyl-label">DECK B</div>
             </div>
@@ -794,6 +1245,12 @@
               <circle cx="44" cy="4" r="5" fill="#444"/>
               <rect x="10" y="66" width="8" height="6" fill="#ff007b"/>
             </svg>
+          </div>
+
+          <!-- Visualizador de Forma de Onda y Espectro Deck B -->
+          <div class="deck-waveform-container" title="Visualizador en tiempo real de onda sonora y frecuencias">
+            <canvas id="waveform-b" class="deck-waveform" width="380" height="48"></canvas>
+            <span class="waveform-badge">ESPECTRO &bull; VIBRACIÓN</span>
           </div>
 
           <!-- Tiempo y Scrubber Deck B -->
@@ -805,8 +1262,20 @@
             <input type="range" id="scrubber-b" min="0" max="100" value="0" style="width: 100%; cursor: pointer;">
           </div>
 
-          <!-- Faders de Pitch y Controles Deck B -->
-          <div style="margin-top: 14px;">
+          <!-- Barra de BPM & Tap Tempo Deck B -->
+          <div class="bpm-control-bar">
+            <div>
+              <span style="font-size: 0.65rem; color: var(--text-muted); display: block; font-weight: 700;">TEMPO / BPM</span>
+              <span id="deck-b-bpm" class="bpm-display">128.0 BPM</span>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button id="btn-tap-b" type="button" class="btn-tap" title="Pulsa rítmicamente para calcular BPM">TAP</button>
+              <button id="btn-reset-pitch-b" type="button" class="btn-tap" title="Restablecer velocidad a 0.0%">0%</button>
+            </div>
+          </div>
+
+          <!-- Fader de Pitch Deck B -->
+          <div style="margin-top: 6px;">
             <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem;">
               <span>VELOCIDAD / PITCH:</span>
               <span id="pitch-b-text" style="color: #ff007b; font-weight: 700;">0.0%</span>
@@ -814,6 +1283,7 @@
             <input type="range" id="pitch-b" min="-16" max="16" value="0" step="0.5" style="width: 100%;">
           </div>
 
+          <!-- Controles Principales Deck B -->
           <div class="deck-btn-row">
             <button id="btn-cue-b" class="btn-cue btn-icon-with-tooltip" aria-label="CUE">
               <svg class="icon cue-icon" viewBox="0 0 24 24"><polygon points="11 19 2 12 11 5 11 19"/><polygon points="22 19 13 12 22 5 22 19"/></svg>
@@ -827,6 +1297,48 @@
               <span>SYNC</span>
               <span class="deck-tooltip-text">SYNC (Sincronizar BPM y Tempo)</span>
             </button>
+          </div>
+
+          <!-- Hot Cues Pads 1 - 4 Deck B -->
+          <div class="hot-cues-section">
+            <div class="hot-cues-header">
+              <span>HOT CUES (PADS 1 - 4)</span>
+              <span style="font-size: 0.62rem; color: var(--text-muted); font-weight: normal;">Clic: fijar/saltar &bull; Clic der.: borrar</span>
+            </div>
+            <div class="hot-cues-grid">
+              <button type="button" class="btn-hot-cue" id="cue-b-1" data-deck="B" data-index="0" title="Hot Cue 1 (Clic derecho para borrar)">
+                <span>CUE 1</span>
+                <span class="hot-cue-time">--:--</span>
+              </button>
+              <button type="button" class="btn-hot-cue" id="cue-b-2" data-deck="B" data-index="1" title="Hot Cue 2 (Clic derecho para borrar)">
+                <span>CUE 2</span>
+                <span class="hot-cue-time">--:--</span>
+              </button>
+              <button type="button" class="btn-hot-cue" id="cue-b-3" data-deck="B" data-index="2" title="Hot Cue 3 (Clic derecho para borrar)">
+                <span>CUE 3</span>
+                <span class="hot-cue-time">--:--</span>
+              </button>
+              <button type="button" class="btn-hot-cue" id="cue-b-4" data-deck="B" data-index="3" title="Hot Cue 4 (Clic derecho para borrar)">
+                <span>CUE 4</span>
+                <span class="hot-cue-time">--:--</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Auto-Loop / Beat Looping Deck B -->
+          <div class="loop-section">
+            <div class="loop-header">
+              <span>BEAT LOOPING</span>
+              <span id="loop-b-badge" style="font-size: 0.64rem; font-weight: 700; color: var(--text-muted);">OFF</span>
+            </div>
+            <div class="loop-btn-grid">
+              <button type="button" class="btn-loop btn-loop-b" data-deck="B" data-beats="0.5">1/2</button>
+              <button type="button" class="btn-loop btn-loop-b" data-deck="B" data-beats="1">1</button>
+              <button type="button" class="btn-loop btn-loop-b" data-deck="B" data-beats="2">2</button>
+              <button type="button" class="btn-loop btn-loop-b" data-deck="B" data-beats="4">4</button>
+              <button type="button" class="btn-loop btn-loop-b" data-deck="B" data-beats="8">8</button>
+              <button type="button" class="btn-loop btn-loop-exit" id="btn-loop-b-exit" data-deck="B" title="Salir del bucle">EXIT</button>
+            </div>
           </div>
         </div>
 
@@ -1046,12 +1558,30 @@
       const audioA = document.getElementById("audio-deck-a");
       const audioB = document.getElementById("audio-deck-b");
 
-      // Web Audio API Context para Ecualizadores y Mezcla
+      // Web Audio API Context para Ecualizadores, Filtros, Analizadores y Sintetizadores DJ
       let audioCtx = null;
       let sourceA, sourceB;
       let gainA, gainB;
       let eqHiA, eqMidA, eqLowA;
       let eqHiB, eqMidB, eqLowB;
+      let filterA, filterB;
+      let analyserA, analyserB;
+
+      // Estado BPM & Tempo Base (Default 128 BPM club standard)
+      let baseBpmA = 128.0;
+      let baseBpmB = 128.0;
+      let currentBpmA = 128.0;
+      let currentBpmB = 128.0;
+      let tapTimesA = [];
+      let tapTimesB = [];
+
+      // Estado Hot Cues (4 pads por deck: timestamps en segundos o null)
+      const hotCuesA = [null, null, null, null];
+      const hotCuesB = [null, null, null, null];
+
+      // Estado Beat Looping
+      let activeLoopA = null; // { beats: 4, loopStart: sec, loopEnd: sec }
+      let activeLoopB = null;
 
       function initWebAudio() {
         if (audioCtx) return;
@@ -1071,10 +1601,22 @@
         eqLowA.type = "lowshelf";
         eqLowA.frequency.value = 250;
 
+        // Sound Color Filter Deck A (LPF / HPF Biquad)
+        filterA = audioCtx.createBiquadFilter();
+        filterA.type = "lowpass";
+        filterA.frequency.value = 22050;
+        filterA.Q.value = 0.7;
+
+        // Analizador de Espectro / VU Deck A
+        analyserA = audioCtx.createAnalyser();
+        analyserA.fftSize = 64;
+
         sourceA.connect(eqLowA);
         eqLowA.connect(eqMidA);
         eqMidA.connect(eqHiA);
-        eqHiA.connect(gainA);
+        eqHiA.connect(filterA);
+        filterA.connect(gainA);
+        gainA.connect(analyserA);
         gainA.connect(audioCtx.destination);
 
         // Nodos Deck B
@@ -1090,57 +1632,38 @@
         eqLowB.type = "lowshelf";
         eqLowB.frequency.value = 250;
 
+        // Sound Color Filter Deck B (LPF / HPF Biquad)
+        filterB = audioCtx.createBiquadFilter();
+        filterB.type = "lowpass";
+        filterB.frequency.value = 22050;
+        filterB.Q.value = 0.7;
+
+        // Analizador de Espectro / VU Deck B
+        analyserB = audioCtx.createAnalyser();
+        analyserB.fftSize = 64;
+
         sourceB.connect(eqLowB);
         eqLowB.connect(eqMidB);
         eqMidB.connect(eqHiB);
-        eqHiB.connect(gainB);
+        eqHiB.connect(filterB);
+        filterB.connect(gainB);
+        gainB.connect(analyserB);
         gainB.connect(audioCtx.destination);
 
         updateCrossfader(document.getElementById("crossfader").value);
+        startVisualizerLoop();
       }
 
       // =========================================================================
-      // COLA DE REPRODUCCIÓN PERSISTENTE EN COOKIES Y LOCALSTORAGE
-      // No se eliminan solas las pistas; persisten incluso al cerrar la página
+      // COLA DE REPRODUCCIÓN EN MEMORIA DE SESIÓN (SIN COOKIES NI LOCALSTORAGE)
       // =========================================================================
+      try {
+        // Limpieza de rastros anteriores en cookies o localStorage
+        document.cookie = "dj_queue=; Path=/; Max-Age=0;";
+        localStorage.removeItem("cloudtranslator_dj_queue");
+      } catch (e) {}
 
-      function saveQueue() {
-        try {
-          localStorage.setItem("cloudtranslator_dj_queue", JSON.stringify(djQueue));
-          const compact = djQueue.slice(0, 35).map(t => ({
-            id: t.id,
-            title: t.title,
-            artist: t.artist,
-            platform: t.platform,
-            duration: t.duration,
-            url: t.url,
-            streamUrl: t.streamUrl || null
-          }));
-          document.cookie = `dj_queue=${encodeURIComponent(JSON.stringify(compact))}; Path=/; Max-Age=31536000; SameSite=Lax`;
-        } catch (e) {
-          console.warn("Error guardando cola DJ:", e);
-        }
-      }
-
-      function loadSavedQueue() {
-        try {
-          const local = localStorage.getItem("cloudtranslator_dj_queue");
-          if (local) {
-            const parsed = JSON.parse(local);
-            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-          }
-          const cookieMatch = document.cookie.match(/(?:^|; )dj_queue=([^;]*)/);
-          if (cookieMatch) {
-            const parsed = JSON.parse(decodeURIComponent(cookieMatch[1]));
-            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-          }
-        } catch (e) {
-          console.warn("Error leyendo cola guardada:", e);
-        }
-        return [];
-      }
-
-      let djQueue = loadSavedQueue();
+      let djQueue = [];
       let currentQueueTrackIndex = -1;
 
       function updateQueueCounter() {
@@ -1204,13 +1727,11 @@
         const temp = djQueue[index];
         djQueue[index] = djQueue[target];
         djQueue[target] = temp;
-        saveQueue();
         renderQueue();
       };
 
       window.removeQueueItem = (id) => {
         djQueue = djQueue.filter(i => i.id !== id);
-        saveQueue();
         renderQueue();
       };
 
@@ -1218,7 +1739,6 @@
       if (btnClearQueue) {
         btnClearQueue.addEventListener("click", () => {
           djQueue = [];
-          saveQueue();
           renderQueue();
         });
       }
@@ -1299,9 +1819,7 @@
         });
       });
 
-      // =========================================================================
-      // AÑADIDO FLASH EN 1 MILISEGUNDO (SIN ESPERAR CONVERSIÓN NI BLOQUEAR UI)
-      // =========================================================================
+      // Añadido flash instantáneo en memoria
       function addTrackInstant(url) {
         if (!url || !url.trim()) {
           alert("Por favor ingresa una URL válida de YouTube, TikTok u otra plataforma soportada.");
@@ -1339,9 +1857,8 @@
           streamUrl: null
         };
 
-        // INSERCIÓN FLASH EN 0.1 MILISEGUNDOS
+        // INSERCIÓN FLASH EN MEMORIA
         djQueue.push(newItem);
-        saveQueue();
         renderQueue();
 
         // Limpiar entrada de inmediato
@@ -1362,7 +1879,6 @@
             newItem.title = data.title;
             if (data.author) newItem.artist = data.author;
             if (data.duration) newItem.duration = data.duration;
-            saveQueue();
             renderQueue();
           }
         })
@@ -1409,7 +1925,6 @@
         // Si es enlace directo de audio mp3/wav
         if (item.url && item.url.match(/\.(mp3|wav|ogg|m4a|aac)(\?.*)?$/i)) {
           item.streamUrl = item.url;
-          saveQueue();
           audio.src = item.url;
           audio.load();
           return;
@@ -1428,7 +1943,6 @@
             item.streamUrl = data.streamUrl;
             if (data.title) item.title = data.title;
             if (data.duration) item.duration = data.duration;
-            saveQueue();
             renderQueue();
 
             if (titleEl) titleEl.textContent = item.title;
@@ -1446,7 +1960,63 @@
         }
       }
 
-      // Controles Deck A
+      // =========================================================================
+      // INTERACCIÓN DE SCRATCH ANALÓGICO PARA TORNAMESAS
+      // =========================================================================
+      function setupScratch(turntableId, audioEl, platterEl) {
+        const turntable = document.getElementById(turntableId);
+        if (!turntable) return;
+        let isScratching = false;
+        let lastX = 0;
+        let rotationDeg = 0;
+        let wasPlayingBeforeScratch = false;
+
+        const onStart = (clientX) => {
+          initWebAudio();
+          isScratching = true;
+          lastX = clientX;
+          wasPlayingBeforeScratch = !audioEl.paused;
+          if (wasPlayingBeforeScratch) {
+            audioEl.pause();
+          }
+        };
+
+        const onMove = (clientX) => {
+          if (!isScratching) return;
+          const deltaX = clientX - lastX;
+          lastX = clientX;
+          rotationDeg += deltaX * 1.6;
+          platterEl.style.transform = `rotate(${rotationDeg}deg)`;
+          if (audioEl.duration) {
+            const scrubAmount = (deltaX / 180) * (Math.min(audioEl.duration, 120) * 0.015);
+            audioEl.currentTime = Math.max(0, Math.min(audioEl.duration, audioEl.currentTime + scrubAmount));
+          }
+        };
+
+        const onEnd = () => {
+          if (!isScratching) return;
+          isScratching = false;
+          if (wasPlayingBeforeScratch) {
+            audioEl.play().catch(console.warn);
+          }
+        };
+
+        turntable.addEventListener("mousedown", (e) => onStart(e.clientX));
+        window.addEventListener("mousemove", (e) => onMove(e.clientX));
+        window.addEventListener("mouseup", onEnd);
+
+        turntable.addEventListener("touchstart", (e) => {
+          if (e.touches.length > 0) onStart(e.touches[0].clientX);
+        }, { passive: true });
+        window.addEventListener("touchmove", (e) => {
+          if (e.touches.length > 0) onMove(e.touches[0].clientX);
+        }, { passive: true });
+        window.addEventListener("touchend", onEnd);
+      }
+
+      // =========================================================================
+      // CONTROLES DECK A
+      // =========================================================================
       const btnPlayA = document.getElementById("btn-play-a");
       const btnCueA = document.getElementById("btn-cue-a");
       const btnSyncA = document.getElementById("btn-sync-a");
@@ -1456,7 +2026,10 @@
       const pitchAText = document.getElementById("pitch-a-text");
       const curTimeA = document.getElementById("deck-a-cur-time");
       const remTimeA = document.getElementById("deck-a-rem-time");
-      const tooltipPlayA = document.getElementById("tooltip-play-a");
+      const bpmAEl = document.getElementById("deck-a-bpm");
+      const btnTapA = document.getElementById("btn-tap-a");
+      const btnResetPitchA = document.getElementById("btn-reset-pitch-a");
+      const loopABadge = document.getElementById("loop-a-badge");
 
       function updatePlayAState(playing) {
         if (playing) {
@@ -1488,6 +2061,12 @@
         updatePlayAState(false);
       });
 
+      function updateBpmDisplayA() {
+        const p = parseFloat(pitchA.value);
+        currentBpmA = (baseBpmA * (1 + (p / 100))).toFixed(1);
+        if (bpmAEl) bpmAEl.textContent = `${currentBpmA} BPM`;
+      }
+
       // SYNC Deck A -> Empata con Deck B
       btnSyncA.addEventListener("click", () => {
         initWebAudio();
@@ -1495,6 +2074,8 @@
         const p = parseFloat(pitchA.value);
         pitchAText.textContent = `${p > 0 ? "+" : ""}${p.toFixed(1)}%`;
         audioA.playbackRate = Math.max(0.25, Math.min(2.0, 1 + (p / 100)));
+        baseBpmA = baseBpmB;
+        updateBpmDisplayA();
         if (!audioB.paused && audioB.duration && audioA.duration) {
           audioA.currentTime = audioB.currentTime % audioA.duration;
         }
@@ -1506,7 +2087,106 @@
         const p = parseFloat(pitchA.value);
         pitchAText.textContent = `${p > 0 ? "+" : ""}${p.toFixed(1)}%`;
         audioA.playbackRate = Math.max(0.25, Math.min(2.0, 1 + (p / 100)));
+        updateBpmDisplayA();
       });
+
+      if (btnResetPitchA) {
+        btnResetPitchA.addEventListener("click", () => {
+          pitchA.value = 0;
+          pitchAText.textContent = "0.0%";
+          audioA.playbackRate = 1.0;
+          updateBpmDisplayA();
+        });
+      }
+
+      // TAP Tempo Deck A
+      if (btnTapA) {
+        btnTapA.addEventListener("click", () => {
+          const now = performance.now();
+          tapTimesA.push(now);
+          if (tapTimesA.length > 5) tapTimesA.shift();
+          if (tapTimesA.length >= 2) {
+            const first = tapTimesA[0];
+            const last = tapTimesA[tapTimesA.length - 1];
+            if ((last - tapTimesA[tapTimesA.length - 2]) > 2200) {
+              tapTimesA = [now];
+              return;
+            }
+            const avgInterval = (last - first) / (tapTimesA.length - 1);
+            const calculatedBpm = Math.round(60000 / avgInterval);
+            if (calculatedBpm >= 60 && calculatedBpm <= 190) {
+              baseBpmA = calculatedBpm;
+              updateBpmDisplayA();
+            }
+          }
+        });
+      }
+
+      // Hot Cues Deck A (Pads 1 - 4)
+      for (let i = 0; i < 4; i++) {
+        const pad = document.getElementById(`cue-a-${i + 1}`);
+        if (pad) {
+          pad.addEventListener("click", () => {
+            initWebAudio();
+            if (hotCuesA[i] === null) {
+              // Asignar CUE en posición actual
+              hotCuesA[i] = audioA.currentTime;
+              const m = Math.floor(hotCuesA[i] / 60);
+              const s = Math.floor(hotCuesA[i] % 60);
+              pad.querySelector(".hot-cue-time").textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+              pad.classList.add("pad-set");
+            } else {
+              // Saltar instantáneamente al CUE
+              audioA.currentTime = hotCuesA[i];
+              if (audioA.paused) {
+                audioA.play().then(() => updatePlayAState(true)).catch(console.warn);
+              }
+            }
+          });
+
+          // Clic derecho para borrar CUE
+          pad.addEventListener("contextmenu", (e) => {
+            e.preventDefault();
+            hotCuesA[i] = null;
+            pad.querySelector(".hot-cue-time").textContent = "--:--";
+            pad.classList.remove("pad-set");
+          });
+        }
+      }
+
+      // Beat Looping Deck A
+      document.querySelectorAll(".btn-loop-a").forEach(btn => {
+        btn.addEventListener("click", () => {
+          initWebAudio();
+          const beats = parseFloat(btn.getAttribute("data-beats"));
+          document.querySelectorAll(".btn-loop-a").forEach(b => b.classList.remove("active-loop"));
+          btn.classList.add("active-loop");
+
+          const secondsPerBeat = 60 / parseFloat(currentBpmA);
+          const loopDuration = beats * secondsPerBeat;
+          activeLoopA = {
+            beats,
+            loopStart: audioA.currentTime,
+            loopEnd: audioA.currentTime + loopDuration
+          };
+          if (loopABadge) {
+            loopABadge.textContent = `${beats} BEAT${beats === 1 ? '' : 'S'}`;
+            loopABadge.style.color = "#10b981";
+          }
+        });
+      });
+
+      const btnLoopAExit = document.getElementById("btn-loop-a-exit");
+      if (btnLoopAExit) {
+        btnLoopAExit.addEventListener("click", () => {
+          activeLoopA = null;
+          document.querySelectorAll(".btn-loop-a").forEach(b => b.classList.remove("active-loop"));
+          if (loopABadge) {
+            loopABadge.textContent = "OFF";
+            loopABadge.style.color = "var(--text-muted)";
+          }
+        });
+      }
 
       // Bucle infinito Auto-DJ: Alternancia Deck A -> Deck B
       let autoTransitioningToB = false;
@@ -1514,6 +2194,12 @@
 
       audioA.addEventListener("timeupdate", () => {
         if (!audioA.duration) return;
+
+        // Gestión Beat Loop Activo
+        if (activeLoopA && audioA.currentTime >= activeLoopA.loopEnd) {
+          audioA.currentTime = activeLoopA.loopStart;
+        }
+
         scrubberA.value = (audioA.currentTime / audioA.duration) * 100;
         const curM = Math.floor(audioA.currentTime / 60);
         const curS = Math.floor(audioA.currentTime % 60);
@@ -1527,7 +2213,6 @@
         // Auto-DJ: A los 8 segundos restantes, iniciar Deck B y crossfade suave
         if (isAutoDJ && rem <= 8 && !autoTransitioningToB) {
           autoTransitioningToB = true;
-          // Si Deck B está en pausa y tiene fuente, arrancarlo
           if (audioB.src && audioB.paused) {
             audioB.play().then(() => updatePlayBState(true)).catch(console.warn);
           }
@@ -1552,7 +2237,9 @@
         audioA.currentTime = (scrubberA.value / 100) * audioA.duration;
       });
 
-      // Controles Deck B
+      // =========================================================================
+      // CONTROLES DECK B
+      // =========================================================================
       const btnPlayB = document.getElementById("btn-play-b");
       const btnCueB = document.getElementById("btn-cue-b");
       const btnSyncB = document.getElementById("btn-sync-b");
@@ -1562,7 +2249,10 @@
       const pitchBText = document.getElementById("pitch-b-text");
       const curTimeB = document.getElementById("deck-b-cur-time");
       const remTimeB = document.getElementById("deck-b-rem-time");
-      const tooltipPlayB = document.getElementById("tooltip-play-b");
+      const bpmBEl = document.getElementById("deck-b-bpm");
+      const btnTapB = document.getElementById("btn-tap-b");
+      const btnResetPitchB = document.getElementById("btn-reset-pitch-b");
+      const loopBBadge = document.getElementById("loop-b-badge");
 
       function updatePlayBState(playing) {
         if (playing) {
@@ -1594,6 +2284,12 @@
         updatePlayBState(false);
       });
 
+      function updateBpmDisplayB() {
+        const p = parseFloat(pitchB.value);
+        currentBpmB = (baseBpmB * (1 + (p / 100))).toFixed(1);
+        if (bpmBEl) bpmBEl.textContent = `${currentBpmB} BPM`;
+      }
+
       // SYNC Deck B -> Empata con Deck A
       btnSyncB.addEventListener("click", () => {
         initWebAudio();
@@ -1601,6 +2297,8 @@
         const p = parseFloat(pitchB.value);
         pitchBText.textContent = `${p > 0 ? "+" : ""}${p.toFixed(1)}%`;
         audioB.playbackRate = Math.max(0.25, Math.min(2.0, 1 + (p / 100)));
+        baseBpmB = baseBpmA;
+        updateBpmDisplayB();
         if (!audioA.paused && audioA.duration && audioB.duration) {
           audioB.currentTime = audioA.currentTime % audioB.duration;
         }
@@ -1612,11 +2310,116 @@
         const p = parseFloat(pitchB.value);
         pitchBText.textContent = `${p > 0 ? "+" : ""}${p.toFixed(1)}%`;
         audioB.playbackRate = Math.max(0.25, Math.min(2.0, 1 + (p / 100)));
+        updateBpmDisplayB();
       });
+
+      if (btnResetPitchB) {
+        btnResetPitchB.addEventListener("click", () => {
+          pitchB.value = 0;
+          pitchBText.textContent = "0.0%";
+          audioB.playbackRate = 1.0;
+          updateBpmDisplayB();
+        });
+      }
+
+      // TAP Tempo Deck B
+      if (btnTapB) {
+        btnTapB.addEventListener("click", () => {
+          const now = performance.now();
+          tapTimesB.push(now);
+          if (tapTimesB.length > 5) tapTimesB.shift();
+          if (tapTimesB.length >= 2) {
+            const first = tapTimesB[0];
+            const last = tapTimesB[tapTimesB.length - 1];
+            if ((last - tapTimesB[tapTimesB.length - 2]) > 2200) {
+              tapTimesB = [now];
+              return;
+            }
+            const avgInterval = (last - first) / (tapTimesB.length - 1);
+            const calculatedBpm = Math.round(60000 / avgInterval);
+            if (calculatedBpm >= 60 && calculatedBpm <= 190) {
+              baseBpmB = calculatedBpm;
+              updateBpmDisplayB();
+            }
+          }
+        });
+      }
+
+      // Hot Cues Deck B (Pads 1 - 4)
+      for (let i = 0; i < 4; i++) {
+        const pad = document.getElementById(`cue-b-${i + 1}`);
+        if (pad) {
+          pad.addEventListener("click", () => {
+            initWebAudio();
+            if (hotCuesB[i] === null) {
+              // Asignar CUE en posición actual
+              hotCuesB[i] = audioB.currentTime;
+              const m = Math.floor(hotCuesB[i] / 60);
+              const s = Math.floor(hotCuesB[i] % 60);
+              pad.querySelector(".hot-cue-time").textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+              pad.classList.add("pad-set");
+            } else {
+              // Saltar instantáneamente al CUE
+              audioB.currentTime = hotCuesB[i];
+              if (audioB.paused) {
+                audioB.play().then(() => updatePlayBState(true)).catch(console.warn);
+              }
+            }
+          });
+
+          // Clic derecho para borrar CUE
+          pad.addEventListener("contextmenu", (e) => {
+            e.preventDefault();
+            hotCuesB[i] = null;
+            pad.querySelector(".hot-cue-time").textContent = "--:--";
+            pad.classList.remove("pad-set");
+          });
+        }
+      }
+
+      // Beat Looping Deck B
+      document.querySelectorAll(".btn-loop-b").forEach(btn => {
+        btn.addEventListener("click", () => {
+          initWebAudio();
+          const beats = parseFloat(btn.getAttribute("data-beats"));
+          document.querySelectorAll(".btn-loop-b").forEach(b => b.classList.remove("active-loop"));
+          btn.classList.add("active-loop");
+
+          const secondsPerBeat = 60 / parseFloat(currentBpmB);
+          const loopDuration = beats * secondsPerBeat;
+          activeLoopB = {
+            beats,
+            loopStart: audioB.currentTime,
+            loopEnd: audioB.currentTime + loopDuration
+          };
+          if (loopBBadge) {
+            loopBBadge.textContent = `${beats} BEAT${beats === 1 ? '' : 'S'}`;
+            loopBBadge.style.color = "#ff007b";
+          }
+        });
+      });
+
+      const btnLoopBExit = document.getElementById("btn-loop-b-exit");
+      if (btnLoopBExit) {
+        btnLoopBExit.addEventListener("click", () => {
+          activeLoopB = null;
+          document.querySelectorAll(".btn-loop-b").forEach(b => b.classList.remove("active-loop"));
+          if (loopBBadge) {
+            loopBBadge.textContent = "OFF";
+            loopBBadge.style.color = "var(--text-muted)";
+          }
+        });
+      }
 
       // Bucle infinito Auto-DJ: Alternancia Deck B -> Deck A
       audioB.addEventListener("timeupdate", () => {
         if (!audioB.duration) return;
+
+        // Gestión Beat Loop Activo
+        if (activeLoopB && audioB.currentTime >= activeLoopB.loopEnd) {
+          audioB.currentTime = activeLoopB.loopStart;
+        }
+
         scrubberB.value = (audioB.currentTime / audioB.duration) * 100;
         const curM = Math.floor(audioB.currentTime / 60);
         const curS = Math.floor(audioB.currentTime % 60);
@@ -1654,7 +2457,9 @@
         audioB.currentTime = (scrubberB.value / 100) * audioB.duration;
       });
 
-      // Crossfader & Auto-DJ & Faders de Volumen
+      // =========================================================================
+      // CROSSFADER, VOLUMEN & SOUND COLOR FX FILTERS
+      // =========================================================================
       const crossfader = document.getElementById("crossfader");
       let isAutoDJ = true;
       let channelVolA = 1.0;
@@ -1668,14 +2473,12 @@
         if (gainA) gainA.gain.value = gainValA;
         if (gainB) gainB.gain.value = gainValB;
 
-        // Fallback volumen directo si no hay audioContext aún
         if (!audioCtx) {
           audioA.volume = Math.max(0, Math.min(1, gainValA));
           audioB.volume = Math.max(0, Math.min(1, gainValB));
         }
       }
 
-      // Conectar Faders de Canal VOL A y VOL B
       const sliderVolA = document.getElementById("vol-a");
       const sliderVolB = document.getElementById("vol-b");
       if (sliderVolA) {
@@ -1710,7 +2513,7 @@
         const startVal = parseFloat(crossfader.value);
         const endVal = target === "A" ? 0 : 100;
         const steps = 30;
-        const intervalTime = 50; // Total ~1.5 segundos suave
+        const intervalTime = 50;
         let step = 0;
 
         const timer = setInterval(() => {
@@ -1728,6 +2531,61 @@
         btnAutoDJ.innerHTML = `<svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> <span>Auto-DJ: ${isAutoDJ ? "ACTIVADO" : "DESACTIVADO"}</span>`;
         btnAutoDJ.style.background = isAutoDJ ? "rgba(0, 240, 255, 0.15)" : "rgba(255, 255, 255, 0.05)";
       });
+
+      // Controles Color FX Filter (Deck A y Deck B)
+      const sliderFilterA = document.getElementById("filter-a");
+      const filterAValText = document.getElementById("filter-a-val");
+      const sliderFilterB = document.getElementById("filter-b");
+      const filterBValText = document.getElementById("filter-b-val");
+
+      function applyColorFilter(val, filterNode, textEl) {
+        if (!filterNode) return;
+        const v = parseFloat(val);
+        if (Math.abs(v) < 3) {
+          filterNode.type = "lowpass";
+          filterNode.frequency.value = 22050;
+          filterNode.Q.value = 0.5;
+          if (textEl) textEl.textContent = "FLAT";
+        } else if (v < 0) {
+          // Low Pass Filter sweep hacia abajo (corta agudos)
+          filterNode.type = "lowpass";
+          filterNode.Q.value = 2.4;
+          const ratio = -v / 100;
+          const freq = 20000 * Math.pow(160 / 20000, ratio);
+          filterNode.frequency.value = freq;
+          if (textEl) textEl.textContent = `LPF ${Math.round(freq)}Hz`;
+        } else {
+          // High Pass Filter sweep hacia arriba (corta graves)
+          filterNode.type = "highpass";
+          filterNode.Q.value = 2.4;
+          const ratio = v / 100;
+          const freq = 25 * Math.pow(8500 / 25, ratio);
+          filterNode.frequency.value = freq;
+          if (textEl) textEl.textContent = `HPF ${Math.round(freq)}Hz`;
+        }
+      }
+
+      if (sliderFilterA) {
+        sliderFilterA.addEventListener("input", () => {
+          initWebAudio();
+          applyColorFilter(sliderFilterA.value, filterA, filterAValText);
+        });
+        sliderFilterA.addEventListener("dblclick", () => {
+          sliderFilterA.value = 0;
+          applyColorFilter(0, filterA, filterAValText);
+        });
+      }
+
+      if (sliderFilterB) {
+        sliderFilterB.addEventListener("input", () => {
+          initWebAudio();
+          applyColorFilter(sliderFilterB.value, filterB, filterBValText);
+        });
+        sliderFilterB.addEventListener("dblclick", () => {
+          sliderFilterB.value = 0;
+          applyColorFilter(0, filterB, filterBValText);
+        });
+      }
 
       // Ecualizadores Dinámicos (EQ de 3 Bandas)
       const eqMap = {
@@ -1752,7 +2610,261 @@
         }
       });
 
+      // =========================================================================
+      // DJ SAMPLER FX PADS (SINTETIZADOS CON WEB AUDIO API)
+      // =========================================================================
+      function playAirHorn() {
+        initWebAudio();
+        const now = audioCtx.currentTime;
+        const notes = [
+          { time: 0.00, dur: 0.12, freq: 880 },
+          { time: 0.14, dur: 0.12, freq: 880 },
+          { time: 0.28, dur: 0.38, freq: 932 }
+        ];
+        notes.forEach(n => {
+          const osc = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          const bpf = audioCtx.createBiquadFilter();
+          bpf.type = "bandpass";
+          bpf.frequency.value = n.freq * 1.4;
+          bpf.Q.value = 2.8;
+
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(n.freq, now + n.time);
+          osc.frequency.exponentialRampToValueAtTime(n.freq * 0.94, now + n.time + n.dur);
+
+          g.gain.setValueAtTime(0.001, now + n.time);
+          g.gain.linearRampToValueAtTime(0.4, now + n.time + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.001, now + n.time + n.dur);
+
+          osc.connect(bpf);
+          bpf.connect(g);
+          g.connect(audioCtx.destination);
+
+          osc.start(now + n.time);
+          osc.stop(now + n.time + n.dur);
+        });
+      }
+
+      function playDubSiren() {
+        initWebAudio();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const lfo = audioCtx.createOscillator();
+        const lfoGain = audioCtx.createGain();
+        const mainGain = audioCtx.createGain();
+
+        osc.type = "square";
+        lfo.type = "sawtooth";
+        lfo.frequency.value = 5.5; // modulación 5.5 Hz
+        lfoGain.gain.value = 420;
+
+        osc.frequency.setValueAtTime(780, now);
+        lfo.connect(osc.frequency);
+
+        mainGain.gain.setValueAtTime(0.001, now);
+        mainGain.gain.linearRampToValueAtTime(0.32, now + 0.04);
+        mainGain.gain.exponentialRampToValueAtTime(0.001, now + 1.25);
+
+        osc.connect(mainGain);
+        mainGain.connect(audioCtx.destination);
+
+        lfo.start(now);
+        osc.start(now);
+        lfo.stop(now + 1.25);
+        osc.stop(now + 1.25);
+      }
+
+      function play808Drop() {
+        initWebAudio();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(145, now);
+        osc.frequency.exponentialRampToValueAtTime(32, now + 1.1);
+
+        gain.gain.setValueAtTime(0.65, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.25);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 1.25);
+      }
+
+      function triggerVinylBrake() {
+        const decksToBrake = [];
+        if (!audioA.paused) decksToBrake.push({ audio: audioA, update: updatePlayAState });
+        if (!audioB.paused) decksToBrake.push({ audio: audioB, update: updatePlayBState });
+        if (decksToBrake.length === 0) return;
+
+        decksToBrake.forEach(({ audio, update }) => {
+          const startRate = audio.playbackRate || 1.0;
+          const duration = 750; // ms
+          const startTime = performance.now();
+          const step = (now) => {
+            const elapsed = now - startTime;
+            const progress = Math.min(1, elapsed / duration);
+            if (progress < 1) {
+              audio.playbackRate = Math.max(0.05, startRate * (1 - progress));
+              requestAnimationFrame(step);
+            } else {
+              audio.playbackRate = 1.0;
+              audio.pause();
+              update(false);
+            }
+          };
+          requestAnimationFrame(step);
+        });
+      }
+
+      // Eventos Sampler Pads
+      const btnFxHorn = document.getElementById("btn-fx-horn");
+      const btnFxSiren = document.getElementById("btn-fx-siren");
+      const btnFxDrop = document.getElementById("btn-fx-drop");
+      const btnFxBrake = document.getElementById("btn-fx-brake");
+
+      function triggerPadVisual(el) {
+        if (!el) return;
+        el.classList.add("fired");
+        setTimeout(() => el.classList.remove("fired"), 250);
+      }
+
+      if (btnFxHorn) {
+        btnFxHorn.addEventListener("click", () => {
+          triggerPadVisual(btnFxHorn);
+          playAirHorn();
+        });
+      }
+      if (btnFxSiren) {
+        btnFxSiren.addEventListener("click", () => {
+          triggerPadVisual(btnFxSiren);
+          playDubSiren();
+        });
+      }
+      if (btnFxDrop) {
+        btnFxDrop.addEventListener("click", () => {
+          triggerPadVisual(btnFxDrop);
+          play808Drop();
+        });
+      }
+      if (btnFxBrake) {
+        btnFxBrake.addEventListener("click", () => {
+          triggerPadVisual(btnFxBrake);
+          triggerVinylBrake();
+        });
+      }
+
+      // =========================================================================
+      // VISUALIZADOR DE ONDAS SONORAS EN VIVO & MEDIDORES STEREO LED VU
+      // =========================================================================
+      const canvasA = document.getElementById("waveform-a");
+      const ctxA = canvasA ? canvasA.getContext("2d") : null;
+      const canvasB = document.getElementById("waveform-b");
+      const ctxB = canvasB ? canvasB.getContext("2d") : null;
+
+      const vuLedsA = document.querySelectorAll("#vu-leds-a .vu-led");
+      const vuLedsB = document.querySelectorAll("#vu-leds-b .vu-led");
+
+      function updateVuMeter(leds, level) {
+        // level: 0.0 - 1.0
+        const activeCount = Math.min(5, Math.floor(level * 5.8));
+        leds.forEach((led, i) => {
+          led.className = "vu-led";
+          if (i < activeCount) {
+            if (i < 3) led.classList.add("active-green");
+            else if (i < 4) led.classList.add("active-yellow");
+            else led.classList.add("active-red");
+          }
+        });
+      }
+
+      function drawWaveform(canvas, ctx, analyser, audioEl, colorHex) {
+        if (!canvas || !ctx) return;
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        // Fondo oscuro con rejilla sutil
+        ctx.fillStyle = "rgba(6, 8, 14, 0.9)";
+        ctx.fillRect(0, 0, w, h);
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, h / 2);
+        ctx.lineTo(w, h / 2);
+        ctx.stroke();
+
+        let avgLevel = 0;
+
+        if (analyser && !audioEl.paused) {
+          const bufferLength = analyser.frequencyBinCount;
+          const dataArray = new Uint8Array(bufferLength);
+          analyser.getByteFrequencyData(dataArray);
+
+          const barWidth = (w / bufferLength) * 1.5;
+          let x = 0;
+          let sum = 0;
+
+          for (let i = 0; i < bufferLength; i++) {
+            const v = dataArray[i];
+            sum += v;
+            const barHeight = (v / 255) * (h * 0.85);
+
+            ctx.fillStyle = colorHex;
+            ctx.shadowColor = colorHex;
+            ctx.shadowBlur = 6;
+            ctx.fillRect(x, (h - barHeight) / 2, Math.max(2, barWidth - 2), barHeight);
+
+            x += barWidth;
+          }
+          ctx.shadowBlur = 0;
+          avgLevel = (sum / bufferLength) / 255;
+        } else {
+          // Línea de reposo sutil
+          ctx.strokeStyle = colorHex;
+          ctx.lineWidth = 1.5;
+          ctx.globalAlpha = 0.35;
+          ctx.beginPath();
+          ctx.moveTo(0, h / 2);
+          ctx.lineTo(w, h / 2);
+          ctx.stroke();
+          ctx.globalAlpha = 1.0;
+        }
+
+        // Cabeza lectora de posición (playhead)
+        if (audioEl.duration) {
+          const playheadX = (audioEl.currentTime / audioEl.duration) * w;
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(playheadX, 0);
+          ctx.lineTo(playheadX, h);
+          ctx.stroke();
+        }
+
+        return avgLevel;
+      }
+
+      function startVisualizerLoop() {
+        function renderFrame() {
+          const levelA = drawWaveform(canvasA, ctxA, analyserA, audioA, "#00f0ff");
+          const levelB = drawWaveform(canvasB, ctxB, analyserB, audioB, "#ff007b");
+
+          updateVuMeter(vuLedsA, levelA || 0);
+          updateVuMeter(vuLedsB, levelB || 0);
+
+          requestAnimationFrame(renderFrame);
+        }
+        renderFrame();
+      }
+
+      // Scratch interactivo en ambas tornamesas
       setupScratch("turntable-a", audioA, platterA);
+      setupScratch("turntable-b", audioB, platterB);
 
       // Render inicial de la cola
       renderQueue();
