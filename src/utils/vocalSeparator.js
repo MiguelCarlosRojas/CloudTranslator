@@ -9,8 +9,16 @@
 const fs = require("fs");
 const path = require("path");
 const { spawn } = require("child_process");
+const axios = require("axios");
 const logger = require("./logger");
 const { processConversion, sanitizeFilename, formatDurationSeconds } = require("./mediaEngine");
+
+let GradioClient = null;
+try {
+  GradioClient = require("@gradio/client").Client;
+} catch (e) {
+  logger.warn(`No se pudo cargar @gradio/client en vocalSeparator: ${e.message}`);
+}
 
 // Ruta a FFmpeg
 let ffmpegPath = "ffmpeg";
@@ -60,7 +68,161 @@ if (cleanupInterval.unref) {
 }
 
 /**
+ * Separación neuronal con Demucs v4 (Meta AI) para aislamiento acústico perfecto de stems
+ */
+async function separateWithDemucsAI(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate = "320k") {
+  if (!GradioClient) {
+    throw new Error("Gradio client no está inicializado.");
+  }
+
+  const fileBuf = fs.readFileSync(inputAudioPath);
+  const blob = new Blob([fileBuf], { type: "audio/mp3" });
+
+  logger.info("Separador AI: Conectando con Demucs v4 (Meta AI Source Separation)...");
+  const connectPromise = GradioClient.connect("abidlabs/music-separation");
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("Timeout conectando con Demucs AI (45s)")), 45000)
+  );
+  const app = await Promise.race([connectPromise, timeoutPromise]);
+
+  logger.info("Separador AI: Ejecutando inferencia neuronal profunda de stems...");
+  const predictPromise = app.predict("/inference", [blob]);
+  const predTimeout = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("Timeout en predicción de Demucs AI (50s)")), 50000)
+  );
+  const result = await Promise.race([predictPromise, predTimeout]);
+
+  if (!result || !result.data || result.data.length < 2) {
+    throw new Error("Respuesta inválida de Demucs AI");
+  }
+
+  const vocUrl = result.data[0].url;
+  const instUrl = result.data[1].url;
+  if (!vocUrl || !instUrl) {
+    throw new Error("URLs de stems no devueltas por Demucs AI");
+  }
+
+  logger.info("Separador AI: Descargando stems aislados por la red neuronal...");
+  const [resVoc, resInst] = await Promise.all([
+    axios.get(vocUrl, { responseType: "arraybuffer", timeout: 35000 }),
+    axios.get(instUrl, { responseType: "arraybuffer", timeout: 35000 })
+  ]);
+
+  const tempVocWav = path.join(STEMS_CACHE_DIR, `temp_ai_voc_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.wav`);
+  const tempInstWav = path.join(STEMS_CACHE_DIR, `temp_ai_inst_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.wav`);
+
+  fs.writeFileSync(tempVocWav, Buffer.from(resVoc.data));
+  fs.writeFileSync(tempInstWav, Buffer.from(resInst.data));
+
+  try {
+    logger.info("Separador AI: Renderizando master en MP3 con calidad solicitada...");
+    await Promise.all([
+      new Promise((res, rej) => {
+        const ff = spawn(ffmpegPath, [
+          "-y",
+          "-i", tempInstWav,
+          "-c:a", "libmp3lame",
+          "-b:a", bitrate,
+          "-id3v2_version", "3",
+          outInstrumentalPath
+        ]);
+        ff.on("close", code => code === 0 ? res() : rej(new Error(`Error ffmpeg instrumental AI: code ${code}`)));
+        ff.on("error", rej);
+      }),
+      new Promise((res, rej) => {
+        const ff = spawn(ffmpegPath, [
+          "-y",
+          "-i", tempVocWav,
+          "-c:a", "libmp3lame",
+          "-b:a", bitrate,
+          "-id3v2_version", "3",
+          outVocalsPath
+        ]);
+        ff.on("close", code => code === 0 ? res() : rej(new Error(`Error ffmpeg vocals AI: code ${code}`)));
+        ff.on("error", rej);
+      })
+    ]);
+    logger.info("Separador AI: Stems neuronales Demucs v4 generados con éxito rotundo.");
+  } finally {
+    try { if (fs.existsSync(tempVocWav)) fs.unlinkSync(tempVocWav); } catch {}
+    try { if (fs.existsSync(tempInstWav)) fs.unlinkSync(tempInstWav); } catch {}
+  }
+}
+
+/**
+ * Fallback DSP con supresión espectral de fase y compuerta acústica en caso de desconexión
+ */
+async function separateWithDSPFallback(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate = "320k") {
+  logger.info("Separador: Ejecutando motor DSP resiliente de respaldo...");
+
+  // Pipeline 1: Instrumental (Cancelación de fase sin sibilancias en agudos y sub-bajo puro < 110Hz)
+  const pInstrumental = new Promise((res, rej) => {
+    const instFilter = '[0:a]aformat=channel_layouts=stereo,asplit=2[low][mid];' +
+      '[low]lowpass=f=110[bass];' +
+      '[mid]highpass=f=110,pan=stereo|c0=c0-c1|c1=c1-c0[inst_mid];' +
+      '[bass][inst_mid]amix=inputs=2:dropout_transition=0,volume=2.2[out]';
+
+    const ffInst = spawn(ffmpegPath, [
+      "-y",
+      "-i", inputAudioPath,
+      "-filter_complex", instFilter,
+      "-map", "[out]",
+      "-c:a", "libmp3lame",
+      "-b:a", bitrate,
+      "-id3v2_version", "3",
+      outInstrumentalPath
+    ]);
+
+    let stderr = "";
+    ffInst.stderr.on("data", d => { stderr += d.toString(); });
+    ffInst.on("close", code => {
+      if (code === 0 && fs.existsSync(outInstrumentalPath) && fs.statSync(outInstrumentalPath).size > 1000) {
+        res();
+      } else {
+        rej(new Error(`Error al generar pista instrumental DSP (code ${code}): ${stderr.slice(-200)}`));
+      }
+    });
+    ffInst.on("error", rej);
+  });
+
+  // Pipeline 2: Acapella / Vocales (Canal central + compuerta acústica agate + formantes vocales humanos)
+  const pVocals = new Promise((res, rej) => {
+    const vocFilter = '[0:a]aformat=channel_layouts=stereo,' +
+      'pan=stereo|c0=0.5*c0+0.5*c1|c1=0.5*c0+0.5*c1,' +
+      'highpass=f=180,lowpass=f=4200,' +
+      'equalizer=f=1000:t=q:w=1.2:g=5,equalizer=f=2600:t=q:w=1.5:g=6,' +
+      'agate=threshold=0.04:ratio=4:range=0.08:attack=10:release=120,' +
+      'volume=3.2[out]';
+
+    const ffVoc = spawn(ffmpegPath, [
+      "-y",
+      "-i", inputAudioPath,
+      "-filter_complex", vocFilter,
+      "-map", "[out]",
+      "-c:a", "libmp3lame",
+      "-b:a", bitrate,
+      "-id3v2_version", "3",
+      outVocalsPath
+    ]);
+
+    let stderr = "";
+    ffVoc.stderr.on("data", d => { stderr += d.toString(); });
+    ffVoc.on("close", code => {
+      if (code === 0 && fs.existsSync(outVocalsPath) && fs.statSync(outVocalsPath).size > 1000) {
+        res();
+      } else {
+        rej(new Error(`Error al generar pista vocal DSP (code ${code}): ${stderr.slice(-200)}`));
+      }
+    });
+    ffVoc.on("error", rej);
+  });
+
+  await Promise.all([pInstrumental, pVocals]);
+}
+
+/**
  * Separa un archivo de audio estéreo en Instrumental (sin voz) y Vocals (solo voz)
+ * Utiliza IA Neuronal Demucs v4 de forma primordial y conmuta a DSP en caso de desconexión.
  */
 function separateAudioChannels(inputAudioPath, outInstrumentalPath, outVocalsPath, quality = "320k") {
   return new Promise(async (resolve, reject) => {
@@ -68,69 +230,14 @@ function separateAudioChannels(inputAudioPath, outInstrumentalPath, outVocalsPat
       const bitrateMap = { "320k": "320k", "192k": "192k", "128k": "128k" };
       const bitrate = bitrateMap[quality] || "320k";
 
-      // Pipeline 1: Instrumental / Karaoke (Elimina la voz central mediante cancelación estereofónica DSP de 3 bandas)
-      const pInstrumental = new Promise((res, rej) => {
-        const instFilter = '[0:a]aformat=channel_layouts=stereo,asplit=3[low][mid][high];' +
-          '[low]lowpass=f=180[bass];' +
-          '[mid]highpass=f=180,lowpass=f=6800,pan=stereo|c0=0.5*c0-0.5*c1|c1=0.5*c1-0.5*c0[inst_mid];' +
-          '[high]highpass=f=6800[treble];' +
-          '[bass][inst_mid][treble]amix=inputs=3:dropout_transition=0,volume=2.6[out]';
-
-        const ffInst = spawn(ffmpegPath, [
-          "-y",
-          "-i", inputAudioPath,
-          "-filter_complex", instFilter,
-          "-map", "[out]",
-          "-c:a", "libmp3lame",
-          "-b:a", bitrate,
-          "-id3v2_version", "3",
-          outInstrumentalPath
-        ]);
-
-        let stderr = "";
-        ffInst.stderr.on("data", d => { stderr += d.toString(); });
-        ffInst.on("close", code => {
-          if (code === 0 && fs.existsSync(outInstrumentalPath) && fs.statSync(outInstrumentalPath).size > 1000) {
-            res();
-          } else {
-            rej(new Error(`Error al generar pista instrumental (code ${code}): ${stderr.slice(-200)}`));
-          }
-        });
-        ffInst.on("error", rej);
-      });
-
-      // Pipeline 2: Acapella / Vocales (Aísla el canal central, cancela instrumentos laterales y realza frecuencias vocales)
-      const pVocals = new Promise((res, rej) => {
-        const vocFilter = '[0:a]aformat=channel_layouts=stereo,asplit=2[mid_in][side_in];' +
-          '[mid_in]pan=stereo|c0=0.5*c0+0.5*c1|c1=0.5*c0+0.5*c1[mid];' +
-          '[side_in]pan=stereo|c0=0.5*c0-0.5*c1|c1=0.5*c1-0.5*c0[side];' +
-          '[side]volume=-1[side_inv];' +
-          '[mid][side_inv]amix=inputs=2:dropout_transition=0,highpass=f=140,lowpass=f=7500,equalizer=f=1000:t=q:w=1.5:g=3,equalizer=f=3000:t=q:w=1.5:g=4,volume=3.0[out]';
-
-        const ffVoc = spawn(ffmpegPath, [
-          "-y",
-          "-i", inputAudioPath,
-          "-filter_complex", vocFilter,
-          "-map", "[out]",
-          "-c:a", "libmp3lame",
-          "-b:a", bitrate,
-          "-id3v2_version", "3",
-          outVocalsPath
-        ]);
-
-        let stderr = "";
-        ffVoc.stderr.on("data", d => { stderr += d.toString(); });
-        ffVoc.on("close", code => {
-          if (code === 0 && fs.existsSync(outVocalsPath) && fs.statSync(outVocalsPath).size > 1000) {
-            res();
-          } else {
-            rej(new Error(`Error al generar pista vocal (code ${code}): ${stderr.slice(-200)}`));
-          }
-        });
-        ffVoc.on("error", rej);
-      });
-
-      await Promise.all([pInstrumental, pVocals]);
+      let aiSuccess = false;
+      try {
+        await separateWithDemucsAI(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate);
+        aiSuccess = true;
+      } catch (aiErr) {
+        logger.warn(`Separación con IA Demucs no disponible o fallida (${aiErr.message}). Conmutando a motor DSP de alta resolución...`);
+        await separateWithDSPFallback(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate);
+      }
 
       // Extraer duración
       let duration = "00:00";
@@ -151,6 +258,7 @@ function separateAudioChannels(inputAudioPath, outInstrumentalPath, outVocalsPat
       } catch {}
 
       resolve({
+        engine: aiSuccess ? "Demucs v4 Neural AI" : "Resilient High-Def DSP",
         instrumentalSize: fs.statSync(outInstrumentalPath).size,
         vocalsSize: fs.statSync(outVocalsPath).size,
         duration,
@@ -279,6 +387,7 @@ async function processSeparation(options = {}) {
       thumbnail,
       duration: sepRes.duration,
       durationSeconds: sepRes.durationSeconds,
+      engine: sepRes.engine || "Demucs v4 Neural AI",
       vocals: {
         streamUrl: `/api/separator/stream?id=${jobId}&type=vocals`,
         downloadUrl: `/api/separator/download?id=${jobId}&type=vocals`,

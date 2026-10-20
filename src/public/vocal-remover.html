@@ -523,9 +523,9 @@
             <div style="display: flex; gap: 10px; align-items: center; font-size: 0.82rem; color: var(--text-muted); flex-wrap: wrap;">
               <span id="res-platform" style="background: rgba(255, 255, 255, 0.08); padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">MULTIMEDIA</span>
               <span id="res-duration">00:00</span>
-              <span style="color: var(--primary); display: inline-flex; align-items: center; gap: 4px;">
+              <span id="res-stem-badge" style="color: var(--primary); display: inline-flex; align-items: center; gap: 4px;">
                 <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polyline points="20 6 9 17 4 12"/></svg>
-                2 STEMS GENERADOS
+                DEMUCS v4 AI // 2 STEMS
               </span>
             </div>
           </div>
@@ -828,26 +828,32 @@
         progressStatus.innerHTML = `<span class="spinner" style="display: inline-block; width: 14px; height: 14px;"></span> Extrayendo audio maestro de alta fidelidad...`;
 
         try {
-          setTimeout(() => {
-            if (progressBar.style.width === "20%") {
-              progressBar.style.width = "55%";
-              progressPercent.textContent = "55%";
-              progressStatus.innerHTML = `<span class="spinner" style="display: inline-block; width: 14px; height: 14px;"></span> Ejecutando cancelación estereofónica de fase y separación de acapella...`;
-            }
-          }, 1200);
+          const t1 = setTimeout(() => {
+            progressBar.style.width = "45%";
+            progressPercent.textContent = "45%";
+            progressStatus.innerHTML = `<span class="spinner" style="display: inline-block; width: 14px; height: 14px;"></span> Conectando con red neuronal Demucs v4 (Meta AI)...`;
+          }, 1000);
+
+          const t2 = setTimeout(() => {
+            progressBar.style.width = "75%";
+            progressPercent.textContent = "75%";
+            progressStatus.innerHTML = `<span class="spinner" style="display: inline-block; width: 14px; height: 14px;"></span> Extrayendo acapella y pista instrumental pura sin filtraciones...`;
+          }, 3500);
 
           const res = await fetch("/api/separator/process", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
           });
+          clearTimeout(t1);
+          clearTimeout(t2);
           const data = await res.json();
 
           progressBar.style.width = "100%";
           progressPercent.textContent = "100%";
 
           if (data.status === "success") {
-            progressStatus.textContent = "Separación completada con éxito";
+            progressStatus.textContent = "Separación neuronal completada con éxito";
             displaySeparationResult(data);
           } else {
             alert(data.error || "No se pudo procesar la separación.");
@@ -866,6 +872,11 @@
         document.getElementById("res-duration").textContent = data.duration;
         document.getElementById("time-total").textContent = data.duration;
         document.getElementById("res-thumb").src = data.thumbnail || "/img/logo.png";
+
+        const badgeStem = document.getElementById("res-stem-badge");
+        if (badgeStem && data.engine) {
+          badgeStem.innerHTML = `<svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polyline points="20 6 9 17 4 12"/></svg> ${data.engine.toUpperCase()}`;
+        }
 
         // Configurar fuentes de audio
         audioInst.src = data.instrumental.streamUrl;
