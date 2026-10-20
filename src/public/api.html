@@ -359,11 +359,13 @@
           <span class="tech-card-tag">[ 1.1 // BASE_URL ]</span>
           <h3>URL Base del Servidor</h3>
           <p>Todas las rutas son relativas a la dirección canónica en producción:</p>
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Base URL de Producción</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-base-url')">Copiar</button>
           </div>
           <pre class="code-panel" id="code-base-url">https://cloudtranslator.onrender.com/api</pre>
+          </div>
           <p style="margin-top: 12px; font-size: 0.88rem; color: var(--text-muted);">
             Se requiere comunicación estricta mediante <strong>HTTPS con TLS 1.3</strong>. Las solicitudes HTTP no cifradas se redirigen automáticamente a HTTPS.
           </p>
@@ -412,7 +414,8 @@
           <span class="tech-card-tag">[ 1.3 // ERROR_SCHEMA ]</span>
           <h3>Esquema Estándar de Respuestas de Error</h3>
           <p>Cuando una solicitud falla por validación de parámetros (HTTP 400) o error interno (HTTP 500), el servidor responde con el siguiente formato JSON:</p>
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Esquema de Error JSON (HTTP 400 / 500)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-error-schema')">Copiar</button>
           </div>
@@ -420,6 +423,7 @@
   "success": false,
   "error": "El idioma objetivo es requerido"
 }</pre>
+          </div>
         </article>
       </section>
 
@@ -468,7 +472,8 @@
           </div>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Ejemplo de Solicitud (cURL)</h4>
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Comando cURL (POST Texto Simple)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-single')">Copiar cURL</button>
           </div>
@@ -478,15 +483,18 @@
     "text": "Infraestructura de microservicios en la nube",
     "targetLanguage": "en"
   }'</pre>
+          </div>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Respuesta JSON (HTTP 200 OK)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-post-single')">Copiar JSON</button>
           </div>
           <pre class="code-panel" id="res-post-single">{
   "translatedText": "Cloud microservices infrastructure"
 }</pre>
+          </div>
         </article>
 
         <!-- Sub 2.2: Batch text -->
@@ -529,7 +537,8 @@
           </div>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Ejemplo de Solicitud (cURL)</h4>
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Comando cURL (POST Lote de Textos)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-batch')">Copiar cURL</button>
           </div>
@@ -539,9 +548,11 @@
     "texts": ["Configuración", "Seguridad", "Facturación"],
     "targetLanguage": "en"
   }'</pre>
+          </div>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Respuesta JSON (HTTP 200 OK)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-post-batch')">Copiar JSON</button>
           </div>
@@ -552,6 +563,7 @@
     "Billing"
   ]
 }</pre>
+          </div>
         </article>
       </section>
 
@@ -592,40 +604,82 @@
           </div>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Ejemplo de Solicitud (cURL)</h4>
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Comando cURL (GET Query Params)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-translate')">Copiar cURL</button>
           </div>
           <pre class="code-panel" id="curl-get-translate">curl -X GET "https://cloudtranslator.onrender.com/api/translate?text=Servicio&targetLanguage=en"</pre>
+          </div>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Respuesta JSON (HTTP 200 OK)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-get-translate')">Copiar JSON</button>
           </div>
           <pre class="code-panel" id="res-get-translate">{
   "translatedText": "Service"
 }</pre>
+          </div>
         </article>
       </section>
 
       <!-- SECCIÓN 03: METADATA & HEALTH -->
       <section id="api-get-languages" class="docs-section">
         <div class="section-full-title">
-          <span class="tech-card-tag">[ S.01 // LANGUAGES ]</span>
+          <span class="tech-card-tag">[ T.03 // LANGUAGES ]</span>
           <h2>GET /api/languages</h2>
-          <p>Devuelve la matriz de idiomas activos en el motor de traducción.</p>
+          <p>Devuelve la matriz de idiomas activos en el motor de traducción (+200 idiomas soportados).</p>
+
+          <h4>Especificación del Endpoint</h4>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Propiedad</th>
+                  <th>Valor</th>
+                  <th>Descripción Técnica</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>Método HTTP</code></td>
+                  <td><code>GET</code></td>
+                  <td>Consulta pública idempotente sin efectos colaterales</td>
+                </tr>
+                <tr>
+                  <td><code>Autenticación</code></td>
+                  <td>Pública</td>
+                  <td>No requiere token ni encabezados especiales</td>
+                </tr>
+                <tr>
+                  <td><code>Respuesta</code></td>
+                  <td><code>Array&lt;string&gt;</code></td>
+                  <td>Lista de códigos BCP-47 / ISO-639-1 (ej: <code>"en"</code>, <code>"es"</code>, <code>"fr"</code>, <code>"de"</code>)</td>
+                </tr>
+                <tr>
+                  <td><code>Caché HTTP</code></td>
+                  <td><code>max-age=86400</code> (24h)</td>
+                  <td>Caché inmutable para evitar llamadas redundantes</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <article class="content-box-card">
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Comando cURL (GET /api/languages)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-languages')">Copiar cURL</button>
           </div>
           <pre class="code-panel" id="curl-get-languages">curl -X GET "https://cloudtranslator.onrender.com/api/languages"</pre>
+          </div>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Respuesta JSON (HTTP 200 OK)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-get-languages')">Copiar JSON</button>
           </div>
@@ -635,6 +689,7 @@
     "en", "es", "fr", "de", "it", "pt", "ru", "ja", "zh-CN", "ar", "ko"
   ]
 }</pre>
+          </div>
         </article>
       </section>
 
@@ -647,14 +702,17 @@
         </div>
 
         <article class="content-box-card">
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Comando cURL (GET /api/ping)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-ping')">Copiar cURL</button>
           </div>
           <pre class="code-panel" id="curl-get-ping">curl -X GET "https://cloudtranslator.onrender.com/api/ping"</pre>
+          </div>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Respuesta JSON (HTTP 200 OK)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-get-ping')">Copiar JSON</button>
           </div>
@@ -663,6 +721,7 @@
   "service": "CloudTranslator Core",
   "timestamp": 1727560000000
 }</pre>
+          </div>
         </article>
       </section>
 
@@ -675,14 +734,17 @@
         </div>
 
         <article class="content-box-card">
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Comando cURL (GET /api/health)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-health')">Copiar cURL</button>
           </div>
           <pre class="code-panel" id="curl-get-health">curl -X GET "https://cloudtranslator.onrender.com/api/health"</pre>
+          </div>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Respuesta JSON (HTTP 200 OK)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-get-health')">Copiar JSON</button>
           </div>
@@ -692,6 +754,7 @@
   "uptime": 5120,
   "timestamp": "2026-09-28T22:15:00.000Z"
 }</pre>
+          </div>
         </article>
       </section>
 
@@ -704,14 +767,17 @@
         </div>
 
         <article class="content-box-card">
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Comando cURL (GET /api/tts/voices)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-voices')">Copiar cURL</button>
           </div>
           <pre class="code-panel" id="curl-get-voices">curl -X GET "https://cloudtranslator.onrender.com/api/tts/voices"</pre>
+          </div>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Respuesta JSON (HTTP 200 OK)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-get-voices')">Copiar JSON</button>
           </div>
@@ -739,6 +805,7 @@
     }
   ]
 }</pre>
+          </div>
         </article>
       </section>
 
@@ -750,7 +817,8 @@
         </div>
 
         <article class="content-box-card">
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Comando cURL (POST /api/tts)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-tts')">Copiar cURL</button>
           </div>
@@ -763,9 +831,11 @@
     "rate": 1.0,
     "pitch": 1.0
   }'</pre>
+          </div>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Respuesta JSON (HTTP 200 OK)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-post-tts')">Copiar JSON</button>
           </div>
@@ -781,6 +851,7 @@
   "format": "wav",
   "mimeType": "audio/wav"
 }</pre>
+          </div>
         </article>
       </section>
 
@@ -788,15 +859,62 @@
         <div class="section-full-title">
           <span class="tech-card-tag">[ V.03 // TTS_STREAMING ]</span>
           <h2>GET /api/tts/stream</h2>
-          <p>Transmite el flujo binario de audio de forma continua en tiempo real mediante encabezados <code>Content-Type: audio/wav</code> sin requerir almacenamiento en disco local.</p>
+          <p>Transmite el flujo binario de audio de forma continua en tiempo real mediante encabezados <code>Content-Type: audio/wav</code> con soporte para HTTP 206 Partial Content sin almacenar en disco local.</p>
         </div>
 
         <article class="content-box-card">
-          <div class="code-box-header">
-            <span>Comando cURL (GET /api/tts/stream)</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-tts-stream')">Copiar cURL</button>
+          <h4>Parámetros de Consulta (Query String)</h4>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Parámetro</th>
+                  <th>Tipo</th>
+                  <th>Obligatorio</th>
+                  <th>Valor por Defecto</th>
+                  <th>Descripción Técnica</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>text</code></td>
+                  <td><code>string</code></td>
+                  <td>Sí</td>
+                  <td>&mdash;</td>
+                  <td>Texto codificado en URL a sintetizar vocalmente.</td>
+                </tr>
+                <tr>
+                  <td><code>voiceId</code></td>
+                  <td><code>string</code></td>
+                  <td>No</td>
+                  <td><code>"es-ES-sofia"</code></td>
+                  <td>Identificador acústico de la voz seleccionada del catálogo.</td>
+                </tr>
+                <tr>
+                  <td><code>speed</code></td>
+                  <td><code>number</code></td>
+                  <td>No</td>
+                  <td><code>1.0</code></td>
+                  <td>Velocidad de reproducción (rango admitido: 0.5 a 2.0).</td>
+                </tr>
+                <tr>
+                  <td><code>pitch</code></td>
+                  <td><code>number</code></td>
+                  <td>No</td>
+                  <td><code>1.0</code></td>
+                  <td>Tono acústico base (rango admitido: 0.5 a 1.5).</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <pre class="code-panel" id="curl-get-tts-stream">curl -X GET "https://cloudtranslator.onrender.com/api/tts/stream?text=Hola%20mundo&voiceId=es-ES-sofia" --output locucion.wav</pre>
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// PETICIÓN cURL - STREAMING EN TIEMPO REAL</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-tts-stream')">Copiar cURL</button>
+            </div>
+            <pre class="code-panel" id="curl-get-tts-stream">curl -X GET "https://cloudtranslator.onrender.com/api/tts/stream?text=Hola%20mundo&voiceId=es-ES-sofia" --output locucion.wav</pre>
+          </div>
         </article>
       </section>
 
@@ -808,15 +926,50 @@
         </div>
 
         <article class="content-box-card">
-          <div class="code-box-header">
-            <span>Comando cURL (GET /api/tts/download)</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-tts-download')">Copiar cURL</button>
+          <h4>Parámetros de Consulta (Query String)</h4>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Parámetro</th>
+                  <th>Tipo</th>
+                  <th>Obligatorio</th>
+                  <th>Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>text</code></td>
+                  <td><code>string</code></td>
+                  <td>Sí</td>
+                  <td>Texto codificado para generar el archivo descargable.</td>
+                </tr>
+                <tr>
+                  <td><code>voiceId</code></td>
+                  <td><code>string</code></td>
+                  <td>No</td>
+                  <td>Identificador acústico de la voz (default: <code>"es-ES-sofia"</code>).</td>
+                </tr>
+                <tr>
+                  <td><code>filename</code></td>
+                  <td><code>string</code></td>
+                  <td>No</td>
+                  <td>Nombre personalizado del archivo (default: <code>"sintesis-vocal.wav"</code>).</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <pre class="code-panel" id="curl-get-tts-download">curl -L -O "https://cloudtranslator.onrender.com/api/tts/download?text=Hola%20mundo&voiceId=es-ES-sofia"</pre>
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// PETICIÓN cURL - DESCARGA DIRECTA DE ARCHIVO</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-tts-download')">Copiar cURL</button>
+            </div>
+            <pre class="code-panel" id="curl-get-tts-download">curl -L -O "https://cloudtranslator.onrender.com/api/tts/download?text=Hola%20mundo&voiceId=es-ES-sofia&filename=mi-locucion.wav"</pre>
+          </div>
         </article>
       </section>
 
-      <!-- SECCIÓN 04: PILAR 3 - CLONACIÓN DE VOZ (IA) -->
       <section id="api-post-voice-clone" class="docs-section">
         <div class="section-full-title">
           <span class="tech-card-tag">[ C.01 // VOICE_CLONING_AI ]</span>
@@ -825,7 +978,8 @@
         </div>
 
         <article class="content-box-card">
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Comando cURL (POST /api/voice-clone)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-clone')">Copiar cURL</button>
           </div>
@@ -837,9 +991,11 @@
     "similarity": "high",
     "pitch": 1.0
   }'</pre>
+          </div>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Respuesta JSON (HTTP 200 OK)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-post-clone')">Copiar JSON</button>
           </div>
@@ -855,40 +1011,90 @@
   "format": "wav",
   "mimeType": "audio/wav"
 }</pre>
+          </div>
         </article>
       </section>
 
       <section id="api-get-vc-stream" class="docs-section">
         <div class="section-full-title">
-          <span class="tech-card-tag">[ C.02 // CLONE_STREAM ]</span>
+          <span class="tech-card-tag">[ C.02 // VC_STREAMING ]</span>
           <h2>GET /api/voice-clone/stream</h2>
-          <p>Transmite en streaming continuo el audio con el timbre vocal clonado en tiempo real.</p>
+          <p>Transmite la voz clonada sintetizada en streaming de audio binario continuo PCM a 22,050 Hz.</p>
         </div>
 
         <article class="content-box-card">
-          <div class="code-box-header">
-            <span>Comando cURL (GET /api/voice-clone/stream)</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-vc-stream')">Copiar cURL</button>
+          <h4>Parámetros de Consulta (Query String)</h4>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Parámetro</th>
+                  <th>Tipo</th>
+                  <th>Obligatorio</th>
+                  <th>Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>profileId</code></td>
+                  <td><code>string</code></td>
+                  <td>Sí</td>
+                  <td>Identificador de la huella biométrica generado por <code>POST /api/voice-clone</code>.</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <pre class="code-panel" id="curl-get-vc-stream">curl -X GET "https://cloudtranslator.onrender.com/api/voice-clone/stream?sampleId=smp_78ab" --output voz-clonada.wav</pre>
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// PETICIÓN cURL - STREAMING DE VOZ CLONADA</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-vc-stream')">Copiar cURL</button>
+            </div>
+            <pre class="code-panel" id="curl-get-vc-stream">curl -X GET "https://cloudtranslator.onrender.com/api/voice-clone/stream?profileId=vc_profile_12345" --output clonado.wav</pre>
+          </div>
         </article>
       </section>
 
       <section id="api-get-vc-download" class="docs-section">
         <div class="section-full-title">
-          <span class="tech-card-tag">[ C.03 // CLONE_DOWNLOAD ]</span>
+          <span class="tech-card-tag">[ C.03 // VC_DOWNLOAD ]</span>
           <h2>GET /api/voice-clone/download</h2>
-          <p>Descarga directa física del archivo WAV sintetizado con la voz clonada por IA.</p>
+          <p>Descarga física del archivo WAV de audio sintetizado con el timbre biométrico original.</p>
         </div>
 
         <article class="content-box-card">
-          <div class="code-box-header">
-            <span>Comando cURL (GET /api/voice-clone/download)</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-vc-download')">Copiar cURL</button>
+          <h4>Parámetros de Consulta (Query String)</h4>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Parámetro</th>
+                  <th>Tipo</th>
+                  <th>Obligatorio</th>
+                  <th>Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>profileId</code></td>
+                  <td><code>string</code></td>
+                  <td>Sí</td>
+                  <td>Identificador de la huella vocal sintetizada.</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-      <!-- ================================================================= -->
-      <!-- PILAR 4: CONVERSOR MULTIMEDIA (MP3 / MP4) -->
-      <!-- ================================================================= -->
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// PETICIÓN cURL - DESCARGA DE VOZ CLONADA</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-vc-download')">Copiar cURL</button>
+            </div>
+            <pre class="code-panel" id="curl-get-vc-download">curl -L -O "https://cloudtranslator.onrender.com/api/voice-clone/download?profileId=vc_profile_12345"</pre>
+          </div>
+        </article>
+      </section>
+
       <section id="api-get-media-platforms" class="docs-section">
         <div class="section-full-title">
           <span class="tech-card-tag">[ M.01 // MEDIA_PLATFORMS ]</span>
@@ -897,11 +1103,14 @@
         </div>
 
         <article class="content-box-card">
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Comando cURL (GET /api/media/platforms)</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-media-platforms')">Copiar cURL</button>
           </div>
-          <pre class="code-panel" id="curl-get-media-platforms">curl -X GET "https://cloudtranslator.onrender.com/api/media/platforms"</pre>
+            <pre class="code-panel" id="curl-get-media-platforms">curl -X GET "https://cloudtranslator.onrender.com/api/media/platforms"</pre>
+          </div>
+          </div>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 18px;">Respuesta JSON de Ejemplo</h4>
           <pre class="code-panel">{
@@ -932,19 +1141,62 @@
         <div class="section-full-title">
           <span class="tech-card-tag">[ M.02 // MEDIA_INFO ]</span>
           <h2>POST /api/media/info</h2>
-          <p>Inspecciona un enlace multimedia y extrae en tiempo real el título, autor, duración, miniatura y formatos disponibles.</p>
+          <p>Inspecciona un enlace multimedia de YouTube, TikTok, Facebook, Instagram, Twitter/X o SoundCloud y extrae metadatos técnicos en tiempo real.</p>
         </div>
 
         <article class="content-box-card">
-          <div class="code-box-header">
-            <span>Comando cURL (POST /api/media/info)</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-media-info')">Copiar cURL</button>
+          <h4>Parámetros del Cuerpo (JSON Body)</h4>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Campo</th>
+                  <th>Tipo</th>
+                  <th>Obligatorio</th>
+                  <th>Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>url</code></td>
+                  <td><code>string</code></td>
+                  <td>Sí</td>
+                  <td>Enlace público HTTP/HTTPS al contenido multimedia.</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <pre class="code-panel" id="curl-post-media-info">curl -X POST "https://cloudtranslator.onrender.com/api/media/info" \
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// PETICIÓN cURL - EXTRACCIÓN DE METADATOS</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-media-info')">Copiar cURL</button>
+            </div>
+            <pre class="code-panel" id="curl-post-media-info">curl -X POST "https://cloudtranslator.onrender.com/api/media/info" \
   -H "Content-Type: application/json" \
   -d '{
     "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw"
   }'</pre>
+          </div>
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// RESPUESTA JSON (200 OK)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-post-media-info')">Copiar JSON</button>
+            </div>
+            <pre class="code-panel" id="res-post-media-info">{
+  "success": true,
+  "title": "Me at the zoo",
+  "author": "jawed",
+  "durationSeconds": 19,
+  "thumbnail": "https://i.ytimg.com/vi/jNQXAC9IVRw/hqdefault.jpg",
+  "platform": "youtube",
+  "formats": {
+    "audio": ["mp3", "wav"],
+    "video": ["mp4_360p", "mp4_720p", "mp4_1080p"]
+  }
+}</pre>
+          </div>
         </article>
       </section>
 
@@ -952,21 +1204,78 @@
         <div class="section-full-title">
           <span class="tech-card-tag">[ M.03 // MEDIA_CONVERT ]</span>
           <h2>POST /api/media/convert</h2>
-          <p>Convierte el video al formato solicitado (<code>"mp3"</code> o <code>"mp4"</code>) con la tasa de bits o resolución elegida. Retorna URLs para streaming y descarga física.</p>
+          <p>Transcodifica el enlace multimedia al formato solicitado (<code>"mp3"</code> o <code>"mp4"</code>) con resolución o bitrate calibrado.</p>
         </div>
 
         <article class="content-box-card">
-          <div class="code-box-header">
-            <span>Comando cURL (POST /api/media/convert)</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-media-convert')">Copiar cURL</button>
+          <h4>Parámetros del Cuerpo (JSON Body)</h4>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Campo</th>
+                  <th>Tipo</th>
+                  <th>Obligatorio</th>
+                  <th>Valores Admitidos</th>
+                  <th>Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>url</code></td>
+                  <td><code>string</code></td>
+                  <td>Sí</td>
+                  <td>URL válida</td>
+                  <td>Enlace multimedia de origen a procesar.</td>
+                </tr>
+                <tr>
+                  <td><code>format</code></td>
+                  <td><code>string</code></td>
+                  <td>No</td>
+                  <td><code>"mp3"</code>, <code>"mp4"</code>, <code>"wav"</code></td>
+                  <td>Formato contenedor de salida (default: <code>"mp3"</code>).</td>
+                </tr>
+                <tr>
+                  <td><code>quality</code></td>
+                  <td><code>string</code></td>
+                  <td>No</td>
+                  <td><code>"128k"</code>, <code>"192k"</code>, <code>"320k"</code>, <code>"720p"</code>, <code>"1080p"</code></td>
+                  <td>Calidad acústica o de video (default: <code>"320k"</code>).</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <pre class="code-panel" id="curl-post-media-convert">curl -X POST "https://cloudtranslator.onrender.com/api/media/convert" \
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// PETICIÓN cURL - TRANSCODIFICACIÓN MULTIMEDIA</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-media-convert')">Copiar cURL</button>
+            </div>
+            <pre class="code-panel" id="curl-post-media-convert">curl -X POST "https://cloudtranslator.onrender.com/api/media/convert" \
   -H "Content-Type: application/json" \
   -d '{
     "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
     "format": "mp3",
     "quality": "320k"
   }'</pre>
+          </div>
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// RESPUESTA JSON (200 OK)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-post-media-convert')">Copiar JSON</button>
+            </div>
+            <pre class="code-panel" id="res-post-media-convert">{
+  "success": true,
+  "jobId": "conv_98234_abc",
+  "title": "Me at the zoo",
+  "format": "mp3",
+  "quality": "320k",
+  "streamUrl": "/api/media/stream?id=conv_98234_abc",
+  "downloadUrl": "/api/media/download?id=conv_98234_abc",
+  "directMediaUrl": "https://cloudtranslator.onrender.com/api/media/stream?id=conv_98234_abc"
+}</pre>
+          </div>
         </article>
       </section>
 
@@ -974,15 +1283,50 @@
         <div class="section-full-title">
           <span class="tech-card-tag">[ M.04 // MEDIA_BATCH ]</span>
           <h2>POST /api/media/batch</h2>
-          <p>Procesa concurrentemente un arreglo de hasta 10 enlaces de video simultáneos.</p>
+          <p>Procesa concurrentemente un arreglo de hasta 10 enlaces de video simultáneos con resolución de promesas en paralelo.</p>
         </div>
 
         <article class="content-box-card">
-          <div class="code-box-header">
-            <span>Comando cURL (POST /api/media/batch)</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-media-batch')">Copiar cURL</button>
+          <h4>Parámetros del Cuerpo (JSON Body)</h4>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Campo</th>
+                  <th>Tipo</th>
+                  <th>Obligatorio</th>
+                  <th>Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>urls</code></td>
+                  <td><code>Array&lt;string&gt;</code></td>
+                  <td>Sí</td>
+                  <td>Arreglo con 1 a 10 URLs públicas a convertir por lotes.</td>
+                </tr>
+                <tr>
+                  <td><code>format</code></td>
+                  <td><code>string</code></td>
+                  <td>No</td>
+                  <td>Formato de salida común para el lote (default: <code>"mp3"</code>).</td>
+                </tr>
+                <tr>
+                  <td><code>quality</code></td>
+                  <td><code>string</code></td>
+                  <td>No</td>
+                  <td>Tasa de bits o resolución (default: <code>"320k"</code>).</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <pre class="code-panel" id="curl-post-media-batch">curl -X POST "https://cloudtranslator.onrender.com/api/media/batch" \
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// PETICIÓN cURL - CONVERSIÓN CONCURRENTE POR LOTES</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-media-batch')">Copiar cURL</button>
+            </div>
+            <pre class="code-panel" id="curl-post-media-batch">curl -X POST "https://cloudtranslator.onrender.com/api/media/batch" \
   -H "Content-Type: application/json" \
   -d '{
     "urls": [
@@ -992,6 +1336,7 @@
     "format": "mp3",
     "quality": "320k"
   }'</pre>
+          </div>
         </article>
       </section>
 
@@ -1003,11 +1348,35 @@
         </div>
 
         <article class="content-box-card">
-          <div class="code-box-header">
-            <span>Comando cURL (GET /api/media/stream)</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-media-stream')">Copiar cURL</button>
+          <h4>Parámetros de Consulta (Query String)</h4>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Parámetro</th>
+                  <th>Tipo</th>
+                  <th>Obligatorio</th>
+                  <th>Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>id</code></td>
+                  <td><code>string</code></td>
+                  <td>Sí</td>
+                  <td>Identificador del trabajo de transcodificación (jobId).</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <pre class="code-panel" id="curl-get-media-stream">curl -X GET "https://cloudtranslator.onrender.com/api/media/stream?id=media_12345_abc"</pre>
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// PETICIÓN cURL - STREAMING DE AUDIO / VIDEO</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-media-stream')">Copiar cURL</button>
+            </div>
+            <pre class="code-panel" id="curl-get-media-stream">curl -X GET "https://cloudtranslator.onrender.com/api/media/stream?id=conv_98234_abc"</pre>
+          </div>
         </article>
       </section>
 
@@ -1019,51 +1388,112 @@
         </div>
 
         <article class="content-box-card">
-          <div class="code-box-header">
-            <span>Comando cURL (GET /api/media/download)</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-media-download')">Copiar cURL</button>
+          <h4>Parámetros de Consulta (Query String)</h4>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Parámetro</th>
+                  <th>Tipo</th>
+                  <th>Obligatorio</th>
+                  <th>Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>id</code></td>
+                  <td><code>string</code></td>
+                  <td>Sí</td>
+                  <td>Identificador del archivo multimedia generado.</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <pre class="code-panel" id="curl-get-media-download">curl -L -O "https://cloudtranslator.onrender.com/api/media/download?id=media_12345_abc"</pre>
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// PETICIÓN cURL - DESCARGA FÍSICA MULTIMEDIA</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-media-download')">Copiar cURL</button>
+            </div>
+            <pre class="code-panel" id="curl-get-media-download">curl -L -O "https://cloudtranslator.onrender.com/api/media/download?id=conv_98234_abc"</pre>
+          </div>
         </article>
       </section>
 
-      <!-- SECCIÓN 06: CONSOLA INTERACTIVA EN VIVO -->
-      
-      <!-- ========================================== -->
-      <!-- GRUPO 06: ENDPOINTS PILAR 5 - SEPARADOR DE VOZ -->
-      <!-- ========================================== -->
       <section id="api-post-separator-process" class="docs-section">
         <div class="section-full-title">
           <span class="tech-card-tag">[ S.01 // SEPARATOR_PROCESS ]</span>
           <h2>POST /api/separator/process</h2>
-          <p>Separa la voz de la pista instrumental a partir de una URL o un archivo codificado en Base64.</p>
+          <p>Separa en tiempo real la voz (Acappella) de la pista instrumental (Karaoke) mediante descomposición espectral STFT y filtrado de correlación de fase estéreo.</p>
         </div>
 
         <article class="content-box-card">
-          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-            <span class="badge" style="background: #ffffff; color: #000000; font-weight: 700;">POST</span>
-            <code style="font-size: 0.95rem; color: #ffffff;">https://cloudtranslator.onrender.com/api/separator/process</code>
+          <h4>Parámetros del Cuerpo (JSON Body)</h4>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Campo</th>
+                  <th>Tipo</th>
+                  <th>Obligatorio</th>
+                  <th>Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>url</code></td>
+                  <td><code>string</code></td>
+                  <td>Condicional</td>
+                  <td>Enlace público HTTP/HTTPS al video o canción a separar.</td>
+                </tr>
+                <tr>
+                  <td><code>audioBase64</code></td>
+                  <td><code>string</code></td>
+                  <td>Condicional</td>
+                  <td>Cadena Base64 con el contenido de audio grabado con micrófono o archivo local.</td>
+                </tr>
+                <tr>
+                  <td><code>stems</code></td>
+                  <td><code>Array&lt;string&gt;</code></td>
+                  <td>No</td>
+                  <td>Pistas a aislar: <code>["vocals", "instrumental"]</code> (default: ambas).</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <p style="margin-bottom: 14px;"><strong>Encabezados:</strong> <code>Content-Type: application/json</code></p>
 
-          <h4 style="color: #ffffff; font-size: 0.9rem; margin-bottom: 6px;">Cuerpo de la Petición (JSON):</h4>
-          <pre class="code-panel">{
-  "url": "https://www.youtube.com/watch?v=jNQXAC9IVRw",
-  "quality": "lossless"
-}</pre>
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// PETICIÓN cURL - SEPARACIÓN DE VOZ E INSTRUMENTAL</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-post-separator')">Copiar cURL</button>
+            </div>
+            <pre class="code-panel" id="curl-post-separator">curl -X POST "https://cloudtranslator.onrender.com/api/separator/process" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "stems": ["vocals", "instrumental"]
+  }'</pre>
+          </div>
 
-          <h4 style="color: #ffffff; font-size: 0.9rem; margin-top: 14px; margin-bottom: 6px;">Respuesta Exitosa (200 OK):</h4>
-          <pre class="code-panel">{
-  "status": "success",
-  "id": "sep_1713589200_a1b2c",
-  "title": "Canción Analizada",
-  "duration": 214,
-  "engine": "Demucs v4 Neural AI (Zero-Bleed)",
-  "vocalsStreamUrl": "/api/separator/stream?id=sep_1713589200_a1b2c&type=vocals",
-  "instrumentalStreamUrl": "/api/separator/stream?id=sep_1713589200_a1b2c&type=instrumental",
-  "vocalsDownloadUrl": "/api/separator/download?id=sep_1713589200_a1b2c&type=vocals",
-  "instrumentalDownloadUrl": "/api/separator/download?id=sep_1713589200_a1b2c&type=instrumental"
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// RESPUESTA JSON (200 OK)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-post-separator')">Copiar JSON</button>
+            </div>
+            <pre class="code-panel" id="res-post-separator">{
+  "success": true,
+  "jobId": "sep_84920_xyz",
+  "vocalsUrl": "/api/separator/stream?id=sep_84920_xyz&type=vocals",
+  "instrumentalUrl": "/api/separator/stream?id=sep_84920_xyz&type=instrumental",
+  "downloadVocals": "/api/separator/download?id=sep_84920_xyz&type=vocals",
+  "downloadInstrumental": "/api/separator/download?id=sep_84920_xyz&type=instrumental",
+  "metrics": {
+    "vocalIsolationDb": 22.4,
+    "instrumentalIsolationDb": 26.1,
+    "latencyMs": 412
+  }
 }</pre>
+          </div>
         </article>
       </section>
 
@@ -1071,19 +1501,48 @@
         <div class="section-full-title">
           <span class="tech-card-tag">[ S.02 // SEPARATOR_STREAM ]</span>
           <h2>GET /api/separator/stream</h2>
-          <p>Transmite en streaming con rango HTTP 206 la pista vocal o instrumental aislada.</p>
+          <p>Reproduce en streaming de audio binario continuo la pista vocal aislada (Acappella) o la pista instrumental (Karaoke).</p>
         </div>
 
         <article class="content-box-card">
-          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-            <span class="badge" style="background: #ffffff; color: #000000; font-weight: 700;">GET</span>
-            <code style="font-size: 0.95rem; color: #ffffff;">https://cloudtranslator.onrender.com/api/separator/stream?id=[ID]&amp;type=[vocals|instrumental]</code>
+          <h4>Parámetros de Consulta (Query String)</h4>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Parámetro</th>
+                  <th>Tipo</th>
+                  <th>Obligatorio</th>
+                  <th>Valores Admitidos</th>
+                  <th>Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>id</code></td>
+                  <td><code>string</code></td>
+                  <td>Sí</td>
+                  <td>Identificador del proceso</td>
+                  <td>Código de trabajo devuelto por <code>POST /api/separator/process</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>type</code></td>
+                  <td><code>string</code></td>
+                  <td>Sí</td>
+                  <td><code>"vocals"</code> o <code>"instrumental"</code></td>
+                  <td>Tipo de pista a transmitir por el socket de audio.</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <p><strong>Parámetros de consulta (Query Params):</strong></p>
-          <ul style="color: var(--text-secondary); padding-left: 20px; line-height: 1.8;">
-            <li><code>id</code> (requerido): Identificador del proceso devuelto por <code>/api/separator/process</code>.</li>
-            <li><code>type</code> (requerido): <code>vocals</code> para voz pura o <code>instrumental</code> para pista instrumental.</li>
-          </ul>
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// PETICIÓN cURL - STREAMING DE PISTA SEPARADA</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-sep-stream')">Copiar cURL</button>
+            </div>
+            <pre class="code-panel" id="curl-get-sep-stream">curl -X GET "https://cloudtranslator.onrender.com/api/separator/stream?id=sep_84920_xyz&type=vocals" --output pista-vocal.wav</pre>
+          </div>
         </article>
       </section>
 
@@ -1091,21 +1550,51 @@
         <div class="section-full-title">
           <span class="tech-card-tag">[ S.03 // SEPARATOR_DOWNLOAD ]</span>
           <h2>GET /api/separator/download</h2>
-          <p>Descarga directa del stem en formato MP3 puro con metadatos y encabezado de archivo adjunto.</p>
+          <p>Descarga física con cabecera <code>Content-Disposition: attachment</code> del archivo WAV de alta fidelidad correspondiente al stem aislado.</p>
         </div>
 
         <article class="content-box-card">
-          <div class="code-box-header">
-            <span>Comando cURL (GET /api/separator/download)</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-sep-dl')">Copiar cURL</button>
+          <h4>Parámetros de Consulta (Query String)</h4>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Parámetro</th>
+                  <th>Tipo</th>
+                  <th>Obligatorio</th>
+                  <th>Valores Admitidos</th>
+                  <th>Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>id</code></td>
+                  <td><code>string</code></td>
+                  <td>Sí</td>
+                  <td>Identificador del proceso</td>
+                  <td>Código de trabajo de la separación realizada.</td>
+                </tr>
+                <tr>
+                  <td><code>type</code></td>
+                  <td><code>string</code></td>
+                  <td>Sí</td>
+                  <td><code>"vocals"</code> o <code>"instrumental"</code></td>
+                  <td>Pista a descargar físicamente en formato WAV.</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <pre class="code-panel" id="curl-get-sep-dl">curl -L -O "https://cloudtranslator.onrender.com/api/separator/download?id=sep_1713589200_a1b2c&type=vocals"</pre>
+
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// PETICIÓN cURL - DESCARGA FÍSICA DEL STEM AISLADO</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-sep-download')">Copiar cURL</button>
+            </div>
+            <pre class="code-panel" id="curl-get-sep-download">curl -L -O "https://cloudtranslator.onrender.com/api/separator/download?id=sep_84920_xyz&type=instrumental"</pre>
+          </div>
         </article>
       </section>
 
-      <!-- ========================================== -->
-      <!-- GRUPO 07: ENDPOINTS PILAR 6 - CLOUDDJ -->
-      <!-- ========================================== -->
       <section id="api-dj-architecture" class="docs-section">
         <div class="section-full-title">
           <span class="tech-card-tag">[ D.01 // DJ_INTEGRATION ]</span>
@@ -1118,7 +1607,8 @@
             Las pistas del CloudDJ se preparan utilizando <code>POST /api/media/convert</code> con formato MP3 y 320 kbps. El reproductor utiliza streaming HTTP 206 y nodos Web Audio API con ecualización de 3 bandas paramétricas (Low, Mid, High), control de crossfader de energía constante y scratch en tiempo real.
           </p>
 
-          <div class="code-box-header">
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
             <span>Petición cURL para precargar pista en consola DJ</span>
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-dj-track-prep')">Copiar</button>
           </div>
@@ -1129,6 +1619,7 @@
     "format": "mp3",
     "quality": "320k"
   }'</pre>
+          </div>
         </article>
       </section>
 
@@ -1168,21 +1659,22 @@
             </div>
 
             <div>
-              <div class="code-box-header">
+              <div class="code-box-wrapper">
+            <div class="code-box-header">
                 <span>Respuesta del Servidor (JSON en tiempo real)</span>
                 <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'live-api-output')">Copiar Respuesta</button>
               </div>
               <pre class="code-panel" id="live-api-output" style="min-height: 120px;">Pulsa "Ejecutar Petición POST" para probar el endpoint en vivo...</pre>
-            </div>
           </div>
+            </div>
         </article>
       </section>
 
-      <!-- Pie de Página Integrado al Final del Contenedor de Scroll Interno -->
-      <footer id="footer-placeholder" data-component="footer" data-active="api"></footer>
-
     </main>
   </div>
+
+  <!-- Pie de Página Fijo al Final Ocupando Todo el Ancho (Barra + Contenido) -->
+  <footer id="footer-placeholder" data-component="footer" data-active="api"></footer>
 
   <script src="/js/cloud-translator.js"></script>
   <script>

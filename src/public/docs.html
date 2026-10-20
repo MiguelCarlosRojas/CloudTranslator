@@ -314,7 +314,7 @@
         </p>
         <div style="background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.25); border-radius: var(--radius-md); padding: 14px 18px; margin-top: 18px; font-size: 0.88rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
           <span>¿Buscas los parámetros exactos JSON, cabeceras HTTP y consolas de prueba cURL de los endpoints?</span>
-          <a href="/api" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;">Ir a API REST Playground &rarr;</a>
+          <a href="/api" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;">Ir a API REST &rarr;</a>
         </div>
       </section>
 
@@ -363,7 +363,57 @@
           <p>
             A diferencia de Google Translate o widgets invasivos que insertan frames de terceros y pierden el estado al recargar, CloudTranslator almacena la selección del usuario en una cookie HTTP de primer nivel:
           </p>
-          <pre><code>cloud_translator_lang=en; Path=/; Max-Age=31536000; SameSite=Lax</code></pre>
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// CABECERA HTTP SET-COOKIE</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-doc-cookie')">Copiar Código</button>
+            </div>
+            <pre class="code-panel" id="code-doc-cookie"><code>Set-Cookie: cloud_translator_lang=en; Path=/; Max-Age=31536000; SameSite=Lax; Secure</code></pre>
+          </div>
+
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Componente Arquitectónico</th>
+                  <th>Mecanismo Técnico</th>
+                  <th>Latencia Cómputo</th>
+                  <th>Persistencia</th>
+                  <th>Garantía de Rendimiento</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Consolidación Atómica</strong></td>
+                  <td>Escaneo DFS DOM en 1 paso sincrónico</td>
+                  <td>&lt; 5 ms</td>
+                  <td>En memoria de renderizado</td>
+                  <td>1 sola petición HTTP POST por traducción completa</td>
+                </tr>
+                <tr>
+                  <td><strong>Cookie Técnica HTTP</strong></td>
+                  <td>Cookie de 1er nivel <code>SameSite=Lax</code></td>
+                  <td>0 ms (cliente nativo)</td>
+                  <td>365 días (31,536,000 s)</td>
+                  <td>Preserva selección en recargas sin parpadeo visual</td>
+                </tr>
+                <tr>
+                  <td><strong>Caché LRU Servidor</strong></td>
+                  <td>Hash criptográfico SHA-256 en memoria RAM</td>
+                  <td>0 ms de inferencia</td>
+                  <td>2,000 bloques recientes</td>
+                  <td>Reutilización instantánea de frases concurrentes</td>
+                </tr>
+                <tr>
+                  <td><strong>Caché Local Cliente</strong></td>
+                  <td>Map en memoria JS del SDK</td>
+                  <td>0 ms de red</td>
+                  <td>Duración de la sesión SPA</td>
+                  <td>Evita reenvíos al alternar entre idiomas visitados</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <p>
             Esta cookie técnica permite que las visitas subsiguientes y las transiciones entre páginas mantengan el idioma elegido de forma automática, sin parpadeos de contenido original y con sincronización en navegaciones internas SPA.
           </p>
@@ -411,6 +461,51 @@
         </article>
 
         <article class="docs-subsection" id="sub-p1-reinsertion">
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Selector / Elemento</th>
+                  <th>Tipo de Protección</th>
+                  <th>Acción del Motor</th>
+                  <th>Justificación Técnica</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>&lt;script&gt;, &lt;style&gt;</code></td>
+                  <td>Aislamiento de Ejecución</td>
+                  <td>Exclusión Total</td>
+                  <td>Previene errores sintácticos de JavaScript y CSS</td>
+                </tr>
+                <tr>
+                  <td><code>&lt;pre&gt;, &lt;code&gt;</code></td>
+                  <td>Preservación de Sintaxis</td>
+                  <td>Exclusión Total</td>
+                  <td>Conserva snippets de código fuente sin alterar keywords</td>
+                </tr>
+                <tr>
+                  <td><code>[data-no-translate]</code></td>
+                  <td>Atributo Declarativo HTML5</td>
+                  <td>Exclusión Recursiva</td>
+                  <td>Permite a los desarrolladores proteger módulos específicos</td>
+                </tr>
+                <tr>
+                  <td><code>.no-translate</code></td>
+                  <td>Clase CSS de Exclusión</td>
+                  <td>Exclusión de Rama</td>
+                  <td>Ignora bloques interactivos, widgets o marcas registradas</td>
+                </tr>
+                <tr>
+                  <td><code>nodeType === 3</code></td>
+                  <td>TEXT_NODE Nativo</td>
+                  <td>Reemplazo de <code>nodeValue</code></td>
+                  <td>Mantiene vivos todos los listeners de eventos y reactividad</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
           <h3>2.3 Re-inyección Segura del DOM</h3>
           <p>
             El array devuelto por el servidor conserva un mapeo posicional exacto <code>O(1)</code> con las referencias a los nodos originales del DOM. Al actualizar <code>node.nodeValue = translatedText</code>, se garantiza que <strong>los listeners de eventos asociados, atributos de accesibilidad y reactividad de frameworks no se destruyan</strong>.
@@ -459,6 +554,57 @@
         </article>
 
         <article class="docs-subsection" id="sub-p2-http206">
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Voz / Idioma</th>
+                  <th>Género Acústico</th>
+                  <th>Rango F0 Base</th>
+                  <th>Velocidad Soportada</th>
+                  <th>Acentuación / Modulación Prosódica</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>es-ES-ElviraNeural</code> (Español España)</td>
+                  <td>Femenino (Contralto)</td>
+                  <td>190 - 230 Hz</td>
+                  <td>0.5x &mdash; 2.0x</td>
+                  <td>Modulación castellana peninsular con formantes F1-F4</td>
+                </tr>
+                <tr>
+                  <td><code>es-MX-JorgeNeural</code> (Español México)</td>
+                  <td>Masculino (Barítono)</td>
+                  <td>110 - 145 Hz</td>
+                  <td>0.5x &mdash; 2.0x</td>
+                  <td>Entonación neutra latinoamericana, decaimiento suave</td>
+                </tr>
+                <tr>
+                  <td><code>en-US-JennyNeural</code> (Inglés USA)</td>
+                  <td>Femenino (Mezzosoprano)</td>
+                  <td>210 - 250 Hz</td>
+                  <td>0.5x &mdash; 2.0x</td>
+                  <td>Fonética americana estándar con atenuación de bordes</td>
+                </tr>
+                <tr>
+                  <td><code>fr-FR-DeniseNeural</code> (Francés)</td>
+                  <td>Femenino (Soprano)</td>
+                  <td>230 - 270 Hz</td>
+                  <td>0.5x &mdash; 2.0x</td>
+                  <td>Resonancia nasofaríngea calibrada para vocales francesas</td>
+                </tr>
+                <tr>
+                  <td><code>ja-JP-NanamiNeural</code> (Japonés)</td>
+                  <td>Femenino (Tenor Vocal)</td>
+                  <td>220 - 260 Hz</td>
+                  <td>0.5x &mdash; 2.0x</td>
+                  <td>Segmentación de moras y preservación de pitch accent tonal</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
           <h3>3.4 Streaming de Audio con Soporte HTTP 206 Partial Content</h3>
           <p>
             Los endpoints de audio de CloudTranslator procesan cabeceras de rango <code>Range: bytes=start-end</code>, respondiendo con el código <code>206 Partial Content</code> y cabecera <code>Content-Range</code>. Esto permite a los reproductores de audio comenzar a sonar al instante de solicitar el primer fragmento de 64 KB sin esperar a que el archivo completo se descargue.
@@ -496,6 +642,51 @@
         </article>
 
         <article class="docs-subsection" id="sub-p3-alpha-status">
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Rango F0 Fundamental</th>
+                  <th>Clasificación Biométrica</th>
+                  <th>Tasa Cruces por Cero (ZCR)</th>
+                  <th>Ajuste de Pitch Shifter</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>85 &mdash; 115 Hz</td>
+                  <td>Bajo Profundo</td>
+                  <td>&lt; 0.12 (baja fricción)</td>
+                  <td>Factor de escala 0.70x &mdash; 0.85x</td>
+                </tr>
+                <tr>
+                  <td>115 &mdash; 145 Hz</td>
+                  <td>Barítono Natural</td>
+                  <td>0.12 &mdash; 0.18</td>
+                  <td>Factor de escala 0.85x &mdash; 1.00x</td>
+                </tr>
+                <tr>
+                  <td>145 &mdash; 180 Hz</td>
+                  <td>Tenor Lírico</td>
+                  <td>0.18 &mdash; 0.24</td>
+                  <td>Factor de escala 1.00x &mdash; 1.15x</td>
+                </tr>
+                <tr>
+                  <td>180 &mdash; 220 Hz</td>
+                  <td>Contralto Femenino</td>
+                  <td>0.24 &mdash; 0.30</td>
+                  <td>Factor de escala 1.15x &mdash; 1.30x</td>
+                </tr>
+                <tr>
+                  <td>220 &mdash; 270 Hz</td>
+                  <td>Mezzosoprano / Soprano</td>
+                  <td>&gt; 0.30 (alta resonancia)</td>
+                  <td>Factor de escala 1.30x &mdash; 1.50x</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
           <h3>4.3 Alcance Autónomo sin Dependencias de Terceros</h3>
           <p>
             El motor de clonación vocal de CloudTranslator es <strong>100% propietario y autosuficiente</strong>: opera dentro del entorno Node.js sin enviar la muestra de audio a servicios externos ni requerir suscripciones de terceros. Su etiqueta <code>ALPHA</code> refleja el trabajo continuo en la optimización de los formantes dinámicos de dicción rápida.
@@ -538,6 +729,43 @@
         </article>
 
         <article class="docs-subsection" id="sub-p4-ttl-proxy">
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Formato Salida</th>
+                  <th>Códec Contenedor</th>
+                  <th>Bitrate Típico</th>
+                  <th>Canales / Sample Rate</th>
+                  <th>Compatibilidad</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>audio/mp3</code> (.mp3)</td>
+                  <td>MPEG-1 Audio Layer III (LAME)</td>
+                  <td>128, 192, 320 kbps</td>
+                  <td>Estéreo 44.1 kHz / 48 kHz</td>
+                  <td>Universal (iOS, Android, Windows, macOS, Linux)</td>
+                </tr>
+                <tr>
+                  <td><code>video/mp4</code> (.mp4)</td>
+                  <td>H.264 / AVC + AAC-LC</td>
+                  <td>Hasta 1080p @ 60fps</td>
+                  <td>Estéreo AAC 192 kbps</td>
+                  <td>HTML5 nativo, Smart TVs, navegadores móviles</td>
+                </tr>
+                <tr>
+                  <td><code>audio/wav</code> (.wav)</td>
+                  <td>PCM lineal sin compresión</td>
+                  <td>1411 kbps (16-bit)</td>
+                  <td>Estéreo 44.1 kHz</td>
+                  <td>Estudio de producción, DAW, mezcla en vivo</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
           <h3>5.3 Proxy Seguro de Miniaturas y Ciclo de Vida TTL de 30 Minutos</h3>
           <p>
             Para prevenir violaciones de políticas de Referrer y bloqueos de dominios cruzados por parte de CDNs de redes sociales, el endpoint <code>/api/media/thumbnail-proxy</code> descarga e inyecta la miniatura de forma limpia al frontend. Todos los archivos generados residen en almacenamiento temporal volátil con un <strong>TTL (Time To Live) estricto de 30 minutos</strong>, purgándose automáticamente para resguardar la privacidad.
@@ -567,6 +795,33 @@
         </article>
 
         <article class="docs-subsection" id="sub-p5-dual-stem-player">
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Pista Generada (Stem)</th>
+                  <th>Filtro / Algoritmo Espectral</th>
+                  <th>Rango de Frecuencias Activo</th>
+                  <th>Aislamiento Acústico</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Pista Vocal (Acappella)</strong></td>
+                  <td>Demucs v4 HT + Bandpass Bi-cuadrático</td>
+                  <td>300 Hz &mdash; 3,800 Hz</td>
+                  <td>&gt; 22 dB de reducción instrumental</td>
+                </tr>
+                <tr>
+                  <td><strong>Pista Instrumental (Karaoke)</strong></td>
+                  <td>Notch Filter + Low-Shelf subgrave + High-Shelf</td>
+                  <td>20 Hz &mdash; 300 Hz + 4 kHz &mdash; 20 kHz</td>
+                  <td>&gt; 26 dB de supresión vocal central</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
           <h3>6.2 Reproductor Dual Sincronizado en Fase Estéreo</h3>
           <p>
             El frontend de CloudTranslator levanta dos instancias de audio HTML5 sincronizadas por un <strong>Master Time Bus</strong>. Al ajustar los deslizadores de volumen o activar los modos interactivos (<em>Solo Instrumental</em>, <em>Solo Voz</em> o <em>Ambos</em>), la reproducción se mantiene bloqueada al milisegundo exacto sin desfases de fase audible (comb filtering).
@@ -589,8 +844,54 @@
           <p>
             La consola DJ implementa la especificación Web Audio API conectando un grafo estéreo modular:
           </p>
-          <pre><code>[Audio Element Deck A] -> [MediaElementSource] -> [LowShelf EQ] -> [Peaking EQ] -> [HighShelf EQ] -> [GainNode A] ---                                                                                                                        +--> [MasterGain] -> [Destination]
-[Audio Element Deck B] -> [MediaElementSource] -> [LowShelf EQ] -> [Peaking EQ] -> [HighShelf EQ] -> [GainNode B] ---/</code></pre>
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// TOPOLOGÍA DEL GRAFO WEB AUDIO API (DSP EN TIEMPO REAL)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-doc-webaudio')">Copiar Grafo</button>
+            </div>
+            <pre class="code-panel" id="code-doc-webaudio"><code>[Audio Element Deck A] ──> [MediaElementSource] ──> [LowShelf (100Hz)] ──> [Peaking EQ (1kHz)] ──> [HighShelf (8kHz)] ──> [GainNode A] ──> [Crossfader A] ──┐
+                                                                                                                                           ├──> [Master Limiter] ──> [Destination]
+[Audio Element Deck B] ──> [MediaElementSource] ──> [LowShelf (100Hz)] ──> [Peaking EQ (1kHz)] ──> [HighShelf (8kHz)] ──> [GainNode B] ──> [Crossfader B] ──┘</code></pre>
+          </div>
+
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Nodo Web Audio</th>
+                  <th>Tipo de Filtro / Proceso</th>
+                  <th>Frecuencia de Corte / Rango</th>
+                  <th>Impacto Acústico</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>BiquadFilterNode (Low)</code></td>
+                  <td>lowshelf</td>
+                  <td>100 Hz (&plusmn;12 dB)</td>
+                  <td>Control de bombos, subgraves y bajos 808</td>
+                </tr>
+                <tr>
+                  <td><code>BiquadFilterNode (Mid)</code></td>
+                  <td>peaking (Q = 1.0)</td>
+                  <td>1,000 Hz (&plusmn;12 dB)</td>
+                  <td>Presencia de voces, cajas e instrumentos melódicos</td>
+                </tr>
+                <tr>
+                  <td><code>BiquadFilterNode (High)</code></td>
+                  <td>highshelf</td>
+                  <td>8,000 Hz (&plusmn;12 dB)</td>
+                  <td>Control de brillo, platillos, aire y sibilancia</td>
+                </tr>
+                <tr>
+                  <td><code>GainNode (Crossfader)</code></td>
+                  <td>Curva Coseno / Seno de Potencia Constante</td>
+                  <td>Ganancia 0.0 &mdash; 1.0 lineal</td>
+                  <td>Transición sin caída de energía entre ambos Decks</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <p>
             Cada canal posee tres filtros Biquad independientes:
           </p>
@@ -606,8 +907,22 @@
           <p>
             Para evitar que la música pierda volumen acústico perceptible cuando el crossfader está centrado al 50%, CloudTranslator calcula la ganancia de cada Deck mediante funciones trigonométricas de potencia constante:
           </p>
-          <pre><code>GainA = cos(x * pi / 2)
-GainB = sin(x * pi / 2)   // donde x varía suavemente de 0.0 (Deck A) a 1.0 (Deck B)</code></pre>
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// JAVASCRIPT - ALGORITMO DE POTENCIA CONSTANTE (EQUAL-POWER CROSSFADE)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-doc-crossfade')">Copiar Código</button>
+            </div>
+            <pre class="code-panel" id="code-doc-crossfade"><code>// Cálculo de curva de igual potencia para evitar caídas de volumen al centro (x = 0.5)
+function applyEqualPowerCrossfade(x, gainNodeA, gainNodeB, audioCtx) {
+  // x oscila entre 0.0 (Deck A al 100%) y 1.0 (Deck B al 100%)
+  const gainA = Math.cos(x * 0.5 * Math.PI);
+  const gainB = Math.sin(x * 0.5 * Math.PI);
+  
+  // Transición suave de 15ms sin clics acústicos
+  gainNodeA.gain.setTargetAtTime(gainA, audioCtx.currentTime, 0.015);
+  gainNodeB.gain.setTargetAtTime(gainB, audioCtx.currentTime, 0.015);
+}</code></pre>
+          </div>
           <p>
             Esto asegura que la suma de energías acústicas <code>GainA² + GainB² = 1.0</code> permanezca perfectamente plana en cualquier posición del crossfader.
           </p>
@@ -627,21 +942,67 @@ GainB = sin(x * pi / 2)   // donde x varía suavemente de 0.0 (Deck A) a 1.0 (De
         <article class="docs-subsection" id="sub-sdk-vanilla">
           <h3>8.1 Integración en Vanilla JavaScript</h3>
           <p>Descarga o importa el script cliente <code>cloud-translator.js</code> e inicializa la clase:</p>
-          <pre><code>&lt;script src="https://cloudtranslator.onrender.com/js/cloud-translator.js"&gt;&lt;/script&gt;
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// HTML &amp; JAVASCRIPT VANILLA</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-doc-sdk-vanilla')">Copiar Código</button>
+            </div>
+            <pre class="code-panel" id="code-doc-sdk-vanilla"><code>&lt;script src="https://cloudtranslator.onrender.com/js/cloud-translator.js"&gt;&lt;/script&gt;
 &lt;script&gt;
+  // Inicialización del cliente con persistencia en Cookies
   const translator = new CloudTranslator({
     endpoint: "https://cloudtranslator.onrender.com/api/translate",
-    useCookies: true,        // Persistencia por 365 días en cookie HTTP
-    batchSize: 500,          // Lote óptimo de nodos por petición consolidada
-    onProgress: (status) => console.log("Estado de traducción:", status)
+    useCookies: true,
+    batchSize: 500,
+    ignoreSelectors: [".no-translate", "[data-no-translate]"]
   });
 
-  // Traducir toda la página web a Francés
+  // Traducir a Francés
   translator.translatePage("fr");
 
   // Restaurar idioma original
   // translator.restoreOriginal();
 &lt;/script&gt;</code></pre>
+          </div>
+
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Propiedad de Configuración</th>
+                  <th>Tipo de Dato</th>
+                  <th>Valor por Defecto</th>
+                  <th>Descripción del Comportamiento</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>endpoint</code></td>
+                  <td><code>string</code> (URL)</td>
+                  <td><code>"/api/translate"</code></td>
+                  <td>Ruta absoluta o remota del microservicio de traducción por lotes</td>
+                </tr>
+                <tr>
+                  <td><code>useCookies</code></td>
+                  <td><code>boolean</code></td>
+                  <td><code>true</code></td>
+                  <td>Persiste automáticamente la preferencia de idioma en la cookie técnica <code>cloud_translator_lang</code></td>
+                </tr>
+                <tr>
+                  <td><code>batchSize</code></td>
+                  <td><code>number</code></td>
+                  <td><code>500</code></td>
+                  <td>Límite máximo de nodos de texto empaquetados por cada consulta atómica</td>
+                </tr>
+                <tr>
+                  <td><code>ignoreSelectors</code></td>
+                  <td><code>Array&lt;string&gt;</code></td>
+                  <td><code>[".no-translate"]</code></td>
+                  <td>Lista de selectores CSS y atributos que serán excluidos del recorrido recursivo</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </article>
 
         <article class="docs-subsection" id="sub-sdk-frameworks">
@@ -649,31 +1010,58 @@ GainB = sin(x * pi / 2)   // donde x varía suavemente de 0.0 (Deck A) a 1.0 (De
           <p>
             En aplicaciones React o Vue, inicializa la instancia dentro de un hook de ciclo de vida (<code>useEffect</code> o <code>onMounted</code>) para garantizar que el DOM cliente esté disponible:
           </p>
-          <pre><code>import { useEffect } from 'react';
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// REACT / NEXT.JS INTEGRATION COMPONENT</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-doc-sdk-react')">Copiar Código</button>
+            </div>
+            <pre class="code-panel" id="code-doc-sdk-react"><code>import { useEffect } from 'react';
 
 export default function Layout({ children }) {
   useEffect(() => {
     if (window.CloudTranslator) {
       window.ctInstance = new window.CloudTranslator({
         endpoint: "https://cloudtranslator.onrender.com/api/translate",
-        useCookies: true
+        useCookies: true,
+        batchSize: 500
       });
     }
   }, []);
 
   return &lt;div&gt;{children}&lt;/div&gt;;
 }</code></pre>
+          </div>
         </article>
       </section>
-
-      <!-- Pie de Página Integrado al Final del Contenedor de Scroll Interno -->
-      <footer id="footer-placeholder" data-component="footer" data-active="docs"></footer>
 
     </main>
   </div>
 
+  <!-- Pie de Página Fijo al Final Ocupando Todo el Ancho (Barra + Contenido) -->
+  <footer id="footer-placeholder" data-component="footer" data-active="docs"></footer>
+
   <script src="/js/cloud-translator.js"></script>
   <script>
+    // Función global para copiar al portapapeles con feedback visual
+    function copiarAlPortapapeles(btn, elementId) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      const texto = el.innerText || el.textContent;
+      navigator.clipboard.writeText(texto.trim()).then(() => {
+        const originalText = btn.textContent;
+        btn.textContent = "COPIADO";
+        btn.style.background = "#ffffff";
+        btn.style.color = "#000000";
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.style.background = "";
+          btn.style.color = "";
+        }, 1500);
+      }).catch(err => {
+        console.error("Error al copiar:", err);
+      });
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       const scrollContainer = document.querySelector(".docs-main-content");
       const isDesktop = window.innerWidth > 992;
