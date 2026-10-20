@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="/img/logo.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/img/logo.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/img/logo.png">
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/style.css?v=2.5.2">
   <script>
     (function(){try{var m=document.cookie.match(/(?:^|; )cloud_translator_lang=([^;]*)/);var l=m?decodeURIComponent(m[1]):null;if(l&&l!=="original"&&l!=="es"){document.documentElement.classList.add("ct-pending");setTimeout(function(){document.documentElement.classList.remove("ct-pending");},800);}}catch(e){}})();
   </script>
@@ -1116,8 +1116,12 @@
             <pre class="code-panel" id="curl-get-media-platforms">curl -X GET "https://cloudtranslator.onrender.com/api/media/platforms"</pre>
           </div>
 
-          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 18px;">Respuesta JSON de Ejemplo</h4>
-          <pre class="code-panel">{
+          <div class="code-box-wrapper" style="margin-top: 18px;">
+            <div class="code-box-header">
+              <span>// RESPUESTA JSON DE EJEMPLO (200 OK)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-get-media-platforms')">Copiar JSON</button>
+            </div>
+            <pre class="code-panel" id="res-get-media-platforms">{
   "status": "success",
   "service": "CloudTranslator Media Converter API (Pilar 04)",
   "total": 8,
@@ -1138,6 +1142,7 @@
     }
   ]
 }</pre>
+          </div>
         </article>
 
         <article class="docs-subsection" id="api-post-media-info">
