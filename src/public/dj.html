@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CloudDJ (Pilar 06) - Mezclador Multimedia Virtual en Vivo | Mezcla música en tiempo real desde YouTube, TikTok y enlaces web con tornamesas dobles, crossfader, ecualizador y cola de reproducción.">
+  <meta property="og:title" content="CloudDJ - Mezclador Virtual en Vivo y Cola de Pistas (Pilar 06)">
+  <meta property="og:description" content="Sé un DJ en la nube: carga enlaces de YouTube o TikTok, mezcla dos pistas con crossfader, ecualizadores, scratch y cola de reproducción continua.">
+  <title>CloudDJ - Mezclador Virtual en Vivo & Cola de Pistas (Pilar 06) - CloudTranslator</title>
+  <link rel="icon" type="image/png" sizes="192x192" href="/img/logo.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/img/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/logo.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <script>
+    (function(){try{var m=document.cookie.match(/(?:^|; )cloud_translator_lang=([^;]*)/);var l=m?decodeURIComponent(m[1]):null;if(l&&l!=="original"&&l!=="es"){document.documentElement.classList.add("ct-pending");setTimeout(function(){document.documentElement.classList.remove("ct-pending");},800);}}catch(e){}})();
+  </script>
+  <script src="/js/spa-router.js" defer></script>
+  <script src="/components/components.js" defer></script>
+  <style>
+    /* Estilos del Módulo CloudDJ */
+    .dj-console {
+      background: radial-gradient(circle at 50% 0%, rgba(20, 26, 42, 0.95), rgba(8, 10, 16, 0.98));
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+      margin-bottom: 32px;
+    }
+    .dj-decks-grid {
+      display: grid;
+      grid-template-columns: 1fr 280px 1fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+    @media (max-width: 1024px) {
+      .dj-decks-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .dj-deck-card {
+      background: rgba(14, 18, 30, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+    .dj-deck-card.deck-a {
+      border-top: 3px solid var(--primary);
+    }
+    .dj-deck-card.deck-b {
+      border-top: 3px solid #ff007b;
+    }
+    .turntable-wrapper {
+      position: relative;
+      width: 190px;
+      height: 190px;
+      margin: 16px auto;
+      cursor: grab;
+      user-select: none;
+    }
+    .turntable-wrapper:active {
+      cursor: grabbing;
+    }
+    .vinyl-platter {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: repeating-radial-gradient(circle, #111, #111 2px, #1a1a1a 3px, #1a1a1a 4px);
+      border: 6px solid #222;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(0, 0, 0, 0.9);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.05s linear;
+    }
+    .vinyl-platter.spinning {
+      animation: spinPlatter 2.8s linear infinite;
+    }
+    .vinyl-label {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #0077ff);
+      border: 3px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: #000;
+      text-align: center;
+    }
+    .deck-b .vinyl-label {
+      background: linear-gradient(135deg, #ff007b, #c026d3);
+      color: #fff;
+    }
+    .vinyl-needle {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 48px;
+      height: 74px;
+      pointer-events: none;
+      transform-origin: top right;
+      transition: transform 0.3s ease;
+    }
+    .spinning ~ .vinyl-needle {
+      transform: rotate(18deg);
+    }
+    @keyframes spinPlatter {
+      100% { transform: rotate(360deg); }
+    }
+    .dj-central-mixer {
+      background: rgba(10, 13, 22, 0.9);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+    }
+    .crossfader-container {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 14px 12px;
+      margin-top: 18px;
+      text-align: center;
+    }
+    .crossfader-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 12px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, var(--primary), rgba(255, 255, 255, 0.3), #ff007b);
+      outline: none;
+      cursor: pointer;
+    }
+    .crossfader-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 32px;
+      height: 28px;
+      border-radius: 4px;
+      background: #ffffff;
+      border: 2px solid #000;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+      cursor: grab;
+    }
+    .crossfader-slider::-webkit-slider-thumb:active {
+      cursor: grabbing;
+    }
+    .eq-knob-group {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      margin: 12px 0;
+      gap: 6px;
+    }
+    .eq-slider-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+    }
+    .eq-slider-col label {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--text-muted);
+    }
+    .eq-slider-v {
+      -webkit-appearance: slider-vertical;
+      writing-mode: bt-lr;
+      width: 24px;
+      height: 70px;
+      cursor: pointer;
+    }
+    .deck-btn-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .btn-cue, .btn-play-deck, .btn-sync {
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-play-deck.active {
+      background: #10b981;
+      border-color: #10b981;
+      color: #000;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.5);
+    }
+    .btn-cue:active {
+      background: #f59e0b;
+      color: #000;
+    }
+    .queue-card {
+      background: rgba(14, 18, 30, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      margin-bottom: 32px;
+    }
+    .queue-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      transition: all 0.2s ease;
+    }
+    .queue-item:hover {
+      border-color: rgba(0, 240, 255, 0.3);
+      background: rgba(0, 240, 255, 0.04);
+    }
+    .queue-item.current-a {
+      border-left: 4px solid var(--primary);
+    }
+    .queue-item.current-b {
+      border-left: 4px solid #ff007b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra Superior -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <a href="/" class="brand-wrapper">
+        <span class="brand-logo">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="38" height="38">
+          CloudTranslator
+        </span>
+        <span class="brand-badge">v2.5.0</span>
+      </a>
+
+      <nav class="desktop-nav">
+        <ul class="main-menu">
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/converter">Conversor</a></li>
+          <li><a href="/vocal-remover">Separador Voz</a></li>
+          <li><a href="/dj" class="active">CloudDJ</a></li>
+          <li><a href="/docs">Docs</a></li>
+        </ul>
+      </nav>
+
+      <!-- Barra de Herramientas de Traducción Activa -->
+      <div class="toolbar-controls no-translate" data-no-translate>
+        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+          English
+        </button>
+
+        <div class="selector-box">
+          <div class="selector-dropdown">
+            <select id="select-lang" aria-label="Seleccionar idioma">
+              <option value="en">English (en)</option>
+              <option value="es">Español (es)</option>
+              <option value="fr">Français (fr)</option>
+              <option value="de">Deutsch (de)</option>
+              <option value="it">Italiano (it)</option>
+              <option value="pt">Portugués (pt)</option>
+              <option value="ja">日本語 (ja)</option>
+              <option value="zh-CN">中文 (zh-CN)</option>
+              <option value="ru">Русский (ru)</option>
+            </select>
+          </div>
+          <div class="custom-lang-group">
+            <input type="text" id="input-custom-lang" placeholder="ISO" maxlength="5" title="Código ISO personalizado">
+            <button id="btn-translate-custom" class="btn btn-primary" title="Traducir">GO</button>
+          </div>
+        </div>
+
+        <button id="btn-restore" class="btn btn-outline" title="Restaurar idioma original">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+          Original
+        </button>
+
+        <div id="status-pill" class="status-pill" title="Estado del microservicio">
+          <span class="spinner"></span>
+          <span id="status-text">LISTO</span>
+        </div>
+      </div>
+
+      <!-- Botón Hamburguesa Móvil -->
+      <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Abrir Menú de Navegación">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+
+    <!-- Backdrop para Barra Lateral -->
+    <div id="drawer-backdrop"></div>
+
+    <!-- Barra de Navegación Lateral Móvil -->
+    <aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
+      <div class="drawer-header">
+        <a href="/" class="drawer-brand">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
+          <span>CloudTranslator</span>
+        </a>
+        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+
+      <div class="drawer-body">
+        <div class="drawer-section">
+          <span class="drawer-title">LOS 6 PILARES</span>
+          <ul class="drawer-menu">
+            <li><a href="/translator"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traductor en la Nube</a></li>
+            <li><a href="/tts"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS)</a></li>
+            <li><a href="/voice-clone"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz (IA)</a></li>
+            <li><a href="/converter"><svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="8" cy="12" r="2"/></svg> Conversor Multimedia</a></li>
+            <li><a href="/vocal-remover"><svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Separador de Voz (Pilar 05)</a></li>
+            <li><a href="/dj" class="active"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg> CloudDJ Mezclador (Pilar 06)</a></li>
+            <li><a href="/donate"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+  </header>
+
+  <main class="full-container">
+
+    <!-- Hero de CloudDJ -->
+    <section class="hero-full">
+      <div class="hero-split">
+        <div class="hero-split-content">
+          <span class="hero-tag-glow">PILAR 06 // CLOUDDJ MEZCLADOR MULTIMEDIA</span>
+          <h1 style="font-size: clamp(2rem, 4.2vw, 3rem); font-weight: 800;">Conviértete en DJ con Música de la Red</h1>
+          <p class="lead">
+            Copia el enlace de cualquier plataforma donde esté la música (YouTube, TikTok, etc.) y mézclala en vivo. Utiliza dos tornamesas con <strong>Scratch interactivo</strong>, <strong>Crossfader</strong> suave, ecualizador de 3 bandas, transición automatizada <strong>(Auto-DJ)</strong> y una <strong>cola de reproducción</strong> para preparar exactamente lo que sonará después.
+          </p>
+          <div class="hero-actions">
+            <a href="#dj-studio" class="btn btn-primary">Abrir Consola DJ</a>
+            <a href="#queue-section" class="btn btn-outline">Gestionar Cola</a>
+            <a href="/vocal-remover" class="btn btn-outline">Separador Acapella</a>
+          </div>
+        </div>
+
+        <div class="hero-split-media">
+          <div class="hero-logo-wrapper">
+            <div class="hero-logo-glow" style="background: radial-gradient(circle, rgba(0, 240, 255, 0.4) 0%, rgba(255, 0, 123, 0.25) 60%, transparent 80%);"></div>
+            <img src="/img/logo.png" alt="CloudDJ Logo" class="hero-logo-big" width="290" height="290">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- CAMPO RÁPIDO: "COLOCAR EL QUE VA A IR DESPUÉS"                             -->
+    <!-- ========================================================================= -->
+    <section class="translator-card" style="margin-bottom: 24px;">
+      <label for="input-up-next-url" class="field-label" style="display: flex; justify-content: space-between; align-items: center;">
+        <span>
+          <svg class="icon" style="color: var(--primary);" viewBox="0 0 24 24"><path d="m18 8 4 4-4 4"/><path d="M2 12h20"/></svg>
+          COLOCAR PISTA SIGUIENTE (LO QUE VA A IR DESPUÉS)
+        </span>
+        <span style="color: var(--text-muted); font-weight: 400; font-size: 0.8rem;">Carga directa al Deck B o encolar</span>
+      </label>
+      
+      <div class="input-with-actions">
+        <input type="url" id="input-up-next-url" class="text-input" placeholder="Pega el enlace de la siguiente canción (YouTube, TikTok, etc.)">
+        <div class="input-actions-group">
+          <button id="btn-load-to-deck-b" class="btn" style="background: rgba(255, 0, 123, 0.2); border: 1px solid #ff007b; color: #fff;" title="Cargar inmediatamente al Deck B">
+            Cargar al Deck B
+          </button>
+          <button id="btn-add-to-queue" class="btn btn-primary" title="Añadir a la lista de lo que va después">
+            + Añadir a la Cola
+          </button>
+          <button id="btn-paste-up-next" class="action-btn" title="Pegar">Pegar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- CONSOLA PRINCIPAL DE CLOUDDJ (DECK A | MEZCLADOR CENTRAL | DECK B)        -->
+    <!-- ========================================================================= -->
+    <section id="dj-studio" class="dj-console">
+      
+      <div class="dj-decks-grid">
+        
+        <!-- =================== DECK A (IZQUIERDA / EN VIVO) =================== -->
+        <div class="dj-deck-card deck-a">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 800; font-size: 0.82rem; letter-spacing: 0.08em; color: var(--primary);">DECK A // MASTER</span>
+              <span id="deck-a-dur" style="font-size: 0.82rem; color: var(--text-muted);">00:00</span>
+            </div>
+            <h3 id="deck-a-title" style="margin: 0 0 6px 0; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              Pista A (Vacía)
+            </h3>
+            <span id="deck-a-artist" style="font-size: 0.8rem; color: var(--text-muted);">Carga una canción desde URL o la cola</span>
+          </div>
+
+          <!-- Tornamesa Vinilo Deck A -->
+          <div class="turntable-wrapper" id="turntable-a" title="Arrastra para hacer scratch">
+            <div class="vinyl-platter" id="platter-a">
+              <div class="vinyl-label">DECK A</div>
+            </div>
+            <svg class="vinyl-needle" viewBox="0 0 48 74">
+              <path d="M44 2 L22 45 L14 70" stroke="#bbb" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <circle cx="44" cy="4" r="5" fill="#444"/>
+              <rect x="10" y="66" width="8" height="6" fill="#00f0ff"/>
+            </svg>
+          </div>
+
+          <!-- Tiempo y Scrubber Deck A -->
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px;">
+              <span id="deck-a-cur-time">00:00</span>
+              <span id="deck-a-rem-time">-00:00</span>
+            </div>
+            <input type="range" id="scrubber-a" min="0" max="100" value="0" style="width: 100%; cursor: pointer;">
+          </div>
+
+          <!-- Faders de Pitch y Controles Deck A -->
+          <div style="margin-top: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem;">
+              <span>VELOCIDAD / PITCH:</span>
+              <span id="pitch-a-text" style="color: var(--primary); font-weight: 700;">0.0%</span>
+            </div>
+            <input type="range" id="pitch-a" min="-16" max="16" value="0" step="0.5" style="width: 100%;">
+          </div>
+
+          <div class="deck-btn-row">
+            <button id="btn-cue-a" class="btn-cue">CUE</button>
+            <button id="btn-play-a" class="btn-play-deck">
+              <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              PLAY
+            </button>
+            <button id="btn-sync-a" class="btn-sync" title="Sincronizar tempo con Deck B">SYNC</button>
+          </div>
+        </div>
+
+        <!-- =================== MEZCLADOR CENTRAL =================== -->
+        <div class="dj-central-mixer">
+          <div style="text-align: center; width: 100%;">
+            <span style="font-weight: 800; font-size: 0.78rem; letter-spacing: 0.1em; color: var(--text-muted);">MASTER MIXER</span>
+            <div style="margin: 8px 0;">
+              <button id="btn-auto-dj" class="btn" style="width: 100%; font-size: 0.8rem; background: rgba(0, 240, 255, 0.15); border: 1px solid var(--primary); color: #fff;">
+                ⚡ Auto-DJ: ACTIVADO
+              </button>
+            </div>
+          </div>
+
+          <!-- Ecualizadores Centrales de 3 Bandas -->
+          <div style="width: 100%;">
+            <span style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); display: block; text-align: center; margin-bottom: 4px;">EQ DE 3 BANDAS (DECK A vs B)</span>
+            <div class="eq-knob-group">
+              <div class="eq-slider-col">
+                <label>HI</label>
+                <input type="range" id="eq-hi-a" class="eq-slider-v" min="-20" max="10" value="0" orient="vertical">
+              </div>
+              <div class="eq-slider-col">
+                <label>MID</label>
+                <input type="range" id="eq-mid-a" class="eq-slider-v" min="-20" max="10" value="0" orient="vertical">
+              </div>
+              <div class="eq-slider-col">
+                <label>LOW</label>
+                <input type="range" id="eq-low-a" class="eq-slider-v" min="-20" max="10" value="0" orient="vertical">
+              </div>
+              <div style="width: 1px; background: rgba(255,255,255,0.1); margin: 0 4px;"></div>
+              <div class="eq-slider-col">
+                <label>LOW</label>
+                <input type="range" id="eq-low-b" class="eq-slider-v" min="-20" max="10" value="0" orient="vertical">
+              </div>
+              <div class="eq-slider-col">
+                <label>MID</label>
+                <input type="range" id="eq-mid-b" class="eq-slider-v" min="-20" max="10" value="0" orient="vertical">
+              </div>
+              <div class="eq-slider-col">
+                <label>HI</label>
+                <input type="range" id="eq-hi-b" class="eq-slider-v" min="-20" max="10" value="0" orient="vertical">
+              </div>
+            </div>
+          </div>
+
+          <!-- Faders de Volumen de Canal -->
+          <div style="display: flex; justify-content: space-around; width: 100%; margin: 8px 0;">
+            <div style="text-align: center;">
+              <span style="font-size: 0.7rem; color: var(--primary);">VOL A</span>
+              <input type="range" id="vol-a" class="eq-slider-v" min="0" max="1" step="0.05" value="1" orient="vertical">
+            </div>
+            <div style="text-align: center;">
+              <span style="font-size: 0.7rem; color: #ff007b;">VOL B</span>
+              <input type="range" id="vol-b" class="eq-slider-v" min="0" max="1" step="0.05" value="1" orient="vertical">
+            </div>
+          </div>
+
+          <!-- Crossfader Master Horizontal -->
+          <div class="crossfader-container">
+            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; font-weight: 800; margin-bottom: 6px;">
+              <span style="color: var(--primary);">◀ DECK A</span>
+              <span style="color: var(--text-muted);">CROSSFADER</span>
+              <span style="color: #ff007b;">DECK B ▶</span>
+            </div>
+            <input type="range" id="crossfader" class="crossfader-slider" min="0" max="100" value="50">
+            <div style="margin-top: 8px; display: flex; gap: 8px;">
+              <button id="btn-fade-left" class="action-btn" style="flex: 1; font-size: 0.75rem;">Fade A</button>
+              <button id="btn-fade-center" class="action-btn" style="flex: 1; font-size: 0.75rem;">Centro</button>
+              <button id="btn-fade-right" class="action-btn" style="flex: 1; font-size: 0.75rem;">Fade B</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- =================== DECK B (DERECHA / SIGUIENTE) =================== -->
+        <div class="dj-deck-card deck-b">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 800; font-size: 0.82rem; letter-spacing: 0.08em; color: #ff007b;">DECK B // UP NEXT</span>
+              <span id="deck-b-dur" style="font-size: 0.82rem; color: var(--text-muted);">00:00</span>
+            </div>
+            <h3 id="deck-b-title" style="margin: 0 0 6px 0; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              Pista B (Vacía)
+            </h3>
+            <span id="deck-b-artist" style="font-size: 0.8rem; color: var(--text-muted);">Carga una canción desde URL o la cola</span>
+          </div>
+
+          <!-- Tornamesa Vinilo Deck B -->
+          <div class="turntable-wrapper" id="turntable-b" title="Arrastra para hacer scratch">
+            <div class="vinyl-platter" id="platter-b">
+              <div class="vinyl-label">DECK B</div>
+            </div>
+            <svg class="vinyl-needle" viewBox="0 0 48 74">
+              <path d="M44 2 L22 45 L14 70" stroke="#bbb" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <circle cx="44" cy="4" r="5" fill="#444"/>
+              <rect x="10" y="66" width="8" height="6" fill="#ff007b"/>
+            </svg>
+          </div>
+
+          <!-- Tiempo y Scrubber Deck B -->
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px;">
+              <span id="deck-b-cur-time">00:00</span>
+              <span id="deck-b-rem-time">-00:00</span>
+            </div>
+            <input type="range" id="scrubber-b" min="0" max="100" value="0" style="width: 100%; cursor: pointer;">
+          </div>
+
+          <!-- Faders de Pitch y Controles Deck B -->
+          <div style="margin-top: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem;">
+              <span>VELOCIDAD / PITCH:</span>
+              <span id="pitch-b-text" style="color: #ff007b; font-weight: 700;">0.0%</span>
+            </div>
+            <input type="range" id="pitch-b" min="-16" max="16" value="0" step="0.5" style="width: 100%;">
+          </div>
+
+          <div class="deck-btn-row">
+            <button id="btn-cue-b" class="btn-cue">CUE</button>
+            <button id="btn-play-b" class="btn-play-deck">
+              <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              PLAY
+            </button>
+            <button id="btn-sync-b" class="btn-sync" title="Sincronizar tempo con Deck A">SYNC</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- LISTA / COLA DEL DJ ("LO QUE VA A IR DESPUÉS")                            -->
+    <!-- ========================================================================= -->
+    <section id="queue-section" class="queue-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h2 style="margin: 0 0 4px 0; font-size: 1.3rem; font-weight: 800;">
+            <svg class="icon" style="color: var(--primary);" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            Cola de Reproducción & Pistas Siguientes
+          </h2>
+          <span id="queue-counter" style="color: var(--text-muted); font-size: 0.85rem;">3 pistas preparadas en lista</span>
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-clear-queue" class="action-btn" style="color: #ff4d4d;">Limpiar Cola</button>
+          <button id="btn-load-presets" class="btn btn-outline" style="font-size: 0.85rem; padding: 6px 14px;">Cargar Temas Demo</button>
+        </div>
+      </div>
+
+      <div id="queue-list-container">
+        <!-- Pistas de la cola renderizadas dinámicamente -->
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="main-footer">
+    <div class="footer-bottom" style="text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 0.88rem;">
+      CloudTranslator &copy; 2026 &bull; Pilar 06: CloudDJ Mezclador Multimedia en Vivo con Auto-DJ &bull; Desarrollado por Miguel Angel Carlos Rojas
+    </div>
+  </footer>
+
+  <!-- Elementos de Audio HTML5 para cada Deck -->
+  <audio id="audio-deck-a" preload="auto"></audio>
+  <audio id="audio-deck-b" preload="auto"></audio>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const audioA = document.getElementById("audio-deck-a");
+      const audioB = document.getElementById("audio-deck-b");
+
+      // Web Audio API Context para Ecualizadores y Mezcla
+      let audioCtx = null;
+      let sourceA, sourceB;
+      let gainA, gainB;
+      let eqHiA, eqMidA, eqLowA;
+      let eqHiB, eqMidB, eqLowB;
+
+      function initWebAudio() {
+        if (audioCtx) return;
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+
+        // Nodos Deck A
+        sourceA = audioCtx.createMediaElementSource(audioA);
+        gainA = audioCtx.createGain();
+        eqHiA = audioCtx.createBiquadFilter();
+        eqHiA.type = "highshelf";
+        eqHiA.frequency.value = 3500;
+        eqMidA = audioCtx.createBiquadFilter();
+        eqMidA.type = "peaking";
+        eqMidA.frequency.value = 1500;
+        eqLowA = audioCtx.createBiquadFilter();
+        eqLowA.type = "lowshelf";
+        eqLowA.frequency.value = 250;
+
+        sourceA.connect(eqLowA);
+        eqLowA.connect(eqMidA);
+        eqMidA.connect(eqHiA);
+        eqHiA.connect(gainA);
+        gainA.connect(audioCtx.destination);
+
+        // Nodos Deck B
+        sourceB = audioCtx.createMediaElementSource(audioB);
+        gainB = audioCtx.createGain();
+        eqHiB = audioCtx.createBiquadFilter();
+        eqHiB.type = "highshelf";
+        eqHiB.frequency.value = 3500;
+        eqMidB = audioCtx.createBiquadFilter();
+        eqMidB.type = "peaking";
+        eqMidB.frequency.value = 1500;
+        eqLowB = audioCtx.createBiquadFilter();
+        eqLowB.type = "lowshelf";
+        eqLowB.frequency.value = 250;
+
+        sourceB.connect(eqLowB);
+        eqLowB.connect(eqMidB);
+        eqMidB.connect(eqHiB);
+        eqHiB.connect(gainB);
+        gainB.connect(audioCtx.destination);
+
+        updateCrossfader(document.getElementById("crossfader").value);
+      }
+
+      // Cola de Pistas ("Lo que va a ir después")
+      let djQueue = [
+        {
+          id: "q1",
+          title: "Rick Astley - Never Gonna Give You Up (Remaster)",
+          artist: "Rick Astley",
+          platform: "YouTube",
+          duration: "03:33",
+          url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          streamUrl: null
+        },
+        {
+          id: "q2",
+          title: "Synthwave Cyber Beat 2026",
+          artist: "CloudDJ Demo",
+          platform: "Web Audio",
+          duration: "02:45",
+          url: "https://example.com/synthwave.mp3",
+          streamUrl: null
+        },
+        {
+          id: "q3",
+          title: "Future Funk Electro Groove",
+          artist: "CloudDJ Demo",
+          platform: "Web Audio",
+          duration: "03:15",
+          url: "https://example.com/futurefunk.mp3",
+          streamUrl: null
+        }
+      ];
+
+      function renderQueue() {
+        const container = document.getElementById("queue-list-container");
+        container.innerHTML = "";
+        document.getElementById("queue-counter").textContent = `${djQueue.length} pistas preparadas en lista`;
+
+        if (djQueue.length === 0) {
+          container.innerHTML = `<div style="text-align: center; padding: 24px; color: var(--text-muted);">No hay canciones en la cola. Pega un enlace arriba para agregar.</div>`;
+          return;
+        }
+
+        djQueue.forEach((item, index) => {
+          const el = document.createElement("div");
+          el.className = "queue-item";
+          el.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
+              <span style="font-weight: 800; font-size: 0.95rem; color: var(--primary); width: 24px;">#${index + 1}</span>
+              <div style="min-width: 0;">
+                <div style="font-weight: 700; font-size: 0.95rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.title}</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">${item.artist} &bull; ${item.platform} &bull; ${item.duration}</div>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+              <button class="action-btn" style="color: var(--primary); border-color: rgba(0, 240, 255, 0.3);" onclick="loadQueueItemToDeck('${item.id}', 'A')">Deck A</button>
+              <button class="action-btn" style="color: #ff007b; border-color: rgba(255, 0, 123, 0.3);" onclick="loadQueueItemToDeck('${item.id}', 'B')">Deck B</button>
+              <button class="action-btn" onclick="moveQueueItem(${index}, -1)" title="Subir">▲</button>
+              <button class="action-btn" onclick="moveQueueItem(${index}, 1)" title="Bajar">▼</button>
+              <button class="action-btn" style="color: #ff4d4d;" onclick="removeQueueItem('${item.id}')" title="Eliminar">✕</button>
+            </div>
+          `;
+          container.appendChild(el);
+        });
+      }
+
+      window.moveQueueItem = (index, dir) => {
+        const target = index + dir;
+        if (target < 0 || target >= djQueue.length) return;
+        const temp = djQueue[index];
+        djQueue[index] = djQueue[target];
+        djQueue[target] = temp;
+        renderQueue();
+      };
+
+      window.removeQueueItem = (id) => {
+        djQueue = djQueue.filter(i => i.id !== id);
+        renderQueue();
+      };
+
+      document.getElementById("btn-clear-queue").addEventListener("click", () => {
+        djQueue = [];
+        renderQueue();
+      });
+
+      document.getElementById("btn-load-presets").addEventListener("click", () => {
+        djQueue = [
+          {
+            id: "q_" + Date.now() + "_1",
+            title: "Rick Astley - Never Gonna Give You Up (Remaster)",
+            artist: "Rick Astley",
+            platform: "YouTube",
+            duration: "03:33",
+            url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+          },
+          {
+            id: "q_" + Date.now() + "_2",
+            title: "Electro Cyber Dance Session 2026",
+            artist: "CloudDJ Hit",
+            platform: "TikTok",
+            duration: "02:20",
+            url: "https://www.tiktok.com/@tiktok/video/7106594312292453678"
+          }
+        ];
+        renderQueue();
+      });
+
+      // Añadir pista desde campo "Colocar Pista Siguiente"
+      const inputUpNext = document.getElementById("input-up-next-url");
+      const btnAddQueue = document.getElementById("btn-add-to-queue");
+      const btnLoadToDeckB = document.getElementById("btn-load-to-deck-b");
+      const btnPasteUpNext = document.getElementById("btn-paste-up-next");
+
+      btnPasteUpNext.addEventListener("click", async () => {
+        try {
+          const txt = await navigator.clipboard.readText();
+          if (txt) inputUpNext.value = txt.trim();
+        } catch { inputUpNext.focus(); }
+      });
+
+      async function fetchMediaAndAdd(url, targetDeck = null) {
+        if (!url) {
+          alert("Por favor ingresa una URL válida.");
+          return;
+        }
+
+        const cleanUrl = url.trim();
+        const placeholderId = "q_" + Date.now();
+        const newItem = {
+          id: placeholderId,
+          title: "Analizando enlace...",
+          artist: "Cargando audio",
+          platform: "Multimedia",
+          duration: "--:--",
+          url: cleanUrl
+        };
+
+        if (!targetDeck) {
+          djQueue.push(newItem);
+          renderQueue();
+        }
+
+        try {
+          const res = await fetch("/api/media/convert", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: cleanUrl, format: "mp3", quality: "320k" })
+          });
+          const data = await res.json();
+
+          if (data.status === "success") {
+            newItem.title = data.title;
+            newItem.artist = data.author || "Artista";
+            newItem.platform = data.platform;
+            newItem.duration = data.duration;
+            newItem.streamUrl = data.streamUrl;
+
+            if (targetDeck === "B") {
+              loadTrackToDeck(newItem, "B");
+            } else if (targetDeck === "A") {
+              loadTrackToDeck(newItem, "A");
+            } else {
+              renderQueue();
+            }
+          } else {
+            alert(data.error || "No se pudo cargar la canción.");
+            djQueue = djQueue.filter(i => i.id !== placeholderId);
+            renderQueue();
+          }
+        } catch (err) {
+          alert("Error de conexión: " + err.message);
+          djQueue = djQueue.filter(i => i.id !== placeholderId);
+          renderQueue();
+        }
+      }
+
+      btnAddQueue.addEventListener("click", () => {
+        const u = inputUpNext.value.trim();
+        if (u) {
+          fetchMediaAndAdd(u, null);
+          inputUpNext.value = "";
+        }
+      });
+
+      btnLoadToDeckB.addEventListener("click", () => {
+        const u = inputUpNext.value.trim();
+        if (u) {
+          fetchMediaAndAdd(u, "B");
+          inputUpNext.value = "";
+        }
+      });
+
+      window.loadQueueItemToDeck = async (id, deck) => {
+        const item = djQueue.find(i => i.id === id);
+        if (!item) return;
+
+        if (item.streamUrl) {
+          loadTrackToDeck(item, deck);
+        } else {
+          await fetchMediaAndAdd(item.url, deck);
+        }
+      };
+
+      function loadTrackToDeck(item, deck) {
+        initWebAudio();
+        const titleEl = document.getElementById(`deck-${deck.toLowerCase()}-title`);
+        const artistEl = document.getElementById(`deck-${deck.toLowerCase()}-artist`);
+        const durEl = document.getElementById(`deck-${deck.toLowerCase()}-dur`);
+        const audio = deck === "A" ? audioA : audioB;
+
+        titleEl.textContent = item.title;
+        artistEl.textContent = `${item.artist} (${item.platform})`;
+        durEl.textContent = item.duration;
+        audio.src = item.streamUrl || item.url;
+        audio.load();
+      }
+
+      // Controles Deck A
+      const btnPlayA = document.getElementById("btn-play-a");
+      const btnCueA = document.getElementById("btn-cue-a");
+      const platterA = document.getElementById("platter-a");
+      const scrubberA = document.getElementById("scrubber-a");
+      const pitchA = document.getElementById("pitch-a");
+      const pitchAText = document.getElementById("pitch-a-text");
+      const curTimeA = document.getElementById("deck-a-cur-time");
+      const remTimeA = document.getElementById("deck-a-rem-time");
+
+      btnPlayA.addEventListener("click", () => {
+        initWebAudio();
+        if (audioA.paused) {
+          audioA.play().then(() => {
+            btnPlayA.classList.add("active");
+            platterA.classList.add("spinning");
+          });
+        } else {
+          audioA.pause();
+          btnPlayA.classList.remove("active");
+          platterA.classList.remove("spinning");
+        }
+      });
+
+      btnCueA.addEventListener("click", () => {
+        audioA.pause();
+        audioA.currentTime = 0;
+        btnPlayA.classList.remove("active");
+        platterA.classList.remove("spinning");
+      });
+
+      pitchA.addEventListener("input", () => {
+        const p = parseFloat(pitchA.value);
+        pitchAText.textContent = `${p > 0 ? "+" : ""}${p.toFixed(1)}%`;
+        audioA.playbackRate = 1 + (p / 100);
+      });
+
+      audioA.addEventListener("timeupdate", () => {
+        if (!audioA.duration) return;
+        scrubberA.value = (audioA.currentTime / audioA.duration) * 100;
+        const curM = Math.floor(audioA.currentTime / 60);
+        const curS = Math.floor(audioA.currentTime % 60);
+        curTimeA.textContent = `${String(curM).padStart(2, "0")}:${String(curS).padStart(2, "0")}`;
+
+        const rem = audioA.duration - audioA.currentTime;
+        const remM = Math.floor(rem / 60);
+        const remS = Math.floor(rem % 60);
+        remTimeA.textContent = `-${String(remM).padStart(2, "0")}:${String(remS).padStart(2, "0")}`;
+
+        // Auto-DJ: Al faltar 12 segundos, hacer crossfade suave hacia Deck B
+        if (isAutoDJ && rem <= 12 && rem > 11 && !audioB.paused) {
+          triggerAutoCrossfade("B");
+        }
+      });
+
+      scrubberA.addEventListener("input", () => {
+        if (!audioA.duration) return;
+        audioA.currentTime = (scrubberA.value / 100) * audioA.duration;
+      });
+
+      // Controles Deck B
+      const btnPlayB = document.getElementById("btn-play-b");
+      const btnCueB = document.getElementById("btn-cue-b");
+      const platterB = document.getElementById("platter-b");
+      const scrubberB = document.getElementById("scrubber-b");
+      const pitchB = document.getElementById("pitch-b");
+      const pitchBText = document.getElementById("pitch-b-text");
+      const curTimeB = document.getElementById("deck-b-cur-time");
+      const remTimeB = document.getElementById("deck-b-rem-time");
+
+      btnPlayB.addEventListener("click", () => {
+        initWebAudio();
+        if (audioB.paused) {
+          audioB.play().then(() => {
+            btnPlayB.classList.add("active");
+            platterB.classList.add("spinning");
+          });
+        } else {
+          audioB.pause();
+          btnPlayB.classList.remove("active");
+          platterB.classList.remove("spinning");
+        }
+      });
+
+      btnCueB.addEventListener("click", () => {
+        audioB.pause();
+        audioB.currentTime = 0;
+        btnPlayB.classList.remove("active");
+        platterB.classList.remove("spinning");
+      });
+
+      pitchB.addEventListener("input", () => {
+        const p = parseFloat(pitchB.value);
+        pitchBText.textContent = `${p > 0 ? "+" : ""}${p.toFixed(1)}%`;
+        audioB.playbackRate = 1 + (p / 100);
+      });
+
+      audioB.addEventListener("timeupdate", () => {
+        if (!audioB.duration) return;
+        scrubberB.value = (audioB.currentTime / audioB.duration) * 100;
+        const curM = Math.floor(audioB.currentTime / 60);
+        const curS = Math.floor(audioB.currentTime % 60);
+        curTimeB.textContent = `${String(curM).padStart(2, "0")}:${String(curS).padStart(2, "0")}`;
+
+        const rem = audioB.duration - audioB.currentTime;
+        const remM = Math.floor(rem / 60);
+        const remS = Math.floor(rem % 60);
+        remTimeB.textContent = `-${String(remM).padStart(2, "0")}:${String(remS).padStart(2, "0")}`;
+
+        // Auto-DJ: Al faltar 12 segundos, hacer crossfade suave hacia Deck A
+        if (isAutoDJ && rem <= 12 && rem > 11 && !audioA.paused) {
+          triggerAutoCrossfade("A");
+        }
+      });
+
+      scrubberB.addEventListener("input", () => {
+        if (!audioB.duration) return;
+        audioB.currentTime = (scrubberB.value / 100) * audioB.duration;
+      });
+
+      // Crossfader & Auto-DJ
+      const crossfader = document.getElementById("crossfader");
+      let isAutoDJ = true;
+
+      function updateCrossfader(val) {
+        const x = val / 100; // 0 = solo A, 1 = solo B, 0.5 = ambos
+        // Curva de potencia constante
+        const gainValA = Math.cos(x * 0.5 * Math.PI);
+        const gainValB = Math.cos((1 - x) * 0.5 * Math.PI);
+
+        if (gainA) gainA.gain.value = gainValA;
+        if (gainB) gainB.gain.value = gainValB;
+
+        // Fallback volumen directo si no hay audioContext aún
+        if (!audioCtx) {
+          audioA.volume = gainValA;
+          audioB.volume = gainValB;
+        }
+      }
+
+      crossfader.addEventListener("input", () => {
+        initWebAudio();
+        updateCrossfader(crossfader.value);
+      });
+
+      document.getElementById("btn-fade-left").addEventListener("click", () => triggerAutoCrossfade("A"));
+      document.getElementById("btn-fade-center").addEventListener("click", () => {
+        crossfader.value = 50;
+        updateCrossfader(50);
+      });
+      document.getElementById("btn-fade-right").addEventListener("click", () => triggerAutoCrossfade("B"));
+
+      function triggerAutoCrossfade(target) {
+        initWebAudio();
+        const startVal = parseFloat(crossfader.value);
+        const endVal = target === "A" ? 0 : 100;
+        const steps = 30;
+        const intervalTime = 60; // Total ~1.8 segundos
+        let step = 0;
+
+        const timer = setInterval(() => {
+          step++;
+          const curVal = startVal + ((endVal - startVal) * (step / steps));
+          crossfader.value = curVal;
+          updateCrossfader(curVal);
+          if (step >= steps) clearInterval(timer);
+        }, intervalTime);
+      }
+
+      const btnAutoDJ = document.getElementById("btn-auto-dj");
+      btnAutoDJ.addEventListener("click", () => {
+        isAutoDJ = !isAutoDJ;
+        btnAutoDJ.textContent = `⚡ Auto-DJ: ${isAutoDJ ? "ACTIVADO" : "DESACTIVADO"}`;
+        btnAutoDJ.style.background = isAutoDJ ? "rgba(0, 240, 255, 0.15)" : "rgba(255, 255, 255, 0.05)";
+      });
+
+      // Ecualizadores (EQ)
+      const bindEQ = (id, filterNode) => {
+        const el = document.getElementById(id);
+        el.addEventListener("input", () => {
+          initWebAudio();
+          if (filterNode) filterNode.gain.value = parseFloat(el.value);
+        });
+      };
+
+      bindEQ("eq-hi-a", eqHiA);
+      bindEQ("eq-mid-a", eqMidA);
+      bindEQ("eq-low-a", eqLowA);
+      bindEQ("eq-hi-b", eqHiB);
+      bindEQ("eq-mid-b", eqMidB);
+      bindEQ("eq-low-b", eqLowB);
+
+      // Scratching interactivo en tornamesas
+      function setupScratch(turntableId, audioElem, platterElem) {
+        const tt = document.getElementById(turntableId);
+        let isScratching = false;
+        let lastY = 0;
+
+        tt.addEventListener("mousedown", (e) => {
+          isScratching = true;
+          lastY = e.clientY;
+          platterElem.classList.remove("spinning");
+        });
+
+        window.addEventListener("mousemove", (e) => {
+          if (!isScratching || !audioElem.duration) return;
+          const deltaY = e.clientY - lastY;
+          lastY = e.clientY;
+          audioElem.currentTime = Math.max(0, Math.min(audioElem.duration, audioElem.currentTime - (deltaY * 0.06)));
+        });
+
+        window.addEventListener("mouseup", () => {
+          if (isScratching) {
+            isScratching = false;
+            if (!audioElem.paused) platterElem.classList.add("spinning");
+          }
+        });
+      }
+
+      setupScratch("turntable-a", audioA, platterA);
+      setupScratch("turntable-b", audioB, platterB);
+
+      // Render inicial de la cola
+      renderQueue();
+
+      // Cargar primera pista en Deck A
+      if (djQueue.length > 0) {
+        document.getElementById("deck-a-title").textContent = djQueue[0].title;
+        document.getElementById("deck-a-artist").textContent = `${djQueue[0].artist} (${djQueue[0].platform})`;
+        document.getElementById("deck-a-dur").textContent = djQueue[0].duration;
+      }
+    });
+  </script>
+</body>
+</html>

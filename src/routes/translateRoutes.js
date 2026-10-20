@@ -17,6 +17,10 @@ const {
   processConversion,
   getMediaById
 } = require("../utils/mediaEngine");
+const {
+  processSeparation,
+  getStemById
+} = require("../utils/vocalSeparator");
 const axios = require("axios");
 const logger = require("../utils/logger");
 
@@ -563,6 +567,106 @@ router.get("/media/download", async (req, res) => {
   } catch (err) {
     logger.error(`Error en /media/download: ${err.message}`);
     res.status(500).send("Error al descargar archivo multimedia.");
+  }
+});
+
+// =========================================================================
+// PILAR 05: SEPARADOR DE VOZ E INSTRUMENTAL (VOCAL REMOVER & STEMS SPLITTER)
+// =========================================================================
+
+// Procesa la separación de voz e instrumental desde URL o archivo subido
+router.post("/separator/process", async (req, res) => {
+  try {
+    const { url, audioBase64, filename, quality = "320k" } = req.body || {};
+    if (!url && !audioBase64) {
+      return res.status(400).json({
+        status: "error",
+        error: "Debe proporcionar una URL multimedia o un archivo de audio/video para separar."
+      });
+    }
+
+    const result = await processSeparation({ url, audioBase64, filename, quality });
+    res.json(result);
+  } catch (error) {
+    logger.error(`Error en /separator/process: ${error.message}`);
+    res.status(500).json({
+      status: "error",
+      error: error.message || "Error al procesar la separación de voz e instrumental."
+    });
+  }
+});
+
+// Streaming de pista aislada (type=vocals o type=instrumental) con HTTP 206
+router.get("/separator/stream", (req, res) => {
+  try {
+    const { id, type = "instrumental" } = req.query;
+    const stemItem = getStemById(id);
+    if (!stemItem) {
+      return res.status(404).send("Pista no encontrada o sesión expirada (TTL 30 min).");
+    }
+
+    const filePath = type === "vocals" ? stemItem.vocalsPath : stemItem.instrumentalPath;
+    if (!filePath || !fs.existsSync(filePath)) {
+      return res.status(404).send("Archivo de pista no disponible.");
+    }
+
+    const stat = fs.statSync(filePath);
+    const total = stat.size;
+    const range = req.headers.range;
+
+    if (range) {
+      const parts = range.replace(/bytes=/, "").split("-");
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : total - 1;
+      const chunkSize = end - start + 1;
+
+      res.status(206);
+      res.setHeader("Content-Range", `bytes ${start}-${end}/${total}`);
+      res.setHeader("Accept-Ranges", "bytes");
+      res.setHeader("Content-Length", chunkSize);
+      res.setHeader("Content-Type", "audio/mpeg");
+
+      const stream = fs.createReadStream(filePath, { start, end });
+      return stream.pipe(res);
+    }
+
+    res.setHeader("Content-Type", "audio/mpeg");
+    res.setHeader("Content-Length", total);
+    res.setHeader("Accept-Ranges", "bytes");
+    const stream = fs.createReadStream(filePath);
+    return stream.pipe(res);
+  } catch (err) {
+    logger.error(`Error en /separator/stream: ${err.message}`);
+    res.status(500).send("Error interno en streaming de pista.");
+  }
+});
+
+// Descarga directa de pista aislada (type=vocals o type=instrumental)
+router.get("/separator/download", (req, res) => {
+  try {
+    const { id, type = "instrumental" } = req.query;
+    const stemItem = getStemById(id);
+    if (!stemItem) {
+      return res.status(404).send("Pista no encontrada o expirada para descarga.");
+    }
+
+    const filePath = type === "vocals" ? stemItem.vocalsPath : stemItem.instrumentalPath;
+    const rawFilename = type === "vocals" ? stemItem.vocalsFilename : stemItem.instrumentalFilename;
+    const filename = (rawFilename || `stem_${type}.mp3`).replace(/[^\x20-\x7E]/g, "_");
+
+    if (!filePath || !fs.existsSync(filePath)) {
+      return res.status(404).send("Archivo físico no disponible para descarga.");
+    }
+
+    const stat = fs.statSync(filePath);
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.setHeader("Content-Type", "audio/mpeg");
+    res.setHeader("Content-Length", stat.size);
+    const stream = fs.createReadStream(filePath);
+    return stream.pipe(res);
+  } catch (err) {
+    logger.error(`Error en /separator/download: ${err.message}`);
+    res.status(500).send("Error al descargar pista.");
   }
 });
 

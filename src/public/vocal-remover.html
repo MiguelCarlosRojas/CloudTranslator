@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Separador de Voz e Instrumental de CloudTranslator (Pilar 05) | Aísla la voz (Acapella) y la pista instrumental (Karaoke) de cualquier enlace o archivo de audio/video.">
+  <meta property="og:title" content="Separador de Voz e Instrumental (Acapella / Karaoke) - CloudTranslator">
+  <meta property="og:description" content="Quita y separa la voz de cualquier canción o video de YouTube, TikTok, o subiendo tu archivo. Descarga voz e instrumental por separado.">
+  <title>Separador de Voz e Instrumental (Acapella / Karaoke) - CloudTranslator</title>
+  <link rel="icon" type="image/png" sizes="192x192" href="/img/logo.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/img/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/logo.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <script>
+    (function(){try{var m=document.cookie.match(/(?:^|; )cloud_translator_lang=([^;]*)/);var l=m?decodeURIComponent(m[1]):null;if(l&&l!=="original"&&l!=="es"){document.documentElement.classList.add("ct-pending");setTimeout(function(){document.documentElement.classList.remove("ct-pending");},800);}}catch(e){}})();
+  </script>
+  <script src="/js/spa-router.js" defer></script>
+  <script src="/components/components.js" defer></script>
+  <style>
+    .stem-mode-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 12px;
+    }
+    .stem-tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: rgba(18, 22, 34, 0.6);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      transition: all 0.25s ease;
+    }
+    .stem-tab-btn.active {
+      background: rgba(0, 240, 255, 0.12);
+      border-color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.2);
+    }
+    .drop-zone {
+      border: 2px dashed rgba(0, 240, 255, 0.35);
+      border-radius: 12px;
+      padding: 36px 20px;
+      text-align: center;
+      background: rgba(10, 14, 24, 0.6);
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--primary);
+      background: rgba(0, 240, 255, 0.08);
+      box-shadow: 0 0 24px rgba(0, 240, 255, 0.15);
+    }
+    .stem-channel-card {
+      background: rgba(14, 18, 30, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    .stem-channel-card.vocals {
+      border-left: 4px solid #ff007b;
+    }
+    .stem-channel-card.instrumental {
+      border-left: 4px solid #00f0ff;
+    }
+    .channel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .channel-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      padding: 4px 12px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+    .channel-badge.vocals {
+      background: rgba(255, 0, 123, 0.15);
+      color: #ff007b;
+      border: 1px solid rgba(255, 0, 123, 0.4);
+    }
+    .channel-badge.instrumental {
+      background: rgba(0, 240, 255, 0.15);
+      color: #00f0ff;
+      border: 1px solid rgba(0, 240, 255, 0.4);
+    }
+    .channel-controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .volume-slider-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .volume-slider {
+      -webkit-appearance: none;
+      width: 110px;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.2);
+      outline: none;
+    }
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--primary);
+    }
+    .wave-visualizer {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 38px;
+      width: 100%;
+      margin: 12px 0;
+      padding: 0 6px;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .wave-bar {
+      flex: 1;
+      height: 20%;
+      background: rgba(0, 240, 255, 0.3);
+      border-radius: 2px;
+      transition: height 0.15s ease, background 0.15s ease;
+    }
+    .wave-visualizer.playing.vocals .wave-bar {
+      background: rgba(255, 0, 123, 0.85);
+      animation: pulseVocal 0.8s infinite alternate ease-in-out;
+    }
+    .wave-visualizer.playing.instrumental .wave-bar {
+      background: rgba(0, 240, 255, 0.85);
+      animation: pulseInst 0.7s infinite alternate ease-in-out;
+    }
+    @keyframes pulseVocal {
+      0% { height: 15%; }
+      50% { height: 85%; }
+      100% { height: 35%; }
+    }
+    @keyframes pulseInst {
+      0% { height: 25%; }
+      50% { height: 95%; }
+      100% { height: 45%; }
+    }
+    .master-player-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(8, 10, 18, 0.95);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+    }
+    .btn-stem-play {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+      transition: transform 0.2s ease;
+    }
+    .btn-stem-play:hover {
+      transform: scale(1.08);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra Superior -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <a href="/" class="brand-wrapper">
+        <span class="brand-logo">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="38" height="38">
+          CloudTranslator
+        </span>
+        <span class="brand-badge">v2.5.0</span>
+      </a>
+
+      <nav class="desktop-nav">
+        <ul class="main-menu">
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/converter">Conversor</a></li>
+          <li><a href="/vocal-remover" class="active">Separador Voz</a></li>
+          <li><a href="/dj">CloudDJ</a></li>
+          <li><a href="/docs">Docs</a></li>
+        </ul>
+      </nav>
+
+      <!-- Barra de Herramientas de Traducción Activa -->
+      <div class="toolbar-controls no-translate" data-no-translate>
+        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+          English
+        </button>
+
+        <div class="selector-box">
+          <div class="selector-dropdown">
+            <select id="select-lang" aria-label="Seleccionar idioma">
+              <option value="en">English (en)</option>
+              <option value="es">Español (es)</option>
+              <option value="fr">Français (fr)</option>
+              <option value="de">Deutsch (de)</option>
+              <option value="it">Italiano (it)</option>
+              <option value="pt">Portugués (pt)</option>
+              <option value="ja">日本語 (ja)</option>
+              <option value="zh-CN">中文 (zh-CN)</option>
+              <option value="ru">Русский (ru)</option>
+            </select>
+          </div>
+          <div class="custom-lang-group">
+            <input type="text" id="input-custom-lang" placeholder="ISO" maxlength="5" title="Código ISO personalizado">
+            <button id="btn-translate-custom" class="btn btn-primary" title="Traducir">GO</button>
+          </div>
+        </div>
+
+        <button id="btn-restore" class="btn btn-outline" title="Restaurar idioma original">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+          Original
+        </button>
+
+        <div id="status-pill" class="status-pill" title="Estado del microservicio">
+          <span class="spinner"></span>
+          <span id="status-text">LISTO</span>
+        </div>
+      </div>
+
+      <!-- Botón Hamburguesa Móvil -->
+      <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Abrir Menú de Navegación">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+
+    <!-- Backdrop para Barra Lateral -->
+    <div id="drawer-backdrop"></div>
+
+    <!-- Barra de Navegación Lateral Móvil -->
+    <aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
+      <div class="drawer-header">
+        <a href="/" class="drawer-brand">
+          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
+          <span>CloudTranslator</span>
+        </a>
+        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+
+      <div class="drawer-body">
+        <div class="drawer-section">
+          <span class="drawer-title">LOS 6 PILARES</span>
+          <ul class="drawer-menu">
+            <li><a href="/translator"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traductor en la Nube</a></li>
+            <li><a href="/tts"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS)</a></li>
+            <li><a href="/voice-clone"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz (IA)</a></li>
+            <li><a href="/converter"><svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="8" cy="12" r="2"/></svg> Conversor Multimedia</a></li>
+            <li><a href="/vocal-remover" class="active"><svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Separador de Voz (Pilar 05)</a></li>
+            <li><a href="/dj"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg> CloudDJ Mezclador (Pilar 06)</a></li>
+            <li><a href="/donate"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+  </header>
+
+  <main class="full-container">
+
+    <!-- Hero de la Página -->
+    <section class="hero-full">
+      <div class="hero-split">
+        <div class="hero-split-content">
+          <span class="hero-tag-glow">PILAR 05 // SEPARADOR DE VOZ E INSTRUMENTAL</span>
+          <h1 style="font-size: clamp(2rem, 4.2vw, 3rem); font-weight: 800;">Separar Voz y Música de Cualquier Canción</h1>
+          <p class="lead">
+            Elimina o aísla la voz para dejar solo la <strong>pista instrumental (Karaoke)</strong> o extrae la <strong>voz pura (Acapella)</strong>. Pega enlaces de <strong>YouTube, TikTok, Instagram</strong> o sube archivos locales de audio y video. Escucha y descarga cada pista por separado en alta definición.
+          </p>
+          <div class="hero-actions">
+            <a href="#splitter-studio" class="btn btn-primary">Comenzar Separación</a>
+            <a href="/dj" class="btn btn-outline">Abrir en CloudDJ</a>
+            <a href="/converter" class="btn btn-outline">Conversor de Video</a>
+          </div>
+        </div>
+
+        <div class="hero-split-media">
+          <div class="hero-logo-wrapper">
+            <div class="hero-logo-glow" style="background: radial-gradient(circle, rgba(255, 0, 123, 0.35) 0%, rgba(0, 240, 255, 0.2) 60%, transparent 80%);"></div>
+            <img src="/img/logo.png" alt="CloudTranslator Stems" class="hero-logo-big" width="290" height="290">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Estudio de Separación Multimedia -->
+    <section id="splitter-studio" class="translator-card" style="margin-top: 10px; margin-bottom: 40px;">
+      
+      <!-- Pestañas de Modo de Entrada -->
+      <div class="stem-mode-tabs">
+        <button id="tab-mode-url" class="stem-tab-btn active">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Pegar Enlace Multimedia (YouTube, TikTok, etc.)
+        </button>
+        <button id="tab-mode-file" class="stem-tab-btn">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Subir Archivo de Audio o Video
+        </button>
+      </div>
+
+      <!-- Panel 1: Entrada por Enlace URL -->
+      <div id="panel-url">
+        <label for="input-media-url" class="field-label">
+          ENLACE DE LA CANCIÓN O VIDEO
+          <span style="font-weight: 400; text-transform: none; color: var(--text-muted);">(YouTube, TikTok, Instagram, Facebook, X, etc.)</span>
+        </label>
+        <div class="input-with-actions" style="margin-bottom: 20px;">
+          <input type="url" id="input-media-url" class="text-input" placeholder="https://www.youtube.com/watch?v=... o enlace de TikTok">
+          <div class="input-actions-group">
+            <button id="btn-paste-url" class="action-btn" title="Pegar del portapapeles">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1"/></svg>
+              Pegar
+            </button>
+            <button id="btn-clear-url" class="action-btn" title="Limpiar enlace">
+              <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 2: Entrada por Archivo Local -->
+      <div id="panel-file" style="display: none; margin-bottom: 20px;">
+        <label class="field-label">SUBIR ARCHIVO MULTIMEDIA (.MP3, .WAV, .M4A, .MP4, ETC.)</label>
+        <div id="drop-zone" class="drop-zone">
+          <svg class="icon" style="width: 48px; height: 48px; stroke: var(--primary); margin-bottom: 12px;" viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <h3 id="drop-zone-title" style="margin: 0 0 6px 0; font-size: 1.15rem;">Arrastra y suelta tu archivo aquí</h3>
+          <p id="drop-zone-desc" style="color: var(--text-muted); margin: 0 0 14px 0; font-size: 0.88rem;">O haz clic para examinar desde tu dispositivo (hasta 50 MB)</p>
+          <span class="btn btn-outline" style="pointer-events: none;">Seleccionar Archivo</span>
+          <input type="file" id="file-input" accept="audio/*,video/*" style="display: none;">
+        </div>
+        <div id="file-info-badge" style="display: none; margin-top: 12px; align-items: center; justify-content: space-between; background: rgba(0, 240, 255, 0.08); padding: 10px 16px; border-radius: 8px; border: 1px solid rgba(0, 240, 255, 0.3);">
+          <span id="file-info-name" style="font-weight: 700; color: #ffffff;">cancion.mp3</span>
+          <button id="btn-remove-file" class="action-btn" style="color: #ff4d4d;">Eliminar</button>
+        </div>
+      </div>
+
+      <!-- Barra de Configuración y Botón de Acción -->
+      <div style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 220px;">
+          <label for="select-quality" class="field-label">CALIDAD DE RENDERIZADO DE STEMS</label>
+          <select id="select-quality" class="text-input" style="padding: 10px 14px;">
+            <option value="320k">320 kbps (Alta Fidelidad / Studio Master)</option>
+            <option value="192k">192 kbps (Estándar Recomendado)</option>
+            <option value="128k">128 kbps (Ahorro de Datos)</option>
+          </select>
+        </div>
+
+        <button id="btn-process-split" class="btn btn-primary" style="height: 48px; padding: 0 28px; font-weight: 800; letter-spacing: 0.04em;">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          <span id="btn-split-text">Separar Voz e Instrumental</span>
+        </button>
+      </div>
+
+      <!-- Caja de Progreso Dinámico -->
+      <div id="progress-box" style="display: none; margin-top: 24px; padding: 18px; background: rgba(0, 0, 0, 0.45); border-radius: 10px; border: 1px solid rgba(0, 240, 255, 0.2);">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.88rem; font-weight: 700;">
+          <span id="progress-status"><span class="spinner"></span> Procesando audio maestro...</span>
+          <span id="progress-percent" style="color: var(--primary);">0%</span>
+        </div>
+        <div style="width: 100%; height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden;">
+          <div id="progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #ff007b, var(--primary)); transition: width 0.4s ease;"></div>
+        </div>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- RESULTADO: ESTUDIO DE REPRODUCCIÓN DUAL & DESCARGAS SEPARADAS             -->
+      <!-- ========================================================================= -->
+      <div id="result-box" style="display: none; margin-top: 32px; border-top: 1px solid var(--border-subtle); padding-top: 28px;">
+        
+        <!-- Cabecera de la Pista Procesada -->
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+          <img id="res-thumb" src="/img/logo.png" alt="Cover" style="width: 64px; height: 64px; border-radius: 10px; object-fit: cover; border: 1px solid var(--border-subtle);">
+          <div style="flex: 1; min-width: 200px;">
+            <h3 id="res-title" style="margin: 0 0 4px 0; font-size: 1.25rem; font-weight: 800;">Título de la Canción</h3>
+            <div style="display: flex; gap: 10px; align-items: center; font-size: 0.82rem; color: var(--text-muted);">
+              <span id="res-platform" style="background: rgba(255, 255, 255, 0.08); padding: 2px 8px; border-radius: 4px;">MULTIMEDIA</span>
+              <span id="res-duration">00:00</span>
+              <span style="color: var(--primary);">✓ 2 STEMS GENERADOS</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra Maestra de Reproducción Sincronizada -->
+        <div class="master-player-bar">
+          <button id="btn-master-play" class="btn-stem-play" title="Reproducir / Pausar Ambos Canales">
+            <svg id="master-play-icon" class="icon" style="width: 20px; height: 20px;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+          <div style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">
+              <span>TIEMPO TRANSCURRIDO: <strong id="time-current" style="color: #fff;">00:00</strong></span>
+              <span>DURACIÓN TOTAL: <strong id="time-total" style="color: #fff;">00:00</strong></span>
+            </div>
+            <input type="range" id="master-scrubber" min="0" max="100" value="0" style="width: 100%; cursor: pointer;">
+          </div>
+        </div>
+
+        <!-- CANAL 1: PISTA INSTRUMENTAL (KARAOKE) -->
+        <div class="stem-channel-card instrumental">
+          <div class="channel-header">
+            <div>
+              <span class="channel-badge instrumental">
+                <svg class="icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                Pista Instrumental (Karaoke / Sin Voz)
+              </span>
+              <span id="inst-size" style="font-size: 0.8rem; color: var(--text-muted); margin-left: 8px;">320 kbps</span>
+            </div>
+            
+            <div class="channel-controls">
+              <div class="volume-slider-box">
+                <svg class="icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                <input type="range" id="vol-inst" class="volume-slider" min="0" max="1" step="0.05" value="1" title="Volumen Instrumental">
+                <span id="vol-inst-text" style="font-size: 0.75rem; font-weight: 700; width: 34px;">100%</span>
+              </div>
+              <button id="btn-mute-inst" class="action-btn" title="Silenciar Instrumental">Mute</button>
+              <button id="btn-solo-inst" class="action-btn" title="Solo Instrumental">Solo</button>
+              <a id="btn-dl-inst" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.85rem;" download>
+                <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Descargar Instrumental
+              </a>
+            </div>
+          </div>
+
+          <div id="viz-inst" class="wave-visualizer instrumental">
+            <!-- Barras de onda generadas dinámicamente -->
+          </div>
+        </div>
+
+        <!-- CANAL 2: VOZ AISLADA (ACAPELLA) -->
+        <div class="stem-channel-card vocals">
+          <div class="channel-header">
+            <div>
+              <span class="channel-badge vocals">
+                <svg class="icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+                Voz Aislada (Acapella / Solo Voz)
+              </span>
+              <span id="voc-size" style="font-size: 0.8rem; color: var(--text-muted); margin-left: 8px;">320 kbps</span>
+            </div>
+
+            <div class="channel-controls">
+              <div class="volume-slider-box">
+                <svg class="icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                <input type="range" id="vol-voc" class="volume-slider" min="0" max="1" step="0.05" value="1" title="Volumen Vocal">
+                <span id="vol-voc-text" style="font-size: 0.75rem; font-weight: 700; width: 34px;">100%</span>
+              </div>
+              <button id="btn-mute-voc" class="action-btn" title="Silenciar Voz">Mute</button>
+              <button id="btn-solo-voc" class="action-btn" title="Solo Voz">Solo</button>
+              <a id="btn-dl-voc" class="btn" style="background: linear-gradient(135deg, #ff007b, #c026d3); color: #fff; padding: 8px 18px; font-size: 0.85rem; border: none; font-weight: 700;" download>
+                <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Descargar Solo Voz
+              </a>
+            </div>
+          </div>
+
+          <div id="viz-voc" class="wave-visualizer vocals">
+            <!-- Barras de onda generadas dinámicamente -->
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="main-footer">
+    <div class="footer-bottom" style="text-align: center; padding: 24px 0; color: var(--text-muted); font-size: 0.88rem;">
+      CloudTranslator &copy; 2026 &bull; Pilar 05: Separador de Voz e Instrumental con DSP Nativo &bull; Desarrollado por Miguel Angel Carlos Rojas
+    </div>
+  </footer>
+
+  <!-- Audio elements ocultos para sincronización -->
+  <audio id="audio-inst" preload="auto"></audio>
+  <audio id="audio-voc" preload="auto"></audio>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Pestañas
+      const tabUrl = document.getElementById("tab-mode-url");
+      const tabFile = document.getElementById("tab-mode-file");
+      const panelUrl = document.getElementById("panel-url");
+      const panelFile = document.getElementById("panel-file");
+
+      let currentMode = "url";
+      let selectedFileBase64 = null;
+      let selectedFileName = "";
+
+      tabUrl.addEventListener("click", () => {
+        currentMode = "url";
+        tabUrl.classList.add("active");
+        tabFile.classList.remove("active");
+        panelUrl.style.display = "block";
+        panelFile.style.display = "none";
+      });
+
+      tabFile.addEventListener("click", () => {
+        currentMode = "file";
+        tabFile.classList.add("active");
+        tabUrl.classList.remove("active");
+        panelFile.style.display = "block";
+        panelUrl.style.display = "none";
+      });
+
+      // Drag and drop
+      const dropZone = document.getElementById("drop-zone");
+      const fileInput = document.getElementById("file-input");
+      const fileBadge = document.getElementById("file-info-badge");
+      const fileNameEl = document.getElementById("file-info-name");
+      const btnRemoveFile = document.getElementById("btn-remove-file");
+
+      dropZone.addEventListener("click", () => fileInput.click());
+      dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("dragover"); });
+      dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+      dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropZone.classList.remove("dragover");
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+          handleFile(e.dataTransfer.files[0]);
+        }
+      });
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files && e.target.files[0]) {
+          handleFile(e.target.files[0]);
+        }
+      });
+
+      function handleFile(file) {
+        if (file.size > 50 * 1024 * 1024) {
+          alert("El archivo excede el límite máximo de 50 MB.");
+          return;
+        }
+        selectedFileName = file.name;
+        fileNameEl.textContent = `${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)`;
+        fileBadge.style.display = "flex";
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          selectedFileBase64 = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      btnRemoveFile.addEventListener("click", () => {
+        selectedFileBase64 = null;
+        selectedFileName = "";
+        fileInput.value = "";
+        fileBadge.style.display = "none";
+      });
+
+      // Pegar y Limpiar
+      const inputUrl = document.getElementById("input-media-url");
+      const btnPaste = document.getElementById("btn-paste-url");
+      const btnClear = document.getElementById("btn-clear-url");
+
+      btnPaste.addEventListener("click", async () => {
+        try {
+          const txt = await navigator.clipboard.readText();
+          if (txt) inputUrl.value = txt.trim();
+        } catch { inputUrl.focus(); }
+      });
+      btnClear.addEventListener("click", () => { inputUrl.value = ""; inputUrl.focus(); });
+
+      // Generar barras decorativas para visualizadores
+      ["viz-inst", "viz-voc"].forEach(id => {
+        const box = document.getElementById(id);
+        for (let i = 0; i < 45; i++) {
+          const bar = document.createElement("div");
+          bar.className = "wave-bar";
+          bar.style.height = `${Math.floor(Math.random() * 65 + 15)}%`;
+          box.appendChild(bar);
+        }
+      });
+
+      // Procesar Separación
+      const btnProcess = document.getElementById("btn-process-split");
+      const btnText = document.getElementById("btn-split-text");
+      const progressBox = document.getElementById("progress-box");
+      const progressBar = document.getElementById("progress-bar");
+      const progressPercent = document.getElementById("progress-percent");
+      const progressStatus = document.getElementById("progress-status");
+      const resultBox = document.getElementById("result-box");
+
+      const audioInst = document.getElementById("audio-inst");
+      const audioVoc = document.getElementById("audio-voc");
+
+      btnProcess.addEventListener("click", async () => {
+        const quality = document.getElementById("select-quality").value;
+
+        let payload = { quality };
+        if (currentMode === "url") {
+          const u = inputUrl.value.trim();
+          if (!u) {
+            alert("Introduce un enlace multimedia válido.");
+            return;
+          }
+          payload.url = u;
+        } else {
+          if (!selectedFileBase64) {
+            alert("Por favor selecciona o arrastra un archivo de audio/video.");
+            return;
+          }
+          payload.audioBase64 = selectedFileBase64;
+          payload.filename = selectedFileName;
+        }
+
+        // Reset
+        audioInst.pause();
+        audioVoc.pause();
+        resultBox.style.display = "none";
+        btnProcess.disabled = true;
+        progressBox.style.display = "block";
+        progressBar.style.width = "20%";
+        progressPercent.textContent = "20%";
+        progressStatus.innerHTML = `<span class="spinner"></span> Extrayendo audio maestro de alta fidelidad...`;
+
+        try {
+          setTimeout(() => {
+            if (progressBar.style.width === "20%") {
+              progressBar.style.width = "55%";
+              progressPercent.textContent = "55%";
+              progressStatus.innerHTML = `<span class="spinner"></span> Ejecutando cancelación de fase y división de acapella...`;
+            }
+          }, 1200);
+
+          const res = await fetch("/api/separator/process", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+
+          progressBar.style.width = "100%";
+          progressPercent.textContent = "100%";
+
+          if (data.status === "success") {
+            progressStatus.textContent = "¡Separación completada con éxito!";
+            displaySeparationResult(data);
+          } else {
+            alert(data.error || "No se pudo procesar la separación.");
+          }
+        } catch (err) {
+          alert("Error de red: " + err.message);
+        } finally {
+          btnProcess.disabled = false;
+        }
+      });
+
+      function displaySeparationResult(data) {
+        resultBox.style.display = "block";
+        document.getElementById("res-title").textContent = data.title;
+        document.getElementById("res-platform").textContent = data.platform;
+        document.getElementById("res-duration").textContent = data.duration;
+        document.getElementById("time-total").textContent = data.duration;
+        document.getElementById("res-thumb").src = data.thumbnail || "/img/logo.png";
+
+        // Configurar fuentes de audio
+        audioInst.src = data.instrumental.streamUrl;
+        audioVoc.src = data.vocals.streamUrl;
+
+        // Configurar botones de descarga directa
+        const btnDlInst = document.getElementById("btn-dl-inst");
+        btnDlInst.href = data.instrumental.downloadUrl;
+        btnDlInst.setAttribute("download", data.instrumental.filename);
+
+        const btnDlVoc = document.getElementById("btn-dl-voc");
+        btnDlVoc.href = data.vocals.downloadUrl;
+        btnDlVoc.setAttribute("download", data.vocals.filename);
+
+        audioInst.load();
+        audioVoc.load();
+
+        resultBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
+      // Controles del Reproductor Dual Sincronizado
+      const btnMasterPlay = document.getElementById("btn-master-play");
+      const masterIcon = document.getElementById("master-play-icon");
+      const masterScrubber = document.getElementById("master-scrubber");
+      const timeCurrent = document.getElementById("time-current");
+      const vizInst = document.getElementById("viz-inst");
+      const vizVoc = document.getElementById("viz-voc");
+
+      let isPlaying = false;
+
+      function updateMasterPlayState(playing) {
+        isPlaying = playing;
+        if (playing) {
+          masterIcon.innerHTML = `<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>`;
+          vizInst.classList.add("playing");
+          vizVoc.classList.add("playing");
+        } else {
+          masterIcon.innerHTML = `<polygon points="5 3 19 12 5 21 5 3"/>`;
+          vizInst.classList.remove("playing");
+          vizVoc.classList.remove("playing");
+        }
+      }
+
+      btnMasterPlay.addEventListener("click", () => {
+        if (isPlaying) {
+          audioInst.pause();
+          audioVoc.pause();
+          updateMasterPlayState(false);
+        } else {
+          // Sincronizar tiempo exacto
+          audioVoc.currentTime = audioInst.currentTime;
+          Promise.all([audioInst.play(), audioVoc.play()]).then(() => {
+            updateMasterPlayState(true);
+          }).catch(console.error);
+        }
+      });
+
+      // Actualizar barra de progreso
+      audioInst.addEventListener("timeupdate", () => {
+        if (!audioInst.duration) return;
+        const pct = (audioInst.currentTime / audioInst.duration) * 100;
+        masterScrubber.value = pct;
+        const curM = Math.floor(audioInst.currentTime / 60);
+        const curS = Math.floor(audioInst.currentTime % 60);
+        timeCurrent.textContent = `${String(curM).padStart(2, "0")}:${String(curS).padStart(2, "0")}`;
+      });
+
+      masterScrubber.addEventListener("input", () => {
+        if (!audioInst.duration) return;
+        const newTime = (masterScrubber.value / 100) * audioInst.duration;
+        audioInst.currentTime = newTime;
+        audioVoc.currentTime = newTime;
+      });
+
+      audioInst.addEventListener("ended", () => {
+        updateMasterPlayState(false);
+      });
+
+      // Controles de Volumen y Mute / Solo
+      const volInst = document.getElementById("vol-inst");
+      const volVoc = document.getElementById("vol-voc");
+      const volInstText = document.getElementById("vol-inst-text");
+      const volVocText = document.getElementById("vol-voc-text");
+      const btnMuteInst = document.getElementById("btn-mute-inst");
+      const btnMuteVoc = document.getElementById("btn-mute-voc");
+      const btnSoloInst = document.getElementById("btn-solo-inst");
+      const btnSoloVoc = document.getElementById("btn-solo-voc");
+
+      volInst.addEventListener("input", () => {
+        audioInst.volume = volInst.value;
+        volInstText.textContent = `${Math.round(volInst.value * 100)}%`;
+      });
+
+      volVoc.addEventListener("input", () => {
+        audioVoc.volume = volVoc.value;
+        volVocText.textContent = `${Math.round(volVoc.value * 100)}%`;
+      });
+
+      btnMuteInst.addEventListener("click", () => {
+        audioInst.muted = !audioInst.muted;
+        btnMuteInst.textContent = audioInst.muted ? "Desmutear" : "Mute";
+        btnMuteInst.style.color = audioInst.muted ? "#ff4d4d" : "";
+      });
+
+      btnMuteVoc.addEventListener("click", () => {
+        audioVoc.muted = !audioVoc.muted;
+        btnMuteVoc.textContent = audioVoc.muted ? "Desmutear" : "Mute";
+        btnMuteVoc.style.color = audioVoc.muted ? "#ff4d4d" : "";
+      });
+
+      btnSoloInst.addEventListener("click", () => {
+        audioInst.muted = false;
+        audioVoc.muted = true;
+        btnMuteInst.textContent = "Mute";
+        btnMuteInst.style.color = "";
+        btnMuteVoc.textContent = "Desmutear";
+        btnMuteVoc.style.color = "#ff4d4d";
+      });
+
+      btnSoloVoc.addEventListener("click", () => {
+        audioVoc.muted = false;
+        audioInst.muted = true;
+        btnMuteVoc.textContent = "Mute";
+        btnMuteVoc.style.color = "";
+        btnMuteInst.textContent = "Desmutear";
+        btnMuteInst.style.color = "#ff4d4d";
+      });
+    });
+  </script>
+</body>
+</html>

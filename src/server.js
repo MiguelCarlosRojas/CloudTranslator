@@ -61,7 +61,9 @@ app.get("/", (req, res) => {
       "1. Traductor en la Nube (+200 idiomas por lotes)",
       "2. Texto a Voz Neuronal (TTS Studio)",
       "3. Clonación de Voz por Inteligencia Artificial",
-      "4. Conversor Multimedia Universal (YouTube, TikTok, Instagram a MP3 / MP4)"
+      "4. Conversor Multimedia Universal (YouTube, TikTok, Instagram a MP3 / MP4)",
+      "5. Separador de Voz e Instrumental (Extracción de Stems Acapella / Karaoke)",
+      "6. CloudDJ (Mezclador Virtual en Vivo con Crossfade y Cola de Reproducción)"
     ],
     documentation: "https://cloudtranslator.onrender.com/docs",
     endpoints: {
@@ -74,6 +76,9 @@ app.get("/", (req, res) => {
       mediaStream: "GET /api/media/stream",
       mediaDownload: "GET /api/media/download",
       mediaPlatforms: "GET /api/media/platforms",
+      separatorProcess: "POST /api/separator/process",
+      separatorStream: "GET /api/separator/stream",
+      separatorDownload: "GET /api/separator/download",
       languages: "GET /api/languages",
       health: "GET /api/health",
       ping: "GET /api/ping"
@@ -93,7 +98,9 @@ app.get("/api", (req, res, next) => {
       "1. Traductor en la Nube (+200 idiomas por lotes)",
       "2. Texto a Voz Neuronal (TTS Studio)",
       "3. Clonación de Voz por Inteligencia Artificial",
-      "4. Conversor Multimedia Universal (YouTube, TikTok, Instagram a MP3 / MP4)"
+      "4. Conversor Multimedia Universal (YouTube, TikTok, Instagram a MP3 / MP4)",
+      "5. Separador de Voz e Instrumental (Extracción de Stems Acapella / Karaoke)",
+      "6. CloudDJ (Mezclador Virtual en Vivo con Crossfade y Cola de Reproducción)"
     ],
     documentation: "https://cloudtranslator.onrender.com/api",
     endpoints: {
@@ -106,6 +113,9 @@ app.get("/api", (req, res, next) => {
       mediaStream: "GET /api/media/stream",
       mediaDownload: "GET /api/media/download",
       mediaPlatforms: "GET /api/media/platforms",
+      separatorProcess: "POST /api/separator/process",
+      separatorStream: "GET /api/separator/stream",
+      separatorDownload: "GET /api/separator/download",
       languages: "GET /api/languages",
       health: "GET /api/health",
       ping: "GET /api/ping"
@@ -123,6 +133,11 @@ const pageRoutes = [
   { path: "/voice-clone", file: "voice-clone.html" },
   { path: "/converter", file: "converter.html" },
   { path: "/media", file: "converter.html" },
+  { path: "/vocal-remover", file: "vocal-remover.html" },
+  { path: "/separator", file: "vocal-remover.html" },
+  { path: "/stems", file: "vocal-remover.html" },
+  { path: "/dj", file: "dj.html" },
+  { path: "/cloud-dj", file: "dj.html" },
   { path: "/donate", file: "donate.html" },
   { path: "/docs", file: "docs.html" },
   { path: "/learn", file: "learn.html" },
