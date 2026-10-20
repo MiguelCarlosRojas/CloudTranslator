@@ -1059,63 +1059,7 @@ body.ct-translating {
 /* ==========================================================================
    Diseño de Documentación & API (Layout de 2 Columnas con Sidebar Lateral Completo)
    ========================================================================== */
-@media (min-width: 993px) {
-  body:has(.docs-layout-container) {
-    height: 100vh;
-    max-height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
 
-  body:has(.docs-layout-container) .top-nav {
-    flex-shrink: 0;
-  }
-
-  body:has(.docs-layout-container) .docs-layout-container {
-    flex: 1;
-    min-height: 0;
-    height: auto;
-    max-height: none;
-    overflow: hidden;
-    display: flex;
-    width: 100%;
-  }
-
-  body:has(.docs-layout-container) .docs-sidebar {
-    height: 100%;
-    max-height: 100%;
-    overflow-y: auto;
-  }
-
-  body:has(.docs-layout-container) .docs-main-content {
-    height: 100%;
-    max-height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding-bottom: 48px;
-  }
-
-  /* Pie de Página Fijo al Final Ocupando Todo el Ancho (Barra + Contenido) */
-  body:has(.docs-layout-container) footer {
-    flex-shrink: 0;
-    width: 100%;
-    z-index: 120;
-    border-top: 1px solid var(--border-subtle);
-    background: rgba(6, 8, 15, 0.98);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-  }
-
-  body:has(.docs-layout-container) .footer-inner-full {
-    padding: 22px clamp(20px, 3vw, 48px) 12px clamp(20px, 3vw, 48px);
-    gap: clamp(16px, 2.5vw, 40px);
-  }
-
-  body:has(.docs-layout-container) .footer-bottom-full {
-    padding: 8px clamp(20px, 3vw, 48px);
-  }
-}
 
 .docs-layout-container {
   display: flex;
@@ -1124,7 +1068,7 @@ body.ct-translating {
   margin: 0;
   position: relative;
   align-items: stretch;
-  overflow: hidden;
+  min-height: calc(100vh - 64px);
 }
 
 /* Barra Lateral Sticky / Fija a la Izquierda (Desktop) */
@@ -1133,9 +1077,9 @@ body.ct-translating {
   min-width: 360px;
   max-width: 380px;
   flex-shrink: 0;
-  position: relative;
-  height: 100%;
-  max-height: 100%;
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
   overflow-y: auto;
   border-right: 1px solid var(--border-subtle);
   background: rgba(6, 9, 18, 0.98);
@@ -1329,22 +1273,14 @@ body.ct-translating {
   color: var(--primary);
 }
 
-/* Contenido Principal de Documentación (Libre de Desplazamiento Bloqueado) */
-/* Contenido Principal de Documentación & API: Posición Fija con Scroll Interno Propio */
+/* Contenido Principal de Documentación & API */
 .docs-main-content {
   flex: 1;
   min-width: 0;
-  height: 100%;
-  max-height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  box-sizing: border-box;
-  scroll-behavior: smooth;
-  padding: clamp(28px, 4vw, 52px) clamp(24px, 5vw, 68px) 0 clamp(24px, 5vw, 68px);
+  padding: clamp(28px, 4vw, 52px) clamp(24px, 5vw, 68px) 64px clamp(24px, 5vw, 68px);
   width: 100%;
   max-width: 1440px;
-  display: flex;
-  flex-direction: column;
+  box-sizing: border-box;
 }
 
 

@@ -1063,65 +1063,116 @@ export default function Layout({ children }) {
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      const scrollContainer = document.querySelector(".docs-main-content");
-      const isDesktop = window.innerWidth > 992;
+      // 1. ScrollSpy de alta precisión para el sidebar de la documentación
+      const allTargets = Array.from(document.querySelectorAll(".docs-section[id], .docs-subsection[id]"));
+      const sidebar = document.querySelector(".docs-sidebar");
 
-      // 1. ScrollSpy para el sidebar de la documentación con observación del scroll interno
-      const sessionLinks = document.querySelectorAll(".docs-sidebar-session");
-      const subLinks = document.querySelectorAll(".docs-sidebar-sublink");
-      const observedElements = document.querySelectorAll(".docs-section, .docs-subsection");
+      function setActiveNav(targetId) {
+        if (!targetId) return;
 
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const id = entry.target.getAttribute("id");
+        // Limpiar estados activos previos
+        document.querySelectorAll(".docs-sidebar-session.active, .docs-sidebar-sublink.active").forEach(el => {
+          el.classList.remove("active");
+        });
 
-            if (entry.target.classList.contains("docs-subsection")) {
-              subLinks.forEach(sub => {
-                if (sub.getAttribute("data-target") === id || sub.getAttribute("href") === "#" + id) {
-                  sub.classList.add("active");
-                  const parentGroup = sub.closest(".docs-sidebar-group");
-                  if (parentGroup) {
-                    sessionLinks.forEach(s => s.classList.remove("active"));
-                    parentGroup.querySelector(".docs-sidebar-session")?.classList.add("active");
-                  }
-                } else {
-                  sub.classList.remove("active");
-                }
-              });
-            } else if (entry.target.classList.contains("docs-section")) {
-              sessionLinks.forEach(link => {
-                if (link.getAttribute("data-target") === id || link.getAttribute("href") === "#" + id) {
-                  link.classList.add("active");
-                }
-              });
+        const activeSub = document.querySelector(`.docs-sidebar-sublink[href="#${targetId}"], .docs-sidebar-sublink[data-target="${targetId}"]`);
+        const activeSession = document.querySelector(`.docs-sidebar-session[href="#${targetId}"], .docs-sidebar-session[data-target="${targetId}"]`);
+
+        let targetLink = null;
+
+        if (activeSub) {
+          activeSub.classList.add("active");
+          targetLink = activeSub;
+          const parentGroup = activeSub.closest(".docs-sidebar-group");
+          if (parentGroup) {
+            const parentSession = parentGroup.querySelector(".docs-sidebar-session");
+            if (parentSession) parentSession.classList.add("active");
+          }
+        } else if (activeSession) {
+          activeSession.classList.add("active");
+          targetLink = activeSession;
+        } else {
+          // Si es un ID de sección o subsección que pertenece a un grupo
+          const targetEl = document.getElementById(targetId);
+          if (targetEl) {
+            const parentSection = targetEl.closest(".docs-section");
+            if (parentSection && parentSection.id) {
+              const sessionLink = document.querySelector(`.docs-sidebar-session[href="#${parentSection.id}"], .docs-sidebar-session[data-target="${parentSection.id}"]`);
+              if (sessionLink) {
+                sessionLink.classList.add("active");
+                targetLink = sessionLink;
+              }
             }
           }
+        }
+
+        // Auto-scroll del sidebar para mantener visible el enlace activo
+        if (targetLink && sidebar) {
+          const linkRect = targetLink.getBoundingClientRect();
+          const sidebarRect = sidebar.getBoundingClientRect();
+          if (linkRect.top < sidebarRect.top + 60 || linkRect.bottom > sidebarRect.bottom - 60) {
+            targetLink.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          }
+        }
+      }
+
+      let isThrottled = false;
+      function handleScroll() {
+        if (isThrottled) return;
+        isThrottled = true;
+        requestAnimationFrame(() => {
+          isThrottled = false;
+
+          const scrollY = window.scrollY;
+          const windowHeight = window.innerHeight;
+          const documentHeight = document.documentElement.scrollHeight;
+
+          // Si el usuario llega al final de la página (cerca del pie de página)
+          if (windowHeight + scrollY >= documentHeight - 120) {
+            if (allTargets.length > 0) {
+              const lastTarget = allTargets[allTargets.length - 1];
+              setActiveNav(lastTarget.id);
+            }
+            return;
+          }
+
+          // Detección por desplazamiento: encontrar el elemento bajo el header sticky (offset 140px)
+          const offset = 140;
+          let currentId = null;
+
+          for (let i = 0; i < allTargets.length; i++) {
+            const el = allTargets[i];
+            const top = el.getBoundingClientRect().top;
+            if (top <= offset) {
+              currentId = el.id;
+            } else {
+              break;
+            }
+          }
+
+          if (currentId) {
+            setActiveNav(currentId);
+          } else if (allTargets.length > 0 && scrollY < 150) {
+            setActiveNav(allTargets[0].id);
+          }
         });
-      }, {
-        root: isDesktop ? scrollContainer : null,
-        rootMargin: "-20px 0px -60% 0px",
-        threshold: 0.1
-      });
+      }
 
-      observedElements.forEach(el => observer.observe(el));
+      window.addEventListener("scroll", handleScroll, { passive: true });
+      setTimeout(handleScroll, 120);
 
-      // 2. Navegación suave dentro del panel fijo con barra de desplazamiento interna
+      // 2. Navegación suave al hacer clic en enlaces
       function scrollToTarget(targetId) {
         if (!targetId) return;
-        const targetEl = document.getElementById(targetId.replace(/^#/, ''));
+        const cleanId = targetId.replace(/^#/, '');
+        const targetEl = document.getElementById(cleanId);
         if (!targetEl) return;
-        if (scrollContainer && window.innerWidth > 992) {
-          const containerRect = scrollContainer.getBoundingClientRect();
-          const targetRect = targetEl.getBoundingClientRect();
-          const targetScrollTop = scrollContainer.scrollTop + (targetRect.top - containerRect.top) - 24;
-          scrollContainer.scrollTo({
-            top: targetScrollTop,
-            behavior: "smooth"
-          });
-        } else {
-          targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
+        const topOffset = targetEl.getBoundingClientRect().top + window.scrollY - 84;
+        window.scrollTo({
+          top: Math.max(0, topOffset),
+          behavior: "smooth"
+        });
+        setActiveNav(cleanId);
       }
 
       document.querySelectorAll('.docs-sidebar a[href^="#"], .docs-mobile-toc-bar a[href^="#"], .docs-main-content a[href^="#"]').forEach(link => {
@@ -1142,6 +1193,7 @@ export default function Layout({ children }) {
           scrollToTarget(window.location.hash);
         }, 150);
       }
+
 
       // 3. Control de Índice Rápido Móvil
       const btnToggleToc = document.getElementById("btn-toggle-docs-toc");
