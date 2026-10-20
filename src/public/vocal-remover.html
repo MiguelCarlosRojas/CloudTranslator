@@ -1350,31 +1350,19 @@
         // Configurar botones de copia directa
         const btnCopyStreamInst = document.getElementById("btn-copy-stream-inst");
         if (btnCopyStreamInst) {
-          btnCopyStreamInst.onclick = async () => {
-            const fullUrl = window.location.origin + data.instrumental.downloadUrl;
-            try {
-              await navigator.clipboard.writeText(fullUrl);
-              const origHtml = btnCopyStreamInst.innerHTML;
-              btnCopyStreamInst.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ¡Enlace Copiado!`;
-              setTimeout(() => { btnCopyStreamInst.innerHTML = origHtml; }, 2000);
-            } catch (err) {
-              alert("Enlace: " + fullUrl);
-            }
+          btnCopyStreamInst.onclick = () => {
+            const downloadFull = window.location.origin + data.instrumental.downloadUrl;
+            navigator.clipboard.writeText(downloadFull);
+            alert("Enlace directo copiado al portapapeles.");
           };
         }
 
         const btnCopyStreamVoc = document.getElementById("btn-copy-stream-voc");
         if (btnCopyStreamVoc) {
-          btnCopyStreamVoc.onclick = async () => {
-            const fullUrl = window.location.origin + data.vocals.downloadUrl;
-            try {
-              await navigator.clipboard.writeText(fullUrl);
-              const origHtml = btnCopyStreamVoc.innerHTML;
-              btnCopyStreamVoc.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ¡Enlace Copiado!`;
-              setTimeout(() => { btnCopyStreamVoc.innerHTML = origHtml; }, 2000);
-            } catch (err) {
-              alert("Enlace: " + fullUrl);
-            }
+          btnCopyStreamVoc.onclick = () => {
+            const downloadFull = window.location.origin + data.vocals.downloadUrl;
+            navigator.clipboard.writeText(downloadFull);
+            alert("Enlace directo copiado al portapapeles.");
           };
         }
 
@@ -1433,16 +1421,10 @@
           btnDlActive.setAttribute("download", targetStem.filename);
         }
         if (btnCopyActive) {
-          btnCopyActive.onclick = async () => {
-            const fullUrl = window.location.origin + targetStem.downloadUrl;
-            try {
-              await navigator.clipboard.writeText(fullUrl);
-              const origHtml = btnCopyActive.innerHTML;
-              btnCopyActive.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ¡Enlace Copiado!`;
-              setTimeout(() => { btnCopyActive.innerHTML = origHtml; }, 2000);
-            } catch (err) {
-              alert("Enlace: " + fullUrl);
-            }
+          btnCopyActive.onclick = () => {
+            const downloadFull = window.location.origin + targetStem.downloadUrl;
+            navigator.clipboard.writeText(downloadFull);
+            alert("Enlace directo copiado al portapapeles.");
           };
         }
       }

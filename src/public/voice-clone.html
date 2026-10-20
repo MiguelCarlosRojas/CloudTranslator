@@ -1041,7 +1041,8 @@
 
               if (data.audioBase64 || data.streamUrl) {
                 let resultUrl = data.streamUrl;
-                window.lastCloneStreamUrl = data.streamUrl || data.downloadUrl || null;
+                window.lastCloneStreamUrl = data.streamUrl || null;
+                window.lastCloneDownloadUrl = data.downloadUrl || data.streamUrl || null;
                 if (data.audioBase64) {
                   const base64Data = data.audioBase64.includes(",") ? data.audioBase64.split(",")[1] : data.audioBase64;
                   const byteCharacters = atob(base64Data);
@@ -1134,29 +1135,16 @@
 
         const btnCopyStreamClone = document.getElementById("btn-copy-stream-clone");
         if (btnCopyStreamClone) {
-          btnCopyStreamClone.onclick = async () => {
-            if (!generatedVoiceBlob) {
+          btnCopyStreamClone.onclick = () => {
+            const targetUrl = window.lastCloneDownloadUrl || window.lastCloneStreamUrl;
+            if (!targetUrl) {
               alert("Primero sintetiza una voz para poder copiar su enlace directo.");
               return;
             }
 
-            const origCopyHtml = btnCopyStreamClone.innerHTML;
-            try {
-              let directUrl = "";
-              if (window.lastCloneStreamUrl) {
-                directUrl = window.lastCloneStreamUrl.startsWith("http") ? window.lastCloneStreamUrl : window.location.origin + window.lastCloneStreamUrl;
-              } else {
-                directUrl = window.location.origin + "/api/voice-clone/stream";
-              }
-              await navigator.clipboard.writeText(directUrl);
-              btnCopyStreamClone.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ¡Enlace Copiado!`;
-              setTimeout(() => {
-                btnCopyStreamClone.innerHTML = origCopyHtml;
-              }, 2000);
-            } catch (err) {
-              alert("Error al copiar enlace: " + err.message);
-              btnCopyStreamClone.innerHTML = origCopyHtml;
-            }
+            const downloadFull = targetUrl.startsWith("http") ? targetUrl : window.location.origin + targetUrl;
+            navigator.clipboard.writeText(downloadFull);
+            alert("Enlace directo copiado al portapapeles.");
           };
         }
 

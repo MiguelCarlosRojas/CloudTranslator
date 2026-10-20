@@ -894,19 +894,16 @@
 
       // Copiar Enlace Directo
       if (ttsBtnCopyStream) {
-        ttsBtnCopyStream.addEventListener("click", async () => {
+        ttsBtnCopyStream.onclick = async () => {
           const text = (ttsInput.value || "").trim();
           if (!text) {
             alert("Escribe un texto antes de copiar el enlace directo.");
             return;
           }
 
-          const origCopyHtml = ttsBtnCopyStream.innerHTML;
-          ttsBtnCopyStream.innerHTML = `<span class="spinner" style="display:inline-block;width:14px;height:14px;margin-right:6px;"></span> Obteniendo...`;
-
-          try {
-            let audioData = lastGeneratedAudio;
-            if (!audioData || audioData.text !== text) {
+          let audioData = lastGeneratedAudio;
+          if (!audioData || audioData.text !== text) {
+            try {
               const resp = await fetch("/api/tts", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -922,27 +919,21 @@
               if (audioData.status === "success") {
                 lastGeneratedAudio = audioData;
               }
+            } catch (e) {
+              alert("Error al obtener enlace: " + e.message);
+              return;
             }
-
-            let fullUrl = "";
-            if (audioData && audioData.streamUrl) {
-              fullUrl = audioData.streamUrl.startsWith("http") ? audioData.streamUrl : window.location.origin + audioData.streamUrl;
-            } else if (audioData && audioData.downloadUrl) {
-              fullUrl = audioData.downloadUrl.startsWith("http") ? audioData.downloadUrl : window.location.origin + audioData.downloadUrl;
-            } else {
-              fullUrl = window.location.origin + `/api/tts/stream?text=${encodeURIComponent(text)}&voiceId=${encodeURIComponent(ttsVoice.value)}`;
-            }
-
-            await navigator.clipboard.writeText(fullUrl);
-            ttsBtnCopyStream.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ¡Enlace Copiado!`;
-            setTimeout(() => {
-              ttsBtnCopyStream.innerHTML = origCopyHtml;
-            }, 2000);
-          } catch (e) {
-            alert("Error al copiar el enlace directo: " + e.message);
-            ttsBtnCopyStream.innerHTML = origCopyHtml;
           }
-        });
+
+          const targetUrl = (audioData && audioData.downloadUrl) ? audioData.downloadUrl : (audioData && audioData.streamUrl ? audioData.streamUrl : null);
+          if (targetUrl) {
+            const downloadFull = targetUrl.startsWith("http") ? targetUrl : window.location.origin + targetUrl;
+            navigator.clipboard.writeText(downloadFull);
+            alert("Enlace directo copiado al portapapeles.");
+          } else {
+            alert("No se pudo obtener el enlace directo.");
+          }
+        };
       }
 
       // Cargar voces al inicio
