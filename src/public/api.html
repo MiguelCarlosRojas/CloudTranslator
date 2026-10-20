@@ -1696,11 +1696,10 @@
         </article>
       </section>
 
+      <!-- Pie de Página al Final de la API (Abajo de todo el contenido) -->
+      <footer id="footer-placeholder" data-component="footer" data-active="api" style="margin-top: 60px; margin-left: calc(-1 * clamp(24px, 5vw, 68px)); margin-right: calc(-1 * clamp(24px, 5vw, 68px)); width: calc(100% + 2 * clamp(24px, 5vw, 68px));"></footer>
     </main>
   </div>
-
-  <!-- Pie de Página Fijo al Final Ocupando Todo el Ancho (Barra + Contenido) -->
-  <footer id="footer-placeholder" data-component="footer" data-active="api"></footer>
 
   <script src="/js/cloud-translator.js"></script>
   <script>
@@ -1725,14 +1724,14 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      // 1. ScrollSpy de alta precisión para el sidebar de la API REST
+      // 1. ScrollSpy y navegación con scroll interno en docs-main-content para la API REST
       const allTargets = Array.from(document.querySelectorAll(".docs-section[id], .docs-subsection[id]"));
+      const docsMain = document.querySelector(".docs-main-content");
       const sidebar = document.querySelector(".docs-sidebar");
 
       function setActiveNav(targetId) {
         if (!targetId) return;
 
-        // Limpiar estados activos previos
         document.querySelectorAll(".docs-sidebar-session.active, .docs-sidebar-sublink.active").forEach(el => {
           el.classList.remove("active");
         });
@@ -1753,59 +1752,64 @@
         } else if (activeSession) {
           activeSession.classList.add("active");
           targetLink = activeSession;
-        } else {
-          // Si el ID pertenece a una sección o subsección padre
-          const targetEl = document.getElementById(targetId);
-          if (targetEl) {
-            const parentSection = targetEl.closest(".docs-section");
-            if (parentSection && parentSection.id) {
-              const sessionLink = document.querySelector(`.docs-sidebar-session[href="#${parentSection.id}"], .docs-sidebar-session[data-target="${parentSection.id}"]`);
-              if (sessionLink) {
-                sessionLink.classList.add("active");
-                targetLink = sessionLink;
-              }
-            }
-          }
         }
 
-        // Auto-scroll del sidebar para mantener visible el enlace activo
         if (targetLink && sidebar) {
-          const linkRect = targetLink.getBoundingClientRect();
           const sidebarRect = sidebar.getBoundingClientRect();
-          if (linkRect.top < sidebarRect.top + 60 || linkRect.bottom > sidebarRect.bottom - 60) {
-            targetLink.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          const linkRect = targetLink.getBoundingClientRect();
+          if (linkRect.top < sidebarRect.top + 50 || linkRect.bottom > sidebarRect.bottom - 50) {
+            targetLink.scrollIntoView({ behavior: "smooth", block: "nearest" });
           }
         }
       }
 
-      let isThrottled = false;
       function handleScroll() {
-        if (isThrottled) return;
-        isThrottled = true;
-        requestAnimationFrame(() => {
-          isThrottled = false;
+        if (!allTargets.length) return;
+        const isDesktop = window.innerWidth > 860 && docsMain;
 
-          const scrollY = window.scrollY;
-          const windowHeight = window.innerHeight;
-          const documentHeight = document.documentElement.scrollHeight;
+        if (isDesktop) {
+          const mainScrollTop = docsMain.scrollTop;
+          const mainScrollHeight = docsMain.scrollHeight;
+          const mainClientHeight = docsMain.clientHeight;
 
-          // Si el usuario llega al final de la página (cerca del pie de página)
-          if (windowHeight + scrollY >= documentHeight - 120) {
-            if (allTargets.length > 0) {
-              const lastTarget = allTargets[allTargets.length - 1];
-              setActiveNav(lastTarget.id);
-            }
+          if (mainClientHeight + mainScrollTop >= mainScrollHeight - 100) {
+            setActiveNav(allTargets[allTargets.length - 1].id);
             return;
           }
 
-          // Detección por desplazamiento: encontrar el elemento bajo el header sticky (offset 140px)
-          const offset = 140;
+          const mainTop = docsMain.getBoundingClientRect().top;
           let currentId = null;
 
           for (let i = 0; i < allTargets.length; i++) {
             const el = allTargets[i];
+            const elTop = el.getBoundingClientRect().top;
+            if (elTop - mainTop <= 90) {
+              currentId = el.id;
+            } else {
+              break;
+            }
+          }
+
+          if (currentId) {
+            setActiveNav(currentId);
+          } else if (allTargets.length > 0 && mainScrollTop < 100) {
+            setActiveNav(allTargets[0].id);
+          }
+        } else {
+          const scrollY = window.scrollY || window.pageYOffset;
+          const windowHeight = window.innerHeight;
+          const documentHeight = document.documentElement.scrollHeight;
+
+          if (windowHeight + scrollY >= documentHeight - 120) {
+            setActiveNav(allTargets[allTargets.length - 1].id);
+            return;
+          }
+
+          let currentId = null;
+          for (let i = 0; i < allTargets.length; i++) {
+            const el = allTargets[i];
             const top = el.getBoundingClientRect().top;
-            if (top <= offset) {
+            if (top <= 140) {
               currentId = el.id;
             } else {
               break;
@@ -1817,9 +1821,12 @@
           } else if (allTargets.length > 0 && scrollY < 150) {
             setActiveNav(allTargets[0].id);
           }
-        });
+        }
       }
 
+      if (docsMain) {
+        docsMain.addEventListener("scroll", handleScroll, { passive: true });
+      }
       window.addEventListener("scroll", handleScroll, { passive: true });
       setTimeout(handleScroll, 120);
 
@@ -1829,11 +1836,23 @@
         const cleanId = targetId.replace(/^#/, '');
         const targetEl = document.getElementById(cleanId);
         if (!targetEl) return;
-        const topOffset = targetEl.getBoundingClientRect().top + window.scrollY - 84;
-        window.scrollTo({
-          top: Math.max(0, topOffset),
-          behavior: "smooth"
-        });
+
+        const isDesktop = window.innerWidth > 860 && docsMain;
+        if (isDesktop) {
+          const mainRect = docsMain.getBoundingClientRect();
+          const targetRect = targetEl.getBoundingClientRect();
+          const offset = targetRect.top - mainRect.top + docsMain.scrollTop - 24;
+          docsMain.scrollTo({
+            top: Math.max(0, offset),
+            behavior: "smooth"
+          });
+        } else {
+          const topOffset = targetEl.getBoundingClientRect().top + window.scrollY - 84;
+          window.scrollTo({
+            top: Math.max(0, topOffset),
+            behavior: "smooth"
+          });
+        }
         setActiveNav(cleanId);
       }
 

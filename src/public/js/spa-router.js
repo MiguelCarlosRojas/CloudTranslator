@@ -237,6 +237,16 @@
     // Desplazamiento suave para anclas en la misma página
     if (href.startsWith("#")) {
       const targetElement = document.querySelector(href);
+      const docsMain = document.querySelector(".docs-main-content");
+      if (docsMain && targetElement && docsMain.contains(targetElement)) {
+        e.preventDefault();
+        const mainRect = docsMain.getBoundingClientRect();
+        const targetRect = targetElement.getBoundingClientRect();
+        const offset = targetRect.top - mainRect.top + docsMain.scrollTop - 24;
+        docsMain.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+        window.history.pushState(null, "", href);
+        return;
+      }
       if (targetElement) {
         e.preventDefault();
         targetElement.scrollIntoView({ behavior: "smooth" });

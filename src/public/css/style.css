@@ -1067,8 +1067,10 @@ body.ct-translating {
   max-width: 100%;
   margin: 0;
   position: relative;
-  align-items: flex-start;
-  min-height: calc(100vh - 64px);
+  align-items: stretch;
+  height: calc(100vh - 64px);
+  max-height: calc(100vh - 64px);
+  overflow: hidden;
   clear: both;
 }
 
@@ -1078,10 +1080,10 @@ body.ct-translating {
   min-width: 360px;
   max-width: 380px;
   flex-shrink: 0;
-  position: sticky;
-  top: 64px;
-  height: calc(100vh - 64px);
-  max-height: calc(100vh - 64px);
+  position: relative;
+  top: 0;
+  height: 100%;
+  max-height: 100%;
   overflow-y: auto;
   border-right: 1px solid var(--border-subtle);
   background: rgba(6, 9, 18, 0.98);
@@ -1092,7 +1094,7 @@ body.ct-translating {
   gap: 0;
   -webkit-overflow-scrolling: touch;
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.35);
-  align-self: flex-start;
+  box-sizing: border-box;
 }
 
 @media (min-width: 1440px) {
@@ -1280,9 +1282,13 @@ body.ct-translating {
 .docs-main-content {
   flex: 1;
   min-width: 0;
-  padding: clamp(28px, 4vw, 52px) clamp(24px, 5vw, 68px) 80px clamp(24px, 5vw, 68px);
+  height: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  padding: clamp(28px, 4vw, 52px) clamp(24px, 5vw, 68px) 0 clamp(24px, 5vw, 68px);
   width: 100%;
-  max-width: 1440px;
   box-sizing: border-box;
   position: relative;
   z-index: 1;

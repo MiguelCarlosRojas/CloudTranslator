@@ -185,38 +185,45 @@
       display: flex;
       align-items: center;
       gap: 3px;
-      height: 38px;
+      height: 44px;
       width: 100%;
-      margin: 12px 0;
-      padding: 0 6px;
-      background: rgba(0, 0, 0, 0.35);
-      border-radius: 8px;
+      margin: 14px 0;
+      padding: 0 10px;
+      background: rgba(3, 7, 18, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
       overflow: hidden;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.45);
     }
     .wave-bar {
       flex: 1;
+      min-width: 2px;
       height: 20%;
-      background: rgba(0, 240, 255, 0.3);
-      border-radius: 2px;
-      transition: height 0.15s ease, background 0.15s ease;
-    }
-    .wave-visualizer.playing.vocals .wave-bar {
-      background: rgba(255, 0, 123, 0.85);
-      animation: pulseVocal 0.8s infinite alternate ease-in-out;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.12);
+      transition: height 0.25s ease, background 0.25s ease, transform 0.25s ease, opacity 0.25s ease, box-shadow 0.25s ease;
+      transform-origin: center;
+      opacity: 0.35;
     }
     .wave-visualizer.playing.instrumental .wave-bar {
-      background: rgba(0, 240, 255, 0.85);
-      animation: pulseInst 0.7s infinite alternate ease-in-out;
+      background: linear-gradient(180deg, #00f0ff 0%, #0099ff 100%);
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+      animation: pulseInst 0.85s infinite alternate ease-in-out;
     }
-    @keyframes pulseVocal {
-      0% { height: 15%; }
-      50% { height: 85%; }
-      100% { height: 35%; }
+    .wave-visualizer.playing.vocals .wave-bar {
+      background: linear-gradient(180deg, #ff007b 0%, #c4005e 100%);
+      box-shadow: 0 0 8px rgba(255, 0, 123, 0.4);
+      animation: pulseVocal 0.8s infinite alternate ease-in-out;
     }
     @keyframes pulseInst {
-      0% { height: 25%; }
-      50% { height: 95%; }
-      100% { height: 45%; }
+      0% { transform: scaleY(0.25); opacity: 0.6; }
+      50% { transform: scaleY(1.0); opacity: 1; }
+      100% { transform: scaleY(0.38); opacity: 0.75; }
+    }
+    @keyframes pulseVocal {
+      0% { transform: scaleY(0.2); opacity: 0.55; }
+      50% { transform: scaleY(1.0); opacity: 1; }
+      100% { transform: scaleY(0.35); opacity: 0.7; }
     }
     .master-player-bar {
       display: flex;
@@ -1221,15 +1228,17 @@
         });
       });
 
-      // Generar barras decorativas para visualizadores
+      // Generar barras decorativas para visualizadores con retardos ondulares
       ["viz-inst", "viz-voc"].forEach(id => {
         const box = document.getElementById(id);
         if (!box) return;
         box.innerHTML = "";
-        for (let i = 0; i < 45; i++) {
+        for (let i = 0; i < 48; i++) {
           const bar = document.createElement("div");
           bar.className = "wave-bar";
-          bar.style.height = `${Math.floor(Math.random() * 65 + 15)}%`;
+          const baseHeight = 18 + Math.sin((i / 48) * Math.PI) * 45 + ((i % 5) * 6);
+          bar.style.height = `${Math.min(95, Math.max(16, Math.floor(baseHeight)))}%`;
+          bar.style.animationDelay = `${((i * 0.045) % 0.8).toFixed(3)}s`;
           box.appendChild(bar);
         }
       });
@@ -1463,6 +1472,7 @@
           audioInst.muted = true;
           updateMuteButtonState(btnMuteInst, true);
           updateMuteButtonState(btnMuteVoc, false);
+          updateVisualizerStates();
         } else if (mode === "both") {
           btnModeBoth.classList.add("active");
           currentListenLabel.textContent = "AMBOS SINCRONIZADOS";
@@ -1487,17 +1497,31 @@
 
       let isPlaying = false;
 
+      function updateVisualizerStates() {
+        const instActive = isPlaying && !audioInst.muted && audioInst.volume > 0;
+        const vocActive = isPlaying && !audioVoc.muted && audioVoc.volume > 0;
+
+        if (instActive) {
+          vizInst.classList.add("playing");
+        } else {
+          vizInst.classList.remove("playing");
+        }
+
+        if (vocActive) {
+          vizVoc.classList.add("playing");
+        } else {
+          vizVoc.classList.remove("playing");
+        }
+      }
+
       function updateMasterPlayState(playing) {
         isPlaying = playing;
         if (playing) {
           masterIcon.innerHTML = `<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>`;
-          vizInst.classList.add("playing");
-          vizVoc.classList.add("playing");
         } else {
           masterIcon.innerHTML = `<polygon points="5 3 19 12 5 21 5 3"/>`;
-          vizInst.classList.remove("playing");
-          vizVoc.classList.remove("playing");
         }
+        updateVisualizerStates();
       }
 
       btnMasterPlay.addEventListener("click", () => {
@@ -1551,22 +1575,26 @@
       volInst.addEventListener("input", () => {
         audioInst.volume = volInst.value / 100;
         volInstText.textContent = `${volInst.value}%`;
+        updateVisualizerStates();
       });
 
       volVoc.addEventListener("input", () => {
         audioVoc.volume = volVoc.value / 100;
         volVocText.textContent = `${volVoc.value}%`;
+        updateVisualizerStates();
       });
 
       // Botones de Mute individuales con icono y tooltip
       btnMuteInst.addEventListener("click", () => {
         audioInst.muted = !audioInst.muted;
         updateMuteButtonState(btnMuteInst, audioInst.muted);
+        updateVisualizerStates();
       });
 
       btnMuteVoc.addEventListener("click", () => {
         audioVoc.muted = !audioVoc.muted;
         updateMuteButtonState(btnMuteVoc, audioVoc.muted);
+        updateVisualizerStates();
       });
 
       // Inicialización del traductor

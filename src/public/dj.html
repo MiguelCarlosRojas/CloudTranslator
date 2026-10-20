@@ -388,6 +388,46 @@
       color: var(--text-white);
       border-color: rgba(255, 255, 255, 0.25);
     }
+  
+    /* Tooltip Reactivo para Botones de Decks (Play, Cue, Sync) */
+    .btn-icon-with-tooltip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-icon-with-tooltip .deck-tooltip-text {
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: rgba(10, 14, 26, 0.95);
+      border: 1px solid var(--border-subtle);
+      color: #ffffff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      pointer-events: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+      z-index: 100;
+    }
+    .btn-icon-with-tooltip:hover .deck-tooltip-text {
+      visibility: visible;
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .btn-sync.active-sync {
+      background: var(--primary) !important;
+      color: #000000 !important;
+      font-weight: 800;
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.6) !important;
+    }
+
   </style>
 </head>
 <body>
@@ -590,7 +630,7 @@
           <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           <span>Cargar al Deck A</span>
         </button>
-        <button id="btn-load-to-deck-b" type="button" class="btn" style="flex: 1; min-width: 170px; height: 44px; background: rgba(255, 0, 123, 0.2); border: 1px solid #ff007b; color: #fff; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: var(--radius-md);" title="Cargar inmediatamente al Deck B">
+        <button id="btn-load-to-deck-b" type="button" class="btn" style="flex: 1; min-width: 170px; height: 44px; background: linear-gradient(135deg, #ff007b 0%, #d60064 100%); border: 1px solid #ff007b; color: #fff; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: var(--radius-md); box-shadow: 0 4px 16px rgba(255, 0, 123, 0.35); cursor: pointer;" title="Cargar inmediatamente al Deck B">
           <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           <span>Cargar al Deck B</span>
         </button>
@@ -652,12 +692,18 @@
           </div>
 
           <div class="deck-btn-row">
-            <button id="btn-cue-a" class="btn-cue">CUE</button>
-            <button id="btn-play-a" class="btn-play-deck">
-              <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              PLAY
+            <button id="btn-cue-a" class="btn-cue btn-icon-with-tooltip" aria-label="CUE">
+              <svg class="icon cue-icon" viewBox="0 0 24 24"><polygon points="11 19 2 12 11 5 11 19"/><polygon points="22 19 13 12 22 5 22 19"/></svg>
+              <span class="deck-tooltip-text">CUE (Reiniciar)</span>
             </button>
-            <button id="btn-sync-a" class="btn-sync" title="Sincronizar tempo con Deck B">SYNC</button>
+            <button id="btn-play-a" class="btn-play-deck btn-icon-with-tooltip" aria-label="Reproducir">
+              <svg class="icon play-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span class="deck-tooltip-text" id="tooltip-play-a">Reproducir</span>
+            </button>
+            <button id="btn-sync-a" class="btn-sync btn-icon-with-tooltip" aria-label="Sincronizar tempo con Deck B">
+              <span>SYNC</span>
+              <span class="deck-tooltip-text">SYNC (Sincronizar BPM y Tempo)</span>
+            </button>
           </div>
         </div>
 
@@ -777,12 +823,18 @@
           </div>
 
           <div class="deck-btn-row">
-            <button id="btn-cue-b" class="btn-cue">CUE</button>
-            <button id="btn-play-b" class="btn-play-deck">
-              <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              PLAY
+            <button id="btn-cue-b" class="btn-cue btn-icon-with-tooltip" aria-label="CUE">
+              <svg class="icon cue-icon" viewBox="0 0 24 24"><polygon points="11 19 2 12 11 5 11 19"/><polygon points="22 19 13 12 22 5 22 19"/></svg>
+              <span class="deck-tooltip-text">CUE (Reiniciar)</span>
             </button>
-            <button id="btn-sync-b" class="btn-sync" title="Sincronizar tempo con Deck A">SYNC</button>
+            <button id="btn-play-b" class="btn-play-deck btn-icon-with-tooltip" aria-label="Reproducir">
+              <svg class="icon play-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span class="deck-tooltip-text" id="tooltip-play-b">Reproducir</span>
+            </button>
+            <button id="btn-sync-b" class="btn-sync btn-icon-with-tooltip" aria-label="Sincronizar tempo con Deck A">
+              <span>SYNC</span>
+              <span class="deck-tooltip-text">SYNC (Sincronizar BPM y Tempo)</span>
+            </button>
           </div>
         </div>
 
@@ -799,7 +851,7 @@
             <svg class="icon" style="color: var(--primary);" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
             Cola de Reproducción & Pistas Siguientes
           </h2>
-          <span id="queue-counter" style="color: var(--text-muted); font-size: 0.85rem;">3 pistas preparadas en lista</span>
+          <span id="queue-counter" style="color: var(--text-muted); font-size: 0.85rem;">0 pistas en lista</span>
         </div>
 
         <div style="display: flex; gap: 8px; align-items: center;">
@@ -1058,10 +1110,19 @@
       // Cola de Pistas ("Lo que va a ir después") - Inicia limpia sin pistas demo
       let djQueue = [];
 
+      function updateQueueCounter() {
+        const counterEl = document.getElementById("queue-counter");
+        if (counterEl) {
+          const count = djQueue.length;
+          counterEl.textContent = `${count} ${count === 1 ? 'pista en lista' : 'pistas en lista'}`;
+        }
+      }
+
       function renderQueue() {
         const container = document.getElementById("queue-list-container");
+        if (!container) return;
         container.innerHTML = "";
-        document.getElementById("queue-counter").textContent = `${djQueue.length} pistas preparadas en lista`;
+        updateQueueCounter();
 
         if (djQueue.length === 0) {
           container.innerHTML = `<div style="text-align: center; padding: 36px 20px; color: var(--text-muted); font-size: 0.95rem;">No hay canciones en la cola. Pega un enlace multimedia arriba y pulsa "Añadir a la Cola" para preparar tus mezclas.</div>`;
@@ -1118,32 +1179,13 @@
         renderQueue();
       };
 
-      document.getElementById("btn-clear-queue").addEventListener("click", () => {
-        djQueue = [];
-        renderQueue();
-      });
-
-      document.getElementById("btn-load-presets").addEventListener("click", () => {
-        djQueue = [
-          {
-            id: "q_" + Date.now() + "_1",
-            title: "Rick Astley - Never Gonna Give You Up (Remaster)",
-            artist: "Rick Astley",
-            platform: "YouTube",
-            duration: "03:33",
-            url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-          },
-          {
-            id: "q_" + Date.now() + "_2",
-            title: "Electro Cyber Dance Session 2026",
-            artist: "CloudDJ Hit",
-            platform: "TikTok",
-            duration: "02:20",
-            url: "https://www.tiktok.com/@tiktok/video/7106594312292453678"
-          }
-        ];
-        renderQueue();
-      });
+      const btnClearQueue = document.getElementById("btn-clear-queue");
+      if (btnClearQueue) {
+        btnClearQueue.addEventListener("click", () => {
+          djQueue = [];
+          renderQueue();
+        });
+      }
 
       // Añadir pista desde campo "Colocar Pista Siguiente"
       const inputUpNext = document.getElementById("input-up-next-url");
@@ -1217,8 +1259,8 @@
       });
 
       async function fetchMediaAndAdd(url, targetDeck = null) {
-        if (!url) {
-          alert("Por favor ingresa una URL válida.");
+        if (!url || !url.trim()) {
+          alert("Por favor ingresa una URL válida de YouTube, TikTok u otra plataforma soportada.");
           return;
         }
 
@@ -1279,27 +1321,37 @@
             fetchMediaAndAdd(u, "A");
             inputUpNext.value = "";
             syncDetectedPlatform("");
+          } else {
+            alert("Pega un enlace antes de pulsar Cargar al Deck A");
           }
         });
       }
 
-      btnAddQueue.addEventListener("click", () => {
-        const u = inputUpNext.value.trim();
-        if (u) {
-          fetchMediaAndAdd(u, null);
-          inputUpNext.value = "";
-          syncDetectedPlatform("");
-        }
-      });
+      if (btnAddQueue) {
+        btnAddQueue.addEventListener("click", () => {
+          const u = inputUpNext.value.trim();
+          if (u) {
+            fetchMediaAndAdd(u, null);
+            inputUpNext.value = "";
+            syncDetectedPlatform("");
+          } else {
+            alert("Pega un enlace antes de pulsar Añadir a la Cola");
+          }
+        });
+      }
 
-      btnLoadToDeckB.addEventListener("click", () => {
-        const u = inputUpNext.value.trim();
-        if (u) {
-          fetchMediaAndAdd(u, "B");
-          inputUpNext.value = "";
-          syncDetectedPlatform("");
-        }
-      });
+      if (btnLoadToDeckB) {
+        btnLoadToDeckB.addEventListener("click", () => {
+          const u = inputUpNext.value.trim();
+          if (u) {
+            fetchMediaAndAdd(u, "B");
+            inputUpNext.value = "";
+            syncDetectedPlatform("");
+          } else {
+            alert("Pega un enlace antes de pulsar Cargar al Deck B");
+          }
+        });
+      }
 
       window.loadQueueItemToDeck = async (id, deck) => {
         const item = djQueue.find(i => i.id === id);
@@ -1319,9 +1371,9 @@
         const durEl = document.getElementById(`deck-${deck.toLowerCase()}-dur`);
         const audio = deck === "A" ? audioA : audioB;
 
-        titleEl.textContent = item.title;
-        artistEl.textContent = `${item.artist} (${item.platform})`;
-        durEl.textContent = item.duration;
+        if (titleEl) titleEl.textContent = item.title;
+        if (artistEl) artistEl.textContent = `${item.artist} (${item.platform})`;
+        if (durEl) durEl.textContent = item.duration;
         audio.src = item.streamUrl || item.url;
         audio.load();
       }
@@ -1329,39 +1381,68 @@
       // Controles Deck A
       const btnPlayA = document.getElementById("btn-play-a");
       const btnCueA = document.getElementById("btn-cue-a");
+      const btnSyncA = document.getElementById("btn-sync-a");
       const platterA = document.getElementById("platter-a");
       const scrubberA = document.getElementById("scrubber-a");
       const pitchA = document.getElementById("pitch-a");
       const pitchAText = document.getElementById("pitch-a-text");
       const curTimeA = document.getElementById("deck-a-cur-time");
       const remTimeA = document.getElementById("deck-a-rem-time");
+      const tooltipPlayA = document.getElementById("tooltip-play-a");
+
+      function updatePlayAState(playing) {
+        if (playing) {
+          btnPlayA.classList.add("active");
+          platterA.classList.add("spinning");
+          btnPlayA.innerHTML = `<svg class="icon play-icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg><span class="deck-tooltip-text" id="tooltip-play-a">Pausar</span>`;
+        } else {
+          btnPlayA.classList.remove("active");
+          platterA.classList.remove("spinning");
+          btnPlayA.innerHTML = `<svg class="icon play-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg><span class="deck-tooltip-text" id="tooltip-play-a">Reproducir</span>`;
+        }
+      }
 
       btnPlayA.addEventListener("click", () => {
         initWebAudio();
         if (audioA.paused) {
           audioA.play().then(() => {
-            btnPlayA.classList.add("active");
-            platterA.classList.add("spinning");
-          });
+            updatePlayAState(true);
+          }).catch(console.warn);
         } else {
           audioA.pause();
-          btnPlayA.classList.remove("active");
-          platterA.classList.remove("spinning");
+          updatePlayAState(false);
         }
       });
 
       btnCueA.addEventListener("click", () => {
         audioA.pause();
         audioA.currentTime = 0;
-        btnPlayA.classList.remove("active");
-        platterA.classList.remove("spinning");
+        updatePlayAState(false);
+      });
+
+      // SYNC Deck A -> Empata con Deck B
+      btnSyncA.addEventListener("click", () => {
+        initWebAudio();
+        pitchA.value = pitchB.value;
+        const p = parseFloat(pitchA.value);
+        pitchAText.textContent = `${p > 0 ? "+" : ""}${p.toFixed(1)}%`;
+        audioA.playbackRate = Math.max(0.25, Math.min(2.0, 1 + (p / 100)));
+        if (!audioB.paused && audioB.duration && audioA.duration) {
+          audioA.currentTime = audioB.currentTime % audioA.duration;
+        }
+        btnSyncA.classList.add("active-sync");
+        setTimeout(() => btnSyncA.classList.remove("active-sync"), 1800);
       });
 
       pitchA.addEventListener("input", () => {
         const p = parseFloat(pitchA.value);
         pitchAText.textContent = `${p > 0 ? "+" : ""}${p.toFixed(1)}%`;
-        audioA.playbackRate = 1 + (p / 100);
+        audioA.playbackRate = Math.max(0.25, Math.min(2.0, 1 + (p / 100)));
       });
+
+      // Bucle infinito Auto-DJ: Alternancia Deck A -> Deck B
+      let autoTransitioningToB = false;
+      let autoTransitioningToA = false;
 
       audioA.addEventListener("timeupdate", () => {
         if (!audioA.duration) return;
@@ -1375,9 +1456,26 @@
         const remS = Math.floor(rem % 60);
         remTimeA.textContent = `-${String(remM).padStart(2, "0")}:${String(remS).padStart(2, "0")}`;
 
-        // Auto-DJ: Al faltar 12 segundos, hacer crossfade suave hacia Deck B
-        if (isAutoDJ && rem <= 12 && rem > 11 && !audioB.paused) {
+        // Auto-DJ: A los 8 segundos restantes, iniciar Deck B y crossfade suave
+        if (isAutoDJ && rem <= 8 && !autoTransitioningToB) {
+          autoTransitioningToB = true;
+          // Si Deck B está en pausa y tiene fuente, arrancarlo
+          if (audioB.src && audioB.paused) {
+            audioB.play().then(() => updatePlayBState(true)).catch(console.warn);
+          }
           triggerAutoCrossfade("B");
+        }
+      });
+
+      audioA.addEventListener("ended", () => {
+        updatePlayAState(false);
+        autoTransitioningToB = false;
+
+        // Auto-DJ Infinito: Cargar siguiente pista de la cola en Deck A para que quede listo
+        if (isAutoDJ && djQueue.length > 0) {
+          const nextTrack = djQueue.shift();
+          renderQueue();
+          loadTrackToDeck(nextTrack, "A");
         }
       });
 
@@ -1389,40 +1487,66 @@
       // Controles Deck B
       const btnPlayB = document.getElementById("btn-play-b");
       const btnCueB = document.getElementById("btn-cue-b");
+      const btnSyncB = document.getElementById("btn-sync-b");
       const platterB = document.getElementById("platter-b");
       const scrubberB = document.getElementById("scrubber-b");
       const pitchB = document.getElementById("pitch-b");
       const pitchBText = document.getElementById("pitch-b-text");
       const curTimeB = document.getElementById("deck-b-cur-time");
       const remTimeB = document.getElementById("deck-b-rem-time");
+      const tooltipPlayB = document.getElementById("tooltip-play-b");
+
+      function updatePlayBState(playing) {
+        if (playing) {
+          btnPlayB.classList.add("active");
+          platterB.classList.add("spinning");
+          btnPlayB.innerHTML = `<svg class="icon play-icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg><span class="deck-tooltip-text" id="tooltip-play-b">Pausar</span>`;
+        } else {
+          btnPlayB.classList.remove("active");
+          platterB.classList.remove("spinning");
+          btnPlayB.innerHTML = `<svg class="icon play-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg><span class="deck-tooltip-text" id="tooltip-play-b">Reproducir</span>`;
+        }
+      }
 
       btnPlayB.addEventListener("click", () => {
         initWebAudio();
         if (audioB.paused) {
           audioB.play().then(() => {
-            btnPlayB.classList.add("active");
-            platterB.classList.add("spinning");
-          });
+            updatePlayBState(true);
+          }).catch(console.warn);
         } else {
           audioB.pause();
-          btnPlayB.classList.remove("active");
-          platterB.classList.remove("spinning");
+          updatePlayBState(false);
         }
       });
 
       btnCueB.addEventListener("click", () => {
         audioB.pause();
         audioB.currentTime = 0;
-        btnPlayB.classList.remove("active");
-        platterB.classList.remove("spinning");
+        updatePlayBState(false);
+      });
+
+      // SYNC Deck B -> Empata con Deck A
+      btnSyncB.addEventListener("click", () => {
+        initWebAudio();
+        pitchB.value = pitchA.value;
+        const p = parseFloat(pitchB.value);
+        pitchBText.textContent = `${p > 0 ? "+" : ""}${p.toFixed(1)}%`;
+        audioB.playbackRate = Math.max(0.25, Math.min(2.0, 1 + (p / 100)));
+        if (!audioA.paused && audioA.duration && audioB.duration) {
+          audioB.currentTime = audioA.currentTime % audioB.duration;
+        }
+        btnSyncB.classList.add("active-sync");
+        setTimeout(() => btnSyncB.classList.remove("active-sync"), 1800);
       });
 
       pitchB.addEventListener("input", () => {
         const p = parseFloat(pitchB.value);
         pitchBText.textContent = `${p > 0 ? "+" : ""}${p.toFixed(1)}%`;
-        audioB.playbackRate = 1 + (p / 100);
+        audioB.playbackRate = Math.max(0.25, Math.min(2.0, 1 + (p / 100)));
       });
 
+      // Bucle infinito Auto-DJ: Alternancia Deck B -> Deck A
       audioB.addEventListener("timeupdate", () => {
         if (!audioB.duration) return;
         scrubberB.value = (audioB.currentTime / audioB.duration) * 100;
@@ -1435,9 +1559,25 @@
         const remS = Math.floor(rem % 60);
         remTimeB.textContent = `-${String(remM).padStart(2, "0")}:${String(remS).padStart(2, "0")}`;
 
-        // Auto-DJ: Al faltar 12 segundos, hacer crossfade suave hacia Deck A
-        if (isAutoDJ && rem <= 12 && rem > 11 && !audioA.paused) {
+        // Auto-DJ: A los 8 segundos restantes, iniciar Deck A y crossfade suave
+        if (isAutoDJ && rem <= 8 && !autoTransitioningToA) {
+          autoTransitioningToA = true;
+          if (audioA.src && audioA.paused) {
+            audioA.play().then(() => updatePlayAState(true)).catch(console.warn);
+          }
           triggerAutoCrossfade("A");
+        }
+      });
+
+      audioB.addEventListener("ended", () => {
+        updatePlayBState(false);
+        autoTransitioningToA = false;
+
+        // Auto-DJ Infinito: Cargar siguiente pista de la cola en Deck B para que quede listo
+        if (isAutoDJ && djQueue.length > 0) {
+          const nextTrack = djQueue.shift();
+          renderQueue();
+          loadTrackToDeck(nextTrack, "B");
         }
       });
 
@@ -1446,24 +1586,43 @@
         audioB.currentTime = (scrubberB.value / 100) * audioB.duration;
       });
 
-      // Crossfader & Auto-DJ
+      // Crossfader & Auto-DJ & Faders de Volumen
       const crossfader = document.getElementById("crossfader");
       let isAutoDJ = true;
+      let channelVolA = 1.0;
+      let channelVolB = 1.0;
 
       function updateCrossfader(val) {
-        const x = val / 100; // 0 = solo A, 1 = solo B, 0.5 = ambos
-        // Curva de potencia constante
-        const gainValA = Math.cos(x * 0.5 * Math.PI);
-        const gainValB = Math.cos((1 - x) * 0.5 * Math.PI);
+        const x = val / 100; // 0 = solo A, 1 = solo B, 0.5 = centro
+        const gainValA = Math.cos(x * 0.5 * Math.PI) * channelVolA;
+        const gainValB = Math.cos((1 - x) * 0.5 * Math.PI) * channelVolB;
 
         if (gainA) gainA.gain.value = gainValA;
         if (gainB) gainB.gain.value = gainValB;
 
         // Fallback volumen directo si no hay audioContext aún
         if (!audioCtx) {
-          audioA.volume = gainValA;
-          audioB.volume = gainValB;
+          audioA.volume = Math.max(0, Math.min(1, gainValA));
+          audioB.volume = Math.max(0, Math.min(1, gainValB));
         }
+      }
+
+      // Conectar Faders de Canal VOL A y VOL B
+      const sliderVolA = document.getElementById("vol-a");
+      const sliderVolB = document.getElementById("vol-b");
+      if (sliderVolA) {
+        sliderVolA.addEventListener("input", () => {
+          initWebAudio();
+          channelVolA = parseFloat(sliderVolA.value);
+          updateCrossfader(crossfader.value);
+        });
+      }
+      if (sliderVolB) {
+        sliderVolB.addEventListener("input", () => {
+          initWebAudio();
+          channelVolB = parseFloat(sliderVolB.value);
+          updateCrossfader(crossfader.value);
+        });
       }
 
       crossfader.addEventListener("input", () => {
@@ -1483,7 +1642,7 @@
         const startVal = parseFloat(crossfader.value);
         const endVal = target === "A" ? 0 : 100;
         const steps = 30;
-        const intervalTime = 60; // Total ~1.8 segundos
+        const intervalTime = 50; // Total ~1.5 segundos suave
         let step = 0;
 
         const timer = setInterval(() => {
@@ -1502,51 +1661,30 @@
         btnAutoDJ.style.background = isAutoDJ ? "rgba(0, 240, 255, 0.15)" : "rgba(255, 255, 255, 0.05)";
       });
 
-      // Ecualizadores (EQ)
-      const bindEQ = (id, filterNode) => {
-        const el = document.getElementById(id);
-        el.addEventListener("input", () => {
-          initWebAudio();
-          if (filterNode) filterNode.gain.value = parseFloat(el.value);
-        });
+      // Ecualizadores Dinámicos (EQ de 3 Bandas)
+      const eqMap = {
+        "eq-hi-a": () => eqHiA,
+        "eq-mid-a": () => eqMidA,
+        "eq-low-a": () => eqLowA,
+        "eq-low-b": () => eqLowB,
+        "eq-mid-b": () => eqMidB,
+        "eq-hi-b": () => eqHiB
       };
 
-      bindEQ("eq-hi-a", eqHiA);
-      bindEQ("eq-mid-a", eqMidA);
-      bindEQ("eq-low-a", eqLowA);
-      bindEQ("eq-hi-b", eqHiB);
-      bindEQ("eq-mid-b", eqMidB);
-      bindEQ("eq-low-b", eqLowB);
-
-      // Scratching interactivo en tornamesas
-      function setupScratch(turntableId, audioElem, platterElem) {
-        const tt = document.getElementById(turntableId);
-        let isScratching = false;
-        let lastY = 0;
-
-        tt.addEventListener("mousedown", (e) => {
-          isScratching = true;
-          lastY = e.clientY;
-          platterElem.classList.remove("spinning");
-        });
-
-        window.addEventListener("mousemove", (e) => {
-          if (!isScratching || !audioElem.duration) return;
-          const deltaY = e.clientY - lastY;
-          lastY = e.clientY;
-          audioElem.currentTime = Math.max(0, Math.min(audioElem.duration, audioElem.currentTime - (deltaY * 0.06)));
-        });
-
-        window.addEventListener("mouseup", () => {
-          if (isScratching) {
-            isScratching = false;
-            if (!audioElem.paused) platterElem.classList.add("spinning");
-          }
-        });
-      }
+      Object.keys(eqMap).forEach(sliderId => {
+        const slider = document.getElementById(sliderId);
+        if (slider) {
+          slider.addEventListener("input", () => {
+            initWebAudio();
+            const filterNode = eqMap[sliderId]();
+            if (filterNode && filterNode.gain) {
+              filterNode.gain.value = parseFloat(slider.value);
+            }
+          });
+        }
+      });
 
       setupScratch("turntable-a", audioA, platterA);
-      setupScratch("turntable-b", audioB, platterB);
 
       // Render inicial de la cola
       renderQueue();

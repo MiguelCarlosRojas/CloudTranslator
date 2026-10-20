@@ -153,52 +153,31 @@ async function separateWithDemucsAI(inputAudioPath, outInstrumentalPath, outVoca
  * Fallback DSP con supresión espectral de fase y compuerta acústica en caso de desconexión
  */
 async function separateWithDSPFallback(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate = "320k") {
-  logger.info("Separador: Ejecutando motor DSP resiliente de respaldo...");
+  logger.info("Separador: Ejecutando motor DSP de alta resolución con cancelación de fase...");
 
-  // Pipeline 1: Instrumental (Cancelación de fase sin sibilancias en agudos y sub-bajo puro < 110Hz)
-  const pInstrumental = new Promise((res, rej) => {
-    const instFilter = '[0:a]aformat=channel_layouts=stereo,asplit=2[low][mid];' +
-      '[low]lowpass=f=110[bass];' +
-      '[mid]highpass=f=110,pan=stereo|c0=c0-c1|c1=c1-c0[inst_mid];' +
-      '[bass][inst_mid]amix=inputs=2:dropout_transition=0,volume=2.2[out]';
+  // Filtro simultáneo de doble salida con sustracción de fase estéreo:
+  // 1. [out_inst]: Pista Instrumental limpia (Karaoke) eliminando la voz central.
+  // 2. [out_voc]: Voz Aislada (Acapella) mediante sustracción de fase pura del acompañamiento (Master - Instrumental).
+  const filterComplex = 
+    '[0:a]aformat=channel_layouts=stereo,asplit=2[full_orig][for_inst];' +
+    '[for_inst]asplit=3[lows][highs][mids];' +
+    '[lows]lowpass=f=180[bass];' +
+    '[highs]highpass=f=6000[air];' +
+    '[mids]bandpass=f=2200:width_type=h:w=5000,pan=stereo|c0=0.5*c0-0.5*c1|c1=0.5*c1-0.5*c0[karaoke_mid];' +
+    '[bass][karaoke_mid][air]amix=inputs=3:weights=1 1 1:dropout_transition=0,volume=1.4,asplit=2[out_inst][inst_for_sub];' +
+    '[full_orig][inst_for_sub]amix=inputs=2:weights=1.2 -1.0:dropout_transition=0,bandpass=f=1800:width_type=h:w=3600,agate=threshold=0.03:ratio=3:range=0.05:attack=10:release=120,volume=2.4[out_voc]';
 
-    const ffInst = spawn(ffmpegPath, [
+  return new Promise((resolve, reject) => {
+    const ff = spawn(ffmpegPath, [
       "-y",
       "-i", inputAudioPath,
-      "-filter_complex", instFilter,
-      "-map", "[out]",
+      "-filter_complex", filterComplex,
+      "-map", "[out_inst]",
       "-c:a", "libmp3lame",
       "-b:a", bitrate,
       "-id3v2_version", "3",
-      outInstrumentalPath
-    ]);
-
-    let stderr = "";
-    ffInst.stderr.on("data", d => { stderr += d.toString(); });
-    ffInst.on("close", code => {
-      if (code === 0 && fs.existsSync(outInstrumentalPath) && fs.statSync(outInstrumentalPath).size > 1000) {
-        res();
-      } else {
-        rej(new Error(`Error al generar pista instrumental DSP (code ${code}): ${stderr.slice(-200)}`));
-      }
-    });
-    ffInst.on("error", rej);
-  });
-
-  // Pipeline 2: Acapella / Vocales (Canal central + compuerta acústica agate + formantes vocales humanos)
-  const pVocals = new Promise((res, rej) => {
-    const vocFilter = '[0:a]aformat=channel_layouts=stereo,' +
-      'pan=stereo|c0=0.5*c0+0.5*c1|c1=0.5*c0+0.5*c1,' +
-      'highpass=f=180,lowpass=f=4200,' +
-      'equalizer=f=1000:t=q:w=1.2:g=5,equalizer=f=2600:t=q:w=1.5:g=6,' +
-      'agate=threshold=0.04:ratio=4:range=0.08:attack=10:release=120,' +
-      'volume=3.2[out]';
-
-    const ffVoc = spawn(ffmpegPath, [
-      "-y",
-      "-i", inputAudioPath,
-      "-filter_complex", vocFilter,
-      "-map", "[out]",
+      outInstrumentalPath,
+      "-map", "[out_voc]",
       "-c:a", "libmp3lame",
       "-b:a", bitrate,
       "-id3v2_version", "3",
@@ -206,18 +185,19 @@ async function separateWithDSPFallback(inputAudioPath, outInstrumentalPath, outV
     ]);
 
     let stderr = "";
-    ffVoc.stderr.on("data", d => { stderr += d.toString(); });
-    ffVoc.on("close", code => {
-      if (code === 0 && fs.existsSync(outVocalsPath) && fs.statSync(outVocalsPath).size > 1000) {
-        res();
+    ff.stderr.on("data", d => { stderr += d.toString(); });
+    ff.on("close", code => {
+      const instOk = fs.existsSync(outInstrumentalPath) && fs.statSync(outInstrumentalPath).size > 1000;
+      const vocOk = fs.existsSync(outVocalsPath) && fs.statSync(outVocalsPath).size > 1000;
+      if (code === 0 && instOk && vocOk) {
+        logger.info("Separador DSP: Stems instrumental y vocal generados con éxito rotundo.");
+        resolve();
       } else {
-        rej(new Error(`Error al generar pista vocal DSP (code ${code}): ${stderr.slice(-200)}`));
+        reject(new Error(`Error al generar stems DSP (code ${code}): ${stderr.slice(-200)}`));
       }
     });
-    ffVoc.on("error", rej);
+    ff.on("error", reject);
   });
-
-  await Promise.all([pInstrumental, pVocals]);
 }
 
 /**
