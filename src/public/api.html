@@ -294,16 +294,19 @@
 
     <!-- CONTENIDO PRINCIPAL DE LA API -->
     <main class="docs-main-content">
-
       <!-- Encabezado de la API -->
       <section class="docs-section" style="padding-top: 10px;">
         <span class="hero-tag-glow">[ ESPECIFICACIÓN TÉCNICA FORMAL ]</span>
         <h1 style="font-size: clamp(1.8rem, 3.2vw, 2.5rem); margin: 12px 0 16px 0; color: #ffffff;">
-          Especificación de Endpoints REST
+          Referencia Técnica de la API REST
         </h1>
         <p class="lead">
-          Referencia exhaustiva de esquemas JSON, parámetros de consulta y códigos de respuesta HTTP devueltos por el gateway <code>https://cloudtranslator.onrender.com</code>. Para guías de integración paso a paso consulta <a href="/learn" style="color: #ffffff; text-decoration: underline;">Aprender</a>.
+          Documentación detallada de todos los endpoints, esquemas JSON de petición y respuesta, códigos de estado HTTP y contratos de integración para los 6 pilares de CloudTranslator.
         </p>
+        <div style="background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.25); border-radius: var(--radius-md); padding: 14px 18px; margin-top: 18px; font-size: 0.88rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+          <span>¿Buscas la guía técnica de arquitectura, teoría de procesamiento de audio y SDK frontend?</span>
+          <a href="/docs" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;">Ir a Documentación &rarr;</a>
+        </div>
       </section>
 
       <!-- Índice Rápido para Móvil/Tablet -->
@@ -326,8 +329,8 @@
         </div>
       </div>
 
-      <!-- SECCIÓN 01: GATEWAY & PROTOCOLO -->
-            <!-- ========================================================================= -->
+
+      <!-- ========================================================================= -->
       <!-- SESIÓN 01: GATEWAY & PROTOCOLO                                           -->
       <!-- ========================================================================= -->
       <section class="docs-section" id="session-gateway">
@@ -337,7 +340,7 @@
           <p>Base URL de producción, requisitos de cifrado HTTPS con TLS 1.3, encabezados obligatorios y estructura unificada de errores.</p>
         </div>
 
-        <!-- Sub 1.1: Base URL -->
+<!-- Sub 1.1: Base URL -->
         <article id="sub-base-url" class="docs-subsection">
           <span class="tech-card-tag">[ 1.1 // BASE_URL ]</span>
           <h3>URL Base del Servidor</h3>
@@ -409,6 +412,7 @@
           </div>
         </article>
       </section>
+
 
       <!-- ========================================================================= -->
       <!-- SESIÓN 02: PILAR 1 - API DE TRADUCCIÓN DOM                               -->
@@ -617,25 +621,61 @@
         <article class="docs-subsection" id="api-get-languages">
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
             <span class="tech-card-tag">[ ENDPOINT T.03 ]</span>
-            <span class="badge" style="background: #00ff8022; color: #00ff80; font-weight: 700; font-size: 0.75rem; padding: 3px 8px; border-radius: 4px;">GET</span>
+            <span class="badge" style="background: rgba(0, 255, 128, 0.15); color: #00ff80; font-weight: 700; font-size: 0.75rem; padding: 3px 8px; border-radius: 4px;">GET</span>
           </div>
           <h3>GET /api/languages &mdash; Catálogo de Idiomas Soportados</h3>
-          <p style="margin-bottom: 16px; color: var(--text-muted);">Consulta el catálogo completo de 28 idiomas disponibles con códigos ISO-639-1, nombres nativos y soporte direccional.</p>
+          <p style="margin-bottom: 16px; color: var(--text-muted);">Devuelve la matriz de idiomas activos en el motor de traducción (+200 idiomas soportados).</p>
+
+          <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 14px;">Especificación del Endpoint</h4>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Propiedad</th>
+                  <th>Valor</th>
+                  <th>Descripción Técnica</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>Método HTTP</code></td>
+                  <td><code>GET</code></td>
+                  <td>Consulta pública idempotente sin efectos colaterales</td>
+                </tr>
+                <tr>
+                  <td><code>Autenticación</code></td>
+                  <td>Pública</td>
+                  <td>No requiere token ni encabezados especiales</td>
+                </tr>
+                <tr>
+                  <td><code>Respuesta</code></td>
+                  <td><code>Array&lt;string&gt;</code></td>
+                  <td>Lista de códigos BCP-47 / ISO-639-1 (ej: <code>"en"</code>, <code>"es"</code>, <code>"fr"</code>, <code>"de"</code>)</td>
+                </tr>
+                <tr>
+                  <td><code>Caché HTTP</code></td>
+                  <td><code>max-age=86400</code> (24h)</td>
+                  <td>Caché inmutable para evitar llamadas redundantes</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
           <div class="code-box-wrapper">
             <div class="code-box-header">
-            <span>Comando cURL (GET /api/languages)</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-languages')">Copiar cURL</button>
-          </div>
-          <pre class="code-panel" id="curl-get-languages">curl -X GET "https://cloudtranslator.onrender.com/api/languages"</pre>
+              <span>Comando cURL (GET /api/languages)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-languages')">Copiar cURL</button>
+            </div>
+            <pre class="code-panel" id="curl-get-languages">curl -X GET "https://cloudtranslator.onrender.com/api/languages"</pre>
           </div>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 16px;">Respuesta Exitosa (HTTP 200 OK)</h4>
           <div class="code-box-wrapper">
             <div class="code-box-header">
-            <span>Respuesta JSON (HTTP 200 OK)</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-get-languages')">Copiar JSON</button>
-          </div>
-          <pre class="code-panel" id="res-get-languages">{
+              <span>Respuesta JSON (HTTP 200 OK)</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'res-get-languages')">Copiar JSON</button>
+            </div>
+            <pre class="code-panel" id="res-get-languages">{
   "success": true,
   "languages": [
     "en", "es", "fr", "de", "it", "pt", "ru", "ja", "zh-CN", "ar", "ko"
@@ -703,6 +743,7 @@
           </div>
         </article>
       </section>
+
 
       <!-- ========================================================================= -->
       <!-- SESIÓN 03: PILAR 2 - API DE TEXTO A VOZ (TTS)                            -->
@@ -918,6 +959,7 @@
         </article>
       </section>
 
+
       <!-- ========================================================================= -->
       <!-- SESIÓN 04: PILAR 3 - API DE CLONACIÓN DE VOZ IA                          -->
       <!-- ========================================================================= -->
@@ -1048,6 +1090,7 @@
         </article>
       </section>
 
+
       <!-- ========================================================================= -->
       <!-- SESIÓN 05: PILAR 4 - API DE CONVERSOR MULTIMEDIA                         -->
       <!-- ========================================================================= -->
@@ -1071,7 +1114,6 @@
             <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'curl-get-media-platforms')">Copiar cURL</button>
           </div>
             <pre class="code-panel" id="curl-get-media-platforms">curl -X GET "https://cloudtranslator.onrender.com/api/media/platforms"</pre>
-          </div>
           </div>
 
           <h4 style="color: #ffffff; font-size: 0.95rem; margin-top: 18px;">Respuesta JSON de Ejemplo</h4>
@@ -1372,6 +1414,7 @@
         </article>
       </section>
 
+
       <!-- ========================================================================= -->
       <!-- SESIÓN 06: PILAR 5 - API DE SEPARADOR DE VOZ                             -->
       <!-- ========================================================================= -->
@@ -1552,6 +1595,7 @@
         </article>
       </section>
 
+
       <!-- ========================================================================= -->
       <!-- SESIÓN 07: PILAR 6 - CLOUDDJ MEZCLADOR                                   -->
       <!-- ========================================================================= -->
@@ -1569,7 +1613,6 @@
           </div>
           <h3>Motor Web Audio &amp; Ingesta para CloudDJ</h3>
           <p style="margin-bottom: 16px; color: var(--text-muted);">Especificación de ruteo y preparación de pistas para la consola de mezcla dual y cola secuencial.</p>
-          <article class="docs-subsection">
           <p style="margin-bottom: 14px;">
             Las pistas del CloudDJ se preparan utilizando <code>POST /api/media/convert</code> con formato MP3 y 320 kbps. El reproductor utiliza streaming HTTP 206 y nodos Web Audio API con ecualización de 3 bandas paramétricas (Low, Mid, High), control de crossfader de energía constante y scratch en tiempo real.
           </p>
@@ -1588,8 +1631,8 @@
   }'</pre>
           </div>
         </article>
-        </article>
       </section>
+
 
       <!-- ========================================================================= -->
       <!-- SESIÓN 08: PRUEBAS EN VIVO & CONSOLA INTERACTIVA                         -->
@@ -1608,7 +1651,6 @@
           </div>
           <h3>Consola Interactiva de Pruebas REST</h3>
           <p style="margin-bottom: 16px; color: var(--text-muted);">Envía solicitudes reales a <code>https://cloudtranslator.onrender.com/api/translate</code> y examina la respuesta JSON devuelta en vivo.</p>
-          <article class="docs-subsection">
           <div style="display: grid; grid-template-columns: 1fr; gap: 14px;">
             <div>
               <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 6px;">
@@ -1645,7 +1687,7 @@
               <pre class="code-panel" id="live-api-output" style="min-height: 120px;">Pulsa "Ejecutar Petición POST" para probar el endpoint en vivo...</pre>
           </div>
             </div>
-        </article>
+            </div>
         </article>
       </section>
 
@@ -1809,7 +1851,7 @@
         }, 150);
       }
 
-
+      // Control de Índice Rápido Móvil / Tablet (TOC)
       const btnToggleToc = document.getElementById("btn-toggle-api-toc");
       const tocContent = document.getElementById("api-mobile-toc-content");
       if (btnToggleToc && tocContent) {
@@ -1824,57 +1866,64 @@
         });
       }
 
-      // 2. Consola Interactiva de API en Vivo
+      // 3. Consola Interactiva de API en Vivo
       const btnRun = document.getElementById("btn-run-live-api");
       const textInput = document.getElementById("live-api-text");
       const langSelect = document.getElementById("live-api-lang");
       const outputEl = document.getElementById("live-api-output");
 
-      btnRun.addEventListener("click", async () => {
-        const textVal = textInput.value.trim();
-        const langVal = langSelect.value;
-        if (!textVal) return;
+      if (btnRun && textInput && langSelect && outputEl) {
+        btnRun.addEventListener("click", async () => {
+          const textVal = textInput.value.trim();
+          const langVal = langSelect.value;
+          if (!textVal) return;
 
-        outputEl.textContent = "Enviando solicitud a https://cloudtranslator.onrender.com/api/translate...";
-        const t0 = performance.now();
+          outputEl.textContent = "Enviando solicitud a https://cloudtranslator.onrender.com/api/translate...";
+          const t0 = performance.now();
 
-        try {
-          const resp = await fetch("https://cloudtranslator.onrender.com/api/translate", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              text: textVal,
-              targetLanguage: langVal
-            })
-          });
+          try {
+            const resp = await fetch("https://cloudtranslator.onrender.com/api/translate", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                text: textVal,
+                targetLanguage: langVal
+              })
+            });
 
-          const latency = Math.round(performance.now() - t0);
-          const data = await resp.json();
+            const latency = Math.round(performance.now() - t0);
+            const data = await resp.json();
 
-          const result = {
-            httpStatus: resp.status + " " + resp.statusText,
-            latencyMs: latency,
-            responseBody: data
+            outputEl.textContent = JSON.stringify(data, null, 2);
+          } catch (err) {
+            outputEl.textContent = JSON.stringify({
+              success: false,
+              error: err.message || "Error al conectar con la API"
+            }, null, 2);
+          }
+        });
+      }
+
+      // 4. Inicialización del cliente CloudTranslator
+      try {
+        const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";
+        window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
+        const btnEn = document.getElementById("btn-english");
+        if (btnEn) btnEn.onclick = () => window.translator.translateToEnglish();
+        const btnRest = document.getElementById("btn-restore");
+        if (btnRest) btnRest.onclick = () => window.translator.restoreOriginal();
+        const selLang = document.getElementById("select-lang");
+        if (selLang) selLang.onchange = (e) => window.translator.translatePage(e.target.value);
+        const btnCustom = document.getElementById("btn-translate-custom");
+        if (btnCustom) {
+          btnCustom.onclick = () => {
+            const val = document.getElementById("input-custom-lang").value.trim().toLowerCase();
+            if (val) window.translator.translatePage(val);
           };
-
-          outputEl.textContent = JSON.stringify(result, null, 2);
-        } catch (err) {
-          outputEl.textContent = "Error al conectar con la API: " + err.message;
         }
-      });
-
-      // 3. Inicialización del SDK de traducción de página
-      const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";
-      window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
-      document.getElementById("btn-english").onclick = () => window.translator.translateToEnglish();
-      document.getElementById("btn-restore").onclick = () => window.translator.restoreOriginal();
-      document.getElementById("select-lang").onchange = (e) => window.translator.translatePage(e.target.value);
-      document.getElementById("btn-translate-custom").onclick = () => {
-        const val = document.getElementById("input-custom-lang").value.trim().toLowerCase();
-        if (val) window.translator.translatePage(val);
-      };
+      } catch (e) {}
     });
   </script>
 </body>

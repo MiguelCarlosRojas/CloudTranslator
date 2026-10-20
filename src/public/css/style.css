@@ -1063,6 +1063,7 @@ body.ct-translating {
 
 .docs-layout-container {
   display: flex;
+  flex: 1 0 auto;
   width: 100%;
   max-width: 100%;
   margin: 0;
@@ -1570,6 +1571,10 @@ footer {
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
   margin-top: auto;
+  position: relative;
+  z-index: 10;
+  clear: both;
+  flex-shrink: 0;
 }
 
 .footer-inner-full {
