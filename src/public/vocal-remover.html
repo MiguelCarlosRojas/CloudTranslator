@@ -18,37 +18,76 @@
   <script src="/js/spa-router.js" defer></script>
   <script src="/components/components.js" defer></script>
   <style>
-    .stem-mode-tabs {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 24px;
-      border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 14px;
-      flex-wrap: wrap;
+    .stem-mode-tabs-container {
+      width: 100%;
+      margin-bottom: 22px;
     }
-    .stem-tab-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 20px;
-      border-radius: var(--radius-md);
-      font-size: 0.9rem;
+    .stem-mode-tabs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      width: 100%;
+    }
+    .btn-mode-tab {
+      width: 100%;
+      min-height: 50px;
+      padding: 12px 20px;
+      font-size: 0.95rem;
       font-weight: 700;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
       cursor: pointer;
-      background: rgba(18, 22, 34, 0.7);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       border: 1px solid var(--border-subtle);
+      background: rgba(12, 16, 26, 0.85);
       color: var(--text-secondary);
-      transition: all 0.25s ease;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     }
-    .stem-tab-btn:hover {
-      border-color: var(--border-focus);
+    .btn-mode-tab:hover {
+      border-color: rgba(0, 240, 255, 0.5);
       color: #ffffff;
+      background: rgba(18, 24, 38, 0.95);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
     }
-    .stem-tab-btn.active {
-      background: rgba(0, 240, 255, 0.12);
+    .btn-mode-tab.active {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.18) 0%, rgba(99, 102, 241, 0.15) 100%);
       border-color: var(--primary);
       color: #ffffff;
-      box-shadow: 0 0 16px rgba(0, 240, 255, 0.2);
+      box-shadow: 0 0 24px rgba(0, 240, 255, 0.3), inset 0 0 12px rgba(0, 240, 255, 0.1);
+      transform: translateY(-1px);
+    }
+    .btn-mode-tab .tab-icon {
+      width: 20px;
+      height: 20px;
+      transition: transform 0.25s ease, stroke 0.25s ease;
+      stroke: var(--text-secondary);
+    }
+    .btn-mode-tab:hover .tab-icon,
+    .btn-mode-tab.active .tab-icon {
+      stroke: var(--primary);
+      transform: scale(1.1);
+    }
+    .btn-mode-tab .active-indicator-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 10px var(--primary);
+      margin-left: 6px;
+    }
+    @media (max-width: 640px) {
+      .stem-mode-tabs-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
     }
     .drop-zone {
       border: 2px dashed rgba(0, 240, 255, 0.35);
@@ -370,16 +409,41 @@
     <!-- Estudio de Separación Multimedia -->
     <section id="splitter-studio" class="studio-wrapper" style="margin-top: 10px; margin-bottom: 40px;">
       
-      <!-- Pestañas de Modo de Entrada -->
-      <div class="stem-mode-tabs">
-        <button id="tab-mode-url" type="button" class="stem-tab-btn active">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-          Pegar Enlace Multimedia (YouTube, TikTok, etc.)
-        </button>
-        <button id="tab-mode-file" type="button" class="stem-tab-btn">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Subir Archivo de Audio o Video
-        </button>
+      <!-- Encabezado del Estudio de Separación (Diseño Conversor) -->
+      <div class="studio-header-full" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 22px; flex-wrap: wrap; gap: 14px;">
+        <div>
+          <span class="tech-card-tag">[ STEMS_STUDIO // DEMUCS_V4_AI ]</span>
+          <h2 style="font-size: 1.4rem; font-weight: 800; margin: 4px 0 6px; display: flex; align-items: center; gap: 10px;">
+            <svg class="icon" viewBox="0 0 24 24" style="color: var(--primary);"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            Estudio de Separación de Voz e Instrumental
+          </h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">Aísla la voz o la pista instrumental con algoritmos neuronales Demucs v4 de alta precisión acústica.</p>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button id="btn-paste-clipboard" type="button" class="btn btn-outline" style="font-size: 0.8rem; padding: 8px 14px; display: flex; align-items: center; gap: 6px;">
+            <svg class="icon" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+            Pegar Enlace
+          </button>
+        </div>
+      </div>
+
+      <!-- Pestañas de Modo de Entrada (Ancho Completo y Botones Componentes) -->
+      <div class="stem-mode-tabs-container">
+        <div class="studio-label" style="margin-bottom: 8px;">
+          <span>MÉTODO DE ENTRADA MULTIMEDIA</span>
+          <span id="stem-mode-badge" style="color: var(--primary); font-weight: 700;">ENLACE MULTIMEDIA ACTIVO</span>
+        </div>
+        <div class="stem-mode-tabs-grid">
+          <button id="tab-mode-url" type="button" class="btn btn-mode-tab active" aria-label="Pegar Enlace Multimedia">
+            <svg class="icon tab-icon" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span>Pegar Enlace Multimedia (YouTube, TikTok, etc.)</span>
+            <span class="active-indicator-dot"></span>
+          </button>
+          <button id="tab-mode-file" type="button" class="btn btn-mode-tab" aria-label="Subir Archivo de Audio o Video">
+            <svg class="icon tab-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>Subir Archivo de Audio o Video</span>
+          </button>
+        </div>
       </div>
 
       <!-- Selector de Plataformas con Iconos y Detección Automática (Idéntico a Conversor) -->
@@ -805,33 +869,146 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // Pestañas
+      // Elementos de Modo y Pestañas
       const tabUrl = document.getElementById("tab-mode-url");
       const tabFile = document.getElementById("tab-mode-file");
       const panelUrl = document.getElementById("panel-url");
       const panelFile = document.getElementById("panel-file");
       const platformsBox = document.getElementById("platforms-selector-box");
+      const stemModeBadge = document.getElementById("stem-mode-badge");
 
       let currentMode = "url";
       let selectedFileBase64 = null;
       let selectedFileName = "";
 
+      // Elementos del Proceso y Controles
+      const inputUrl = document.getElementById("input-media-url");
+      const btnClear = document.getElementById("btn-clear-url");
+      const btnPaste = document.getElementById("btn-paste-clipboard");
+      const selectQuality = document.getElementById("select-quality");
+      const qualityBadge = document.getElementById("quality-badge");
+
+      const btnProcess = document.getElementById("btn-process-split");
+      const progressBox = document.getElementById("progress-box");
+      const progressBar = document.getElementById("progress-bar");
+      const progressPercent = document.getElementById("progress-percent");
+      const progressStatus = document.getElementById("progress-status");
+      const resultBox = document.getElementById("result-box");
+
+      const audioInst = document.getElementById("audio-inst");
+      const audioVoc = document.getElementById("audio-voc");
+
+      // Detener y limpiar reproductores de medios
+      function stopMediaPlayback() {
+        if (audioInst) {
+          audioInst.pause();
+          audioInst.currentTime = 0;
+          audioInst.removeAttribute("src");
+          try { audioInst.load(); } catch {}
+        }
+        if (audioVoc) {
+          audioVoc.pause();
+          audioVoc.currentTime = 0;
+          audioVoc.removeAttribute("src");
+          try { audioVoc.load(); } catch {}
+        }
+        updateMasterPlayState(false);
+      }
+
+      // Ocultar resultado anterior y detener reproducción
+      function hidePreviousResult() {
+        resultBox.style.display = "none";
+        stopMediaPlayback();
+      }
+
+      // Reinicia y oculta la barra de estado y progreso previo
+      function resetProgressBox() {
+        progressBox.style.display = "none";
+        progressStatus.innerHTML = "";
+        progressPercent.textContent = "0%";
+        progressBar.style.width = "0%";
+      }
+
+      // Deshabilitar / Habilitar todos los controles mientras se procesa (Igual a Conversor)
+      function setFormDisabled(disabled) {
+        inputUrl.disabled = disabled;
+        btnClear.disabled = disabled;
+        if (btnPaste) btnPaste.disabled = disabled;
+        tabUrl.disabled = disabled;
+        tabFile.disabled = disabled;
+        selectQuality.disabled = disabled;
+        btnProcess.disabled = disabled;
+
+        const interactiveEls = [
+          btnProcess,
+          tabUrl,
+          tabFile,
+          selectQuality,
+          btnClear,
+          btnPaste
+        ];
+
+        interactiveEls.forEach(el => {
+          if (el) {
+            el.style.pointerEvents = disabled ? "none" : "auto";
+            el.style.opacity = disabled ? "0.6" : "1";
+            el.style.cursor = disabled ? "not-allowed" : "pointer";
+          }
+        });
+
+        if (inputUrl) {
+          inputUrl.style.opacity = disabled ? "0.6" : "1";
+          inputUrl.style.cursor = disabled ? "not-allowed" : "text";
+        }
+
+        if (disabled) {
+          btnProcess.innerHTML = `<span class="spinner" style="display:inline-block;width:15px;height:15px;border:2px solid #030712;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></span> <span id="btn-split-text">Separando Stems...</span>`;
+        } else {
+          btnProcess.innerHTML = `<svg class="icon" style="width: 17px; height: 17px;" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> <span id="btn-split-text">Separar Voz e Instrumental</span>`;
+        }
+      }
+
+      // Conmutar Pestañas de Modo (Ocupa 100% de ancho con botones estilizados)
       tabUrl.addEventListener("click", () => {
+        resetProgressBox();
+        hidePreviousResult();
         currentMode = "url";
         tabUrl.classList.add("active");
         tabFile.classList.remove("active");
+
+        if (!tabUrl.querySelector(".active-indicator-dot")) {
+          const dot = document.createElement("span");
+          dot.className = "active-indicator-dot";
+          tabUrl.appendChild(dot);
+        }
+        const fileDot = tabFile.querySelector(".active-indicator-dot");
+        if (fileDot) fileDot.remove();
+
         panelUrl.style.display = "block";
         panelFile.style.display = "none";
         if (platformsBox) platformsBox.style.display = "block";
+        if (stemModeBadge) stemModeBadge.textContent = "ENLACE MULTIMEDIA ACTIVO";
       });
 
       tabFile.addEventListener("click", () => {
+        resetProgressBox();
+        hidePreviousResult();
         currentMode = "file";
         tabFile.classList.add("active");
         tabUrl.classList.remove("active");
+
+        if (!tabFile.querySelector(".active-indicator-dot")) {
+          const dot = document.createElement("span");
+          dot.className = "active-indicator-dot";
+          tabFile.appendChild(dot);
+        }
+        const urlDot = tabUrl.querySelector(".active-indicator-dot");
+        if (urlDot) urlDot.remove();
+
         panelFile.style.display = "block";
         panelUrl.style.display = "none";
         if (platformsBox) platformsBox.style.display = "none";
+        if (stemModeBadge) stemModeBadge.textContent = "SUBIDA DE ARCHIVO ACTIVA";
       });
 
       // Manejo de archivo local
@@ -856,6 +1033,8 @@
 
       function handleFile(file) {
         if (!file) return;
+        resetProgressBox();
+        hidePreviousResult();
         selectedFileName = file.name;
         fileNameEl.textContent = file.name;
         fileInfo.style.display = "flex";
@@ -869,6 +1048,8 @@
       }
 
       btnRemoveFile.addEventListener("click", () => {
+        resetProgressBox();
+        hidePreviousResult();
         selectedFileBase64 = null;
         selectedFileName = "";
         fileInput.value = "";
@@ -877,8 +1058,6 @@
       });
 
       // Detección automática de plataformas
-      const inputUrl = document.getElementById("input-media-url");
-      const btnClear = document.getElementById("btn-clear-url");
       const platformHoverLabel = document.getElementById("platform-hover-label");
       const detectedPlatformBadge = document.getElementById("detected-platform-badge");
 
@@ -925,13 +1104,45 @@
       }
 
       inputUrl.addEventListener("input", () => {
+        resetProgressBox();
+        hidePreviousResult();
         syncDetectedPlatform(inputUrl.value);
       });
 
       btnClear.addEventListener("click", () => {
+        resetProgressBox();
+        hidePreviousResult();
         inputUrl.value = "";
         syncDetectedPlatform("");
         inputUrl.focus();
+      });
+
+      // Botón Pegar Enlace del Portapapeles (Identico a Conversor)
+      if (btnPaste) {
+        btnPaste.addEventListener("click", async () => {
+          try {
+            const clipText = await navigator.clipboard.readText();
+            if (clipText) {
+              if (currentMode !== "url") {
+                tabUrl.click();
+              }
+              inputUrl.value = clipText.trim();
+              resetProgressBox();
+              hidePreviousResult();
+              syncDetectedPlatform(inputUrl.value);
+            }
+          } catch {
+            inputUrl.focus();
+          }
+        });
+      }
+
+      // Selector de Calidad
+      selectQuality.addEventListener("change", () => {
+        resetProgressBox();
+        if (qualityBadge && selectQuality.selectedOptions.length > 0) {
+          qualityBadge.textContent = selectQuality.selectedOptions[0].textContent.split("(")[0].trim().toUpperCase();
+        }
       });
 
       // Clic en chips de plataforma solo enfoca el campo de texto (sin rellenar URL por defecto)
@@ -945,6 +1156,7 @@
       ["viz-inst", "viz-voc"].forEach(id => {
         const box = document.getElementById(id);
         if (!box) return;
+        box.innerHTML = "";
         for (let i = 0; i < 45; i++) {
           const bar = document.createElement("div");
           bar.className = "wave-bar";
@@ -953,74 +1165,71 @@
         }
       });
 
-      // Procesar Separación
-      const btnProcess = document.getElementById("btn-process-split");
-      const progressBox = document.getElementById("progress-box");
-      const progressBar = document.getElementById("progress-bar");
-      const progressPercent = document.getElementById("progress-percent");
-      const progressStatus = document.getElementById("progress-status");
-      const resultBox = document.getElementById("result-box");
-
-      const audioInst = document.getElementById("audio-inst");
-      const audioVoc = document.getElementById("audio-voc");
-
+      // Función: Separar Voz e Instrumental (Comportamiento Idéntico a Convertir)
       btnProcess.addEventListener("click", async () => {
-        const quality = document.getElementById("select-quality").value;
+        const quality = selectQuality.value;
 
         let payload = { quality };
         if (currentMode === "url") {
           const u = inputUrl.value.trim();
           if (!u) {
-            alert("Introduce un enlace multimedia válido.");
+            alert("Por favor introduce un enlace multimedia válido.");
+            inputUrl.focus();
             return;
           }
           payload.url = u;
         } else {
           if (!selectedFileBase64) {
-            alert("Por favor selecciona o arrastra un archivo de audio/video.");
+            alert("Por favor selecciona o arrastra un archivo de audio o video.");
             return;
           }
           payload.audioBase64 = selectedFileBase64;
           payload.filename = selectedFileName;
         }
 
-        // Reset
-        audioInst.pause();
-        audioVoc.pause();
-        resultBox.style.display = "none";
-        btnProcess.disabled = true;
+        hidePreviousResult();
+        setFormDisabled(true);
         progressBox.style.display = "block";
-        progressBar.style.width = "20%";
-        progressPercent.textContent = "20%";
-        progressStatus.innerHTML = `<span class="spinner" style="display: inline-block; width: 14px; height: 14px;"></span> Extrayendo audio maestro de alta fidelidad...`;
+        progressBar.style.width = "25%";
+        progressPercent.textContent = "25%";
+        progressStatus.innerHTML = `<span class="spinner" style="display: inline-block; width: 14px; height: 14px;"></span> Analizando enlace y extrayendo audio maestro...`;
+
+        let t1 = null;
+        let t2 = null;
 
         try {
-          const t1 = setTimeout(() => {
-            progressBar.style.width = "45%";
-            progressPercent.textContent = "45%";
-            progressStatus.innerHTML = `<span class="spinner" style="display: inline-block; width: 14px; height: 14px;"></span> Conectando con red neuronal Demucs v4 (Meta AI)...`;
-          }, 1000);
+          t1 = setTimeout(() => {
+            if (progressBar.style.width === "25%") {
+              progressBar.style.width = "60%";
+              progressPercent.textContent = "60%";
+              progressStatus.innerHTML = `<span class="spinner" style="display: inline-block; width: 14px; height: 14px;"></span> Conectando con red neuronal Demucs v4 (Meta AI)...`;
+            }
+          }, 800);
 
-          const t2 = setTimeout(() => {
-            progressBar.style.width = "75%";
-            progressPercent.textContent = "75%";
-            progressStatus.innerHTML = `<span class="spinner" style="display: inline-block; width: 14px; height: 14px;"></span> Extrayendo acapella y pista instrumental pura sin filtraciones...`;
-          }, 3500);
+          t2 = setTimeout(() => {
+            if (progressBar.style.width === "60%") {
+              progressBar.style.width = "85%";
+              progressPercent.textContent = "85%";
+              progressStatus.innerHTML = `<span class="spinner" style="display: inline-block; width: 14px; height: 14px;"></span> Desacoplando Acapella e Instrumental Puro (-48 dB cero filtración)...`;
+            }
+          }, 2400);
 
           const res = await fetch("/api/separator/process", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
           });
-          clearTimeout(t1);
-          clearTimeout(t2);
+
+          if (t1) clearTimeout(t1);
+          if (t2) clearTimeout(t2);
+
           const data = await res.json();
 
           progressBar.style.width = "100%";
           progressPercent.textContent = "100%";
 
           if (data.status === "success") {
-            progressStatus.textContent = "Separación neuronal completada con éxito";
+            progressStatus.textContent = "¡Separación neuronal completada con éxito!";
             displaySeparationResult(data);
           } else {
             alert(data.error || "No se pudo procesar la separación.");
@@ -1028,7 +1237,9 @@
         } catch (err) {
           alert("Error de red: " + err.message);
         } finally {
-          btnProcess.disabled = false;
+          if (t1) clearTimeout(t1);
+          if (t2) clearTimeout(t2);
+          setFormDisabled(false);
         }
       });
 
@@ -1148,56 +1359,81 @@
           audioVoc.pause();
           updateMasterPlayState(false);
         } else {
+          // Re-sincronizar posición temporal
           audioVoc.currentTime = audioInst.currentTime;
           Promise.all([audioInst.play(), audioVoc.play()]).then(() => {
             updateMasterPlayState(true);
-          }).catch(console.error);
+          }).catch(err => {
+            console.warn("Error en reproducción sincronizada:", err);
+          });
         }
       });
 
-      // Actualizar tiempo y scrubber
+      // Actualizar scrubber durante reproducción
       audioInst.addEventListener("timeupdate", () => {
         if (!audioInst.duration) return;
         const pct = (audioInst.currentTime / audioInst.duration) * 100;
         masterScrubber.value = pct;
-        const curM = Math.floor(audioInst.currentTime / 60);
-        const curS = Math.floor(audioInst.currentTime % 60);
-        timeCurrent.textContent = `${String(curM).padStart(2, "0")}:${String(curS).padStart(2, "0")}`;
+        
+        const m = Math.floor(audioInst.currentTime / 60);
+        const s = Math.floor(audioInst.currentTime % 60);
+        timeCurrent.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+
+        // Pequeño desfase correctivo si se alejan más de 0.08 segundos
+        if (Math.abs(audioInst.currentTime - audioVoc.currentTime) > 0.08) {
+          audioVoc.currentTime = audioInst.currentTime;
+        }
       });
 
+      // Scrubber manual
       masterScrubber.addEventListener("input", () => {
         if (!audioInst.duration) return;
-        const newTime = (masterScrubber.value / 100) * audioInst.duration;
-        audioInst.currentTime = newTime;
-        audioVoc.currentTime = newTime;
+        const targetTime = (masterScrubber.value / 100) * audioInst.duration;
+        audioInst.currentTime = targetTime;
+        audioVoc.currentTime = targetTime;
       });
 
+      // Fin de reproducción
       audioInst.addEventListener("ended", () => {
         updateMasterPlayState(false);
+        masterScrubber.value = 0;
+        timeCurrent.textContent = "00:00";
       });
 
-      // Faders de volumen individuales
+      // Control de volumen independiente
       volInst.addEventListener("input", () => {
-        audioInst.volume = volInst.value;
-        volInstText.textContent = `${Math.round(volInst.value * 100)}%`;
+        audioInst.volume = volInst.value / 100;
+        volInstText.textContent = `${volInst.value}%`;
       });
 
       volVoc.addEventListener("input", () => {
-        audioVoc.volume = volVoc.value;
-        volVocText.textContent = `${Math.round(volVoc.value * 100)}%`;
+        audioVoc.volume = volVoc.value / 100;
+        volVocText.textContent = `${volVoc.value}%`;
       });
 
+      // Botones de Mute individuales
       btnMuteInst.addEventListener("click", () => {
         audioInst.muted = !audioInst.muted;
-        btnMuteInst.textContent = audioInst.muted ? "Desmutear" : "Mute";
+        btnMuteInst.textContent = audioInst.muted ? "Silenciado" : "Mute";
         btnMuteInst.style.color = audioInst.muted ? "#ff4d4d" : "";
       });
 
       btnMuteVoc.addEventListener("click", () => {
         audioVoc.muted = !audioVoc.muted;
-        btnMuteVoc.textContent = audioVoc.muted ? "Desmutear" : "Mute";
+        btnMuteVoc.textContent = audioVoc.muted ? "Silenciado" : "Mute";
         btnMuteVoc.style.color = audioVoc.muted ? "#ff4d4d" : "";
       });
+
+      // Inicialización del traductor
+      const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";
+      window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
+      document.getElementById("btn-english").onclick = () => window.translator.translateToEnglish();
+      document.getElementById("btn-restore").onclick = () => window.translator.restoreOriginal();
+      document.getElementById("select-lang").onchange = (e) => window.translator.translatePage(e.target.value);
+      document.getElementById("btn-translate-custom").onclick = () => {
+        const val = document.getElementById("input-custom-lang").value.trim().toLowerCase();
+        if (val) window.translator.translatePage(val);
+      };
     });
   </script>
 </body>
