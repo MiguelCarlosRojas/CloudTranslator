@@ -181,60 +181,123 @@
       cursor: pointer;
       box-shadow: 0 0 10px var(--primary);
     }
+    .wave-visualizer-container {
+      margin-top: 16px;
+      background: radial-gradient(ellipse at 50% 0%, rgba(13, 20, 36, 0.98), rgba(6, 9, 16, 0.99));
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 12px;
+      padding: 10px 16px 12px 16px;
+      position: relative;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8), 0 4px 18px rgba(0, 0, 0, 0.35);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .wave-visualizer-container.instrumental.active {
+      border-color: rgba(0, 240, 255, 0.55);
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 24px rgba(0, 240, 255, 0.22);
+    }
+    .wave-visualizer-container.vocals.active {
+      border-color: rgba(255, 0, 123, 0.55);
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 24px rgba(255, 0, 123, 0.22);
+    }
+    .viz-hud-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.68rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      opacity: 0.75;
+      text-transform: uppercase;
+    }
+    .viz-hud-header .hud-live-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .viz-hud-header .hud-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+    .wave-visualizer-container.instrumental.active .hud-dot {
+      background: #00f0ff;
+      box-shadow: 0 0 8px #00f0ff;
+    }
+    .wave-visualizer-container.vocals.active .hud-dot {
+      background: #ff007b;
+      box-shadow: 0 0 8px #ff007b;
+    }
     .wave-visualizer {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 3px;
-      height: 52px;
+      gap: 2.5px;
+      height: 56px;
       width: 100%;
-      margin: 14px 0 4px 0;
-      padding: 0 14px;
-      background: linear-gradient(180deg, rgba(8, 12, 22, 0.9) 0%, rgba(4, 6, 12, 0.98) 100%);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      overflow: hidden;
       position: relative;
-      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.6), 0 4px 16px rgba(0, 0, 0, 0.3);
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
-    .wave-visualizer::before {
+    /* Eje central de osciloscopio zero-crossing */
+    .wave-visualizer::after {
       content: "";
       position: absolute;
-      top: 0;
+      top: 50%;
       left: 0;
       right: 0;
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-    }
-    .wave-visualizer.instrumental.active {
-      border-color: rgba(0, 240, 255, 0.45);
-      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.6), 0 0 22px rgba(0, 240, 255, 0.16);
-    }
-    .wave-visualizer.vocals.active {
-      border-color: rgba(255, 0, 123, 0.45);
-      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.6), 0 0 22px rgba(255, 0, 123, 0.16);
+      background: rgba(255, 255, 255, 0.07);
+      pointer-events: none;
+      z-index: 1;
     }
     .wave-bar {
       flex: 1;
       min-width: 2px;
-      max-width: 6px;
-      height: 14%;
+      max-width: 5px;
+      height: 20%;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.12);
       transform-origin: center;
-      transition: height 0.07s ease-out, background 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease;
-      opacity: 0.35;
+      transition: height 0.06s ease-out, background 0.25s ease, opacity 0.25s ease, box-shadow 0.25s ease;
+      position: relative;
+      z-index: 2;
     }
-    .wave-visualizer.instrumental.active .wave-bar {
-      background: linear-gradient(180deg, #00f0ff 0%, #0066ff 100%);
+    /* Estilos Canal Instrumental */
+    .wave-visualizer.instrumental .wave-bar {
+      background: rgba(0, 240, 255, 0.28);
+      opacity: 0.65;
+    }
+    .wave-visualizer-container.instrumental.active .wave-bar {
+      background: linear-gradient(180deg, #67e8f9 0%, #00f0ff 40%, #0284c7 85%, #0369a1 100%);
       box-shadow: 0 0 8px rgba(0, 240, 255, 0.45);
-      opacity: 0.95;
+      opacity: 0.9;
     }
-    .wave-visualizer.vocals.active .wave-bar {
-      background: linear-gradient(180deg, #ff007b 0%, #9333ea 100%);
+    .wave-visualizer-container.instrumental.active .wave-bar.past-progress {
+      opacity: 1;
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
+    }
+    .wave-visualizer-container.instrumental.active .wave-bar.future-progress {
+      opacity: 0.4;
+      box-shadow: none;
+    }
+    /* Estilos Canal Voz */
+    .wave-visualizer.vocals .wave-bar {
+      background: rgba(255, 0, 123, 0.28);
+      opacity: 0.65;
+    }
+    .wave-visualizer-container.vocals.active .wave-bar {
+      background: linear-gradient(180deg, #f472b6 0%, #ff007b 40%, #c026d3 85%, #7e22ce 100%);
       box-shadow: 0 0 8px rgba(255, 0, 123, 0.45);
-      opacity: 0.95;
+      opacity: 0.9;
+    }
+    .wave-visualizer-container.vocals.active .wave-bar.past-progress {
+      opacity: 1;
+      box-shadow: 0 0 10px rgba(255, 0, 123, 0.7);
+    }
+    .wave-visualizer-container.vocals.active .wave-bar.future-progress {
+      opacity: 0.4;
+      box-shadow: none;
     }
     .master-player-bar {
       display: flex;
@@ -741,7 +804,13 @@
             </div>
           </div>
 
-          <div id="viz-inst" class="wave-visualizer instrumental"></div>
+          <div id="viz-container-inst" class="wave-visualizer-container instrumental">
+            <div class="viz-hud-header">
+              <span class="hud-live-tag"><span class="hud-dot"></span> CANAL 01 // ESPECTRO INSTRUMENTAL</span>
+              <span>48.0 KHZ • STEREO</span>
+            </div>
+            <div id="viz-inst" class="wave-visualizer instrumental"></div>
+          </div>
         </div>
 
         <!-- CANAL 2: VOZ AISLADA (ACAPELLA) -->
@@ -772,12 +841,14 @@
               </button>
             </div>
           </div>
-                Copiar Enlace Directo
-              </button>
-            </div>
-          </div>
 
-          <div id="viz-voc" class="wave-visualizer vocals"></div>
+          <div id="viz-container-voc" class="wave-visualizer-container vocals">
+            <div class="viz-hud-header">
+              <span class="hud-live-tag"><span class="hud-dot"></span> CANAL 02 // ESPECTRO VOCAL</span>
+              <span>48.0 KHZ • STEREO</span>
+            </div>
+            <div id="viz-voc" class="wave-visualizer vocals"></div>
+          </div>
         </div>
 
       </div>
@@ -1245,20 +1316,35 @@
         });
       });
 
-      // Generador de Barras y Visualizadores Reactivos de Estudio
-      const VIZ_BAR_COUNT = 48;
+      // Generador de Barras y Visualizadores Reactivos de Estudio (Dual-Polarity DAW Waveforms)
+      const VIZ_BAR_COUNT = 64;
       const instBars = [];
       const vocBars = [];
 
-      function resetBarsToIdle(bars, base) {
+      // Perfiles de onda acústica de estudio precalculados
+      const instBaseProfile = [];
+      const vocBaseProfile = [];
+      for (let i = 0; i < VIZ_BAR_COUNT; i++) {
+        const norm = i / VIZ_BAR_COUNT;
+        const env1 = 0.28 + 0.35 * Math.sin(norm * Math.PI) + 0.16 * Math.sin(norm * Math.PI * 4) * Math.cos(norm * Math.PI * 2);
+        const micro1 = ((i * 17) % 13) * 0.02 - 0.1;
+        instBaseProfile.push(Math.max(0.18, Math.min(0.85, env1 + micro1)));
+
+        const env2 = 0.22 + 0.42 * Math.pow(Math.sin(norm * Math.PI), 1.25) + 0.15 * Math.sin(norm * Math.PI * 5);
+        const micro2 = ((i * 23) % 11) * 0.022 - 0.09;
+        vocBaseProfile.push(Math.max(0.16, Math.min(0.88, env2 + micro2)));
+      }
+
+      function resetBarsToIdle(bars, profile) {
         for (let i = 0; i < bars.length; i++) {
-          const centerNorm = Math.abs(i - (bars.length / 2)) / (bars.length / 2);
-          const baseIdle = Math.round(base + (1 - centerNorm) * 8);
-          bars[i].style.height = `${baseIdle}%`;
+          const h = Math.round((profile[i] || 0.3) * 75);
+          bars[i].style.height = `${Math.max(16, h)}%`;
+          bars[i].classList.remove("past-progress");
+          bars[i].classList.remove("future-progress");
         }
       }
 
-      function initVisualizerBars(containerId, barsArray, baseIdle) {
+      function initVisualizerBars(containerId, barsArray, profile) {
         const box = document.getElementById(containerId);
         if (!box) return;
         box.innerHTML = "";
@@ -1269,11 +1355,11 @@
           box.appendChild(bar);
           barsArray.push(bar);
         }
-        resetBarsToIdle(barsArray, baseIdle);
+        resetBarsToIdle(barsArray, profile);
       }
 
-      initVisualizerBars("viz-inst", instBars, 12);
-      initVisualizerBars("viz-voc", vocBars, 10);
+      initVisualizerBars("viz-inst", instBars, instBaseProfile);
+      initVisualizerBars("viz-voc", vocBars, vocBaseProfile);
 
       // Función: Separar Voz e Instrumental (Comportamiento Idéntico a Convertir)
       btnProcess.addEventListener("click", async () => {
@@ -1505,6 +1591,8 @@
       const masterIcon = document.getElementById("master-play-icon");
       const masterScrubber = document.getElementById("master-scrubber");
       const timeCurrent = document.getElementById("time-current");
+      const vizContainerInst = document.getElementById("viz-container-inst");
+      const vizContainerVoc = document.getElementById("viz-container-voc");
       const vizInst = document.getElementById("viz-inst");
       const vizVoc = document.getElementById("viz-voc");
 
@@ -1513,6 +1601,8 @@
 
       function animateVisualizers(now) {
         const t = now * 0.0035;
+        const progress = (audioInst.duration > 0) ? (audioInst.currentTime / audioInst.duration) : 0;
+        const currentBarIdx = Math.floor(progress * VIZ_BAR_COUNT);
 
         const instActive = isPlaying && !audioInst.muted && audioInst.volume > 0;
         const vocActive = isPlaying && !audioVoc.muted && audioVoc.volume > 0;
@@ -1520,29 +1610,48 @@
         if (instActive) {
           const vol = audioInst.volume;
           for (let i = 0; i < VIZ_BAR_COUNT; i++) {
-            const freqWeight = 0.65 + Math.sin((i / VIZ_BAR_COUNT) * Math.PI) * 0.55;
-            const h1 = Math.sin(t * 3.4 + i * 0.22);
-            const h2 = Math.sin(t * 6.8 + i * 0.44);
-            const h3 = Math.cos(t * 1.9 + i * 0.12);
-            const dynamicAmp = (h1 * 26 + h2 * 18 + h3 * 14 + 34) * freqWeight * vol;
-            instBars[i].style.height = `${Math.min(98, Math.max(12, Math.round(14 + dynamicAmp)))}%`;
+            const base = instBaseProfile[i] || 0.3;
+            const h1 = Math.sin(t * 3.6 + i * 0.24);
+            const h2 = Math.sin(t * 7.2 + i * 0.48);
+            const h3 = Math.cos(t * 1.8 + i * 0.14);
+            const wave = (h1 * 0.22 + h2 * 0.14 + h3 * 0.10) * vol;
+            const finalH = Math.min(96, Math.max(16, Math.round((base * 0.55 + wave + 0.22) * 100)));
+            instBars[i].style.height = `${finalH}%`;
+
+            if (i <= currentBarIdx) {
+              instBars[i].classList.add("past-progress");
+              instBars[i].classList.remove("future-progress");
+            } else {
+              instBars[i].classList.remove("past-progress");
+              instBars[i].classList.add("future-progress");
+            }
           }
         } else {
-          resetBarsToIdle(instBars, 12);
+          resetBarsToIdle(instBars, instBaseProfile);
         }
 
         if (vocActive) {
           const vol = audioVoc.volume;
           for (let i = 0; i < VIZ_BAR_COUNT; i++) {
-            const vocalFocus = Math.pow(Math.sin((i / VIZ_BAR_COUNT) * Math.PI), 1.4);
+            const base = vocBaseProfile[i] || 0.3;
+            const vocalFocus = Math.pow(Math.sin((i / VIZ_BAR_COUNT) * Math.PI), 1.2);
             const h1 = Math.sin(t * 4.6 + i * 0.32);
             const h2 = Math.cos(t * 8.4 + i * 0.58);
             const h3 = Math.sin(t * 2.3 + i * 0.16);
-            const dynamicAmp = (h1 * 28 + h2 * 20 + h3 * 16 + 32) * (0.4 + vocalFocus * 0.8) * vol;
-            vocBars[i].style.height = `${Math.min(98, Math.max(10, Math.round(12 + dynamicAmp)))}%`;
+            const wave = (h1 * 0.24 + h2 * 0.16 + h3 * 0.12) * (0.5 + vocalFocus * 0.8) * vol;
+            const finalH = Math.min(96, Math.max(14, Math.round((base * 0.55 + wave + 0.20) * 100)));
+            vocBars[i].style.height = `${finalH}%`;
+
+            if (i <= currentBarIdx) {
+              vocBars[i].classList.add("past-progress");
+              vocBars[i].classList.remove("future-progress");
+            } else {
+              vocBars[i].classList.remove("past-progress");
+              vocBars[i].classList.add("future-progress");
+            }
           }
         } else {
-          resetBarsToIdle(vocBars, 10);
+          resetBarsToIdle(vocBars, vocBaseProfile);
         }
 
         if (isPlaying) {
@@ -1556,16 +1665,22 @@
         const instActive = isPlaying && !audioInst.muted && audioInst.volume > 0;
         const vocActive = isPlaying && !audioVoc.muted && audioVoc.volume > 0;
 
-        if (instActive) {
-          vizInst.classList.add("active");
-        } else {
-          vizInst.classList.remove("active");
+        if (vizContainerInst) {
+          if (instActive) vizContainerInst.classList.add("active");
+          else vizContainerInst.classList.remove("active");
+        }
+        if (vizInst) {
+          if (instActive) vizInst.classList.add("active");
+          else vizInst.classList.remove("active");
         }
 
-        if (vocActive) {
-          vizVoc.classList.add("active");
-        } else {
-          vizVoc.classList.remove("active");
+        if (vizContainerVoc) {
+          if (vocActive) vizContainerVoc.classList.add("active");
+          else vizContainerVoc.classList.remove("active");
+        }
+        if (vizVoc) {
+          if (vocActive) vizVoc.classList.add("active");
+          else vizVoc.classList.remove("active");
         }
 
         if (isPlaying) {
@@ -1577,8 +1692,8 @@
             cancelAnimationFrame(animFrameId);
             animFrameId = null;
           }
-          resetBarsToIdle(instBars, 12);
-          resetBarsToIdle(vocBars, 10);
+          resetBarsToIdle(instBars, instBaseProfile);
+          resetBarsToIdle(vocBars, vocBaseProfile);
         }
       }
 
