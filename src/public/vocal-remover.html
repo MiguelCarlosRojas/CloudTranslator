@@ -111,7 +111,7 @@
       margin-bottom: 18px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
       position: relative;
-      overflow: hidden;
+      overflow: visible;
       transition: border-color 0.2s ease;
     }
     .stem-channel-card.vocals {
@@ -184,46 +184,57 @@
     .wave-visualizer {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 3px;
-      height: 44px;
+      height: 52px;
       width: 100%;
-      margin: 14px 0;
-      padding: 0 10px;
-      background: rgba(3, 7, 18, 0.7);
+      margin: 14px 0 4px 0;
+      padding: 0 14px;
+      background: linear-gradient(180deg, rgba(8, 12, 22, 0.9) 0%, rgba(4, 6, 12, 0.98) 100%);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.45);
+      position: relative;
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.6), 0 4px 16px rgba(0, 0, 0, 0.3);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .wave-visualizer::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    }
+    .wave-visualizer.instrumental.active {
+      border-color: rgba(0, 240, 255, 0.45);
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.6), 0 0 22px rgba(0, 240, 255, 0.16);
+    }
+    .wave-visualizer.vocals.active {
+      border-color: rgba(255, 0, 123, 0.45);
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.6), 0 0 22px rgba(255, 0, 123, 0.16);
     }
     .wave-bar {
       flex: 1;
       min-width: 2px;
-      height: 20%;
-      border-radius: 4px;
+      max-width: 6px;
+      height: 14%;
+      border-radius: 999px;
       background: rgba(255, 255, 255, 0.12);
-      transition: height 0.25s ease, background 0.25s ease, transform 0.25s ease, opacity 0.25s ease, box-shadow 0.25s ease;
       transform-origin: center;
+      transition: height 0.07s ease-out, background 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease;
       opacity: 0.35;
     }
-    .wave-visualizer.playing.instrumental .wave-bar {
-      background: linear-gradient(180deg, #00f0ff 0%, #0099ff 100%);
-      box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
-      animation: pulseInst 0.85s infinite alternate ease-in-out;
+    .wave-visualizer.instrumental.active .wave-bar {
+      background: linear-gradient(180deg, #00f0ff 0%, #0066ff 100%);
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.45);
+      opacity: 0.95;
     }
-    .wave-visualizer.playing.vocals .wave-bar {
-      background: linear-gradient(180deg, #ff007b 0%, #c4005e 100%);
-      box-shadow: 0 0 8px rgba(255, 0, 123, 0.4);
-      animation: pulseVocal 0.8s infinite alternate ease-in-out;
-    }
-    @keyframes pulseInst {
-      0% { transform: scaleY(0.25); opacity: 0.6; }
-      50% { transform: scaleY(1.0); opacity: 1; }
-      100% { transform: scaleY(0.38); opacity: 0.75; }
-    }
-    @keyframes pulseVocal {
-      0% { transform: scaleY(0.2); opacity: 0.55; }
-      50% { transform: scaleY(1.0); opacity: 1; }
-      100% { transform: scaleY(0.35); opacity: 0.7; }
+    .wave-visualizer.vocals.active .wave-bar {
+      background: linear-gradient(180deg, #ff007b 0%, #9333ea 100%);
+      box-shadow: 0 0 8px rgba(255, 0, 123, 0.45);
+      opacity: 0.95;
     }
     .master-player-bar {
       display: flex;
@@ -302,11 +313,13 @@
       color: var(--text-secondary);
       cursor: pointer;
       transition: all 0.2s ease;
+      z-index: 5;
     }
     .btn-icon-mute:hover {
       border-color: var(--primary);
       color: #ffffff;
       transform: translateY(-1px);
+      z-index: 1000;
     }
     .btn-icon-mute.is-muted {
       background: rgba(239, 68, 68, 0.16);
@@ -318,21 +331,31 @@
       visibility: hidden;
       opacity: 0;
       position: absolute;
-      bottom: calc(100% + 8px);
+      bottom: calc(100% + 10px);
       left: 50%;
       transform: translateX(-50%) translateY(4px);
-      background: rgba(10, 14, 22, 0.98);
-      color: #ffffff;
-      font-size: 0.72rem;
+      background: #090d16;
+      color: #f8fafc;
+      font-size: 0.74rem;
       font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 4px;
-      border: 1px solid var(--border-subtle);
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
       white-space: nowrap;
       pointer-events: none;
-      transition: all 0.2s ease;
-      z-index: 100;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      z-index: 999999;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 12px rgba(0, 240, 255, 0.18);
+    }
+    .btn-icon-mute .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 5px;
+      border-style: solid;
+      border-color: #090d16 transparent transparent transparent;
     }
     .btn-icon-mute:hover .tooltip-text {
       visibility: visible;
@@ -651,16 +674,6 @@
             </div>
           </div>
           <!-- Acciones de Descarga y Compartir -->
-          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a id="btn-dl-active" href="#" class="btn btn-primary" download style="padding: 10px 18px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Descargar
-            </a>
-            <button id="btn-copy-stream-active" type="button" class="btn btn-outline" style="padding: 10px 16px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
-              <svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-              Copiar Enlace Directo
-            </button>
-          </div>
         </div>
 
         <!-- Selector Interactivo de Modo de Escucha (Solo Instrumental / Solo Voz / Ambos) -->
@@ -716,12 +729,12 @@
                 <input type="range" id="vol-inst" class="volume-slider" min="0" max="100" step="1" value="100" title="Volumen Instrumental">
                 <span id="vol-inst-text" style="font-size: 0.75rem; font-weight: 700; width: 34px;">100%</span>
               </div>
-              <button id="btn-mute-inst" type="button" class="btn btn-icon-mute" title="Mute" aria-label="Mute"><svg class="icon mute-icon" viewBox="0 0 24 24" style="width: 17px; height: 17px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg><span class="tooltip-text" id="tt-mute-inst">Mute</span></button>
-              <a id="btn-dl-inst" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;" download>
+              <button id="btn-mute-inst" type="button" class="btn btn-icon-mute" aria-label="Silenciar"><svg class="icon mute-icon" viewBox="0 0 24 24" style="width: 17px; height: 17px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg><span class="tooltip-text" id="tt-mute-inst">Silenciar</span></button>
+              <a id="btn-dl-inst" class="btn btn-primary" style="height: 40px; padding: 0 18px; font-size: 0.88rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: var(--radius-md);" download>
                 <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Descargar
               </a>
-              <button id="btn-copy-stream-inst" type="button" class="btn btn-outline" style="padding: 8px 14px; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+              <button id="btn-copy-stream-inst" type="button" class="btn btn-outline" style="height: 40px; padding: 0 16px; font-size: 0.88rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: var(--radius-md);">
                 <svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                 Copiar Enlace Directo
               </button>
@@ -748,13 +761,17 @@
                 <input type="range" id="vol-voc" class="volume-slider" min="0" max="100" step="1" value="100" title="Volumen Vocal">
                 <span id="vol-voc-text" style="font-size: 0.75rem; font-weight: 700; width: 34px;">100%</span>
               </div>
-              <button id="btn-mute-voc" type="button" class="btn btn-icon-mute" title="Mute" aria-label="Mute"><svg class="icon mute-icon" viewBox="0 0 24 24" style="width: 17px; height: 17px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg><span class="tooltip-text" id="tt-mute-voc">Mute</span></button>
-              <a id="btn-dl-voc" class="btn" style="background: linear-gradient(135deg, #ff007b, #c026d3); color: #fff; padding: 8px 18px; font-size: 0.85rem; border: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;" download>
+              <button id="btn-mute-voc" type="button" class="btn btn-icon-mute" aria-label="Silenciar"><svg class="icon mute-icon" viewBox="0 0 24 24" style="width: 17px; height: 17px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg><span class="tooltip-text" id="tt-mute-voc">Silenciar</span></button>
+              <a id="btn-dl-voc" class="btn" style="height: 40px; padding: 0 18px; font-size: 0.88rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: var(--radius-md); background: linear-gradient(135deg, #ff007b, #c026d3); color: #fff; border: none; box-shadow: 0 0 16px rgba(255, 0, 123, 0.35);" download>
                 <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Descargar
               </a>
-              <button id="btn-copy-stream-voc" type="button" class="btn btn-outline" style="padding: 8px 14px; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+              <button id="btn-copy-stream-voc" type="button" class="btn btn-outline" style="height: 40px; padding: 0 16px; font-size: 0.88rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: var(--radius-md);">
                 <svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                Copiar Enlace Directo
+              </button>
+            </div>
+          </div>
                 Copiar Enlace Directo
               </button>
             </div>
@@ -1228,20 +1245,35 @@
         });
       });
 
-      // Generar barras decorativas para visualizadores con retardos ondulares
-      ["viz-inst", "viz-voc"].forEach(id => {
-        const box = document.getElementById(id);
+      // Generador de Barras y Visualizadores Reactivos de Estudio
+      const VIZ_BAR_COUNT = 48;
+      const instBars = [];
+      const vocBars = [];
+
+      function resetBarsToIdle(bars, base) {
+        for (let i = 0; i < bars.length; i++) {
+          const centerNorm = Math.abs(i - (bars.length / 2)) / (bars.length / 2);
+          const baseIdle = Math.round(base + (1 - centerNorm) * 8);
+          bars[i].style.height = `${baseIdle}%`;
+        }
+      }
+
+      function initVisualizerBars(containerId, barsArray, baseIdle) {
+        const box = document.getElementById(containerId);
         if (!box) return;
         box.innerHTML = "";
-        for (let i = 0; i < 48; i++) {
+        barsArray.length = 0;
+        for (let i = 0; i < VIZ_BAR_COUNT; i++) {
           const bar = document.createElement("div");
           bar.className = "wave-bar";
-          const baseHeight = 18 + Math.sin((i / 48) * Math.PI) * 45 + ((i % 5) * 6);
-          bar.style.height = `${Math.min(95, Math.max(16, Math.floor(baseHeight)))}%`;
-          bar.style.animationDelay = `${((i * 0.045) % 0.8).toFixed(3)}s`;
           box.appendChild(bar);
+          barsArray.push(bar);
         }
-      });
+        resetBarsToIdle(barsArray, baseIdle);
+      }
+
+      initVisualizerBars("viz-inst", instBars, 12);
+      initVisualizerBars("viz-voc", vocBars, 10);
 
       // Función: Separar Voz e Instrumental (Comportamiento Idéntico a Convertir)
       btnProcess.addEventListener("click", async () => {
@@ -1389,9 +1421,6 @@
           };
         }
 
-        // Configurar botón de descarga y enlace activo de cabecera
-        updateActiveDownloadButtons();
-
         audioInst.load();
         audioVoc.load();
 
@@ -1419,41 +1448,19 @@
 
       function updateMuteButtonState(btn, isMuted) {
         const ttId = btn.id === "btn-mute-inst" ? "tt-mute-inst" : "tt-mute-voc";
+        btn.removeAttribute("title");
         if (isMuted) {
           btn.classList.add("is-muted");
-          btn.setAttribute("title", "Silenciado");
           btn.setAttribute("aria-label", "Silenciado");
           btn.innerHTML = `<svg class="icon mute-icon" viewBox="0 0 24 24" style="width: 17px; height: 17px;">${volIconMuted}</svg><span class="tooltip-text" id="${ttId}">Silenciado</span>`;
         } else {
           btn.classList.remove("is-muted");
-          btn.setAttribute("title", "Mute");
-          btn.setAttribute("aria-label", "Mute");
-          btn.innerHTML = `<svg class="icon mute-icon" viewBox="0 0 24 24" style="width: 17px; height: 17px;">${volIconActive}</svg><span class="tooltip-text" id="${ttId}">Mute</span>`;
-        }
-      }
-
-      function updateActiveDownloadButtons(mode) {
-        if (!window.currentSeparationData) return;
-        const btnDlActive = document.getElementById("btn-dl-active");
-        const btnCopyActive = document.getElementById("btn-copy-stream-active");
-        const isVoc = (mode === "voc");
-        const targetStem = isVoc ? window.currentSeparationData.vocals : window.currentSeparationData.instrumental;
-
-        if (btnDlActive) {
-          btnDlActive.href = targetStem.downloadUrl;
-          btnDlActive.setAttribute("download", targetStem.filename);
-        }
-        if (btnCopyActive) {
-          btnCopyActive.onclick = () => {
-            const downloadFull = window.location.origin + targetStem.downloadUrl;
-            navigator.clipboard.writeText(downloadFull);
-            triggerCopyFeedback(btnCopyActive);
-          };
+          btn.setAttribute("aria-label", "Silenciar");
+          btn.innerHTML = `<svg class="icon mute-icon" viewBox="0 0 24 24" style="width: 17px; height: 17px;">${volIconActive}</svg><span class="tooltip-text" id="${ttId}">Silenciar</span>`;
         }
       }
 
       function applyListeningMode(mode) {
-        updateActiveDownloadButtons(mode);
         btnModeInst.classList.remove("active");
         btnModeVoc.classList.remove("active");
         btnModeBoth.classList.remove("active");
@@ -1502,21 +1509,76 @@
       const vizVoc = document.getElementById("viz-voc");
 
       let isPlaying = false;
+      let animFrameId = null;
+
+      function animateVisualizers(now) {
+        const t = now * 0.0035;
+
+        const instActive = isPlaying && !audioInst.muted && audioInst.volume > 0;
+        const vocActive = isPlaying && !audioVoc.muted && audioVoc.volume > 0;
+
+        if (instActive) {
+          const vol = audioInst.volume;
+          for (let i = 0; i < VIZ_BAR_COUNT; i++) {
+            const freqWeight = 0.65 + Math.sin((i / VIZ_BAR_COUNT) * Math.PI) * 0.55;
+            const h1 = Math.sin(t * 3.4 + i * 0.22);
+            const h2 = Math.sin(t * 6.8 + i * 0.44);
+            const h3 = Math.cos(t * 1.9 + i * 0.12);
+            const dynamicAmp = (h1 * 26 + h2 * 18 + h3 * 14 + 34) * freqWeight * vol;
+            instBars[i].style.height = `${Math.min(98, Math.max(12, Math.round(14 + dynamicAmp)))}%`;
+          }
+        } else {
+          resetBarsToIdle(instBars, 12);
+        }
+
+        if (vocActive) {
+          const vol = audioVoc.volume;
+          for (let i = 0; i < VIZ_BAR_COUNT; i++) {
+            const vocalFocus = Math.pow(Math.sin((i / VIZ_BAR_COUNT) * Math.PI), 1.4);
+            const h1 = Math.sin(t * 4.6 + i * 0.32);
+            const h2 = Math.cos(t * 8.4 + i * 0.58);
+            const h3 = Math.sin(t * 2.3 + i * 0.16);
+            const dynamicAmp = (h1 * 28 + h2 * 20 + h3 * 16 + 32) * (0.4 + vocalFocus * 0.8) * vol;
+            vocBars[i].style.height = `${Math.min(98, Math.max(10, Math.round(12 + dynamicAmp)))}%`;
+          }
+        } else {
+          resetBarsToIdle(vocBars, 10);
+        }
+
+        if (isPlaying) {
+          animFrameId = requestAnimationFrame(animateVisualizers);
+        } else {
+          animFrameId = null;
+        }
+      }
 
       function updateVisualizerStates() {
         const instActive = isPlaying && !audioInst.muted && audioInst.volume > 0;
         const vocActive = isPlaying && !audioVoc.muted && audioVoc.volume > 0;
 
         if (instActive) {
-          vizInst.classList.add("playing");
+          vizInst.classList.add("active");
         } else {
-          vizInst.classList.remove("playing");
+          vizInst.classList.remove("active");
         }
 
         if (vocActive) {
-          vizVoc.classList.add("playing");
+          vizVoc.classList.add("active");
         } else {
-          vizVoc.classList.remove("playing");
+          vizVoc.classList.remove("active");
+        }
+
+        if (isPlaying) {
+          if (!animFrameId) {
+            animFrameId = requestAnimationFrame(animateVisualizers);
+          }
+        } else {
+          if (animFrameId) {
+            cancelAnimationFrame(animFrameId);
+            animFrameId = null;
+          }
+          resetBarsToIdle(instBars, 12);
+          resetBarsToIdle(vocBars, 10);
         }
       }
 
@@ -1536,7 +1598,6 @@
           audioVoc.pause();
           updateMasterPlayState(false);
         } else {
-          // Re-sincronizar posición temporal
           audioVoc.currentTime = audioInst.currentTime;
           Promise.all([audioInst.play(), audioVoc.play()]).then(() => {
             updateMasterPlayState(true);
@@ -1556,7 +1617,6 @@
         const s = Math.floor(audioInst.currentTime % 60);
         timeCurrent.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 
-        // Pequeño desfase correctivo si se alejan más de 0.08 segundos
         if (Math.abs(audioInst.currentTime - audioVoc.currentTime) > 0.08) {
           audioVoc.currentTime = audioInst.currentTime;
         }
@@ -1577,32 +1637,49 @@
         timeCurrent.textContent = "00:00";
       });
 
-      // Control de volumen independiente
+      // Control de volumen independiente (Bajar y Subir al 100% sin bugs)
       volInst.addEventListener("input", () => {
-        const val = parseFloat(volInst.value) || 0;
+        const val = Math.min(100, Math.max(0, parseFloat(volInst.value) || 0));
         volInstText.textContent = `${Math.round(val)}%`;
-        if (!audioInst.muted) {
-          audioInst.volume = Math.min(1, Math.max(0, val / 100));
+        const ratio = val / 100;
+        if (ratio > 0 && audioInst.muted) {
+          audioInst.muted = false;
+          updateMuteButtonState(btnMuteInst, false);
+        } else if (ratio === 0 && !audioInst.muted) {
+          audioInst.muted = true;
+          updateMuteButtonState(btnMuteInst, true);
         }
+        audioInst.volume = ratio;
         updateVisualizerStates();
       });
 
       volVoc.addEventListener("input", () => {
-        const val = parseFloat(volVoc.value) || 0;
+        const val = Math.min(100, Math.max(0, parseFloat(volVoc.value) || 0));
         volVocText.textContent = `${Math.round(val)}%`;
-        if (!audioVoc.muted) {
-          audioVoc.volume = Math.min(1, Math.max(0, val / 100));
+        const ratio = val / 100;
+        if (ratio > 0 && audioVoc.muted) {
+          audioVoc.muted = false;
+          updateMuteButtonState(btnMuteVoc, false);
+        } else if (ratio === 0 && !audioVoc.muted) {
+          audioVoc.muted = true;
+          updateMuteButtonState(btnMuteVoc, true);
         }
+        audioVoc.volume = ratio;
         updateVisualizerStates();
       });
 
       // Botones de Mute individuales con icono y tooltip
       btnMuteInst.addEventListener("click", () => {
         audioInst.muted = !audioInst.muted;
-        if (!audioInst.muted) {
-          audioInst.volume = Math.min(1, Math.max(0, (parseFloat(volInst.value) || 100) / 100));
-        } else {
+        if (audioInst.muted) {
+          audioInst.dataset.prevVol = volInst.value;
           audioInst.volume = 0;
+        } else {
+          let restoreVal = parseFloat(audioInst.dataset.prevVol || volInst.value) || 100;
+          if (restoreVal <= 0) restoreVal = 100;
+          volInst.value = restoreVal;
+          volInstText.textContent = `${Math.round(restoreVal)}%`;
+          audioInst.volume = restoreVal / 100;
         }
         updateMuteButtonState(btnMuteInst, audioInst.muted);
         updateVisualizerStates();
@@ -1610,10 +1687,15 @@
 
       btnMuteVoc.addEventListener("click", () => {
         audioVoc.muted = !audioVoc.muted;
-        if (!audioVoc.muted) {
-          audioVoc.volume = Math.min(1, Math.max(0, (parseFloat(volVoc.value) || 100) / 100));
-        } else {
+        if (audioVoc.muted) {
+          audioVoc.dataset.prevVol = volVoc.value;
           audioVoc.volume = 0;
+        } else {
+          let restoreVal = parseFloat(audioVoc.dataset.prevVol || volVoc.value) || 100;
+          if (restoreVal <= 0) restoreVal = 100;
+          volVoc.value = restoreVal;
+          volVocText.textContent = `${Math.round(restoreVal)}%`;
+          audioVoc.volume = restoreVal / 100;
         }
         updateMuteButtonState(btnMuteVoc, audioVoc.muted);
         updateVisualizerStates();
