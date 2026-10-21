@@ -150,6 +150,49 @@ async function separateWithDemucsAI(inputAudioPath, outInstrumentalPath, outVoca
 }
 
 
+const DEMUCS_LOCAL_PY_PATH = path.join(__dirname, "ai_demucs_separator.py");
+
+/**
+ * Separación neuronal profunda local con Meta HT-Demucs v4 (ONNX Runtime)
+ * Descompone el audio en tensores acústicos independientes:
+ * - Vocals: Voz humana pura sin percusión ni instrumentación.
+ * - Instrumental: Pista de acompañamiento completa (Drums + Bass + Other) con supresión total de la voz.
+ */
+async function separateWithDemucsLocal(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate = "320k") {
+  logger.info("Separador AI: Ejecutando arquitectura neuronal profunda Meta HT-Demucs v4 (ONNX)...");
+
+  const kbps = parseInt(bitrate) || 320;
+
+  return new Promise((resolve, reject) => {
+    const py = spawn("python", [DEMUCS_LOCAL_PY_PATH, inputAudioPath, outInstrumentalPath, outVocalsPath, kbps.toString()]);
+    let pyErr = "";
+    let pyOut = "";
+
+    py.stdout.on("data", d => {
+      const str = d.toString();
+      pyOut += str;
+      logger.info(`[HT-Demucs] ${str.trim()}`);
+    });
+
+    py.stderr.on("data", d => {
+      pyErr += d.toString();
+    });
+
+    py.on("close", code => {
+      const instOk = fs.existsSync(outInstrumentalPath) && fs.statSync(outInstrumentalPath).size > 1000;
+      const vocOk = fs.existsSync(outVocalsPath) && fs.statSync(outVocalsPath).size > 1000;
+      if (code === 0 && instOk && vocOk) {
+        logger.info("Separador AI: Stems neuronales aislados exitosamente con HT-Demucs v4.");
+        resolve();
+      } else {
+        reject(new Error(`Error en HT-Demucs v4 (code ${code}): ${pyErr.slice(-300) || pyOut.slice(-300)}`));
+      }
+    });
+
+    py.on("error", reject);
+  });
+}
+
 const STFT_PY_PATH = path.join(__dirname, "stft_separator.py");
 
 /**
@@ -285,18 +328,24 @@ function separateAudioChannels(inputAudioPath, outInstrumentalPath, outVocalsPat
       const bitrateMap = { "320k": "320k", "192k": "192k", "128k": "128k" };
       const bitrate = bitrateMap[quality] || "320k";
 
-      let engineUsed = "STFT Spectral Decomposition (High-Def)";
+      let engineUsed = "Meta HT-Demucs v4 Neural AI";
       try {
-        await separateWithPythonSTFT(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate);
-      } catch (stftErr) {
-        logger.warn(`Motor STFT local no disponible (${stftErr.message}). Probando Demucs AI / DSP...`);
+        await separateWithDemucsLocal(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate);
+      } catch (demucsErr) {
+        logger.warn(`HT-Demucs local no pudo procesar (${demucsErr.message}). Probando Demucs Cloud AI...`);
         try {
           await separateWithDemucsAI(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate);
-          engineUsed = "Demucs v4 Neural AI";
+          engineUsed = "Demucs v4 Cloud AI";
         } catch (aiErr) {
-          logger.warn(`Demucs AI no disponible (${aiErr.message}). Usando motor DSP de respaldo...`);
-          await separateWithDSPFallback(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate);
-          engineUsed = "Resilient High-Def DSP";
+          logger.warn(`Demucs AI no disponible (${aiErr.message}). Probando STFT espectral...`);
+          try {
+            await separateWithPythonSTFT(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate);
+            engineUsed = "STFT Spectral Decomposition";
+          } catch (stftErr) {
+            logger.warn(`STFT espectral falló (${stftErr.message}). Usando motor DSP de respaldo...`);
+            await separateWithDSPFallback(inputAudioPath, outInstrumentalPath, outVocalsPath, bitrate);
+            engineUsed = "Resilient High-Def DSP";
+          }
         }
       }
 

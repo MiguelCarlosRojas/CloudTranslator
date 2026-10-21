@@ -1472,7 +1472,6 @@
           audioInst.muted = true;
           updateMuteButtonState(btnMuteInst, true);
           updateMuteButtonState(btnMuteVoc, false);
-          updateVisualizerStates();
         } else if (mode === "both") {
           btnModeBoth.classList.add("active");
           currentListenLabel.textContent = "AMBOS SINCRONIZADOS";
@@ -1481,6 +1480,7 @@
           updateMuteButtonState(btnMuteInst, false);
           updateMuteButtonState(btnMuteVoc, false);
         }
+        updateVisualizerStates();
       }
 
       btnModeInst.addEventListener("click", () => applyListeningMode("inst"));
