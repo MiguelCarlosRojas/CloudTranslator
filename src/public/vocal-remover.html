@@ -1463,6 +1463,8 @@
           currentListenLabel.textContent = "SOLO INSTRUMENTAL (KARAOKE)";
           audioInst.muted = false;
           audioVoc.muted = true;
+          audioInst.volume = volInst.value / 100;
+          audioVoc.volume = 0;
           updateMuteButtonState(btnMuteInst, false);
           updateMuteButtonState(btnMuteVoc, true);
         } else if (mode === "voc") {
@@ -1470,6 +1472,8 @@
           currentListenLabel.textContent = "SOLO VOZ (ACAPELLA)";
           audioVoc.muted = false;
           audioInst.muted = true;
+          audioVoc.volume = volVoc.value / 100;
+          audioInst.volume = 0;
           updateMuteButtonState(btnMuteInst, true);
           updateMuteButtonState(btnMuteVoc, false);
         } else if (mode === "both") {
@@ -1477,6 +1481,8 @@
           currentListenLabel.textContent = "AMBOS SINCRONIZADOS";
           audioInst.muted = false;
           audioVoc.muted = false;
+          audioInst.volume = volInst.value / 100;
+          audioVoc.volume = volVoc.value / 100;
           updateMuteButtonState(btnMuteInst, false);
           updateMuteButtonState(btnMuteVoc, false);
         }
@@ -1573,14 +1579,18 @@
 
       // Control de volumen independiente
       volInst.addEventListener("input", () => {
-        audioInst.volume = volInst.value / 100;
         volInstText.textContent = `${volInst.value}%`;
+        if (!audioInst.muted) {
+          audioInst.volume = volInst.value / 100;
+        }
         updateVisualizerStates();
       });
 
       volVoc.addEventListener("input", () => {
-        audioVoc.volume = volVoc.value / 100;
         volVocText.textContent = `${volVoc.value}%`;
+        if (!audioVoc.muted) {
+          audioVoc.volume = volVoc.value / 100;
+        }
         updateVisualizerStates();
       });
 
