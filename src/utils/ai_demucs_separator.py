@@ -41,14 +41,14 @@ def separate_stems(input_path, out_inst_path, out_voc_path, bitrate=320):
     # 2. Stem Instrumental puro (Suma de Batería + Bajo + Otros Instrumentos)
     instrumental = stems["drums"] + stems["bass"] + stems["other"]
 
-    # Prevención de clipping y normalización de picos
+    # Normalización de picos a nivel alto (-0.17 dBFS / 0.98) para máximo volumen acústico sin distorsión
     max_inst = np.max(np.abs(instrumental))
-    if max_inst > 0.98:
-        instrumental = instrumental * (0.95 / max_inst)
+    if max_inst > 0.001:
+        instrumental = instrumental * (0.98 / max_inst)
 
     max_voc = np.max(np.abs(vocals))
-    if max_voc > 0.98:
-        vocals = vocals * (0.95 / max_voc)
+    if max_voc > 0.001:
+        vocals = vocals * (0.98 / max_voc)
 
     print(f"[Demucs AI] Guardando stem instrumental en: {out_inst_path}")
     if out_inst_path.lower().endswith(".mp3"):

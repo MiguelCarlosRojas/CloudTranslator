@@ -713,7 +713,7 @@
             <div class="channel-controls">
               <div class="volume-slider-box">
                 <svg class="icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-                <input type="range" id="vol-inst" class="volume-slider" min="0" max="1" step="0.05" value="1" title="Volumen Instrumental">
+                <input type="range" id="vol-inst" class="volume-slider" min="0" max="100" step="1" value="100" title="Volumen Instrumental">
                 <span id="vol-inst-text" style="font-size: 0.75rem; font-weight: 700; width: 34px;">100%</span>
               </div>
               <button id="btn-mute-inst" type="button" class="btn btn-icon-mute" title="Mute" aria-label="Mute"><svg class="icon mute-icon" viewBox="0 0 24 24" style="width: 17px; height: 17px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg><span class="tooltip-text" id="tt-mute-inst">Mute</span></button>
@@ -745,7 +745,7 @@
             <div class="channel-controls">
               <div class="volume-slider-box">
                 <svg class="icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-                <input type="range" id="vol-voc" class="volume-slider" min="0" max="1" step="0.05" value="1" title="Volumen Vocal">
+                <input type="range" id="vol-voc" class="volume-slider" min="0" max="100" step="1" value="100" title="Volumen Vocal">
                 <span id="vol-voc-text" style="font-size: 0.75rem; font-weight: 700; width: 34px;">100%</span>
               </div>
               <button id="btn-mute-voc" type="button" class="btn btn-icon-mute" title="Mute" aria-label="Mute"><svg class="icon mute-icon" viewBox="0 0 24 24" style="width: 17px; height: 17px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg><span class="tooltip-text" id="tt-mute-voc">Mute</span></button>
@@ -1463,7 +1463,7 @@
           currentListenLabel.textContent = "SOLO INSTRUMENTAL (KARAOKE)";
           audioInst.muted = false;
           audioVoc.muted = true;
-          audioInst.volume = volInst.value / 100;
+          audioInst.volume = Math.min(1, Math.max(0, (parseFloat(volInst.value) || 100) / 100));
           audioVoc.volume = 0;
           updateMuteButtonState(btnMuteInst, false);
           updateMuteButtonState(btnMuteVoc, true);
@@ -1472,7 +1472,7 @@
           currentListenLabel.textContent = "SOLO VOZ (ACAPELLA)";
           audioVoc.muted = false;
           audioInst.muted = true;
-          audioVoc.volume = volVoc.value / 100;
+          audioVoc.volume = Math.min(1, Math.max(0, (parseFloat(volVoc.value) || 100) / 100));
           audioInst.volume = 0;
           updateMuteButtonState(btnMuteInst, true);
           updateMuteButtonState(btnMuteVoc, false);
@@ -1481,8 +1481,8 @@
           currentListenLabel.textContent = "AMBOS SINCRONIZADOS";
           audioInst.muted = false;
           audioVoc.muted = false;
-          audioInst.volume = volInst.value / 100;
-          audioVoc.volume = volVoc.value / 100;
+          audioInst.volume = Math.min(1, Math.max(0, (parseFloat(volInst.value) || 100) / 100));
+          audioVoc.volume = Math.min(1, Math.max(0, (parseFloat(volVoc.value) || 100) / 100));
           updateMuteButtonState(btnMuteInst, false);
           updateMuteButtonState(btnMuteVoc, false);
         }
@@ -1579,17 +1579,19 @@
 
       // Control de volumen independiente
       volInst.addEventListener("input", () => {
-        volInstText.textContent = `${volInst.value}%`;
+        const val = parseFloat(volInst.value) || 0;
+        volInstText.textContent = `${Math.round(val)}%`;
         if (!audioInst.muted) {
-          audioInst.volume = volInst.value / 100;
+          audioInst.volume = Math.min(1, Math.max(0, val / 100));
         }
         updateVisualizerStates();
       });
 
       volVoc.addEventListener("input", () => {
-        volVocText.textContent = `${volVoc.value}%`;
+        const val = parseFloat(volVoc.value) || 0;
+        volVocText.textContent = `${Math.round(val)}%`;
         if (!audioVoc.muted) {
-          audioVoc.volume = volVoc.value / 100;
+          audioVoc.volume = Math.min(1, Math.max(0, val / 100));
         }
         updateVisualizerStates();
       });
@@ -1597,12 +1599,22 @@
       // Botones de Mute individuales con icono y tooltip
       btnMuteInst.addEventListener("click", () => {
         audioInst.muted = !audioInst.muted;
+        if (!audioInst.muted) {
+          audioInst.volume = Math.min(1, Math.max(0, (parseFloat(volInst.value) || 100) / 100));
+        } else {
+          audioInst.volume = 0;
+        }
         updateMuteButtonState(btnMuteInst, audioInst.muted);
         updateVisualizerStates();
       });
 
       btnMuteVoc.addEventListener("click", () => {
         audioVoc.muted = !audioVoc.muted;
+        if (!audioVoc.muted) {
+          audioVoc.volume = Math.min(1, Math.max(0, (parseFloat(volVoc.value) || 100) / 100));
+        } else {
+          audioVoc.volume = 0;
+        }
         updateMuteButtonState(btnMuteVoc, audioVoc.muted);
         updateVisualizerStates();
       });

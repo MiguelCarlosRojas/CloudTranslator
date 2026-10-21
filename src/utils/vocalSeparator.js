@@ -120,12 +120,14 @@ async function separateWithNeuralCloudAI(inputAudioPath, outInstrumentalPath, ou
   fs.writeFileSync(tempInstMp3, Buffer.from(resInst.data));
 
   try {
-    logger.info(`Separador AI: Transcodificando a ${bitrate} de alta fidelidad...`);
+    logger.info(`Separador AI: Maximizando ganancia acústica y transcodificando a ${bitrate}...`);
+    // Boost de volumen alto (+5.1dB a +6.0dB) con limitador transparente a 0.98 (-0.17 dBFS) para evitar distorsión
     await Promise.all([
       new Promise((res, rej) => {
         const ff = spawn(ffmpegPath, [
           "-y",
           "-i", tempInstMp3,
+          "-af", "volume=1.85,alimiter=limit=0.98",
           "-c:a", "libmp3lame",
           "-b:a", bitrate,
           "-id3v2_version", "3",
@@ -138,6 +140,7 @@ async function separateWithNeuralCloudAI(inputAudioPath, outInstrumentalPath, ou
         const ff = spawn(ffmpegPath, [
           "-y",
           "-i", tempVocMp3,
+          "-af", "volume=2.0,alimiter=limit=0.98",
           "-c:a", "libmp3lame",
           "-b:a", bitrate,
           "-id3v2_version", "3",
@@ -147,7 +150,7 @@ async function separateWithNeuralCloudAI(inputAudioPath, outInstrumentalPath, ou
         ff.on("error", rej);
       })
     ]);
-    logger.info("Separador AI: Stems neuronales aislados exitosamente con red neuronal profunda.");
+    logger.info("Separador AI: Stems neuronales aislados exitosamente con volumen alto y calibrado.");
   } finally {
     try { if (fs.existsSync(tempVocMp3)) fs.unlinkSync(tempVocMp3); } catch {}
     try { if (fs.existsSync(tempInstMp3)) fs.unlinkSync(tempInstMp3); } catch {}
@@ -202,12 +205,13 @@ async function separateWithDemucsAI(inputAudioPath, outInstrumentalPath, outVoca
   fs.writeFileSync(tempInstWav, Buffer.from(resInst.data));
 
   try {
-    logger.info("Separador AI: Renderizando master en MP3 con calidad solicitada...");
+    logger.info("Separador AI: Renderizando master en MP3 con volumen alto y normalizado...");
     await Promise.all([
       new Promise((res, rej) => {
         const ff = spawn(ffmpegPath, [
           "-y",
           "-i", tempInstWav,
+          "-af", "volume=1.85,alimiter=limit=0.98",
           "-c:a", "libmp3lame",
           "-b:a", bitrate,
           "-id3v2_version", "3",
@@ -220,6 +224,7 @@ async function separateWithDemucsAI(inputAudioPath, outInstrumentalPath, outVoca
         const ff = spawn(ffmpegPath, [
           "-y",
           "-i", tempVocWav,
+          "-af", "volume=2.0,alimiter=limit=0.98",
           "-c:a", "libmp3lame",
           "-b:a", bitrate,
           "-id3v2_version", "3",
@@ -229,7 +234,7 @@ async function separateWithDemucsAI(inputAudioPath, outInstrumentalPath, outVoca
         ff.on("error", rej);
       })
     ]);
-    logger.info("Separador AI: Stems neuronales Demucs v4 generados con éxito rotundo.");
+    logger.info("Separador AI: Stems neuronales Demucs v4 generados con éxito rotundo a volumen alto.");
   } finally {
     try { if (fs.existsSync(tempVocWav)) fs.unlinkSync(tempVocWav); } catch {}
     try { if (fs.existsSync(tempInstWav)) fs.unlinkSync(tempInstWav); } catch {}
