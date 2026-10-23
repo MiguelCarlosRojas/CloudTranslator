@@ -20,8 +20,7 @@ function Invoke-PillarRemoveBg {
         Write-Host ""
         Write-Host "  ${Cyan}${Bold}╭─ [08] Vork Estudio y Eliminador de Fondo IA (U2-Net)${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa la ruta de la imagen (ej: producto.jpg):${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $fileInput = [Console]::ReadLine()
+        $fileInput = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $fileInput -or -not (Test-Path $fileInput.Trim())) {
             Write-Host "  ${Lead}╰─ Imagen no válida o cancelado.${Reset}"
             Write-Host ""
@@ -39,8 +38,7 @@ function Invoke-PillarRemoveBg {
         $chosenBg = Select-InteractiveOption -PromptTitle "Selecciona el modo de procesamiento de fondo:" -Options $bgOptions -DefaultIndex 0
         if ($chosenBg) { $mode = $chosenBg }
 
-        Write-Host "  ${Lead}│${Reset} ${Cyan}Archivo de salida [sin_fondo.png]:${Reset} " -NoNewline
-        $outInput = [Console]::ReadLine()
+        $outInput = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}Archivo de salida [sin_fondo.png]:${Reset} "
         if ($outInput -and $outInput.Trim()) { $out = $outInput.Trim() } else { $out = "sin_fondo.png" }
     }
 

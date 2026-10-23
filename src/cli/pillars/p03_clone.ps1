@@ -23,8 +23,7 @@ function Invoke-PillarClone {
         Write-Host ""
         Write-Host "  ${Cyan}${Bold}╭─ [03] Vork Clonación de Voz IA (Modelado F0)${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ruta del archivo de muestra de audio (ej: muestra.wav):${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $sample = [Console]::ReadLine()
+        $sample = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $sample -or -not $sample.Trim()) {
             Write-Host "  ${Lead}╰─ Clonación cancelada.${Reset}"
             Write-Host ""
@@ -42,11 +41,9 @@ function Invoke-PillarClone {
         if ($chosenF0) { $f0Method = $chosenF0 }
 
         Write-Host "  ${Lead}│${Reset} ${White}Texto o guión a sintetizar con la voz clonada:${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $text = [Console]::ReadLine()
+        $text = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
 
-        Write-Host "  ${Lead}│${Reset} ${Cyan}Archivo de salida [clonado.wav]:${Reset} " -NoNewline
-        $outInput = [Console]::ReadLine()
+        $outInput = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}Archivo de salida [clonado.wav]:${Reset} "
         if ($outInput -and $outInput.Trim()) { $out = $outInput.Trim() }
     }
 

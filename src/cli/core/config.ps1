@@ -1,5 +1,5 @@
 ﻿param(
-    [Parameter(Position=0)]
+    [Parameter(Position=0, ValueFromPipeline=$true)]
     [string]$Command = "",
 
     [Parameter(Position=1, ValueFromRemainingArguments=$true)]
@@ -84,6 +84,135 @@ try {
     Set-Content -Path $lastConvFile -Value $global:VorkConversationId -Force -Encoding UTF8
 } catch { }
 
+function Get-VorkConversationDir {
+    param([string]$ConvId)
+    $base = Join-Path $HOME ".vork\conversations"
+    $targetDir = Join-Path $base $ConvId
+    if (-not (Test-Path $targetDir)) {
+        New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+    }
+    return $targetDir
+}
+
+function Save-VorkConversationRecord {
+    param(
+        [string]$Cmd,
+        [string]$Output = ""
+    )
+    if (-not $global:VorkConversationId) { return }
+    try {
+        $cDir = Get-VorkConversationDir -ConvId $global:VorkConversationId
+        $histPath = Join-Path $cDir "history.txt"
+        Add-Content -Path $histPath -Value $Cmd -Encoding UTF8
+
+        $logPath = Join-Path $cDir "transcript.jsonl"
+        $entry = @{
+            Timestamp = [DateTime]::UtcNow.ToString("o")
+            Command = $Cmd
+            Output = $Output
+        } | ConvertTo-Json -Compress
+        Add-Content -Path $logPath -Value $entry -Encoding UTF8
+
+        $sessPath = Join-Path $cDir "session.json"
+        $sessData = @{
+            ConversationId = $global:VorkConversationId
+            UpdatedAt = [DateTime]::UtcNow.ToString("o")
+            Model = $global:VorkModel
+            Tier = $global:VorkTier
+            Theme = $global:VorkThemeId
+        }
+        $sessData | ConvertTo-Json | Set-Content -Path $sessPath -Encoding UTF8
+    } catch { }
+}
+
+function Load-VorkConversationState {
+    param([string]$ConvId)
+    $cDir = Join-Path $HOME ".vork\conversations\$ConvId"
+    if (Test-Path $cDir) {
+        $sessPath = Join-Path $cDir "session.json"
+        if (Test-Path $sessPath) {
+            try {
+                $sess = Get-Content -Path $sessPath -Raw | ConvertFrom-Json
+                if ($sess.Model) { $global:VorkModel = $sess.Model }
+                if ($sess.Tier) { $global:VorkTier = $sess.Tier }
+                if ($sess.Theme) { Apply-VorkTheme -ThemeName $sess.Theme }
+            } catch { }
+        }
+
+        $histPath = Join-Path $cDir "history.txt"
+        if (Test-Path $histPath) {
+            try {
+                $lines = @(Get-Content -Path $histPath -Encoding UTF8 | Where-Object { $_ -and $_.Trim() })
+                if ($lines.Count -gt 0) {
+                    $global:VorkSessionHistory = [System.Collections.ArrayList]@($lines)
+                }
+            } catch { }
+        }
+    }
+}
+
+function Show-ResumedConversationTranscript {
+    param([string]$ConvId)
+    $cDir = Join-Path $HOME ".vork\conversations\$ConvId"
+    $logPath = Join-Path $cDir "transcript.jsonl"
+    $histPath = Join-Path $cDir "history.txt"
+    $elbow = [char]0x23BF
+
+    Write-Host ""
+    Write-Host "  ${Green}●${Reset} ${White}${Bold}Resumed conversation ${Cyan}$ConvId${Reset}"
+
+    $found = $false
+    if (Test-Path $logPath) {
+        try {
+            $entries = @(Get-Content -Path $logPath -Encoding UTF8 | Where-Object { $_ -and $_.Trim() })
+            if ($entries.Count -gt 0) {
+                $found = $true
+                Write-Host "  ${LeadLight}Restored $($entries.Count) interaction(s) from previous session:${Reset}"
+                Write-Host ""
+                foreach ($raw in $entries) {
+                    try {
+                        $item = $raw | ConvertFrom-Json
+                        Write-Host "  ${Coral}${Bold}> ${White}${Bold}$($item.Command)${Reset}"
+                        if ($item.Output) {
+                            $lines = $item.Output -split "\r?\n"
+                            for ($i = 0; $i -lt $lines.Count; $i++) {
+                                $l = $lines[$i]
+                                if ($i -eq 0) {
+                                    Write-Host "    ${LeadLight}$elbow  $l${Reset}"
+                                } else {
+                                    Write-Host "       ${LeadLight}$l${Reset}"
+                                }
+                            }
+                        }
+                        Write-Host ""
+                    } catch { }
+                }
+            }
+        } catch { }
+    }
+
+    if (-not $found -and (Test-Path $histPath)) {
+        try {
+            $hLines = @(Get-Content -Path $histPath -Encoding UTF8 | Where-Object { $_ -and $_.Trim() })
+            if ($hLines.Count -gt 0) {
+                $found = $true
+                Write-Host "  ${LeadLight}Restored $($hLines.Count) command(s) from previous session:${Reset}"
+                Write-Host ""
+                foreach ($hl in $hLines) {
+                    Write-Host "  ${Coral}${Bold}> ${White}${Bold}$hl${Reset}"
+                    Write-Host "    ${LeadLight}$elbow  Executed $hl${Reset}"
+                    Write-Host ""
+                }
+            }
+        } catch { }
+    }
+
+    if (-not $found) {
+        Write-Host "  ${LeadLight}Session context initialized.${Reset}"
+        Write-Host ""
+    }
+}
+
 function Exit-VorkSession {
     param([int]$ExitCode = 0)
     Write-Host ""
@@ -99,13 +228,16 @@ $ApiBase = if ($env:VORK_API) { $env:VORK_API } elseif ($env:CLOUDTRANSLATOR_API
 # ========================================================
 # PALETA TIPOGRÁFICA ANSI Y SISTEMA DE 10 TEMAS VISUALES
 # ========================================================
-$ESC    = [char]27
-$Reset  = "$ESC[0m"
-$Bold   = "$ESC[1m"
-$Dim    = "$ESC[2m"
-$Italic = "$ESC[3m"
-$White  = "$ESC[38;2;240;246;252m"
-$Gray   = "$ESC[38;2;120;128;140m"
+$ESC      = [char]27
+$CSI      = "$([char]27)["
+$ClrLine  = "$([char]27)[2K"
+$ClrToEnd = "$([char]27)[K"
+$Reset    = "$ESC[0m"
+$Bold     = "$ESC[1m"
+$Dim      = "$ESC[2m"
+$Italic   = "$ESC[3m"
+$White    = "$ESC[38;2;240;246;252m"
+$Gray     = "$ESC[38;2;120;128;140m"
 
 $global:IsWinPlatform = ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT)
 
@@ -387,6 +519,29 @@ if (Test-Path $histFile) {
     }
 } else {
     $global:VorkSessionHistory = [System.Collections.ArrayList]@()
+}
+
+# Si estamos reanudando una sesión específica (-c o --conversation=...), cargar su estado inmediatamente
+if ($global:VorkIsResumed) {
+    Load-VorkConversationState -ConvId $global:VorkConversationId
+}
+
+# Inicializar directorio y metadata de la conversación activa si no existe
+if ($global:VorkConversationId) {
+    try {
+        $activeCDir = Get-VorkConversationDir -ConvId $global:VorkConversationId
+        $activeSessPath = Join-Path $activeCDir "session.json"
+        if (-not (Test-Path $activeSessPath)) {
+            @{
+                ConversationId = $global:VorkConversationId
+                CreatedAt = [DateTime]::UtcNow.ToString("o")
+                UpdatedAt = [DateTime]::UtcNow.ToString("o")
+                Model = if ($global:VorkModel) { $global:VorkModel } else { "Vork 3" }
+                Tier = if ($global:VorkTier) { $global:VorkTier } else { "medium" }
+                Theme = if ($global:VorkThemeId) { $global:VorkThemeId } else { "lead" }
+            } | ConvertTo-Json | Set-Content -Path $activeSessPath -Encoding UTF8
+        }
+    } catch { }
 }
 
 function Show-InteractiveModeSelector {

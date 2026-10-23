@@ -18,8 +18,7 @@ function Invoke-PillarSeparate {
         Write-Host ""
         Write-Host "  ${Cyan}${Bold}╭─ [05] Vork Separador de Stems (Demucs v4)${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa la ruta del archivo de audio o URL (ej: cancion.mp3):${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $target = [Console]::ReadLine()
+        $target = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $target -or -not $target.Trim()) {
             Write-Host "  ${Lead}╰─ Separación cancelada.${Reset}"
             Write-Host ""

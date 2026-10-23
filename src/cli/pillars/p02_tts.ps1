@@ -20,8 +20,7 @@ function Invoke-PillarTTS {
         Write-Host ""
         Write-Host "  ${Cyan}${Bold}╭─ [02] Vork Texto a Voz Neuronal (TTS Studio)${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa el texto a sintetizar:${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $text = [Console]::ReadLine()
+        $text = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $text -or -not $text.Trim()) {
             Write-Host "  ${Lead}╰─ Síntesis cancelada.${Reset}"
             Write-Host ""
@@ -43,8 +42,7 @@ function Invoke-PillarTTS {
             $voice = $chosenVoice
         }
 
-        Write-Host "  ${Lead}│${Reset} ${Cyan}Archivo de salida [voz.mp3]:${Reset} " -NoNewline
-        $outInput = [Console]::ReadLine()
+        $outInput = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}Archivo de salida [voz.mp3]:${Reset} "
         if ($outInput -and $outInput.Trim()) { $out = $outInput.Trim() } else { $out = "voz.mp3" }
     }
 

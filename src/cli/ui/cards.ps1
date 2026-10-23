@@ -3,6 +3,126 @@
     Vork CLI - Modulo UI: Selectores Interactivos con Flechas (Up/Down) y Enter
 #>
 
+function Read-VorkInput {
+    param(
+        [string]$Prompt = ""
+    )
+
+    try { [Console]::TreatControlCAsInput = $false } catch { }
+    try { [Console]::CursorVisible = $true } catch { }
+
+    if ($Prompt) {
+        Write-Host $Prompt -NoNewline
+    }
+
+    if ([Console]::IsInputRedirected) {
+        return [Console]::ReadLine()
+    }
+
+    # Limpiar buffer de teclas residuales
+    while ([Console]::KeyAvailable) {
+        try { [void][Console]::ReadKey($true) } catch { break }
+    }
+
+    $buf = [System.Text.StringBuilder]::new()
+    $pos = 0
+
+    while ($true) {
+        $k = [Console]::ReadKey($true)
+
+        if ($k.Key -eq [ConsoleKey]::Enter) {
+            Write-Host ""
+            return $buf.ToString()
+        }
+
+        # Ctrl+C o Escape para cancelar
+        $isCtrlC = ($k.KeyChar -eq [char]3) -or ($k.Key -eq [ConsoleKey]::C -and ($k.Modifiers -band [ConsoleModifiers]::Control))
+        if ($isCtrlC -or $k.Key -eq [ConsoleKey]::Escape) {
+            Write-Host ""
+            return ""
+        }
+
+        if ($k.Key -eq [ConsoleKey]::Backspace -or $k.KeyChar -eq [char]8) {
+            if ($pos -gt 0) {
+                $buf.Remove($pos - 1, 1) | Out-Null
+                $pos--
+                Write-Host "${CSI}1D" -NoNewline
+                $tail = if ($pos -lt $buf.Length) { $buf.ToString().Substring($pos) } else { "" }
+                Write-Host "$tail $ClrToEnd" -NoNewline
+                $backCount = $tail.Length + 1
+                if ($backCount -gt 0) {
+                    Write-Host "${CSI}${backCount}D" -NoNewline
+                }
+            }
+            continue
+        }
+
+        if ($k.Key -eq [ConsoleKey]::Delete) {
+            if ($pos -lt $buf.Length) {
+                $buf.Remove($pos, 1) | Out-Null
+                $tail = if ($pos -lt $buf.Length) { $buf.ToString().Substring($pos) } else { "" }
+                Write-Host "$tail $ClrToEnd" -NoNewline
+                $backCount = $tail.Length + 1
+                if ($backCount -gt 0) {
+                    Write-Host "${CSI}${backCount}D" -NoNewline
+                }
+            }
+            continue
+        }
+
+        if ($k.Key -eq [ConsoleKey]::LeftArrow) {
+            if ($pos -gt 0) {
+                $pos--
+                Write-Host "${CSI}1D" -NoNewline
+            }
+            continue
+        }
+
+        if ($k.Key -eq [ConsoleKey]::RightArrow) {
+            if ($pos -lt $buf.Length) {
+                $pos++
+                Write-Host "${CSI}1C" -NoNewline
+            }
+            continue
+        }
+
+        if ($k.Key -eq [ConsoleKey]::Home) {
+            if ($pos -gt 0) {
+                Write-Host "${CSI}${pos}D" -NoNewline
+                $pos = 0
+            }
+            continue
+        }
+
+        if ($k.Key -eq [ConsoleKey]::End) {
+            if ($pos -lt $buf.Length) {
+                $fwd = $buf.Length - $pos
+                Write-Host "${CSI}${fwd}C" -NoNewline
+                $pos = $buf.Length
+            }
+            continue
+        }
+
+        $ch = $k.KeyChar
+        if (-not [char]::IsControl($ch)) {
+            if ($pos -eq $buf.Length) {
+                $buf.Append($ch) | Out-Null
+                $pos++
+                Write-Host $ch -NoNewline
+            } else {
+                $buf.Insert($pos, $ch) | Out-Null
+                $pos++
+                $tail = $buf.ToString().Substring($pos)
+                Write-Host "$ch$tail" -NoNewline
+                $backCount = $tail.Length
+                if ($backCount -gt 0) {
+                    Write-Host "${CSI}${backCount}D" -NoNewline
+                }
+            }
+        }
+    }
+}
+
 function Select-InteractiveOption {
     param(
         [string]$PromptTitle,
@@ -35,9 +155,9 @@ function Select-InteractiveOption {
             try { [Console]::SetCursorPosition(2, $menuStartRow + $i) } catch { }
 
             if ($i -eq $sel) {
-                Write-Host "${Cyan}${Bold}> ${White}${Bold}$label${Reset}    $ESC[K" -NoNewline
+                Write-Host "${Cyan}${Bold}> ${White}${Bold}$label${Reset}    $ClrToEnd" -NoNewline
             } else {
-                Write-Host "  ${LeadLight}$label${Reset}    $ESC[K" -NoNewline
+                Write-Host "  ${LeadLight}$label${Reset}    $ClrToEnd" -NoNewline
             }
         }
     }
@@ -64,14 +184,14 @@ function Select-InteractiveOption {
                 try { [Console]::SetCursorPosition(0, $menuStartRow + $Options.Count) } catch { }
                 Write-Host ""
                 $chosen = $Options[$sel]
-                return if ($chosen.Value) { $chosen.Value } else { $chosen.ToString() }
+                if ($chosen.Value) { return $chosen.Value } else { return $chosen.ToString() }
             }
 
             if ($k.Key -eq [ConsoleKey]::Escape) {
                 try { [Console]::SetCursorPosition(0, $menuStartRow + $Options.Count) } catch { }
                 Write-Host ""
                 $def = $Options[$DefaultIndex]
-                return if ($def.Value) { $def.Value } else { $def.ToString() }
+                if ($def.Value) { return $def.Value } else { return $def.ToString() }
             }
 
             # Selección numérica directa (1-9)
@@ -83,7 +203,7 @@ function Select-InteractiveOption {
                 try { [Console]::SetCursorPosition(0, $menuStartRow + $Options.Count) } catch { }
                 Write-Host ""
                 $chosen = $Options[$sel]
-                return if ($chosen.Value) { $chosen.Value } else { $chosen.ToString() }
+                if ($chosen.Value) { return $chosen.Value } else { return $chosen.ToString() }
             }
         }
     } finally {
@@ -129,21 +249,21 @@ function Select-InteractiveTheme {
             $th = $Themes[$i]
             $num = if (($i + 1) -lt 10) { "[$($i + 1)] " } else { "[$($i + 1)]" }
             $isActive = ($th.Id -eq $global:VorkThemeId)
-            $badge = if ($isActive) { "$ESC[42;30;1m [ACTIVO] $Reset" } else { "         " }
+            $badge = if ($isActive) { "$($CSI)42;30;1m [ACTIVO] $Reset" } else { "         " }
             $namePad = $th.Name.PadRight(26)
             $lineContent = "${Cyan}$num${Reset} $badge $($th.Dot) ${White}${Bold}$namePad${Reset} ${LeadLight}· $($th.Acentos)${Reset}"
 
             try { [Console]::SetCursorPosition(2, $menuStartRow + $i) } catch { }
 
             if ($i -eq $sel) {
-                Write-Host "${Cyan}${Bold}> ${Reset}$lineContent    $ESC[K" -NoNewline
+                Write-Host "${Cyan}${Bold}> ${Reset}$lineContent    $ClrToEnd" -NoNewline
             } else {
-                Write-Host "  $lineContent    $ESC[K" -NoNewline
+                Write-Host "  $lineContent    $ClrToEnd" -NoNewline
             }
         }
         try {
             [Console]::SetCursorPosition(2, $menuStartRow + $Themes.Count)
-            Write-Host "  ${LeadDark}↑/↓ Navegar  Enter Seleccionar tema  Esc Cancelar${Reset}    $ESC[K" -NoNewline
+            Write-Host "  ${LeadDark}↑/↓ Navegar  Enter Seleccionar tema  Esc Cancelar${Reset}    $ClrToEnd" -NoNewline
         } catch { }
     }
 
@@ -229,9 +349,9 @@ function Select-InteractivePermissions {
             $item = $PermsHash[$k]
             $num = if (($i + 1) -lt 10) { "[$($i + 1)] " } else { "[$($i + 1)]" }
             $statusBadge = if ($item.Enabled) {
-                "$ESC[42;30;1m [OK] PERMITIDO $Reset"
+                "$($CSI)42;30;1m [OK] PERMITIDO $Reset"
             } else {
-                "$ESC[41;97;1m [X] DENEGADO  $Reset"
+                "$($CSI)41;97;1m [X] DENEGADO  $Reset"
             }
             $title = $item.Name.PadRight(28)
             $lineContent = "${Cyan}$num${Reset} $statusBadge  ${White}${Bold}$title${Reset} ${LeadLight}· $($item.Desc)${Reset}"
@@ -239,9 +359,9 @@ function Select-InteractivePermissions {
             try { [Console]::SetCursorPosition(2, $menuStartRow + $i) } catch { }
 
             if ($i -eq $sel) {
-                Write-Host "${Cyan}${Bold}> ${Reset}$lineContent    $ESC[K" -NoNewline
+                Write-Host "${Cyan}${Bold}> ${Reset}$lineContent    $ClrToEnd" -NoNewline
             } else {
-                Write-Host "  $lineContent    $ESC[K" -NoNewline
+                Write-Host "  $lineContent    $ClrToEnd" -NoNewline
             }
         }
 
@@ -249,15 +369,15 @@ function Select-InteractivePermissions {
         $exitIdx = $keys.Count
         try { [Console]::SetCursorPosition(2, $menuStartRow + $exitIdx) } catch { }
         if ($sel -eq $exitIdx) {
-            Write-Host "${Cyan}${Bold}> ${Green}${Bold}[✓] Guardar y Volver al Prompt${Reset}                                                      $ESC[K" -NoNewline
+            Write-Host ("${Cyan}${Bold}> ${Green}${Bold} " + "[✓] Guardar y Volver al Prompt${Reset}                                                      $ClrToEnd") -NoNewline
         } else {
-            Write-Host "  ${LeadLight}[✓] Guardar y Volver al Prompt${Reset}                                                      $ESC[K" -NoNewline
+            Write-Host ("  ${LeadLight} " + "[✓] Guardar y Volver al Prompt${Reset}                                                      $ClrToEnd") -NoNewline
         }
 
         # Footer con atajos de navegación
         try {
             [Console]::SetCursorPosition(2, $menuStartRow + $exitIdx + 1)
-            Write-Host "  ${LeadDark}↑/↓ Navegar  Enter/Espacio Alternar permiso  Esc Salir${Reset}    $ESC[K" -NoNewline
+            Write-Host "  ${LeadDark}↑/↓ Navegar  Enter/Espacio Alternar permiso  Esc Salir${Reset}    $ClrToEnd" -NoNewline
         } catch { }
     }
 
@@ -362,38 +482,38 @@ function Show-InteractiveModelSwitcher {
 
         # Rule y prompt decorativo
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${Lead}$rule${Reset}$ESC[K"
+        Write-Host "${Lead}$rule${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${Coral}${Bold}> ${Reset}$ESC[K"
+        Write-Host "${Coral}${Bold}> ${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${Lead}$rule${Reset}$ESC[K"
+        Write-Host "${Lead}$rule${Reset}$ClrToEnd"
         $row++
 
         # Título
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${White}${Bold}Switch Model${Reset}$ESC[K"
+        Write-Host "${White}${Bold}Switch Model${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "$ESC[K"
+        Write-Host "$ClrToEnd"
         $row++
 
         # Search Box
         try { [Console]::SetCursorPosition(0, $row) } catch { }
         $searchLabel = if ($searchBuf) { "  ${LeadLight}Search: ${White}${Bold}$searchBuf${Reset}" } else { "  ${LeadLight}Search:${Reset}" }
-        Write-Host "$searchLabel$ESC[K"
+        Write-Host "$searchLabel$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "          ${Lead}────────────────────${Reset}$ESC[K"
+        Write-Host "          ${Lead}────────────────────${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "$ESC[K"
+        Write-Host "$ClrToEnd"
         $row++
 
         if ($filtered.Count -gt 0) {
@@ -401,11 +521,11 @@ function Show-InteractiveModelSwitcher {
             try { [Console]::SetCursorPosition(0, $row) } catch { }
             $mName = $filtered[0]
             $padName = $mName.PadRight(28)
-            Write-Host "${Cyan}${Bold}> ${White}${Bold}$padName ${LeadLight}(current)${Reset}    $ESC[K"
+            Write-Host "${Cyan}${Bold}> ${White}${Bold}$padName ${LeadLight}(current)${Reset}    $ClrToEnd"
             $row++
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "$ESC[K"
+            Write-Host "$ClrToEnd"
             $row++
 
             # Slider de Effort
@@ -430,43 +550,43 @@ function Show-InteractiveModelSwitcher {
             }
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "  ${LeadLight}Effort  ${Cyan}$triL${Reset}        ${White}$sliderGraphic${Reset}        ${Cyan}$triR${Reset}$ESC[K"
+            Write-Host "  ${LeadLight}Effort  ${Cyan}$triL${Reset}        ${White}$sliderGraphic${Reset}        ${Cyan}$triR${Reset}$ClrToEnd"
             $row++
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "                  ${LeadLight}low          medium          high${Reset}$ESC[K"
+            Write-Host "                  ${LeadLight}low          medium          high${Reset}$ClrToEnd"
             $row++
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
             $currEffort = $efforts[$effortIdx]
             $effDesc = $effortDescs[$currEffort]
-            Write-Host "            ${LeadLight}$effDesc${Reset}$ESC[K"
+            Write-Host "            ${LeadLight}$effDesc${Reset}$ClrToEnd"
             $row++
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "$ESC[K"
+            Write-Host "$ClrToEnd"
             $row++
 
             # Footer con instrucciones normales
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "${LeadLight}Keyboard: ${Cyan}↑/↓${Reset} ${LeadLight}Navigate  ${Cyan}←/→${Reset} ${LeadLight}Effort  ${Cyan}enter${Reset} ${LeadLight}Select  ${Cyan}esc${Reset} ${LeadLight}Go Back${Reset}$ESC[K"
+            Write-Host "${LeadLight}Keyboard: ${Cyan}↑/↓${Reset} ${LeadLight}Navigate  ${Cyan}←/→${Reset} ${LeadLight}Effort  ${Cyan}enter${Reset} ${LeadLight}Select  ${Cyan}esc${Reset} ${LeadLight}Go Back${Reset}$ClrToEnd"
             $row++
         } else {
             # Sin coincidencias
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "  ${LeadLight}No models match `"$searchBuf`"${Reset}$ESC[K"
+            Write-Host "  ${LeadLight}No models match `"$searchBuf`"${Reset}$ClrToEnd"
             $row++
 
             # Limpiar filas restantes
             for ($c = 0; $c -lt 5; $c++) {
                 try { [Console]::SetCursorPosition(0, $row) } catch { }
-                Write-Host "$ESC[K"
+                Write-Host "$ClrToEnd"
                 $row++
             }
 
             # Footer esc Clear search
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "${LeadLight}Keyboard: ${Cyan}esc${Reset} ${LeadLight}Clear search${Reset}$ESC[K"
+            Write-Host "${LeadLight}Keyboard: ${Cyan}esc${Reset} ${LeadLight}Clear search${Reset}$ClrToEnd"
             $row++
         }
 
@@ -474,7 +594,7 @@ function Show-InteractiveModelSwitcher {
         try { [Console]::SetCursorPosition(0, $row) } catch { }
         $activeText = "Vork 3 " + [char]0x00B7 + " $($efforts[$effortIdx])"
         $padLen = [Math]::Max(1, ($width - 1) - $activeText.Length)
-        Write-Host "$([string]::new(' ', $padLen))${LeadLight}$activeText${Reset}$ESC[K"
+        Write-Host "$([string]::new(' ', $padLen))${LeadLight}$activeText${Reset}$ClrToEnd"
     }
 
     & $renderAll
@@ -749,42 +869,42 @@ function Show-InteractiveSettings {
 
         # Header con rule y prompt
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${Lead}$rule${Reset}$ESC[K"
+        Write-Host "${Lead}$rule${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${Coral}${Bold}> ${Reset}$ESC[K"
+        Write-Host "${Coral}${Bold}> ${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${Lead}$rule${Reset}$ESC[K"
+        Write-Host "${Lead}$rule${Reset}$ClrToEnd"
         $row++
 
         # Título
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${White}${Bold}Settings${Reset}$ESC[K"
+        Write-Host "${White}${Bold}Settings${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "$ESC[K"
+        Write-Host "$ClrToEnd"
         $row++
 
         # Search Box
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "  ${LeadLight}Search:${Reset}$ESC[K"
+        Write-Host "  ${LeadLight}Search:${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
         $searchDisplay = if ($searchBuf) { $searchBuf } else { " " }
-        Write-Host "          ${White}${Bold}$searchDisplay${Reset}$ESC[K"
+        Write-Host "          ${White}${Bold}$searchDisplay${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "          ${Lead}────────────────────${Reset}$ESC[K"
+        Write-Host "          ${Lead}────────────────────${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "$ESC[K"
+        Write-Host "$ClrToEnd"
         $row++
 
         # Lista de Configuraciones (21 renglones)
@@ -796,16 +916,16 @@ function Show-InteractiveSettings {
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
             if ($i -eq $selIdx) {
-                Write-Host "${Cyan}${Bold}> ${White}${Bold}$lblPad${Reset} ${Cyan}${val}${Reset}    $ESC[K"
+                Write-Host "${Cyan}${Bold}> ${White}${Bold}$lblPad${Reset} ${Cyan}${val}${Reset}    $ClrToEnd"
             } else {
-                Write-Host "  ${White}$lblPad${Reset} ${LeadLight}${val}${Reset}    $ESC[K"
+                Write-Host "  ${White}$lblPad${Reset} ${LeadLight}${val}${Reset}    $ClrToEnd"
             }
             $row++
         }
 
         # Separador para descripción
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "$ESC[K"
+        Write-Host "$ClrToEnd"
         $row++
 
         # Descripción activa envuelta
@@ -824,24 +944,24 @@ function Show-InteractiveSettings {
         }
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "  ${LeadLight}$descL1${Reset}$ESC[K"
+        Write-Host "  ${LeadLight}$descL1${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
         if ($descL2) {
-            Write-Host "  ${LeadLight}$descL2${Reset}$ESC[K"
+            Write-Host "  ${LeadLight}$descL2${Reset}$ClrToEnd"
         } else {
-            Write-Host "$ESC[K"
+            Write-Host "$ClrToEnd"
         }
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "$ESC[K"
+        Write-Host "$ClrToEnd"
         $row++
 
         # Footer de navegación
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${LeadLight}Keyboard: ${Cyan}↑/↓${Reset} ${LeadLight}Navigate  ${Cyan}←/→${Reset} ${LeadLight}Change  ${Cyan}enter${Reset} ${LeadLight}Select  ${Cyan}esc${Reset} ${LeadLight}Clear Search/Exit${Reset}$ESC[K"
+        Write-Host "${LeadLight}Keyboard: ${Cyan}↑/↓${Reset} ${LeadLight}Navigate  ${Cyan}←/→${Reset} ${LeadLight}Change  ${Cyan}enter${Reset} ${LeadLight}Select  ${Cyan}esc${Reset} ${LeadLight}Clear Search/Exit${Reset}$ClrToEnd"
         $row++
 
         # Footer derecho de modelo y potencia
@@ -850,7 +970,7 @@ function Show-InteractiveSettings {
         $activeTierName = if ($global:VorkTier) { $global:VorkTier.ToLower() } else { "medium" }
         $activeFooterText = "$activeModelName " + [char]0x00B7 + " $activeTierName"
         $padLen = [Math]::Max(1, ($width - 1) - $activeFooterText.Length)
-        Write-Host "$([string]::new(' ', $padLen))${LeadLight}$activeFooterText${Reset}$ESC[K"
+        Write-Host "$([string]::new(' ', $padLen))${LeadLight}$activeFooterText${Reset}$ClrToEnd"
     }
 
     & $renderAll

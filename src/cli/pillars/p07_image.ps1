@@ -20,8 +20,7 @@ function Invoke-PillarImage {
         Write-Host ""
         Write-Host "  ${Cyan}${Bold}╭─ [07] Vork Conversor Universal de Imágenes${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa la ruta del archivo de imagen (ej: logo.png):${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $fileInput = [Console]::ReadLine()
+        $fileInput = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $fileInput -or -not (Test-Path $fileInput.Trim())) {
             Write-Host "  ${Lead}╰─ Archivo no encontrado o cancelado.${Reset}"
             Write-Host ""

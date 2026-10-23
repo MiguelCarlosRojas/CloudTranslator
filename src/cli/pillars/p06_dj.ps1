@@ -19,8 +19,7 @@ function Invoke-PillarDJ {
         $action = Select-InteractiveOption -PromptTitle "Selecciona una acción para Vork DJ Mezclador:" -Options $djOptions -DefaultIndex 0
         if ($action -eq "deck_a") {
             Write-Host "  ${Lead}│${Reset} ${White}Ingresa la ruta del archivo de audio o URL:${Reset}"
-            Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-            $trackInput = [Console]::ReadLine()
+            $trackInput = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
             if ($trackInput -and $trackInput.Trim()) { $track = $trackInput.Trim() }
         }
     }

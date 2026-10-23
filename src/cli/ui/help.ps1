@@ -251,7 +251,7 @@ function Show-InteractiveHelpModal {
         for ($t = 0; $t -lt $tabs.Count; $t++) {
             $tName = $tabs[$t]
             if ($t -eq $curTab) {
-                $tabStr += "$ESC[48;2;40;60;90m$ESC[97;1m  $tName  $Reset "
+                $tabStr += "$($CSI)48;2;40;60;90m$($CSI)97;1m  $tName  $Reset "
             } else {
                 $tabStr += "${LeadLight} $tName ${Reset} "
             }

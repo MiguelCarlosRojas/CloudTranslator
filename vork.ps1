@@ -1,5 +1,5 @@
 ﻿param(
-    [Parameter(Position=0)]
+    [Parameter(Position=0, ValueFromPipeline=$true)]
     [string]$Command = "",
 
     [Parameter(Position=1, ValueFromRemainingArguments=$true)]
@@ -84,6 +84,135 @@ try {
     Set-Content -Path $lastConvFile -Value $global:VorkConversationId -Force -Encoding UTF8
 } catch { }
 
+function Get-VorkConversationDir {
+    param([string]$ConvId)
+    $base = Join-Path $HOME ".vork\conversations"
+    $targetDir = Join-Path $base $ConvId
+    if (-not (Test-Path $targetDir)) {
+        New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+    }
+    return $targetDir
+}
+
+function Save-VorkConversationRecord {
+    param(
+        [string]$Cmd,
+        [string]$Output = ""
+    )
+    if (-not $global:VorkConversationId) { return }
+    try {
+        $cDir = Get-VorkConversationDir -ConvId $global:VorkConversationId
+        $histPath = Join-Path $cDir "history.txt"
+        Add-Content -Path $histPath -Value $Cmd -Encoding UTF8
+
+        $logPath = Join-Path $cDir "transcript.jsonl"
+        $entry = @{
+            Timestamp = [DateTime]::UtcNow.ToString("o")
+            Command = $Cmd
+            Output = $Output
+        } | ConvertTo-Json -Compress
+        Add-Content -Path $logPath -Value $entry -Encoding UTF8
+
+        $sessPath = Join-Path $cDir "session.json"
+        $sessData = @{
+            ConversationId = $global:VorkConversationId
+            UpdatedAt = [DateTime]::UtcNow.ToString("o")
+            Model = $global:VorkModel
+            Tier = $global:VorkTier
+            Theme = $global:VorkThemeId
+        }
+        $sessData | ConvertTo-Json | Set-Content -Path $sessPath -Encoding UTF8
+    } catch { }
+}
+
+function Load-VorkConversationState {
+    param([string]$ConvId)
+    $cDir = Join-Path $HOME ".vork\conversations\$ConvId"
+    if (Test-Path $cDir) {
+        $sessPath = Join-Path $cDir "session.json"
+        if (Test-Path $sessPath) {
+            try {
+                $sess = Get-Content -Path $sessPath -Raw | ConvertFrom-Json
+                if ($sess.Model) { $global:VorkModel = $sess.Model }
+                if ($sess.Tier) { $global:VorkTier = $sess.Tier }
+                if ($sess.Theme) { Apply-VorkTheme -ThemeName $sess.Theme }
+            } catch { }
+        }
+
+        $histPath = Join-Path $cDir "history.txt"
+        if (Test-Path $histPath) {
+            try {
+                $lines = @(Get-Content -Path $histPath -Encoding UTF8 | Where-Object { $_ -and $_.Trim() })
+                if ($lines.Count -gt 0) {
+                    $global:VorkSessionHistory = [System.Collections.ArrayList]@($lines)
+                }
+            } catch { }
+        }
+    }
+}
+
+function Show-ResumedConversationTranscript {
+    param([string]$ConvId)
+    $cDir = Join-Path $HOME ".vork\conversations\$ConvId"
+    $logPath = Join-Path $cDir "transcript.jsonl"
+    $histPath = Join-Path $cDir "history.txt"
+    $elbow = [char]0x23BF
+
+    Write-Host ""
+    Write-Host "  ${Green}●${Reset} ${White}${Bold}Resumed conversation ${Cyan}$ConvId${Reset}"
+
+    $found = $false
+    if (Test-Path $logPath) {
+        try {
+            $entries = @(Get-Content -Path $logPath -Encoding UTF8 | Where-Object { $_ -and $_.Trim() })
+            if ($entries.Count -gt 0) {
+                $found = $true
+                Write-Host "  ${LeadLight}Restored $($entries.Count) interaction(s) from previous session:${Reset}"
+                Write-Host ""
+                foreach ($raw in $entries) {
+                    try {
+                        $item = $raw | ConvertFrom-Json
+                        Write-Host "  ${Coral}${Bold}> ${White}${Bold}$($item.Command)${Reset}"
+                        if ($item.Output) {
+                            $lines = $item.Output -split "\r?\n"
+                            for ($i = 0; $i -lt $lines.Count; $i++) {
+                                $l = $lines[$i]
+                                if ($i -eq 0) {
+                                    Write-Host "    ${LeadLight}$elbow  $l${Reset}"
+                                } else {
+                                    Write-Host "       ${LeadLight}$l${Reset}"
+                                }
+                            }
+                        }
+                        Write-Host ""
+                    } catch { }
+                }
+            }
+        } catch { }
+    }
+
+    if (-not $found -and (Test-Path $histPath)) {
+        try {
+            $hLines = @(Get-Content -Path $histPath -Encoding UTF8 | Where-Object { $_ -and $_.Trim() })
+            if ($hLines.Count -gt 0) {
+                $found = $true
+                Write-Host "  ${LeadLight}Restored $($hLines.Count) command(s) from previous session:${Reset}"
+                Write-Host ""
+                foreach ($hl in $hLines) {
+                    Write-Host "  ${Coral}${Bold}> ${White}${Bold}$hl${Reset}"
+                    Write-Host "    ${LeadLight}$elbow  Executed $hl${Reset}"
+                    Write-Host ""
+                }
+            }
+        } catch { }
+    }
+
+    if (-not $found) {
+        Write-Host "  ${LeadLight}Session context initialized.${Reset}"
+        Write-Host ""
+    }
+}
+
 function Exit-VorkSession {
     param([int]$ExitCode = 0)
     Write-Host ""
@@ -99,13 +228,16 @@ $ApiBase = if ($env:VORK_API) { $env:VORK_API } elseif ($env:CLOUDTRANSLATOR_API
 # ========================================================
 # PALETA TIPOGRÁFICA ANSI Y SISTEMA DE 10 TEMAS VISUALES
 # ========================================================
-$ESC    = [char]27
-$Reset  = "$ESC[0m"
-$Bold   = "$ESC[1m"
-$Dim    = "$ESC[2m"
-$Italic = "$ESC[3m"
-$White  = "$ESC[38;2;240;246;252m"
-$Gray   = "$ESC[38;2;120;128;140m"
+$ESC      = [char]27
+$CSI      = "$([char]27)["
+$ClrLine  = "$([char]27)[2K"
+$ClrToEnd = "$([char]27)[K"
+$Reset    = "$ESC[0m"
+$Bold     = "$ESC[1m"
+$Dim      = "$ESC[2m"
+$Italic   = "$ESC[3m"
+$White    = "$ESC[38;2;240;246;252m"
+$Gray     = "$ESC[38;2;120;128;140m"
 
 $global:IsWinPlatform = ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT)
 
@@ -389,6 +521,29 @@ if (Test-Path $histFile) {
     $global:VorkSessionHistory = [System.Collections.ArrayList]@()
 }
 
+# Si estamos reanudando una sesión específica (-c o --conversation=...), cargar su estado inmediatamente
+if ($global:VorkIsResumed) {
+    Load-VorkConversationState -ConvId $global:VorkConversationId
+}
+
+# Inicializar directorio y metadata de la conversación activa si no existe
+if ($global:VorkConversationId) {
+    try {
+        $activeCDir = Get-VorkConversationDir -ConvId $global:VorkConversationId
+        $activeSessPath = Join-Path $activeCDir "session.json"
+        if (-not (Test-Path $activeSessPath)) {
+            @{
+                ConversationId = $global:VorkConversationId
+                CreatedAt = [DateTime]::UtcNow.ToString("o")
+                UpdatedAt = [DateTime]::UtcNow.ToString("o")
+                Model = if ($global:VorkModel) { $global:VorkModel } else { "Vork 3" }
+                Tier = if ($global:VorkTier) { $global:VorkTier } else { "medium" }
+                Theme = if ($global:VorkThemeId) { $global:VorkThemeId } else { "lead" }
+            } | ConvertTo-Json | Set-Content -Path $activeSessPath -Encoding UTF8
+        }
+    } catch { }
+}
+
 function Show-InteractiveModeSelector {
     $modes = @("low", "medium", "high")
     $descriptions = @{
@@ -530,6 +685,126 @@ function Show-Banner {
     Vork CLI - Modulo UI: Selectores Interactivos con Flechas (Up/Down) y Enter
 #>
 
+function Read-VorkInput {
+    param(
+        [string]$Prompt = ""
+    )
+
+    try { [Console]::TreatControlCAsInput = $false } catch { }
+    try { [Console]::CursorVisible = $true } catch { }
+
+    if ($Prompt) {
+        Write-Host $Prompt -NoNewline
+    }
+
+    if ([Console]::IsInputRedirected) {
+        return [Console]::ReadLine()
+    }
+
+    # Limpiar buffer de teclas residuales
+    while ([Console]::KeyAvailable) {
+        try { [void][Console]::ReadKey($true) } catch { break }
+    }
+
+    $buf = [System.Text.StringBuilder]::new()
+    $pos = 0
+
+    while ($true) {
+        $k = [Console]::ReadKey($true)
+
+        if ($k.Key -eq [ConsoleKey]::Enter) {
+            Write-Host ""
+            return $buf.ToString()
+        }
+
+        # Ctrl+C o Escape para cancelar
+        $isCtrlC = ($k.KeyChar -eq [char]3) -or ($k.Key -eq [ConsoleKey]::C -and ($k.Modifiers -band [ConsoleModifiers]::Control))
+        if ($isCtrlC -or $k.Key -eq [ConsoleKey]::Escape) {
+            Write-Host ""
+            return ""
+        }
+
+        if ($k.Key -eq [ConsoleKey]::Backspace -or $k.KeyChar -eq [char]8) {
+            if ($pos -gt 0) {
+                $buf.Remove($pos - 1, 1) | Out-Null
+                $pos--
+                Write-Host "${CSI}1D" -NoNewline
+                $tail = if ($pos -lt $buf.Length) { $buf.ToString().Substring($pos) } else { "" }
+                Write-Host "$tail $ClrToEnd" -NoNewline
+                $backCount = $tail.Length + 1
+                if ($backCount -gt 0) {
+                    Write-Host "${CSI}${backCount}D" -NoNewline
+                }
+            }
+            continue
+        }
+
+        if ($k.Key -eq [ConsoleKey]::Delete) {
+            if ($pos -lt $buf.Length) {
+                $buf.Remove($pos, 1) | Out-Null
+                $tail = if ($pos -lt $buf.Length) { $buf.ToString().Substring($pos) } else { "" }
+                Write-Host "$tail $ClrToEnd" -NoNewline
+                $backCount = $tail.Length + 1
+                if ($backCount -gt 0) {
+                    Write-Host "${CSI}${backCount}D" -NoNewline
+                }
+            }
+            continue
+        }
+
+        if ($k.Key -eq [ConsoleKey]::LeftArrow) {
+            if ($pos -gt 0) {
+                $pos--
+                Write-Host "${CSI}1D" -NoNewline
+            }
+            continue
+        }
+
+        if ($k.Key -eq [ConsoleKey]::RightArrow) {
+            if ($pos -lt $buf.Length) {
+                $pos++
+                Write-Host "${CSI}1C" -NoNewline
+            }
+            continue
+        }
+
+        if ($k.Key -eq [ConsoleKey]::Home) {
+            if ($pos -gt 0) {
+                Write-Host "${CSI}${pos}D" -NoNewline
+                $pos = 0
+            }
+            continue
+        }
+
+        if ($k.Key -eq [ConsoleKey]::End) {
+            if ($pos -lt $buf.Length) {
+                $fwd = $buf.Length - $pos
+                Write-Host "${CSI}${fwd}C" -NoNewline
+                $pos = $buf.Length
+            }
+            continue
+        }
+
+        $ch = $k.KeyChar
+        if (-not [char]::IsControl($ch)) {
+            if ($pos -eq $buf.Length) {
+                $buf.Append($ch) | Out-Null
+                $pos++
+                Write-Host $ch -NoNewline
+            } else {
+                $buf.Insert($pos, $ch) | Out-Null
+                $pos++
+                $tail = $buf.ToString().Substring($pos)
+                Write-Host "$ch$tail" -NoNewline
+                $backCount = $tail.Length
+                if ($backCount -gt 0) {
+                    Write-Host "${CSI}${backCount}D" -NoNewline
+                }
+            }
+        }
+    }
+}
+
 function Select-InteractiveOption {
     param(
         [string]$PromptTitle,
@@ -562,9 +837,9 @@ function Select-InteractiveOption {
             try { [Console]::SetCursorPosition(2, $menuStartRow + $i) } catch { }
 
             if ($i -eq $sel) {
-                Write-Host "${Cyan}${Bold}> ${White}${Bold}$label${Reset}    $ESC[K" -NoNewline
+                Write-Host "${Cyan}${Bold}> ${White}${Bold}$label${Reset}    $ClrToEnd" -NoNewline
             } else {
-                Write-Host "  ${LeadLight}$label${Reset}    $ESC[K" -NoNewline
+                Write-Host "  ${LeadLight}$label${Reset}    $ClrToEnd" -NoNewline
             }
         }
     }
@@ -591,14 +866,14 @@ function Select-InteractiveOption {
                 try { [Console]::SetCursorPosition(0, $menuStartRow + $Options.Count) } catch { }
                 Write-Host ""
                 $chosen = $Options[$sel]
-                return if ($chosen.Value) { $chosen.Value } else { $chosen.ToString() }
+                if ($chosen.Value) { return $chosen.Value } else { return $chosen.ToString() }
             }
 
             if ($k.Key -eq [ConsoleKey]::Escape) {
                 try { [Console]::SetCursorPosition(0, $menuStartRow + $Options.Count) } catch { }
                 Write-Host ""
                 $def = $Options[$DefaultIndex]
-                return if ($def.Value) { $def.Value } else { $def.ToString() }
+                if ($def.Value) { return $def.Value } else { return $def.ToString() }
             }
 
             # Selección numérica directa (1-9)
@@ -610,7 +885,7 @@ function Select-InteractiveOption {
                 try { [Console]::SetCursorPosition(0, $menuStartRow + $Options.Count) } catch { }
                 Write-Host ""
                 $chosen = $Options[$sel]
-                return if ($chosen.Value) { $chosen.Value } else { $chosen.ToString() }
+                if ($chosen.Value) { return $chosen.Value } else { return $chosen.ToString() }
             }
         }
     } finally {
@@ -656,21 +931,21 @@ function Select-InteractiveTheme {
             $th = $Themes[$i]
             $num = if (($i + 1) -lt 10) { "[$($i + 1)] " } else { "[$($i + 1)]" }
             $isActive = ($th.Id -eq $global:VorkThemeId)
-            $badge = if ($isActive) { "$ESC[42;30;1m [ACTIVO] $Reset" } else { "         " }
+            $badge = if ($isActive) { "$($CSI)42;30;1m [ACTIVO] $Reset" } else { "         " }
             $namePad = $th.Name.PadRight(26)
             $lineContent = "${Cyan}$num${Reset} $badge $($th.Dot) ${White}${Bold}$namePad${Reset} ${LeadLight}· $($th.Acentos)${Reset}"
 
             try { [Console]::SetCursorPosition(2, $menuStartRow + $i) } catch { }
 
             if ($i -eq $sel) {
-                Write-Host "${Cyan}${Bold}> ${Reset}$lineContent    $ESC[K" -NoNewline
+                Write-Host "${Cyan}${Bold}> ${Reset}$lineContent    $ClrToEnd" -NoNewline
             } else {
-                Write-Host "  $lineContent    $ESC[K" -NoNewline
+                Write-Host "  $lineContent    $ClrToEnd" -NoNewline
             }
         }
         try {
             [Console]::SetCursorPosition(2, $menuStartRow + $Themes.Count)
-            Write-Host "  ${LeadDark}↑/↓ Navegar  Enter Seleccionar tema  Esc Cancelar${Reset}    $ESC[K" -NoNewline
+            Write-Host "  ${LeadDark}↑/↓ Navegar  Enter Seleccionar tema  Esc Cancelar${Reset}    $ClrToEnd" -NoNewline
         } catch { }
     }
 
@@ -756,9 +1031,9 @@ function Select-InteractivePermissions {
             $item = $PermsHash[$k]
             $num = if (($i + 1) -lt 10) { "[$($i + 1)] " } else { "[$($i + 1)]" }
             $statusBadge = if ($item.Enabled) {
-                "$ESC[42;30;1m [OK] PERMITIDO $Reset"
+                "$($CSI)42;30;1m [OK] PERMITIDO $Reset"
             } else {
-                "$ESC[41;97;1m [X] DENEGADO  $Reset"
+                "$($CSI)41;97;1m [X] DENEGADO  $Reset"
             }
             $title = $item.Name.PadRight(28)
             $lineContent = "${Cyan}$num${Reset} $statusBadge  ${White}${Bold}$title${Reset} ${LeadLight}· $($item.Desc)${Reset}"
@@ -766,9 +1041,9 @@ function Select-InteractivePermissions {
             try { [Console]::SetCursorPosition(2, $menuStartRow + $i) } catch { }
 
             if ($i -eq $sel) {
-                Write-Host "${Cyan}${Bold}> ${Reset}$lineContent    $ESC[K" -NoNewline
+                Write-Host "${Cyan}${Bold}> ${Reset}$lineContent    $ClrToEnd" -NoNewline
             } else {
-                Write-Host "  $lineContent    $ESC[K" -NoNewline
+                Write-Host "  $lineContent    $ClrToEnd" -NoNewline
             }
         }
 
@@ -776,15 +1051,15 @@ function Select-InteractivePermissions {
         $exitIdx = $keys.Count
         try { [Console]::SetCursorPosition(2, $menuStartRow + $exitIdx) } catch { }
         if ($sel -eq $exitIdx) {
-            Write-Host "${Cyan}${Bold}> ${Green}${Bold}[✓] Guardar y Volver al Prompt${Reset}                                                      $ESC[K" -NoNewline
+            Write-Host ("${Cyan}${Bold}> ${Green}${Bold} " + "[✓] Guardar y Volver al Prompt${Reset}                                                      $ClrToEnd") -NoNewline
         } else {
-            Write-Host "  ${LeadLight}[✓] Guardar y Volver al Prompt${Reset}                                                      $ESC[K" -NoNewline
+            Write-Host ("  ${LeadLight} " + "[✓] Guardar y Volver al Prompt${Reset}                                                      $ClrToEnd") -NoNewline
         }
 
         # Footer con atajos de navegación
         try {
             [Console]::SetCursorPosition(2, $menuStartRow + $exitIdx + 1)
-            Write-Host "  ${LeadDark}↑/↓ Navegar  Enter/Espacio Alternar permiso  Esc Salir${Reset}    $ESC[K" -NoNewline
+            Write-Host "  ${LeadDark}↑/↓ Navegar  Enter/Espacio Alternar permiso  Esc Salir${Reset}    $ClrToEnd" -NoNewline
         } catch { }
     }
 
@@ -889,38 +1164,38 @@ function Show-InteractiveModelSwitcher {
 
         # Rule y prompt decorativo
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${Lead}$rule${Reset}$ESC[K"
+        Write-Host "${Lead}$rule${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${Coral}${Bold}> ${Reset}$ESC[K"
+        Write-Host "${Coral}${Bold}> ${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${Lead}$rule${Reset}$ESC[K"
+        Write-Host "${Lead}$rule${Reset}$ClrToEnd"
         $row++
 
         # Título
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${White}${Bold}Switch Model${Reset}$ESC[K"
+        Write-Host "${White}${Bold}Switch Model${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "$ESC[K"
+        Write-Host "$ClrToEnd"
         $row++
 
         # Search Box
         try { [Console]::SetCursorPosition(0, $row) } catch { }
         $searchLabel = if ($searchBuf) { "  ${LeadLight}Search: ${White}${Bold}$searchBuf${Reset}" } else { "  ${LeadLight}Search:${Reset}" }
-        Write-Host "$searchLabel$ESC[K"
+        Write-Host "$searchLabel$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "          ${Lead}────────────────────${Reset}$ESC[K"
+        Write-Host "          ${Lead}────────────────────${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "$ESC[K"
+        Write-Host "$ClrToEnd"
         $row++
 
         if ($filtered.Count -gt 0) {
@@ -928,11 +1203,11 @@ function Show-InteractiveModelSwitcher {
             try { [Console]::SetCursorPosition(0, $row) } catch { }
             $mName = $filtered[0]
             $padName = $mName.PadRight(28)
-            Write-Host "${Cyan}${Bold}> ${White}${Bold}$padName ${LeadLight}(current)${Reset}    $ESC[K"
+            Write-Host "${Cyan}${Bold}> ${White}${Bold}$padName ${LeadLight}(current)${Reset}    $ClrToEnd"
             $row++
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "$ESC[K"
+            Write-Host "$ClrToEnd"
             $row++
 
             # Slider de Effort
@@ -957,43 +1232,43 @@ function Show-InteractiveModelSwitcher {
             }
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "  ${LeadLight}Effort  ${Cyan}$triL${Reset}        ${White}$sliderGraphic${Reset}        ${Cyan}$triR${Reset}$ESC[K"
+            Write-Host "  ${LeadLight}Effort  ${Cyan}$triL${Reset}        ${White}$sliderGraphic${Reset}        ${Cyan}$triR${Reset}$ClrToEnd"
             $row++
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "                  ${LeadLight}low          medium          high${Reset}$ESC[K"
+            Write-Host "                  ${LeadLight}low          medium          high${Reset}$ClrToEnd"
             $row++
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
             $currEffort = $efforts[$effortIdx]
             $effDesc = $effortDescs[$currEffort]
-            Write-Host "            ${LeadLight}$effDesc${Reset}$ESC[K"
+            Write-Host "            ${LeadLight}$effDesc${Reset}$ClrToEnd"
             $row++
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "$ESC[K"
+            Write-Host "$ClrToEnd"
             $row++
 
             # Footer con instrucciones normales
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "${LeadLight}Keyboard: ${Cyan}↑/↓${Reset} ${LeadLight}Navigate  ${Cyan}←/→${Reset} ${LeadLight}Effort  ${Cyan}enter${Reset} ${LeadLight}Select  ${Cyan}esc${Reset} ${LeadLight}Go Back${Reset}$ESC[K"
+            Write-Host "${LeadLight}Keyboard: ${Cyan}↑/↓${Reset} ${LeadLight}Navigate  ${Cyan}←/→${Reset} ${LeadLight}Effort  ${Cyan}enter${Reset} ${LeadLight}Select  ${Cyan}esc${Reset} ${LeadLight}Go Back${Reset}$ClrToEnd"
             $row++
         } else {
             # Sin coincidencias
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "  ${LeadLight}No models match `"$searchBuf`"${Reset}$ESC[K"
+            Write-Host "  ${LeadLight}No models match `"$searchBuf`"${Reset}$ClrToEnd"
             $row++
 
             # Limpiar filas restantes
             for ($c = 0; $c -lt 5; $c++) {
                 try { [Console]::SetCursorPosition(0, $row) } catch { }
-                Write-Host "$ESC[K"
+                Write-Host "$ClrToEnd"
                 $row++
             }
 
             # Footer esc Clear search
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "${LeadLight}Keyboard: ${Cyan}esc${Reset} ${LeadLight}Clear search${Reset}$ESC[K"
+            Write-Host "${LeadLight}Keyboard: ${Cyan}esc${Reset} ${LeadLight}Clear search${Reset}$ClrToEnd"
             $row++
         }
 
@@ -1001,7 +1276,7 @@ function Show-InteractiveModelSwitcher {
         try { [Console]::SetCursorPosition(0, $row) } catch { }
         $activeText = "Vork 3 " + [char]0x00B7 + " $($efforts[$effortIdx])"
         $padLen = [Math]::Max(1, ($width - 1) - $activeText.Length)
-        Write-Host "$([string]::new(' ', $padLen))${LeadLight}$activeText${Reset}$ESC[K"
+        Write-Host "$([string]::new(' ', $padLen))${LeadLight}$activeText${Reset}$ClrToEnd"
     }
 
     & $renderAll
@@ -1276,42 +1551,42 @@ function Show-InteractiveSettings {
 
         # Header con rule y prompt
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${Lead}$rule${Reset}$ESC[K"
+        Write-Host "${Lead}$rule${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${Coral}${Bold}> ${Reset}$ESC[K"
+        Write-Host "${Coral}${Bold}> ${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${Lead}$rule${Reset}$ESC[K"
+        Write-Host "${Lead}$rule${Reset}$ClrToEnd"
         $row++
 
         # Título
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${White}${Bold}Settings${Reset}$ESC[K"
+        Write-Host "${White}${Bold}Settings${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "$ESC[K"
+        Write-Host "$ClrToEnd"
         $row++
 
         # Search Box
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "  ${LeadLight}Search:${Reset}$ESC[K"
+        Write-Host "  ${LeadLight}Search:${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
         $searchDisplay = if ($searchBuf) { $searchBuf } else { " " }
-        Write-Host "          ${White}${Bold}$searchDisplay${Reset}$ESC[K"
+        Write-Host "          ${White}${Bold}$searchDisplay${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "          ${Lead}────────────────────${Reset}$ESC[K"
+        Write-Host "          ${Lead}────────────────────${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "$ESC[K"
+        Write-Host "$ClrToEnd"
         $row++
 
         # Lista de Configuraciones (21 renglones)
@@ -1323,16 +1598,16 @@ function Show-InteractiveSettings {
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
             if ($i -eq $selIdx) {
-                Write-Host "${Cyan}${Bold}> ${White}${Bold}$lblPad${Reset} ${Cyan}${val}${Reset}    $ESC[K"
+                Write-Host "${Cyan}${Bold}> ${White}${Bold}$lblPad${Reset} ${Cyan}${val}${Reset}    $ClrToEnd"
             } else {
-                Write-Host "  ${White}$lblPad${Reset} ${LeadLight}${val}${Reset}    $ESC[K"
+                Write-Host "  ${White}$lblPad${Reset} ${LeadLight}${val}${Reset}    $ClrToEnd"
             }
             $row++
         }
 
         # Separador para descripción
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "$ESC[K"
+        Write-Host "$ClrToEnd"
         $row++
 
         # Descripción activa envuelta
@@ -1351,24 +1626,24 @@ function Show-InteractiveSettings {
         }
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "  ${LeadLight}$descL1${Reset}$ESC[K"
+        Write-Host "  ${LeadLight}$descL1${Reset}$ClrToEnd"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
         if ($descL2) {
-            Write-Host "  ${LeadLight}$descL2${Reset}$ESC[K"
+            Write-Host "  ${LeadLight}$descL2${Reset}$ClrToEnd"
         } else {
-            Write-Host "$ESC[K"
+            Write-Host "$ClrToEnd"
         }
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "$ESC[K"
+        Write-Host "$ClrToEnd"
         $row++
 
         # Footer de navegación
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${LeadLight}Keyboard: ${Cyan}↑/↓${Reset} ${LeadLight}Navigate  ${Cyan}←/→${Reset} ${LeadLight}Change  ${Cyan}enter${Reset} ${LeadLight}Select  ${Cyan}esc${Reset} ${LeadLight}Clear Search/Exit${Reset}$ESC[K"
+        Write-Host "${LeadLight}Keyboard: ${Cyan}↑/↓${Reset} ${LeadLight}Navigate  ${Cyan}←/→${Reset} ${LeadLight}Change  ${Cyan}enter${Reset} ${LeadLight}Select  ${Cyan}esc${Reset} ${LeadLight}Clear Search/Exit${Reset}$ClrToEnd"
         $row++
 
         # Footer derecho de modelo y potencia
@@ -1377,7 +1652,7 @@ function Show-InteractiveSettings {
         $activeTierName = if ($global:VorkTier) { $global:VorkTier.ToLower() } else { "medium" }
         $activeFooterText = "$activeModelName " + [char]0x00B7 + " $activeTierName"
         $padLen = [Math]::Max(1, ($width - 1) - $activeFooterText.Length)
-        Write-Host "$([string]::new(' ', $padLen))${LeadLight}$activeFooterText${Reset}$ESC[K"
+        Write-Host "$([string]::new(' ', $padLen))${LeadLight}$activeFooterText${Reset}$ClrToEnd"
     }
 
     & $renderAll
@@ -1730,7 +2005,7 @@ function Show-InteractiveHelpModal {
         for ($t = 0; $t -lt $tabs.Count; $t++) {
             $tName = $tabs[$t]
             if ($t -eq $curTab) {
-                $tabStr += "$ESC[48;2;40;60;90m$ESC[97;1m  $tName  $Reset "
+                $tabStr += "$($CSI)48;2;40;60;90m$($CSI)97;1m  $tName  $Reset "
             } else {
                 $tabStr += "${LeadLight} $tName ${Reset} "
             }
@@ -1938,8 +2213,7 @@ function Invoke-CmdGoal {
     if (-not $task) {
         Write-Host "  ${Cyan}╭─ /goal · Modo Autónomo Continuo ─────────────────────────${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa el objetivo exhaustivo a resolver:${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $task = [Console]::ReadLine()
+        $task = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $task -or -not $task.Trim()) { return }
     }
     Write-Host ""
@@ -1955,8 +2229,7 @@ function Invoke-CmdPlan {
     if (-not $task) {
         Write-Host "  ${Cyan}╭─ /plan · Planificación Guiada Paso a Paso ───────────────${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa la tarea o arquitectura a planificar:${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $task = [Console]::ReadLine()
+        $task = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $task -or -not $task.Trim()) { return }
     }
     Write-Host ""
@@ -2007,8 +2280,7 @@ function Invoke-CmdLearn {
     if (-not $rule) {
         Write-Host "  ${Cyan}╭─ /learn · Persistir Regla o Preferencia de Trabajo ───────${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa la instrucción o regla a recordar permanentemente:${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $rule = [Console]::ReadLine()
+        $rule = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $rule -or -not $rule.Trim()) { return }
     }
     try {
@@ -2444,8 +2716,7 @@ function Invoke-PillarTranslate {
         Write-Host ""
         Write-Host "  ${Cyan}${Bold}╭─ [01] Vork Traductor en la Nube (+200 Idiomas)${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa el texto que deseas traducir:${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $text = [Console]::ReadLine()
+        $text = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $text -or -not $text.Trim()) {
             Write-Host "  ${Lead}╰─ Traducción cancelada.${Reset}"
             Write-Host ""
@@ -2512,8 +2783,7 @@ function Invoke-PillarTTS {
         Write-Host ""
         Write-Host "  ${Cyan}${Bold}╭─ [02] Vork Texto a Voz Neuronal (TTS Studio)${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa el texto a sintetizar:${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $text = [Console]::ReadLine()
+        $text = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $text -or -not $text.Trim()) {
             Write-Host "  ${Lead}╰─ Síntesis cancelada.${Reset}"
             Write-Host ""
@@ -2535,8 +2805,7 @@ function Invoke-PillarTTS {
             $voice = $chosenVoice
         }
 
-        Write-Host "  ${Lead}│${Reset} ${Cyan}Archivo de salida [voz.mp3]:${Reset} " -NoNewline
-        $outInput = [Console]::ReadLine()
+        $outInput = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}Archivo de salida [voz.mp3]:${Reset} "
         if ($outInput -and $outInput.Trim()) { $out = $outInput.Trim() } else { $out = "voz.mp3" }
     }
 
@@ -2585,8 +2854,7 @@ function Invoke-PillarClone {
         Write-Host ""
         Write-Host "  ${Cyan}${Bold}╭─ [03] Vork Clonación de Voz IA (Modelado F0)${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ruta del archivo de muestra de audio (ej: muestra.wav):${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $sample = [Console]::ReadLine()
+        $sample = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $sample -or -not $sample.Trim()) {
             Write-Host "  ${Lead}╰─ Clonación cancelada.${Reset}"
             Write-Host ""
@@ -2604,11 +2872,9 @@ function Invoke-PillarClone {
         if ($chosenF0) { $f0Method = $chosenF0 }
 
         Write-Host "  ${Lead}│${Reset} ${White}Texto o guión a sintetizar con la voz clonada:${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $text = [Console]::ReadLine()
+        $text = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
 
-        Write-Host "  ${Lead}│${Reset} ${Cyan}Archivo de salida [clonado.wav]:${Reset} " -NoNewline
-        $outInput = [Console]::ReadLine()
+        $outInput = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}Archivo de salida [clonado.wav]:${Reset} "
         if ($outInput -and $outInput.Trim()) { $out = $outInput.Trim() }
     }
 
@@ -2647,8 +2913,7 @@ function Invoke-PillarMedia {
         Write-Host ""
         Write-Host "  ${Cyan}${Bold}╭─ [04] Vork Conversor Multimedia Universal${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa la URL del video (YouTube, TikTok, Reels, IG):${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $url = [Console]::ReadLine()
+        $url = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $url -or -not $url.Trim()) {
             Write-Host "  ${Lead}╰─ Conversión cancelada.${Reset}"
             Write-Host ""
@@ -2715,8 +2980,7 @@ function Invoke-PillarSeparate {
         Write-Host ""
         Write-Host "  ${Cyan}${Bold}╭─ [05] Vork Separador de Stems (Demucs v4)${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa la ruta del archivo de audio o URL (ej: cancion.mp3):${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $target = [Console]::ReadLine()
+        $target = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $target -or -not $target.Trim()) {
             Write-Host "  ${Lead}╰─ Separación cancelada.${Reset}"
             Write-Host ""
@@ -2778,8 +3042,7 @@ function Invoke-PillarDJ {
         $action = Select-InteractiveOption -PromptTitle "Selecciona una acción para Vork DJ Mezclador:" -Options $djOptions -DefaultIndex 0
         if ($action -eq "deck_a") {
             Write-Host "  ${Lead}│${Reset} ${White}Ingresa la ruta del archivo de audio o URL:${Reset}"
-            Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-            $trackInput = [Console]::ReadLine()
+            $trackInput = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
             if ($trackInput -and $trackInput.Trim()) { $track = $trackInput.Trim() }
         }
     }
@@ -2820,8 +3083,7 @@ function Invoke-PillarImage {
         Write-Host ""
         Write-Host "  ${Cyan}${Bold}╭─ [07] Vork Conversor Universal de Imágenes${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa la ruta del archivo de imagen (ej: logo.png):${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $fileInput = [Console]::ReadLine()
+        $fileInput = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $fileInput -or -not (Test-Path $fileInput.Trim())) {
             Write-Host "  ${Lead}╰─ Archivo no encontrado o cancelado.${Reset}"
             Write-Host ""
@@ -2886,8 +3148,7 @@ function Invoke-PillarRemoveBg {
         Write-Host ""
         Write-Host "  ${Cyan}${Bold}╭─ [08] Vork Estudio y Eliminador de Fondo IA (U2-Net)${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa la ruta de la imagen (ej: producto.jpg):${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $fileInput = [Console]::ReadLine()
+        $fileInput = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $fileInput -or -not (Test-Path $fileInput.Trim())) {
             Write-Host "  ${Lead}╰─ Imagen no válida o cancelado.${Reset}"
             Write-Host ""
@@ -2905,8 +3166,7 @@ function Invoke-PillarRemoveBg {
         $chosenBg = Select-InteractiveOption -PromptTitle "Selecciona el modo de procesamiento de fondo:" -Options $bgOptions -DefaultIndex 0
         if ($chosenBg) { $mode = $chosenBg }
 
-        Write-Host "  ${Lead}│${Reset} ${Cyan}Archivo de salida [sin_fondo.png]:${Reset} " -NoNewline
-        $outInput = [Console]::ReadLine()
+        $outInput = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}Archivo de salida [sin_fondo.png]:${Reset} "
         if ($outInput -and $outInput.Trim()) { $out = $outInput.Trim() } else { $out = "sin_fondo.png" }
     }
 
@@ -3115,7 +3375,7 @@ function Dispatch-CLICommand {
             Write-Host ""
             Write-Host "  $ESC[44;97;1m VORK CLI $Reset $Cyan Consultando actualizaciones en el backend ($ApiBase)...$Reset"
             Check-And-AutoUpdate -Force
-            Write-Host "  $ESC[42;30;1m OK $Reset $Green El entorno de terminal esta en su version mas reciente ($VorkVersion).$Reset"
+            Write-Host "  $($CSI)42;30;1m OK $Reset $Green El entorno de terminal esta en su version mas reciente ($VorkVersion).$Reset"
             Write-Host ""
         }
         "health" { Invoke-PillarHealth }
@@ -3221,7 +3481,7 @@ function Read-InteractiveVorkLine {
     $topIdx = 0
     $slashMenuOpen = $false
     $windowSize = 5
-    $menuHeight = 9
+    $menuHeight = 7
 
     try { [Console]::TreatControlCAsInput = $true } catch { }
     $lastCtrlC = [DateTime]::MinValue
@@ -3231,15 +3491,15 @@ function Read-InteractiveVorkLine {
     $dotCh     = [char]0x00B7
 
     $clearMenu = {
-        for ($r = 1; $r -le $menuHeight; $r++) {
+        for ($r = 0; $r -le 8; $r++) {
             try {
-                [Console]::SetCursorPosition(0, $PromptRow + 1 + $r)
-                Write-Host ([string]::new(" ", $Width - 1)) -NoNewline
+                [Console]::SetCursorPosition(0, $PromptRow + 3 + $r)
+                Write-Host "$ClrLine" -NoNewline
             } catch { }
         }
         try {
             [Console]::SetCursorPosition(0, $PromptRow + 2)
-            Write-Host "${LeadLight}$Footer${Reset}$ESC[K" -NoNewline
+            Write-Host "${LeadLight}$Footer${Reset}$ClrToEnd" -NoNewline
         } catch { }
     }
 
@@ -3271,7 +3531,7 @@ function Read-InteractiveVorkLine {
             # Render the 5 visible items
             for ($k = 0; $k -lt $windowSize; $k++) {
                 $itemIdx = $topIdx + $k
-                $rowY = $PromptRow + 2 + $k
+                $rowY = $PromptRow + 3 + $k
                 try { [Console]::SetCursorPosition(0, $rowY) } catch { }
 
                 if ($itemIdx -lt $filtered.Count) {
@@ -3284,12 +3544,12 @@ function Read-InteractiveVorkLine {
                     }
 
                     if ($itemIdx -eq $selIdx) {
-                        Write-Host "${Cyan}${Bold}> ${White}${Bold}$cmdStr${LeadLight}$descStr${Reset}$ESC[K" -NoNewline
+                        Write-Host "${Cyan}${Bold}> ${White}${Bold}$cmdStr${LeadLight}$descStr${Reset}$ClrToEnd" -NoNewline
                     } else {
-                        Write-Host "  ${White}$cmdStr${LeadLight}$descStr${Reset}$ESC[K" -NoNewline
+                        Write-Host "  ${White}$cmdStr${LeadLight}$descStr${Reset}$ClrToEnd" -NoNewline
                     }
                 } else {
-                    Write-Host "$ESC[K" -NoNewline
+                    Write-Host "$ClrLine" -NoNewline
                 }
             }
 
@@ -3305,30 +3565,14 @@ function Read-InteractiveVorkLine {
                 $moreText = "   $upArrow $remAbove more"
             }
             try {
-                [Console]::SetCursorPosition(0, $PromptRow + 2 + $windowSize)
-                Write-Host "${LeadDark}$moreText${Reset}$ESC[K" -NoNewline
+                [Console]::SetCursorPosition(0, $PromptRow + 3 + $windowSize)
+                Write-Host "${LeadDark}$moreText${Reset}$ClrToEnd" -NoNewline
             } catch { }
 
-            # Row 7: Blank separator
+            # Row 7: Navigation hints
             try {
-                [Console]::SetCursorPosition(0, $PromptRow + 2 + $windowSize + 1)
-                Write-Host "$ESC[K" -NoNewline
-            } catch { }
-
-            # Row 8: Navigation hints
-            try {
-                [Console]::SetCursorPosition(0, $PromptRow + 2 + $windowSize + 2)
-                Write-Host "  ${Cyan}$upArrow/$downArrow${Reset} ${LeadLight}Navigate ${LeadDark}$dotCh${Reset} ${Cyan}enter${Reset} ${LeadLight}Select ${LeadDark}$dotCh${Reset} ${Cyan}tab${Reset} ${LeadLight}Complete${Reset}$ESC[K" -NoNewline
-            } catch { }
-
-            # Row 9: Footer (esc to cancel ... Vork 3 · medium)
-            $tierName = if ($global:VorkTier) { $global:VorkTier.ToLower() } else { "medium" }
-            $leftEsc = "esc to cancel"
-            $rightVork = "Vork 3 " + $dotCh + " " + $tierName
-            $escPad = [Math]::Max(1, ($Width - 1) - $leftEsc.Length - $rightVork.Length)
-            try {
-                [Console]::SetCursorPosition(0, $PromptRow + 2 + $windowSize + 3)
-                Write-Host "${LeadLight}${leftEsc}$([string]::new(' ', $escPad))${rightVork}${Reset}$ESC[K" -NoNewline
+                [Console]::SetCursorPosition(0, $PromptRow + 3 + $windowSize + 1)
+                Write-Host "  ${Cyan}$upArrow/$downArrow${Reset} ${LeadLight}Navigate ${LeadDark}$dotCh${Reset} ${Cyan}enter${Reset} ${LeadLight}Select ${LeadDark}$dotCh${Reset} ${Cyan}tab${Reset} ${LeadLight}Complete ${LeadDark}$dotCh${Reset} ${Cyan}esc${Reset} ${LeadLight}Cancel${Reset}$ClrToEnd" -NoNewline
             } catch { }
 
             # Reposition cursor cleanly on prompt row
@@ -3353,7 +3597,7 @@ function Read-InteractiveVorkLine {
             if ($buf.Length -gt 0) {
                 try {
                     [Console]::SetCursorPosition(2, $PromptRow)
-                    Write-Host ([string]::new(" ", [Math]::Max(1, $buf.Length + 4))) -NoNewline
+                    Write-Host "$ClrToEnd" -NoNewline
                     [Console]::SetCursorPosition(2, $PromptRow)
                 } catch { }
                 $buf.Clear() | Out-Null
@@ -3369,6 +3613,7 @@ function Read-InteractiveVorkLine {
                     Write-Host ([string]::new(" ", [Math]::Min(80, $Width - 1))) -NoNewline
                     [Console]::SetCursorPosition(0, $PromptRow + 2)
                 } catch { }
+                try { [Console]::TreatControlCAsInput = $false } catch { }
                 Exit-VorkSession -ExitCode 0
             } else {
                 $lastCtrlC = $now
@@ -3400,16 +3645,18 @@ function Read-InteractiveVorkLine {
         # Intercepción de Ctrl+D
         $isCtrlD = ($key.KeyChar -eq [char]4) -or ($key.Key -eq [ConsoleKey]::D -and ($key.Modifiers -band [ConsoleModifiers]::Control))
         if ($isCtrlD -and $buf.Length -eq 0) {
+            try { [Console]::TreatControlCAsInput = $false } catch { }
             Exit-VorkSession -ExitCode 0
         }
 
         if ($key.Key -eq [ConsoleKey]::Enter) {
+            try { [Console]::TreatControlCAsInput = $false } catch { }
             if ($isSlash -and $filtered.Count -gt 0) {
                 $chosen = $filtered[$selIdx].Cmd
                 & $clearMenu
                 try {
                     [Console]::SetCursorPosition(2, $PromptRow)
-                    Write-Host "$chosen$ESC[K" -NoNewline
+                    Write-Host "${Coral}${Bold}$chosen${Reset}$ClrToEnd" -NoNewline
                     [Console]::SetCursorPosition(0, $PromptRow + 3)
                 } catch { }
                 Write-Host ""
@@ -3417,7 +3664,11 @@ function Read-InteractiveVorkLine {
             }
 
             if ($slashMenuOpen) { & $clearMenu }
-            try { [Console]::SetCursorPosition(0, $PromptRow + 3) } catch { }
+            try {
+                [Console]::SetCursorPosition(2, $PromptRow)
+                Write-Host "${Coral}${Bold}$($buf.ToString())${Reset}$ClrToEnd" -NoNewline
+                [Console]::SetCursorPosition(0, $PromptRow + 3)
+            } catch { }
             Write-Host ""
             return $buf.ToString()
         }
@@ -3430,7 +3681,7 @@ function Read-InteractiveVorkLine {
                 $buf.Append($chosen) | Out-Null
                 try {
                     [Console]::SetCursorPosition(2, $PromptRow)
-                    Write-Host "$chosen$ESC[K" -NoNewline
+                    Write-Host "${Coral}${Bold}$chosen${Reset}$ClrToEnd" -NoNewline
                     [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
                 } catch { }
                 continue
@@ -3450,14 +3701,12 @@ function Read-InteractiveVorkLine {
                 }
 
                 $chosenHist = $global:VorkSessionHistory[$histIdx]
-                $prevLen = $buf.Length
                 $buf.Clear() | Out-Null
                 $buf.Append($chosenHist) | Out-Null
 
                 try {
                     [Console]::SetCursorPosition(2, $PromptRow)
-                    $clearPad = [Math]::Max(0, $prevLen - $buf.Length + 4)
-                    Write-Host ($buf.ToString() + ([string]::new(" ", $clearPad))) -NoNewline
+                    Write-Host "${Coral}${Bold}$($buf.ToString())${Reset}$ClrToEnd" -NoNewline
                     [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
                 } catch { }
                 continue
@@ -3469,7 +3718,6 @@ function Read-InteractiveVorkLine {
                 $selIdx = if ($selIdx -lt ($filtered.Count - 1)) { $selIdx + 1 } else { 0 }
                 continue
             } elseif (-not $isSlash -and $histIdx -ge 0) {
-                $prevLen = $buf.Length
                 if ($histIdx -lt ($global:VorkSessionHistory.Count - 1)) {
                     $histIdx++
                     $chosenHist = $global:VorkSessionHistory[$histIdx]
@@ -3483,8 +3731,7 @@ function Read-InteractiveVorkLine {
 
                 try {
                     [Console]::SetCursorPosition(2, $PromptRow)
-                    $clearPad = [Math]::Max(0, $prevLen - $buf.Length + 4)
-                    Write-Host ($buf.ToString() + ([string]::new(" ", $clearPad))) -NoNewline
+                    Write-Host "${Coral}${Bold}$($buf.ToString())${Reset}$ClrToEnd" -NoNewline
                     [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
                 } catch { }
                 continue
@@ -3499,7 +3746,7 @@ function Read-InteractiveVorkLine {
             if ($buf.Length -gt 0) {
                 try {
                     [Console]::SetCursorPosition(2, $PromptRow)
-                    Write-Host ([string]::new(" ", [Math]::Max(1, $buf.Length + 4))) -NoNewline
+                    Write-Host "$ClrToEnd" -NoNewline
                     [Console]::SetCursorPosition(2, $PromptRow)
                 } catch { }
                 $buf.Clear() | Out-Null
@@ -3518,7 +3765,7 @@ function Read-InteractiveVorkLine {
                 $buf.Remove($buf.Length - 1, 1) | Out-Null
                 try {
                     [Console]::SetCursorPosition(2, $PromptRow)
-                    Write-Host ($buf.ToString() + "   ") -NoNewline
+                    Write-Host "${Coral}${Bold}$($buf.ToString())${Reset} $ClrToEnd" -NoNewline
                     [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
                 } catch { }
                 if ($buf.Length -eq 0 -or -not $buf.ToString().StartsWith("/")) {
@@ -3537,7 +3784,7 @@ function Read-InteractiveVorkLine {
                 $buf.Remove($buf.Length - 1, 1) | Out-Null
                 try {
                     [Console]::SetCursorPosition(2, $PromptRow)
-                    Write-Host ($buf.ToString() + "   ") -NoNewline
+                    Write-Host "${Coral}${Bold}$($buf.ToString())${Reset} $ClrToEnd" -NoNewline
                     [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
                 } catch { }
                 if ($buf.Length -eq 0 -or -not $buf.ToString().StartsWith("/")) {
@@ -3572,10 +3819,10 @@ function Read-InteractiveVorkLine {
             $buf.Append($ch) | Out-Null
             try {
                 [Console]::SetCursorPosition(2, $PromptRow)
-                Write-Host $buf.ToString() -NoNewline
+                Write-Host "${Coral}${Bold}$($buf.ToString())${Reset}$ClrToEnd" -NoNewline
                 [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
             } catch {
-                Write-Host $ch -NoNewline
+                Write-Host "${Coral}${Bold}$ch${Reset}" -NoNewline
             }
             $selIdx = 0
             $topIdx = 0
@@ -3585,8 +3832,15 @@ function Read-InteractiveVorkLine {
 
 function Start-InteractiveREPL {
     Set-VorkWindowIdentity
+    if ($global:VorkIsResumed) {
+        Load-VorkConversationState -ConvId $global:VorkConversationId
+    }
     Clear-Host
     Show-Banner
+
+    if ($global:VorkIsResumed) {
+        Show-ResumedConversationTranscript -ConvId $global:VorkConversationId
+    }
 
     $lineChar = [char]0x2500
     $dotChar = [char]0x00B7
@@ -3603,7 +3857,7 @@ function Start-InteractiveREPL {
             }
         } catch { }
 
-        $neededLines = 11
+        $neededLines = 14
         try {
             $currY = [Console]::CursorTop
             $winBottom = [Console]::WindowTop + [Console]::WindowHeight
@@ -3612,6 +3866,7 @@ function Start-InteractiveREPL {
                 for ($s = 0; $s -lt $scrollNeeded; $s++) {
                     [Console]::WriteLine()
                 }
+                [Console]::SetCursorPosition(0, [Console]::CursorTop - $scrollNeeded)
             }
         } catch { }
 
@@ -3632,7 +3887,9 @@ function Start-InteractiveREPL {
         try { [Console]::SetCursorPosition(2, $pRow) } catch { Write-Host "$ESC[2A$ESC[2C" -NoNewline }
 
         $line = Read-InteractiveVorkLine -PromptRow $pRow -Width $width -Rule $rule -Footer $footer
-        if ($null -eq $line) { break }
+        if ($null -eq $line) {
+            Exit-VorkSession -ExitCode 0
+        }
 
         $line = $line.Trim()
         if (-not $line) { continue }
@@ -3684,13 +3941,19 @@ function Start-InteractiveREPL {
             $argVal = if ($replArgs -and $replArgs.Count -gt 0) { $replArgs[0].ToLower() } else { "" }
             if ($argVal -in "low", "medium", "high") {
                 Set-VorkTier -NewTier $argVal
-                Write-Host "  ${LeadLight}$elbow  Set effort to $argVal${Reset}"
+                $outMsg = "Set effort to $argVal"
+                Write-Host "  ${LeadLight}$elbow  $outMsg${Reset}"
+                Save-VorkConversationRecord -Cmd $line -Output $outMsg
             } else {
                 $mRes = Show-InteractiveModelSwitcher
                 if ($mRes -and $mRes.Action -eq "selected") {
-                    Write-Host "  ${LeadLight}$elbow  Switched to $($mRes.Model) · $($mRes.Tier)${Reset}"
+                    $outMsg = "Switched to $($mRes.Model) · $($mRes.Tier)"
+                    Write-Host "  ${LeadLight}$elbow  $outMsg${Reset}"
+                    Save-VorkConversationRecord -Cmd $line -Output $outMsg
                 } else {
-                    Write-Host "  ${LeadLight}$elbow  Exited /model command${Reset}"
+                    $outMsg = "Exited /model command"
+                    Write-Host "  ${LeadLight}$elbow  $outMsg${Reset}"
+                    Save-VorkConversationRecord -Cmd $line -Output $outMsg
                 }
             }
             continue
@@ -3698,20 +3961,26 @@ function Start-InteractiveREPL {
 
         if ($cmdCheck -eq "theme") {
             Invoke-CmdTheme -ArgsList $replArgs
-            Write-Host "  ${LeadLight}$elbow  Exited /theme command${Reset}"
+            $outMsg = if ($replArgs -and $replArgs.Count -gt 0) { "Changed theme to $global:VorkThemeName" } else { "Exited /theme command" }
+            Write-Host "  ${LeadLight}$elbow  $outMsg${Reset}"
+            Save-VorkConversationRecord -Cmd $line -Output $outMsg
             continue
         }
 
         if ($cmdCheck -in "permissions", "settings", "config") {
             $sRes = Show-InteractiveSettings
-            Write-Host "  ${LeadLight}$elbow  Exited /settings command${Reset}"
+            $outMsg = "Exited /settings command"
+            Write-Host "  ${LeadLight}$elbow  $outMsg${Reset}"
+            Save-VorkConversationRecord -Cmd $line -Output $outMsg
             continue
         }
 
         Dispatch-CLICommand -Cmd $replCmd -ArgsList $replArgs
+        $outMsg = if ($replCmd.StartsWith("/")) { "Exited $replCmd command" } else { "Executed $replCmd" }
         if ($replCmd.StartsWith("/")) {
-            Write-Host "  ${LeadLight}$elbow  Exited $replCmd command${Reset}"
+            Write-Host "  ${LeadLight}$elbow  $outMsg${Reset}"
         }
+        Save-VorkConversationRecord -Cmd $line -Output $outMsg
     }
 }
 
@@ -3724,4 +3993,7 @@ if (-not $Command -or $Command.ToLower() -in "tui", "interactive") {
     Start-InteractiveREPL
 } else {
     Dispatch-CLICommand -Cmd $Command -ArgsList $Arguments
+    $fullCmd = "$Command $($Arguments -join ' ')".Trim()
+    $outMsg = if ($Command.StartsWith("/")) { "Exited $Command command" } else { "Executed $Command" }
+    Save-VorkConversationRecord -Cmd $fullCmd -Output $outMsg
 }

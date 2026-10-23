@@ -20,8 +20,7 @@ function Invoke-PillarMedia {
         Write-Host ""
         Write-Host "  ${Cyan}${Bold}╭─ [04] Vork Conversor Multimedia Universal${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa la URL del video (YouTube, TikTok, Reels, IG):${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $url = [Console]::ReadLine()
+        $url = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $url -or -not $url.Trim()) {
             Write-Host "  ${Lead}╰─ Conversión cancelada.${Reset}"
             Write-Host ""

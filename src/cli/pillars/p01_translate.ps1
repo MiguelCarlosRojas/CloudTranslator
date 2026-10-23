@@ -18,8 +18,7 @@ function Invoke-PillarTranslate {
         Write-Host ""
         Write-Host "  ${Cyan}${Bold}╭─ [01] Vork Traductor en la Nube (+200 Idiomas)${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa el texto que deseas traducir:${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $text = [Console]::ReadLine()
+        $text = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $text -or -not $text.Trim()) {
             Write-Host "  ${Lead}╰─ Traducción cancelada.${Reset}"
             Write-Host ""

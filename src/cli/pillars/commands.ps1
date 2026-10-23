@@ -13,8 +13,7 @@ function Invoke-CmdGoal {
     if (-not $task) {
         Write-Host "  ${Cyan}╭─ /goal · Modo Autónomo Continuo ─────────────────────────${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa el objetivo exhaustivo a resolver:${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $task = [Console]::ReadLine()
+        $task = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $task -or -not $task.Trim()) { return }
     }
     Write-Host ""
@@ -30,8 +29,7 @@ function Invoke-CmdPlan {
     if (-not $task) {
         Write-Host "  ${Cyan}╭─ /plan · Planificación Guiada Paso a Paso ───────────────${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa la tarea o arquitectura a planificar:${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $task = [Console]::ReadLine()
+        $task = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $task -or -not $task.Trim()) { return }
     }
     Write-Host ""
@@ -82,8 +80,7 @@ function Invoke-CmdLearn {
     if (-not $rule) {
         Write-Host "  ${Cyan}╭─ /learn · Persistir Regla o Preferencia de Trabajo ───────${Reset}"
         Write-Host "  ${Lead}│${Reset} ${White}Ingresa la instrucción o regla a recordar permanentemente:${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
-        $rule = [Console]::ReadLine()
+        $rule = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}> ${Reset}"
         if (-not $rule -or -not $rule.Trim()) { return }
     }
     try {
