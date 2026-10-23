@@ -49,7 +49,7 @@ Vork integra 9 soluciones tecnológicas avanzadas en una arquitectura unificada 
 1. **[Traductor en la Nube](/translator):**  
    * Traducción por lotes de alta velocidad (+200 idiomas) con una sola petición HTTP consolidada.
    * Extracción inteligente del DOM con `TreeWalker` respetando atributos, tags no traducibles y metadatos (`document.title`, `<meta name="description">`).
-   * Persistencia estricta en cookies técnicas (`cloud_translator_lang`).
+   * Persistencia estricta en cookies técnicas (`vork_lang`).
 2. **[Texto a Voz (TTS Studio)](/tts):**  
    * Síntesis vocal multilingüe en tiempo real con descarga física de audio en formato `.wav` o `.mp3`.
    * Selección de voces del sistema operativo / navegador, calibración de velocidad (*rate*) y tono (*pitch*).
@@ -98,7 +98,7 @@ Vork integra 9 soluciones tecnológicas avanzadas en una arquitectura unificada 
    * **Servidor (`translateController.js`):** Mantiene una caché LRU de hasta 10,000 entradas (`targetLanguage:texto`). Las frases previamente traducidas responden en 0 ms sin consultar la API externa.
    * **Cliente (`vork.js`):** Mantiene caché en memoria activa durante la sesión (cero uso de `localStorage`), garantizando transiciones instantáneas.
 4. **Soporte Multilingüe Universal (+200 Idiomas):** Compatible con cualquier código ISO de idioma (`en`, `es`, `fr`, `de`, `it`, `pt`, `ja`, `zh-CN`, `ru`, `ko`, `ar`, etc.) y alias flexibles (`to` o `targetLanguage`, `from` o `sourceLanguage`).
-5. **Persistencia Estricta mediante Cookies:** Almacena la elección del idioma en la cookie técnica `cloud_translator_lang` por 365 días (`SameSite=Lax`). Al navegar o recargar, el idioma se aplica automáticamente.
+5. **Persistencia Estricta mediante Cookies:** Almacena la elección del idioma en la cookie técnica `vork_lang` por 365 días (`SameSite=Lax`). Al navegar o recargar, el idioma se aplica automáticamente.
 6. **Compresión HTTP (Gzip / Deflate):** Respuestas comprimidas automáticamente por encima de 512 bytes, reduciendo el ancho de banda transferido.
 7. **CORS Universal Abierto:** Encabezados `Access-Control-Allow-Origin: *` con soporte completo para peticiones preflight (`OPTIONS`), permitiendo la integración desde cualquier frontend (React, Vue, Angular, Svelte, móviles o scripts Vanilla JS).
 8. **Diseño Visual con Iconografía Vectorial SVG (Cero Emojis):** Toda la interfaz de usuario opera con iconos vectoriales SVG limpios con clase estándar `.icon` (`stroke="currentColor"`), eliminando emojis para una experiencia corporativa cristalina y coherente en cualquier pantalla o sistema operativo.

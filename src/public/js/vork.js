@@ -2,7 +2,7 @@
  * Vork Client SDK v3.0.0
  * 
  * Librería de cliente para el ecosistema Vork:
- * - Persistencia de configuración en cookies (vork_lang / cloud_translator_lang).
+ * - Persistencia de configuración en cookies (vork_lang).
  * - Traducción en lote en 1 sola consulta HTTP.
  * - Integración con los 9 pilares de Vork (Traductor, TTS, Clonación, Conversor, Stems, DJ, Imágenes, Fondo IA, CLI).
  */
@@ -14,13 +14,11 @@
     module.exports = factory();
   } else {
     root.Vork = factory();
-    root.CloudTranslator = root.Vork; // Compatibilidad heredada
   }
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
 
   const COOKIE_NAME = "vork_lang";
-  const LEGACY_COOKIE = "cloud_translator_lang";
 
   function setCookie(name, value, days = 365) {
     try {
@@ -45,7 +43,7 @@
   class VorkClient {
     constructor(options = {}) {
       this.apiEndpoint = options.apiEndpoint || "/api/translate";
-      this.currentLang = getCookie(COOKIE_NAME) || getCookie(LEGACY_COOKIE) || "original";
+      this.currentLang = getCookie(COOKIE_NAME) || "original";
       this.cache = new Map();
       this.originalTexts = new Map();
       this.isTranslating = false;

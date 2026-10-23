@@ -1,8 +1,8 @@
 /**
- * CloudTranslator Client SDK v1.4.0
+ * Vork Client SDK v1.4.0
  * 
  * Librería optimizada para traducción web en segundo plano:
- * - Persistencia del idioma elegido EXCLUSIVAMENTE mediante COOKIES (cloud_translator_lang).
+ * - Persistencia del idioma elegido EXCLUSIVAMENTE mediante COOKIES (vork_lang).
  * - Cero uso de localStorage para máxima privacidad y cumplimiento estricto de cookies.
  * - Envía TODOS los textos en UNA SOLA consulta HTTP (/api/translate con texts: [...])
  *   evitando saturar la red con peticiones repetidas.
@@ -15,12 +15,12 @@
   } else if (typeof module === "object" && module.exports) {
     module.exports = factory();
   } else {
-    root.CloudTranslator = factory();
+    root.Vork = factory();
   }
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
 
-  const COOKIE_NAME = "cloud_translator_lang";
+  const COOKIE_NAME = "vork_lang";
 
   /**
    * Utilidades de Cookies (Estricto - 365 días, SameSite=Lax, Path=/)
@@ -32,7 +32,7 @@
       const expires = "expires=" + d.toUTCString();
       document.cookie = `${name}=${encodeURIComponent(value)};${expires};path=/;SameSite=Lax`;
     } catch (e) {
-      console.warn("[CloudTranslator] Error al guardar cookie:", e);
+      console.warn("[Vork] Error al guardar cookie:", e);
     }
   }
 
@@ -56,14 +56,14 @@
     const keysToRemove = [];
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
-      if (k && k.startsWith("cloud_translator_")) {
+      if (k && k.startsWith("vork_")) {
         keysToRemove.push(k);
       }
     }
     keysToRemove.forEach(k => localStorage.removeItem(k));
   } catch (e) {}
 
-  class CloudTranslator {
+  class Vork {
     /**
      * @param {Object} options
      * @param {string} [options.endpoint] - URL del endpoint de traducción
@@ -146,7 +146,7 @@
     }
 
     /**
-     * Revisa si existe la cookie cloud_translator_lang y traduce automáticamente al cargar
+     * Revisa si existe la cookie vork_lang y traduce automáticamente al cargar
      */
     _initCookieLanguage() {
       const applyFromCookie = () => {
@@ -389,7 +389,7 @@
         if (typeof this.onError === "function") {
           this.onError(err);
         } else {
-          console.error("[CloudTranslator] Error durante la traducción:", err);
+          console.error("[Vork] Error durante la traducción:", err);
         }
       } finally {
         this.isTranslating = false;
@@ -435,7 +435,7 @@
             await new Promise(r => setTimeout(r, 400));
             return doFetch(2);
           }
-          console.warn("[CloudTranslator] Advertencia en lote de traducción:", e);
+          console.warn("[Vork] Advertencia en lote de traducción:", e);
         }
         return false;
       };
@@ -577,5 +577,5 @@
     }
   }
 
-  return CloudTranslator;
+  return Vork;
 });

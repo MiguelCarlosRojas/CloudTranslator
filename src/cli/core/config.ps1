@@ -12,7 +12,7 @@ param(
 )
 
 $VorkVersion = "3.0.0"
-$ApiBase = if ($env:VORK_API) { $env:VORK_API } elseif ($env:CLOUDTRANSLATOR_API) { $env:CLOUDTRANSLATOR_API } else { "https://vork-st1k.onrender.com" }
+$ApiBase = if ($env:VORK_API) { $env:VORK_API } else { "https://vork-st1k.onrender.com" }
 
 # ========================================================
 # PALETA TIPOGRÁFICA ANSI PROFESIONAL

@@ -113,7 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
         // Limpieza de rastros anteriores en cookies o localStorage
         document.cookie = "dj_queue=; Path=/; Max-Age=0;";
         localStorage.removeItem("vork_dj_queue");
-        localStorage.removeItem("cloudtranslator_dj_queue");
       } catch (e) {}
 
       let djQueue = [];

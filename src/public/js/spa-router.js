@@ -208,7 +208,7 @@
               }
 
               // Si es el SDK estático de traducción y ya está activo, no recargarlo
-              if ((resolvedSrc.includes("vork.js") || resolvedSrc.includes("cloud-translator.js")) && (window.Vork || window.CloudTranslator)) {
+              if (resolvedSrc.includes("vork.js") && window.Vork) {
                 continue;
               }
 

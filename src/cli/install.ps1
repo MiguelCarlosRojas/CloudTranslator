@@ -37,7 +37,7 @@ if (-not (Test-Path $binDir)) {
     New-Item -ItemType Directory -Path $binDir -Force | Out-Null
 }
 
-$ApiBase = if ($env:VORK_API) { $env:VORK_API } elseif ($env:CLOUDTRANSLATOR_API) { $env:CLOUDTRANSLATOR_API } else { "https://vork-st1k.onrender.com" }
+$ApiBase = if ($env:VORK_API) { $env:VORK_API } else { "https://vork-st1k.onrender.com" }
 
 Write-Host "$Cyan==>$Reset Descargando el motor ejecutable de Vork CLI desde el backend..."
 

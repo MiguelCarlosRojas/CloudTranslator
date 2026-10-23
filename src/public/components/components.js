@@ -323,7 +323,7 @@
         if (btnEnglish) {
           e.preventDefault();
           if (window.translator) window.translator.translateToEnglish();
-          else if (window.CloudTranslator) window.CloudTranslator.translateToEnglish();
+          else if (window.Vork) window.Vork.translateToEnglish();
           return;
         }
 
@@ -331,7 +331,7 @@
         if (btnRestore) {
           e.preventDefault();
           if (window.translator) window.translator.restoreOriginal();
-          else if (window.CloudTranslator) window.CloudTranslator.restoreOriginal();
+          else if (window.Vork) window.Vork.restoreOriginal();
           return;
         }
 
@@ -342,7 +342,7 @@
           const val = (input?.value || "").trim().toLowerCase();
           if (val) {
             if (window.translator) window.translator.translatePage(val);
-            else if (window.CloudTranslator) window.CloudTranslator.translatePage(val);
+            else if (window.Vork) window.Vork.translatePage(val);
           }
           return;
         }
@@ -373,7 +373,7 @@
         if (e.target && e.target.id === "select-lang") {
           const val = e.target.value;
           if (window.translator) window.translator.translatePage(val);
-          else if (window.CloudTranslator) window.CloudTranslator.translatePage(val);
+          else if (window.Vork) window.Vork.translatePage(val);
         }
       });
 
@@ -383,7 +383,7 @@
           const val = e.target.value.trim().toLowerCase();
           if (val) {
             if (window.translator) window.translator.translatePage(val);
-            else if (window.CloudTranslator) window.CloudTranslator.translatePage(val);
+            else if (window.Vork) window.Vork.translatePage(val);
           }
         }
       });
