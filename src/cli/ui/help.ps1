@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Vork CLI - Modulo UI: Catalogo Visual de los 9 Pilares Operacionales
 #>
@@ -7,8 +7,7 @@ function Show-Shortcuts {
     Write-Host ""
     Write-Host "  ${White}${Bold}VORK CLI · ATAJOS & COMANDOS RAPIDOS${Reset}"
     Write-Host "  ${Cyan}  /slash${Reset}          ${Dim}Ver los 43 comandos con barra (/)${Reset}"
-    Write-Host "  ${Cyan}  /modal, /mode${Reset}     ${Dim}Selector interactivo con flechas <- / -> (low, medium, high)${Reset}"
-    Write-Host "  ${Cyan}  /low, /high, /medium${Reset}${Dim}Cambiar nivel de potencia directamente${Reset}"
+    Write-Host "  ${Cyan}  /model, /mode${Reset}   ${Dim}Selector de modelo Vork 3 y potencia (low, medium, high)${Reset}"
     Write-Host "  ${Cyan}  /help${Reset}           ${Dim}Ver catalogo detallado de los 9 pilares${Reset}"
     Write-Host "  ${Cyan}  /clear, cls${Reset}     ${Dim}Limpiar pantalla y refrescar banner${Reset}"
     Write-Host "  ${Cyan}  /exit, quit, q${Reset}  ${Dim}Salir de la sesion interactiva${Reset}"

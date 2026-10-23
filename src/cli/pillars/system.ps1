@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Modulos de Sistema: Version y Telemetria en Vivo (Health)
 #>

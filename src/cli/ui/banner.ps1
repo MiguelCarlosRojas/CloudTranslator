@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Vork CLI - Modulo UI: Banner y Logo Terminal V (Plomo Oscuro & Coral)
 #>

@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Pilar 09: Vork Agentes Autónomos & Modo Interactivo TUI
 #>

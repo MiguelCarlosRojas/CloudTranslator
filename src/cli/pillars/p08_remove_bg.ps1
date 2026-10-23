@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Pilar 08: Vork Estudio y Eliminador de Fondo IA (U2-Net)
 #>
@@ -13,9 +13,23 @@ function Invoke-PillarRemoveBg {
             if ($ArgsList[$i] -in "-Out", "--out", "-o") { $out = $ArgsList[$i+1] }
         }
     }
+
     if (-not $file -or -not (Test-Path $file)) {
-        Write-Host "  ${Yellow}[!] Especifica un archivo valido:${Reset} vork remove-bg foto.jpg -Out limpia.png"
-        return
+        Write-Host ""
+        Write-Host "  ${Cyan}${Bold}╭─ [08] Vork Estudio y Eliminador de Fondo IA (U2-Net)${Reset}"
+        Write-Host "  ${Lead}│${Reset} ${White}Ingresa la ruta de la imagen (ej: producto.jpg):${Reset}"
+        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
+        $fileInput = [Console]::ReadLine()
+        if (-not $fileInput -or -not (Test-Path $fileInput.Trim())) {
+            Write-Host "  ${Lead}╰─ Imagen no válida o cancelado.${Reset}"
+            Write-Host ""
+            return
+        }
+        $file = $fileInput.Trim()
+
+        Write-Host "  ${Lead}│${Reset} ${Cyan}Archivo de salida [sin_fondo.png]:${Reset} " -NoNewline
+        $outInput = [Console]::ReadLine()
+        if ($outInput -and $outInput.Trim()) { $out = $outInput.Trim() } else { $out = "sin_fondo.png" }
     }
 
     Write-Host ""

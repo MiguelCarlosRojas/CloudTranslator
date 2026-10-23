@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Vork CLI - Modulo Core: Despachador y Consola Interactiva REPL
 #>
@@ -12,54 +12,90 @@ function Dispatch-CLICommand {
     $Normalized = if ($Cmd) { $Cmd.TrimStart("/").ToLower() } else { "" }
 
     switch ($Normalized) {
+        # ========================================================
+        # CATEGORIA 1: PILARES OPERACIONALES (9)
+        # ========================================================
+        "translate" { Invoke-PillarTranslate -ArgsList $ArgsList }
+        "tts"       { Invoke-PillarTTS -ArgsList $ArgsList }
+        "clone"     { Invoke-PillarClone -ArgsList $ArgsList }
+        "media"     { Invoke-PillarMedia -ArgsList $ArgsList }
+        "separate"  { Invoke-PillarSeparate -ArgsList $ArgsList }
+        "dj"        { Invoke-PillarDJ -ArgsList $ArgsList }
+        "image"     { Invoke-PillarImage -ArgsList $ArgsList }
+        "remove-bg" { Invoke-PillarRemoveBg -ArgsList $ArgsList }
+        "agents"    { Invoke-PillarAgents -ArgsList $ArgsList }
+
+        # ========================================================
+        # CATEGORIA 2: AGENTES AUTÓNOMOS & PLANIFICACIÓN IA (8)
+        # ========================================================
+        "goal"       { Invoke-CmdGoal -ArgsList $ArgsList }
+        "plan"       { Invoke-CmdPlan -ArgsList $ArgsList }
+        "grill-me"   { Invoke-CmdGrillMe }
+        "teamwork"   { Invoke-CmdTeamwork -ArgsList $ArgsList }
+        "boost"      { Invoke-CmdBoost }
+        "learn"      { Invoke-CmdLearn -ArgsList $ArgsList }
+        "browser"    { Invoke-CmdBrowser -ArgsList $ArgsList }
+        "automation" { Invoke-CmdAutomation }
+
+        # ========================================================
+        # CATEGORIA 3: CONTEXTO, SESIÓN & MEMORIA (7)
+        # ========================================================
+        "compact" { Invoke-CmdCompact }
+        { $_ -in "clear", "cls" } {
+            Clear-Host
+            Show-Banner
+        }
+        "reset"   { Invoke-CmdReset }
+        "history" { Invoke-CmdHistory }
+        "save"    { Invoke-CmdSave -ArgsList $ArgsList }
+        "resume"  { Invoke-CmdResume }
+        "undo"    { Invoke-CmdUndo }
+
+        # ========================================================
+        # CATEGORIA 4: CÓDIGO, GIT & FLUJO DE TRABAJO (7)
+        # ========================================================
+        "status"   { Invoke-CmdStatus }
+        "diff"     { Invoke-CmdDiff }
+        "commit"   { Invoke-CmdCommit -ArgsList $ArgsList }
+        "review"   { Invoke-CmdReview }
+        "test"     { Invoke-CmdTest }
+        "bug"      { Invoke-CmdBug -ArgsList $ArgsList }
+        "refactor" { Invoke-CmdRefactor }
+
+        # ========================================================
+        # CATEGORIA 5: CONFIGURACIÓN & PREFERENCIAS (6)
+        # ========================================================
+        "config"      { Invoke-CmdConfig }
+        "keybindings" { Invoke-CmdKeybindings }
+        "permissions" { Invoke-CmdPermissions }
+        { $_ -in "mode", "modal", "model", "tier", "effort" } {
+            $argVal = if ($ArgsList -and $ArgsList.Count -gt 0) { $ArgsList[0] } else { "" }
+            if ($argVal -in "low", "medium", "high") {
+                Set-VorkTier -NewTier $argVal
+            } else {
+                Show-InteractiveModeSelector
+            }
+        }
+        "theme"       { Invoke-CmdTheme }
+        "env"         { Invoke-CmdEnv }
+
+        # ========================================================
+        # CATEGORIA 6: SISTEMA, TELEMETRÍA & UTILIDADES (6)
+        # ========================================================
         { $_ -in "help", "--help", "-h", "?", "shortcuts", "/shortcuts" } {
             Show-Help
         }
-
         { $_ -in "slash", "slashcommands", "commands" } {
             Show-SlashCommands
         }
-
-        { $_ -in "version", "-v", "--version" } {
-            Invoke-PillarVersion
+        { $_ -in "update", "upgrade" } {
+            Write-Host ""
+            Write-Host "  $ESC[44;97;1m VORK CLI $Reset $Cyan Consultando actualizaciones en el backend ($ApiBase)...$Reset"
+            Check-And-AutoUpdate -Force
+            Write-Host "  $ESC[42;30;1m OK $Reset $Green El entorno de terminal esta en su version mas reciente ($VorkVersion).$Reset"
+            Write-Host ""
         }
-
-        "translate" {
-            Invoke-PillarTranslate -ArgsList $ArgsList
-        }
-
-        "tts" {
-            Invoke-PillarTTS -ArgsList $ArgsList
-        }
-
-        "clone" {
-            Invoke-PillarClone -ArgsList $ArgsList
-        }
-
-        "media" {
-            Invoke-PillarMedia -ArgsList $ArgsList
-        }
-
-        "separate" {
-            Invoke-PillarSeparate -ArgsList $ArgsList
-        }
-
-        "dj" {
-            Invoke-PillarDJ -ArgsList $ArgsList
-        }
-
-        "image" {
-            Invoke-PillarImage -ArgsList $ArgsList
-        }
-
-        "remove-bg" {
-            Invoke-PillarRemoveBg -ArgsList $ArgsList
-        }
-
-        "health" {
-            Invoke-PillarHealth
-        }
-
+        "health" { Invoke-PillarHealth }
         "ping" {
             $sw = [System.Diagnostics.Stopwatch]::StartNew()
             try {
@@ -70,59 +106,22 @@ function Dispatch-CLICommand {
                 Write-Host "  ${Coral}[Error Ping]:${Reset} No se pudo conectar con $ApiBase"
             }
         }
-
         "docs" {
             Write-Host "  ${Cyan}Abriendo documentacion oficial de Vork en el navegador...${Reset}"
             Start-Process "$ApiBase/docs"
         }
-
-        { $_ -in "update", "upgrade" } {
-            Write-Host ""
-            Write-Host "  $ESC[44;97;1m VORK CLI $Reset $Cyan Consultando actualizaciones en el backend ($ApiBase)...$Reset"
-            Check-And-AutoUpdate -Force
-            Write-Host "  $ESC[42;30;1m OK $Reset $Green El entorno de terminal esta en su version mas reciente ($VorkVersion).$Reset"
-            Write-Host ""
+        { $_ -in "version", "-v", "--version" } {
+            Invoke-PillarVersion
         }
-
-        { $_ -in "clear", "cls" } {
-            Clear-Host
-            Show-Banner
-        }
-
-        { $_ -in "mode", "modal", "tier", "effort" } {
-            $argVal = if ($ArgsList -and $ArgsList.Count -gt 0) { $ArgsList[0] } else { "" }
-            if ($argVal) {
-                Set-VorkTier -NewTier $argVal
-            } else {
-                Show-InteractiveModeSelector
-            }
-        }
-
-        "low" {
-            Set-VorkTier -NewTier "low"
-        }
-
-        "medium" {
-            Set-VorkTier -NewTier "medium"
-        }
-
-        "high" {
-            Set-VorkTier -NewTier "high"
-        }
-
         { $_ -in "exit", "quit", "q" } {
             Write-Host "  ${Cyan}Sesion de Vork CLI finalizada.${Reset}"
             exit 0
         }
 
-        { $_ -in "agy", "agents", "tui", "interactive", "goal", "plan", "teamwork", "boost", "learn", "browser", "automation", "grill-me" } {
-            Invoke-PillarAgents -ArgsList ($Cmd, $ArgsList)
-        }
-
         default {
             Write-Host ""
             Write-Host "  ${Coral}[!] Comando no reconocido:${Reset} $White`"$Cmd`"$Reset"
-            Write-Host "  ${Dim}Escribe '?' para atajos o 'slash' para los 43 comandos con barra.${Reset}"
+            Write-Host "  ${Dim}Escribe '?' para atajos o 'slash' para ver los 43 comandos con barra.${Reset}"
             Write-Host ""
         }
     }
@@ -180,18 +179,15 @@ function Read-InteractiveVorkLine {
         @{ Cmd = "/bug";         Desc = "Diagnostico y depuracion asistida de excepciones" },
         @{ Cmd = "/refactor";    Desc = "Reestructurar y optimizar codigo sin alterar salida" },
 
-        # Categoria 5: Configuracion & Preferencias (7)
+        # Categoria 5: Configuracion & Preferencias (6)
         @{ Cmd = "/config";      Desc = "Ajustar permisos, temas visuales y preferencias" },
         @{ Cmd = "/keybindings"; Desc = "Personalizar atajos de teclado y combinaciones" },
         @{ Cmd = "/permissions"; Desc = "Administrar permisos de herramientas y comandos" },
-        @{ Cmd = "/mode";        Desc = "Alternar perfil de potencia de Vork (low, medium, high)" },
-        @{ Cmd = "/modal";       Desc = "Selector interactivo con flechas <- / ->" },
-        @{ Cmd = "/model";       Desc = "Consultar o alternar el modelo de lenguaje activo" },
+        @{ Cmd = "/mode";        Desc = "Selector interactivo de potencia (low, medium, high)" },
+        @{ Cmd = "/modal";       Desc = "Selector interactivo de modelo y potencia Vork 3" },
+        @{ Cmd = "/model";       Desc = "Configurar modelo Vork 3 y nivel de potencia" },
         @{ Cmd = "/theme";       Desc = "Alternar temas visuales (Dark, Cyberpunk, Coral)" },
         @{ Cmd = "/env";         Desc = "Consultar y gestionar variables de entorno activas" },
-        @{ Cmd = "/low";         Desc = "Activar Modo Rapido / Eco (baja latencia, 16kHz)" },
-        @{ Cmd = "/medium";      Desc = "Activar Modo Balanceado (recomendado, 24kHz)" },
-        @{ Cmd = "/high";        Desc = "Activar Modo Estudio / Ultra (maxima fidelidad, 320k)" },
 
         # Categoria 6: Sistema, Telemetria & Utilidades (6)
         @{ Cmd = "/help";        Desc = "Manual interactivo de comandos y atajos de teclado" },
@@ -248,6 +244,8 @@ function Read-InteractiveVorkLine {
 
             $slashMenuOpen = $true
 
+            $maxLineLen = [Math]::Max(40, $Width - 4)
+
             # Render the 5 visible items
             for ($k = 0; $k -lt $windowSize; $k++) {
                 $itemIdx = $topIdx + $k
@@ -258,18 +256,21 @@ function Read-InteractiveVorkLine {
                     $item = $filtered[$itemIdx]
                     $cmdStr = $item.Cmd.PadRight(20)
                     $descStr = $item.Desc
+                    if ($descStr.Length -gt ($maxLineLen - 24)) {
+                        $descStr = $descStr.Substring(0, [Math]::Max(10, $maxLineLen - 27)) + "..."
+                    }
 
                     if ($itemIdx -eq $selIdx) {
                         $txt = "> " + $cmdStr + $descStr
-                        $padLen = [Math]::Max(1, ($Width - 1) - $txt.Length)
+                        $padLen = [Math]::Max(0, $maxLineLen - $txt.Length)
                         Write-Host "${Cyan}${Bold}> ${White}${Bold}$cmdStr${LeadLight}$descStr$([string]::new(' ', $padLen))${Reset}" -NoNewline
                     } else {
                         $txt = "  " + $cmdStr + $descStr
-                        $padLen = [Math]::Max(1, ($Width - 1) - $txt.Length)
+                        $padLen = [Math]::Max(0, $maxLineLen - $txt.Length)
                         Write-Host "  ${White}$cmdStr${LeadLight}$descStr$([string]::new(' ', $padLen))${Reset}" -NoNewline
                     }
                 } else {
-                    Write-Host ([string]::new(" ", [Math]::Min(140, $Width - 1))) -NoNewline
+                    Write-Host ([string]::new(" ", $maxLineLen)) -NoNewline
                 }
             }
 
@@ -286,19 +287,19 @@ function Read-InteractiveVorkLine {
             }
             try {
                 [Console]::SetCursorPosition(0, $PromptRow + 2 + $windowSize)
-                $padLen = [Math]::Max(1, ($Width - 1) - $moreText.Length)
+                $padLen = [Math]::Max(0, $maxLineLen - $moreText.Length)
                 Write-Host "${LeadDark}$moreText$([string]::new(' ', $padLen))${Reset}" -NoNewline
             } catch { }
 
             # Row 7: Blank separator
             try {
                 [Console]::SetCursorPosition(0, $PromptRow + 2 + $windowSize + 1)
-                Write-Host ([string]::new(" ", [Math]::Min(140, $Width - 1))) -NoNewline
+                Write-Host ([string]::new(" ", $maxLineLen)) -NoNewline
             } catch { }
 
             # Row 8: Navigation hints
             $navRaw = "  $upArrow/$downArrow Navigate $dotCh enter Select $dotCh tab Complete"
-            $navPad = [Math]::Max(1, ($Width - 1) - $navRaw.Length)
+            $navPad = [Math]::Max(0, $maxLineLen - $navRaw.Length)
             try {
                 [Console]::SetCursorPosition(0, $PromptRow + 2 + $windowSize + 2)
                 Write-Host "  ${Cyan}$upArrow/$downArrow${Reset} ${LeadLight}Navigate ${LeadDark}$dotCh${Reset} ${Cyan}enter${Reset} ${LeadLight}Select ${LeadDark}$dotCh${Reset} ${Cyan}tab${Reset} ${LeadLight}Complete$([string]::new(' ', $navPad))${Reset}" -NoNewline
@@ -308,7 +309,7 @@ function Read-InteractiveVorkLine {
             $tierName = if ($global:VorkTier) { $global:VorkTier.ToLower() } else { "medium" }
             $leftEsc = "esc to cancel"
             $rightVork = "Vork 3 " + $dotCh + " " + $tierName
-            $escPad = [Math]::Max(1, ($Width - 1) - $leftEsc.Length - $rightVork.Length)
+            $escPad = [Math]::Max(1, $maxLineLen - $leftEsc.Length - $rightVork.Length)
             try {
                 [Console]::SetCursorPosition(0, $PromptRow + 2 + $windowSize + 3)
                 Write-Host "${LeadLight}${leftEsc}$([string]::new(' ', $escPad))${rightVork}${Reset}" -NoNewline
@@ -434,6 +435,16 @@ function Start-InteractiveREPL {
         if ($width -le 20 -or $width -gt 300) { $width = 120 }
         $rule = [string]::new($lineChar, ($width - 1))
 
+        # Asegurar espacio vertical libre para el menu desplegable
+        try {
+            $spaceBelow = [Console]::WindowHeight - ([Console]::CursorTop - [Console]::WindowTop)
+            if ($spaceBelow -lt 12) {
+                $scrollNeeded = 12 - $spaceBelow + 1
+                for ($s = 0; $s -lt $scrollNeeded; $s++) { Write-Host "" }
+                [Console]::SetCursorPosition(0, [Console]::CursorTop - $scrollNeeded)
+            }
+        } catch { }
+
         $left = "? for shortcuts"
         $tierName = if ($global:VorkTier) { $global:VorkTier.ToLower() } else { "medium" }
         $right = if ($env:VORK_FOOTER) { $env:VORK_FOOTER } else { "Vork 3 " + $dotChar + " " + $tierName }
@@ -454,6 +465,9 @@ function Start-InteractiveREPL {
 
         $line = $line.Trim()
         if (-not $line) { continue }
+
+        if (-not $global:VorkSessionHistory) { $global:VorkSessionHistory = @() }
+        $global:VorkSessionHistory += $line
 
         $tokens = $null
         $errs = $null

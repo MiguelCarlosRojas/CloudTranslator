@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Pilar 01: Vork Traductor en la Nube (+200 idiomas por lotes)
 #>
@@ -13,9 +13,38 @@ function Invoke-PillarTranslate {
             if ($ArgsList[$i] -in "-To", "--to", "-t") { $to = $ArgsList[$i+1] }
         }
     }
+
     if (-not $text) {
-        Write-Host "  ${Yellow}[!] Uso:${Reset} vork translate 'texto' -To en"
-        return
+        Write-Host ""
+        Write-Host "  ${Cyan}${Bold}╭─ [01] Vork Traductor en la Nube (+200 Idiomas)${Reset}"
+        Write-Host "  ${Lead}│${Reset} ${White}Ingresa el texto que deseas traducir:${Reset}"
+        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
+        $text = [Console]::ReadLine()
+        if (-not $text -or -not $text.Trim()) {
+            Write-Host "  ${Lead}╰─ Traducción cancelada.${Reset}"
+            Write-Host ""
+            return
+        }
+        $text = $text.Trim()
+
+        Write-Host "  ${Lead}│${Reset} ${White}Selecciona el idioma destino:${Reset}"
+        Write-Host "  ${Lead}│${Reset} ${LeadLight}[1] en (Inglés)  [2] es (Español)  [3] fr (Francés)  [4] de (Alemán)${Reset}"
+        Write-Host "  ${Lead}│${Reset} ${LeadLight}[5] it (Italiano)[6] pt (Portugués)[7] ja (Japonés)  [8] zh (Chino)${Reset}"
+        Write-Host "  ${Lead}│${Reset} ${Cyan}Idioma destino (1-8 o código ISO) [en]:${Reset} " -NoNewline
+        $langInput = [Console]::ReadLine()
+        if ($langInput -and $langInput.Trim()) {
+            switch ($langInput.Trim()) {
+                "1" { $to = "en" }
+                "2" { $to = "es" }
+                "3" { $to = "fr" }
+                "4" { $to = "de" }
+                "5" { $to = "it" }
+                "6" { $to = "pt" }
+                "7" { $to = "ja" }
+                "8" { $to = "zh" }
+                default { $to = $langInput.Trim().ToLower() }
+            }
+        }
     }
 
     Write-Host ""

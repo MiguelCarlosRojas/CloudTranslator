@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Pilar 07: Vork Conversor Universal de Formatos de Imagen (PNG, JPG, WEBP, ICO, AVIF)
 #>
@@ -8,14 +8,34 @@ function Invoke-PillarImage {
 
     $file = if ($ArgsList -and $ArgsList.Length -gt 0) { $ArgsList[0] } else { $null }
     $fmt = "webp"
+    $quality = 90
     if ($ArgsList) {
         for ($i=0; $i -lt $ArgsList.Length; $i++) {
             if ($ArgsList[$i] -in "-Format", "--format", "-f") { $fmt = $ArgsList[$i+1] }
+            if ($ArgsList[$i] -in "-Quality", "--quality", "-q") { $quality = [int]$ArgsList[$i+1] }
         }
     }
+
     if (-not $file -or -not (Test-Path $file)) {
-        Write-Host "  ${Yellow}[!] Especifica un archivo de imagen valido:${Reset} vork image foto.png -Format webp"
-        return
+        Write-Host ""
+        Write-Host "  ${Cyan}${Bold}╭─ [07] Vork Conversor Universal de Imágenes${Reset}"
+        Write-Host "  ${Lead}│${Reset} ${White}Ingresa la ruta del archivo de imagen (ej: logo.png):${Reset}"
+        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
+        $fileInput = [Console]::ReadLine()
+        if (-not $fileInput -or -not (Test-Path $fileInput.Trim())) {
+            Write-Host "  ${Lead}╰─ Archivo no encontrado o cancelado.${Reset}"
+            Write-Host ""
+            return
+        }
+        $file = $fileInput.Trim()
+
+        Write-Host "  ${Lead}│${Reset} ${Cyan}Formato destino (webp, png, jpg, ico, avif) [webp]:${Reset} " -NoNewline
+        $fmtInput = [Console]::ReadLine()
+        if ($fmtInput -and $fmtInput.Trim()) { $fmt = $fmtInput.Trim().ToLower() }
+
+        Write-Host "  ${Lead}│${Reset} ${Cyan}Calidad de compresión (1-100) [90]:${Reset} " -NoNewline
+        $qInput = [Console]::ReadLine()
+        if ($qInput -and $qInput.Trim()) { $quality = [int]$qInput.Trim() }
     }
 
     Write-Host ""

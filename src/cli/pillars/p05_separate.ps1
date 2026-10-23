@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Pilar 05: Vork Separador de Stems (Acapella y Karaoke con Demucs v4)
 #>
@@ -7,9 +7,29 @@ function Invoke-PillarSeparate {
     param([string[]]$ArgsList)
 
     $target = if ($ArgsList -and $ArgsList.Length -gt 0) { $ArgsList[0] } else { $null }
+    $mode = "2stems"
+    if ($ArgsList) {
+        for ($i=0; $i -lt $ArgsList.Length; $i++) {
+            if ($ArgsList[$i] -in "-Mode", "--mode", "-m") { $mode = $ArgsList[$i+1] }
+        }
+    }
+
     if (-not $target) {
-        Write-Host "  ${Yellow}[!] Uso:${Reset} vork separate '<url_o_archivo>'"
-        return
+        Write-Host ""
+        Write-Host "  ${Cyan}${Bold}╭─ [05] Vork Separador de Stems (Demucs v4)${Reset}"
+        Write-Host "  ${Lead}│${Reset} ${White}Ingresa la ruta del archivo de audio o URL (ej: cancion.mp3):${Reset}"
+        Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
+        $target = [Console]::ReadLine()
+        if (-not $target -or -not $target.Trim()) {
+            Write-Host "  ${Lead}╰─ Separación cancelada.${Reset}"
+            Write-Host ""
+            return
+        }
+        $target = $target.Trim()
+
+        Write-Host "  ${Lead}│${Reset} ${Cyan}Modo de separación (2stems: voz+base / 4stems) [2stems]:${Reset} " -NoNewline
+        $mInput = [Console]::ReadLine()
+        if ($mInput -and $mInput.Trim()) { $mode = $mInput.Trim() }
     }
 
     Write-Host ""

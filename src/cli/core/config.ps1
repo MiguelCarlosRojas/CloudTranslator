@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Vork CLI - Modulo de Configuracion y Paleta Tipografica ANSI
 #>
@@ -88,7 +88,8 @@ function Show-InteractiveModeSelector {
     }
 
     Write-Host ""
-    Write-Host "  ${White}${Bold}SELECCIONA EL NIVEL DE POTENCIA DE VORK 3:${Reset}"
+    Write-Host "  ${White}${Bold}MODELO Y POTENCIA DE VORK 3:${Reset}"
+    Write-Host "  ${LeadLight}Versión activa: ${Cyan}${Bold}Vork 3 (Neural AI Engine)${Reset}"
     Write-Host ""
 
     $startRow = try { [Console]::CursorTop } catch { 0 }
@@ -108,7 +109,7 @@ function Show-InteractiveModeSelector {
         
         $desc = $descriptions[$modes[$selIdx]]
         Write-Host "  ${White}$desc${Reset}                                                              "
-        Write-Host "  ${LeadLight}(Usa flechas ${Cyan}<-${Reset} / ${Cyan}->${Reset} para navegar, ${Green}Enter${Reset} para confirmar, ${Coral}Esc${Reset} para cancelar)${Reset}  "
+        Write-Host "  ${LeadLight}(Usa flechas ${Cyan}<-${Reset} / ${Cyan}->${Reset} para cambiar nivel de potencia, ${Green}Enter${Reset} para confirmar, ${Coral}Esc${Reset} para salir)${Reset}  "
 
         $keyInfo = [Console]::ReadKey($true)
         if ($keyInfo.Key -eq [ConsoleKey]::LeftArrow) {

@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Vork CLI - Modulo Core: Auto-Update Silencioso y Sincronizacion Atómica
 #>

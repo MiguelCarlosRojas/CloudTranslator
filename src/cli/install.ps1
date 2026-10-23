@@ -1,4 +1,4 @@
-# Vork CLI - Windows PowerShell Installer
+﻿# Vork CLI - Windows PowerShell Installer
 # Entorno centrado en la terminal para interactuar con los 9 pilares operacionales de Vork
 # Usage: irm https://vork-st1k.onrender.com/cli/install.ps1 | iex
 
