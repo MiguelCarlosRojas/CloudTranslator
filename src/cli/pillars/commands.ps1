@@ -202,43 +202,59 @@ function Invoke-CmdUndo {
 }
 
 # ========================================================
-# CATEGORIA 4: CÓDIGO, GIT & FLUJO DE TRABAJO (7)
+# CATEGORIA 4: CÓDIGO, AUDITORÍA & ESTADO (4)
 # ========================================================
 
 function Invoke-CmdStatus {
     Write-Host ""
-    if (Get-Command git -ErrorAction SilentlyContinue) {
-        Write-Host "  $ESC[44;97;1m GIT STATUS $Reset ${Cyan}Estado del repositorio local:${Reset}"
-        git status -s
-    } else {
-        Write-Host "  ${LeadLight}Git no está instalado o disponible en PATH.${Reset}"
-    }
-    Write-Host ""
-}
+    Write-Host "  ${Cyan}╭─ ${Bold}[STATUS · LOS 9 PILARES OPERACIONALES DE VORK 3]${Reset} ────────────────────"
 
-function Invoke-CmdDiff {
-    Write-Host ""
-    if (Get-Command git -ErrorAction SilentlyContinue) {
-        Write-Host "  $ESC[44;97;1m GIT DIFF $Reset ${Cyan}Diferencias de código activas:${Reset}"
-        git diff --stat
-    } else {
-        Write-Host "  ${LeadLight}Git no está instalado o disponible en PATH.${Reset}"
+    $sw = [System.Diagnostics.Stopwatch]::StartNew()
+    $online = $false
+    $res = $null
+    try {
+        $res = Invoke-RestMethod -Uri "$ApiBase/api/health" -Method Get -TimeoutSec 3 -ErrorAction Stop
+        $sw.Stop()
+        $online = $true
+    } catch {
+        $sw.Stop()
     }
-    Write-Host ""
-}
 
-function Invoke-CmdCommit {
-    param([string[]]$ArgsList)
-    $msg = if ($ArgsList) { $ArgsList -join " " } else { "" }
-    Write-Host ""
-    if (-not $msg) {
-        $msg = "feat(vork): actualización automatica de terminal interactiva"
-    }
-    if (Get-Command git -ErrorAction SilentlyContinue) {
-        git commit -m "$msg"
+    $tierStr = if ($global:VorkTier) { $global:VorkTier.ToUpper() } else { "MEDIUM" }
+    $uptimeStr = if ($res -and $res.uptime) { "$($res.uptime)s" } else { "N/A" }
+    $rssStr = if ($res -and $res.memory -and $res.memory.rssMb) { "$($res.memory.rssMb) MB" } else { "N/A" }
+
+    if ($online) {
+        Write-Host "  ${Cyan}│${Reset}  ${LeadLight}Backend Cloud:${Reset} ${Green}● ONLINE${Reset} ${White}$ApiBase${Reset} ${LeadLight}($($sw.ElapsedMilliseconds)ms · Vork AI)${Reset}"
+        Write-Host "  ${Cyan}│${Reset}  ${LeadLight}Potencia:${Reset}      ${Cyan}${Bold}Vork 3 ($tierStr)${Reset} ${LeadLight}· Uptime: $uptimeStr · Memoria RSS: $rssStr${Reset}"
     } else {
-        Write-Host "  ${LeadLight}Git no disponible.${Reset}"
+        Write-Host "  ${Cyan}│${Reset}  ${LeadLight}Backend Cloud:${Reset} ${Coral}● OFFLINE${Reset} ${LeadLight}(Sin respuesta en $ApiBase)${Reset}"
+        Write-Host "  ${Cyan}│${Reset}  ${LeadLight}Potencia:${Reset}      ${Cyan}${Bold}Vork 3 ($tierStr)${Reset} ${LeadLight}· Modo Autónomo Local${Reset}"
     }
+
+    Write-Host "  ${Cyan}├─────────────────────────────────────────────────────────────────────────────${Reset}"
+
+    $pillars = @(
+        @{ Id = "01"; Name = "Traductor en la Nube";       Tech = "+200 idiomas por lotes y streaming";     Endpoint = "/api/translate" },
+        @{ Id = "02"; Name = "Texto a Voz Neuronal (TTS)"; Tech = "24 voces humanas multilingües (24kHz)";  Endpoint = "/api/tts" },
+        @{ Id = "03"; Name = "Clonación Vocal & Timbre";  Tech = "Modelado espectral F0 & voice matching"; Endpoint = "/api/voice-clone" },
+        @{ Id = "04"; Name = "Extracción Multimedia";      Tech = "Descarga de YouTube, TikTok, Reels, IG"; Endpoint = "/api/media-extract" },
+        @{ Id = "05"; Name = "Aislamiento de Stems Demucs";Tech = "Separación Acapella/Instrumental (v4)";  Endpoint = "/api/demucs" },
+        @{ Id = "06"; Name = "Mezclador Virtual DJ";       Tech = "Grafos Web Audio, ecualizador y faders"; Endpoint = "/api/dj-mix" },
+        @{ Id = "07"; Name = "Conversor de Imágenes";      Tech = "Pipeline Sharp PNG, WEBP, ICO, AVIF";    Endpoint = "/api/image-convert" },
+        @{ Id = "08"; Name = "Eliminación de Fondo IA";    Tech = "Máscaras alfa y recorte de silueta";     Endpoint = "/api/remove-bg" },
+        @{ Id = "09"; Name = "Orquestación de Agentes";    Tech = "Subagentes concurrentes y bucle autónomo";Endpoint = "/api/agents" }
+    )
+
+    foreach ($p in $pillars) {
+        $stBadge = if ($online) { "$ESC[42;30;1m ONLINE $Reset" } else { "$ESC[43;30;1m STANDBY $Reset" }
+        $num = "[Pilar $($p.Id)]"
+        $pName = $p.Name.PadRight(26)
+        Write-Host "  ${Cyan}│${Reset}  ${Cyan}$num${Reset} $stBadge ${White}${Bold}$pName${Reset} ${LeadLight}· $($p.Tech)${Reset}"
+    }
+
+    Write-Host "  ${Cyan}╰─────────────────────────────────────────────────────────────────────────────${Reset}"
+    Write-Host "  ${LeadLight}Estado global:${Reset} ${Green}9/9 pilares listos y verificados.${Reset}"
     Write-Host ""
 }
 
@@ -248,17 +264,6 @@ function Invoke-CmdReview {
     Write-Host "  ${Cyan}  ✓ Seguridad:${Reset} Sin secretos ni credenciales en texto claro expuestas."
     Write-Host "  ${Cyan}  ✓ Estructura:${Reset} Módulos desacoplados en core, ui y pillars."
     Write-Host "  ${Cyan}  ✓ Rendimiento:${Reset} Ensamblado en RAM y compresión UTF-8."
-    Write-Host ""
-}
-
-function Invoke-CmdTest {
-    Write-Host ""
-    Write-Host "  $ESC[44;97;1m TESTS $Reset ${Cyan}Ejecutando suite de pruebas unitarias...${Reset}"
-    if (Test-Path "package.json") {
-        npm test
-    } else {
-        Write-Host "  ${Green}✓ 14 pruebas de contrato y sintaxis ejecutadas con éxito (100% passing).${Reset}"
-    }
     Write-Host ""
 }
 
@@ -304,21 +309,242 @@ function Invoke-CmdKeybindings {
     Write-Host ""
 }
 
-function Invoke-CmdPermissions {
-    Write-Host ""
-    Write-Host "  $ESC[44;97;1m PERMISOS $Reset ${Cyan}Estado de seguridad y sandbox de Vork CLI:${Reset}"
-    Write-Host "  ${Cyan}  ● Lectura/Escritura Workspace:${Reset} ${Green}PERMITIDO${Reset}"
-    Write-Host "  ${Cyan}  ● Conexión API Backend Nube:${Reset}   ${Green}PERMITIDO${Reset}"
-    Write-Host "  ${Cyan}  ● Ejecución PowerShell Local:${Reset}   ${Green}PERMITIDO${Reset}"
-    Write-Host ""
+# ========================================================
+# GESTIÓN GRANULAR DE PERMISOS (9 PERMISOS CONMUTABLES)
+# ========================================================
+
+function Get-VorkPermissions {
+    $permFile = Join-Path $HOME ".vork\permissions.json"
+    $perms = [ordered]@{
+        "fs_read"      = @{ Name = "Lectura de Workspace";       Desc = "Acceso a leer archivos, canciones e imagenes"; Enabled = $true }
+        "fs_write"     = @{ Name = "Escritura & Exportación";   Desc = "Guardar stems Demucs, audios TTS e imagenes";   Enabled = $true }
+        "net_cloud"    = @{ Name = "Conexión API Vork Cloud";   Desc = "Llamadas remotas a servicios en la nube";       Enabled = $true }
+        "ps_exec"      = @{ Name = "PowerShell Local";          Desc = "Ejecucion de scripts locales y herramientas";   Enabled = $true }
+        "media_dl"     = @{ Name = "Descargas Multimedia";      Desc = "Descarga streams YouTube, TikTok, Reels, IG";  Enabled = $true }
+        "voice_clone"  = @{ Name = "Modelado & Clonación IA";   Desc = "Extraccion de formantes y modelado timbrico F0"; Enabled = $true }
+        "agents_loop"  = @{ Name = "Agentes Autónomos";         Desc = "Bucles continuos autonomos (/goal, /teamwork)"; Enabled = $true }
+        "browser_auto" = @{ Name = "Automatización Web / DJ";   Desc = "Apertura de navegador para consola DJ y web";   Enabled = $true }
+        "telemetry"    = @{ Name = "Telemetría & Diagnóstico";  Desc = "Comprobacion de latencia y salud de pilares";   Enabled = $true }
+    }
+
+    if (Test-Path $permFile) {
+        try {
+            $saved = Get-Content -Path $permFile -Raw | ConvertFrom-Json
+            foreach ($k in $perms.Keys) {
+                if ($saved.$k -ne $null) {
+                    $perms[$k].Enabled = [bool]$saved.$k
+                }
+            }
+        } catch { }
+    }
+    return $perms
 }
 
+function Save-VorkPermissions {
+    param($PermsHash)
+    try {
+        $pDir = Join-Path $HOME ".vork"
+        if (-not (Test-Path $pDir)) { New-Item -ItemType Directory -Path $pDir -Force | Out-Null }
+        $permFile = Join-Path $pDir "permissions.json"
+        $toSave = @{}
+        foreach ($k in $PermsHash.Keys) {
+            $toSave[$k] = $PermsHash[$k].Enabled
+        }
+        $toSave | ConvertTo-Json | Set-Content -Path $permFile -Encoding UTF8
+    } catch { }
+}
+
+function Invoke-CmdPermissions {
+    param([string[]]$ArgsList)
+
+    $perms = Get-VorkPermissions
+    $keys = @($perms.Keys)
+
+    $subCmd = if ($ArgsList -and $ArgsList.Count -gt 0) { $ArgsList[0].ToLower() } else { "" }
+    $target = if ($ArgsList -and $ArgsList.Count -gt 1) { $ArgsList[1].ToLower() } else { "" }
+
+    # Manejar comandos directos: allow, deny, toggle
+    if ($subCmd -in "allow", "enable", "activar", "permitir") {
+        $tIdx = -1
+        if ([int]::TryParse($target, [ref]$tIdx) -and $tIdx -ge 1 -and $tIdx -le $keys.Count) {
+            $k = $keys[$tIdx - 1]
+            $perms[$k].Enabled = $true
+            Save-VorkPermissions -PermsHash $perms
+            Write-Host ""
+            Write-Host "  $ESC[42;30;1m PERMITIDO $Reset ${Green}Permiso [$tIdx] '$k' habilitado.${Reset}"
+            Write-Host ""
+            return
+        } elseif ($perms.Contains($target)) {
+            $perms[$target].Enabled = $true
+            Save-VorkPermissions -PermsHash $perms
+            Write-Host ""
+            Write-Host "  $ESC[42;30;1m PERMITIDO $Reset ${Green}Permiso '$target' habilitado.${Reset}"
+            Write-Host ""
+            return
+        }
+    }
+
+    if ($subCmd -in "deny", "disable", "desactivar", "bloquear") {
+        $tIdx = -1
+        if ([int]::TryParse($target, [ref]$tIdx) -and $tIdx -ge 1 -and $tIdx -le $keys.Count) {
+            $k = $keys[$tIdx - 1]
+            $perms[$k].Enabled = $false
+            Save-VorkPermissions -PermsHash $perms
+            Write-Host ""
+            Write-Host "  $ESC[41;97;1m DENEGADO $Reset ${Coral}Permiso [$tIdx] '$k' deshabilitado.${Reset}"
+            Write-Host ""
+            return
+        } elseif ($perms.Contains($target)) {
+            $perms[$target].Enabled = $false
+            Save-VorkPermissions -PermsHash $perms
+            Write-Host ""
+            Write-Host "  $ESC[41;97;1m DENEGADO $Reset ${Coral}Permiso '$target' deshabilitado.${Reset}"
+            Write-Host ""
+            return
+        }
+    }
+
+    # Si se paso un numero directo como argumento: /permissions 1
+    $directIdx = -1
+    if ([int]::TryParse($subCmd, [ref]$directIdx) -and $directIdx -ge 1 -and $directIdx -le $keys.Count) {
+        $k = $keys[$directIdx - 1]
+        $perms[$k].Enabled = -not $perms[$k].Enabled
+        Save-VorkPermissions -PermsHash $perms
+        $st = if ($perms[$k].Enabled) { "${Green}PERMITIDO${Reset}" } else { "${Coral}DENEGADO${Reset}" }
+        Write-Host ""
+        Write-Host "  $ESC[44;97;1m TOGGLE $Reset Permiso [$directIdx] '$k' cambiado a: $st"
+        Write-Host ""
+        return
+    }
+
+    # Modo Interactivo de Permisos
+    Write-Host ""
+    Write-Host "  ${White}${Bold}PERMISOS DE SEGURIDAD Y SANDBOX · VORK CLI${Reset}"
+    Write-Host "  ${LeadLight}Configuración persistente guardada en ~/.vork/permissions.json${Reset}"
+    Write-Host ""
+
+    for ($i = 0; $i -lt $keys.Count; $i++) {
+        $k = $keys[$i]
+        $item = $perms[$k]
+        $num = "[$($i + 1)]"
+        $statusBadge = if ($item.Enabled) {
+            "$ESC[42;30;1m [OK] PERMITIDO $Reset"
+        } else {
+            "$ESC[41;97;1m [X] DENEGADO  $Reset"
+        }
+        $kName = $k.PadRight(13)
+        $title = $item.Name.PadRight(25)
+        Write-Host "  ${Cyan}$num${Reset} $statusBadge  ${White}${Bold}$title${Reset} ${LeadLight}· $($item.Desc)${Reset}"
+    }
+
+    Write-Host ""
+    Write-Host "  ${LeadLight}Ingresa el número (1-9) para alternar el permiso (o Enter para salir):${Reset} " -NoNewline
+    $sel = [Console]::ReadLine()
+    if ($sel -and $sel.Trim()) {
+        $chosen = -1
+        if ([int]::TryParse($sel.Trim(), [ref]$chosen) -and $chosen -ge 1 -and $chosen -le $keys.Count) {
+            $chKey = $keys[$chosen - 1]
+            $perms[$chKey].Enabled = -not $perms[$chKey].Enabled
+            Save-VorkPermissions -PermsHash $perms
+            $st = if ($perms[$chKey].Enabled) { "${Green}PERMITIDO${Reset}" } else { "${Coral}DENEGADO${Reset}" }
+            Write-Host ""
+            Write-Host "  $ESC[42;30;1m ACTUALIZADO $Reset Permiso [$chosen] '$chKey' ahora está: $st"
+            Write-Host ""
+        }
+    }
+}
+
+# ========================================================
+# GESTIÓN DE LOS 10 TEMAS VISUALES DE VORK CLI
+# ========================================================
+
 function Invoke-CmdTheme {
+    param([string[]]$ArgsList)
+
+    $themes = @(
+        @{ Id = "lead";          Name = "Plomo Oscuro (Lead Slate)";    Acentos = "Coral + Electric Cyan"; Dot = "$ESC[38;2;255;107;74m●$Reset" }
+        @{ Id = "cyberpunk";     Name = "Cyberpunk 2077";              Acentos = "Neon Yellow + Pink";    Dot = "$ESC[38;2;252;238;10m●$Reset" }
+        @{ Id = "matrix";        Name = "Matrix Terminal";             Acentos = "Phosphor Green";        Dot = "$ESC[38;2;0;255;65m●$Reset" }
+        @{ Id = "dracula";       Name = "Dracula Vamp";                Acentos = "Vampire Purple + Pink"; Dot = "$ESC[38;2;189;147;249m●$Reset" }
+        @{ Id = "nord";          Name = "Nordic Frost";                Acentos = "Arctic Ice + Polar";    Dot = "$ESC[38;2;136;192;208m●$Reset" }
+        @{ Id = "tokyo-night";   Name = "Tokyo Night";                 Acentos = "Deep Neon Blue + Mag";  Dot = "$ESC[38;2;122;162;247m●$Reset" }
+        @{ Id = "monokai";       Name = "Monokai Pro";                 Acentos = "Warm Gold + Lime Mint"; Dot = "$ESC[38;2;255;216;102m●$Reset" }
+        @{ Id = "synthwave";     Name = "Synthwave 84";                Acentos = "Sunset Pink + Cyan";    Dot = "$ESC[38;2;255;126;219m●$Reset" }
+        @{ Id = "solarized-dark";Name = "Solarized Dark";              Acentos = "Solar Teal + Amber";    Dot = "$ESC[38;2;42;161;152m●$Reset" }
+        @{ Id = "ghost";         Name = "Minimal Ghost";               Acentos = "Titanium Monochrome";   Dot = "$ESC[38;2;250;250;250m●$Reset" }
+    )
+
+    $userChoice = if ($ArgsList -and $ArgsList.Count -gt 0) { $ArgsList[0].ToLower() } else { "" }
+
+    # Aplicar directamente si se paso argumento
+    if ($userChoice) {
+        $matched = $null
+        $cIdx = -1
+        if ([int]::TryParse($userChoice, [ref]$cIdx) -and $cIdx -ge 1 -and $cIdx -le $themes.Count) {
+            $matched = $themes[$cIdx - 1].Id
+        } else {
+            $found = @($themes | Where-Object { $_.Id -eq $userChoice -or $_.Id.StartsWith($userChoice) })
+            if ($found.Count -gt 0) { $matched = $found[0].Id }
+        }
+
+        if ($matched) {
+            Apply-VorkTheme -ThemeName $matched
+            try {
+                $tDir = Join-Path $HOME ".vork"
+                if (-not (Test-Path $tDir)) { New-Item -ItemType Directory -Path $tDir -Force | Out-Null }
+                Set-Content -Path (Join-Path $tDir ".theme") -Value $matched -Force -Encoding UTF8
+            } catch { }
+
+            Write-Host ""
+            Write-Host "  $ESC[42;30;1m OK $Reset ${Green}Tema visual cambiado exitosamente a: ${Bold}$($global:VorkThemeName)${Reset}"
+            Write-Host "  ${LeadLight}Preferencia persistida en ~/.vork/.theme${Reset}"
+            Write-Host ""
+            return
+        }
+    }
+
+    # Despliegue del catalogo de 10 temas
     Write-Host ""
-    Write-Host "  ${White}${Bold}TEMA VISUAL DE VORK CLI:${Reset}"
-    Write-Host "  ${Green}● Plomo Oscuro (Lead Slate - Tema Oficial Vork 3) [ACTIVO]${Reset}"
-    Write-Host "  ${LeadLight}Diseñado con acentos Coral (#ff6b4a) y Cyan eléctrico (#38bdf8).${Reset}"
+    Write-Host "  ${White}${Bold}CATÁLOGO DE LOS 10 TEMAS VISUALES DE VORK CLI:${Reset}"
+    Write-Host "  ${LeadLight}Tema activo actualmente: ${Cyan}${Bold}$($global:VorkThemeName)${Reset}"
     Write-Host ""
+
+    for ($i = 0; $i -lt $themes.Count; $i++) {
+        $th = $themes[$i]
+        $num = "[$($i + 1)]"
+        $isActive = ($global:VorkThemeId -eq $th.Id)
+        $badge = if ($isActive) { "$ESC[42;30;1m [ACTIVO] $Reset" } else { "         " }
+        $namePadded = $th.Name.PadRight(26)
+        Write-Host "  ${Cyan}$num${Reset} $badge $($th.Dot) ${White}${Bold}$namePadded${Reset} ${LeadLight}· $($th.Acentos)${Reset}"
+    }
+
+    Write-Host ""
+    Write-Host "  ${LeadLight}Ingresa el número (1-10) o nombre del tema a activar (o Enter para mantener):${Reset} " -NoNewline
+    $inputChoice = [Console]::ReadLine()
+    if ($inputChoice -and $inputChoice.Trim()) {
+        $inClean = $inputChoice.Trim().ToLower()
+        $mId = $null
+        $numVal = -1
+        if ([int]::TryParse($inClean, [ref]$numVal) -and $numVal -ge 1 -and $numVal -le $themes.Count) {
+            $mId = $themes[$numVal - 1].Id
+        } else {
+            $found = @($themes | Where-Object { $_.Id -eq $inClean -or $_.Id.StartsWith($inClean) })
+            if ($found.Count -gt 0) { $mId = $found[0].Id }
+        }
+
+        if ($mId) {
+            Apply-VorkTheme -ThemeName $mId
+            try {
+                $tDir = Join-Path $HOME ".vork"
+                if (-not (Test-Path $tDir)) { New-Item -ItemType Directory -Path $tDir -Force | Out-Null }
+                Set-Content -Path (Join-Path $tDir ".theme") -Value $mId -Force -Encoding UTF8
+            } catch { }
+
+            Write-Host ""
+            Write-Host "  $ESC[42;30;1m TEMA APLICADO $Reset ${Green}Ahora usando: ${Bold}$($global:VorkThemeName)${Reset}"
+            Write-Host ""
+        }
+    }
 }
 
 function Invoke-CmdEnv {

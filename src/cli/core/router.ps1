@@ -52,13 +52,10 @@ function Dispatch-CLICommand {
         "undo"    { Invoke-CmdUndo }
 
         # ========================================================
-        # CATEGORIA 4: CÓDIGO, GIT & FLUJO DE TRABAJO (7)
+        # CATEGORIA 4: CÓDIGO, AUDITORÍA & FLUJO (4)
         # ========================================================
         "status"   { Invoke-CmdStatus }
-        "diff"     { Invoke-CmdDiff }
-        "commit"   { Invoke-CmdCommit -ArgsList $ArgsList }
         "review"   { Invoke-CmdReview }
-        "test"     { Invoke-CmdTest }
         "bug"      { Invoke-CmdBug -ArgsList $ArgsList }
         "refactor" { Invoke-CmdRefactor }
 
@@ -67,7 +64,7 @@ function Dispatch-CLICommand {
         # ========================================================
         "config"      { Invoke-CmdConfig }
         "keybindings" { Invoke-CmdKeybindings }
-        "permissions" { Invoke-CmdPermissions }
+        "permissions" { Invoke-CmdPermissions -ArgsList $ArgsList }
         { $_ -in "mode", "modal", "model", "tier", "effort" } {
             $argVal = if ($ArgsList -and $ArgsList.Count -gt 0) { $ArgsList[0] } else { "" }
             if ($argVal -in "low", "medium", "high") {
@@ -76,14 +73,17 @@ function Dispatch-CLICommand {
                 Show-InteractiveModeSelector
             }
         }
-        "theme"       { Invoke-CmdTheme }
+        "theme"       { Invoke-CmdTheme -ArgsList $ArgsList }
         "env"         { Invoke-CmdEnv }
 
         # ========================================================
         # CATEGORIA 6: SISTEMA, TELEMETRÍA & UTILIDADES (6)
         # ========================================================
         { $_ -in "help", "--help", "-h", "?", "shortcuts", "/shortcuts" } {
-            Show-Help
+            $chosen = Show-InteractiveHelpModal
+            if ($chosen) {
+                Dispatch-CLICommand -Cmd $chosen -ArgsList @()
+            }
         }
         { $_ -in "slash", "slashcommands", "commands" } {
             Show-SlashCommands
@@ -121,7 +121,7 @@ function Dispatch-CLICommand {
         default {
             Write-Host ""
             Write-Host "  ${Coral}[!] Comando no reconocido:${Reset} $White`"$Cmd`"$Reset"
-            Write-Host "  ${Dim}Escribe '?' para atajos o 'slash' para ver los 43 comandos con barra.${Reset}"
+            Write-Host "  ${Dim}Escribe '?' para atajos o 'slash' para ver los 40 comandos con barra.${Reset}"
             Write-Host ""
         }
     }
@@ -170,12 +170,9 @@ function Read-InteractiveVorkLine {
         @{ Cmd = "/resume";      Desc = "Reanudar una sesion previa o restaurar estado" },
         @{ Cmd = "/undo";        Desc = "Deshacer la ultima accion o cambio de codigo" },
 
-        # Categoria 4: Desarrollo, Git & Codigo (7)
-        @{ Cmd = "/status";      Desc = "Inspeccionar estado de Git, archivos y tareas activas" },
-        @{ Cmd = "/diff";        Desc = "Visualizar diferencias de codigo directamente en terminal" },
-        @{ Cmd = "/commit";      Desc = "Generar commit semantico inteligente con IA" },
+        # Categoria 4: Flujo de Trabajo & Auditoría (4)
+        @{ Cmd = "/status";      Desc = "Inspeccionar estado del entorno y tareas activas" },
         @{ Cmd = "/review";      Desc = "Auditoria de codigo, buenas practicas y seguridad" },
-        @{ Cmd = "/test";        Desc = "Ejecucion y validacion de pruebas unitarias" },
         @{ Cmd = "/bug";         Desc = "Diagnostico y depuracion asistida de excepciones" },
         @{ Cmd = "/refactor";    Desc = "Reestructurar y optimizar codigo sin alterar salida" },
 
@@ -183,8 +180,6 @@ function Read-InteractiveVorkLine {
         @{ Cmd = "/config";      Desc = "Ajustar permisos, temas visuales y preferencias" },
         @{ Cmd = "/keybindings"; Desc = "Personalizar atajos de teclado y combinaciones" },
         @{ Cmd = "/permissions"; Desc = "Administrar permisos de herramientas y comandos" },
-        @{ Cmd = "/mode";        Desc = "Selector interactivo de potencia (low, medium, high)" },
-        @{ Cmd = "/modal";       Desc = "Selector interactivo de modelo y potencia Vork 3" },
         @{ Cmd = "/model";       Desc = "Configurar modelo Vork 3 y nivel de potencia" },
         @{ Cmd = "/theme";       Desc = "Alternar temas visuales (Dark, Cyberpunk, Coral)" },
         @{ Cmd = "/env";         Desc = "Consultar y gestionar variables de entorno activas" },
@@ -210,10 +205,11 @@ function Read-InteractiveVorkLine {
     $dotCh     = [char]0x00B7
 
     $clearMenu = {
+        $clearLen = [Math]::Min(75, [Math]::Max(40, $Width - 6))
         for ($r = 1; $r -le $menuHeight; $r++) {
             try {
                 [Console]::SetCursorPosition(0, $PromptRow + 1 + $r)
-                Write-Host ([string]::new(" ", [Math]::Min(140, $Width - 1))) -NoNewline
+                Write-Host ([string]::new(" ", $clearLen)) -NoNewline
             } catch { }
         }
         try {
@@ -244,7 +240,7 @@ function Read-InteractiveVorkLine {
 
             $slashMenuOpen = $true
 
-            $maxLineLen = [Math]::Max(40, $Width - 4)
+            $maxLineLen = [Math]::Min(75, [Math]::Max(40, $Width - 6))
 
             # Render the 5 visible items
             for ($k = 0; $k -lt $windowSize; $k++) {
@@ -254,10 +250,10 @@ function Read-InteractiveVorkLine {
 
                 if ($itemIdx -lt $filtered.Count) {
                     $item = $filtered[$itemIdx]
-                    $cmdStr = $item.Cmd.PadRight(20)
+                    $cmdStr = $item.Cmd.PadRight(18)
                     $descStr = $item.Desc
-                    if ($descStr.Length -gt ($maxLineLen - 24)) {
-                        $descStr = $descStr.Substring(0, [Math]::Max(10, $maxLineLen - 27)) + "..."
+                    if ($descStr.Length -gt ($maxLineLen - 22)) {
+                        $descStr = $descStr.Substring(0, [Math]::Max(10, $maxLineLen - 25)) + "..."
                     }
 
                     if ($itemIdx -eq $selIdx) {
@@ -413,6 +409,22 @@ function Read-InteractiveVorkLine {
             continue
         }
 
+        if ($buf.Length -eq 0 -and ($key.KeyChar -eq '?' -or $key.Key -eq [ConsoleKey]::OemQuestion)) {
+            $modalChosen = Show-InteractiveHelpModal
+            Clear-Host
+            Show-Banner
+            Write-Host "${Lead}$Rule${Reset}"
+            $pRow = try { [Console]::CursorTop } catch { 0 }
+            Write-Host "${Coral}${Bold}> ${Reset}"
+            Write-Host "${Lead}$Rule${Reset}"
+            Write-Host "${LeadLight}$Footer${Reset}"
+            try { [Console]::SetCursorPosition(2, $pRow) } catch { }
+            if ($modalChosen) {
+                return $modalChosen
+            }
+            continue
+        }
+
         $ch = $key.KeyChar
         if (-not [char]::IsControl($ch)) {
             $buf.Append($ch) | Out-Null
@@ -424,6 +436,7 @@ function Read-InteractiveVorkLine {
 }
 
 function Start-InteractiveREPL {
+    Set-VorkWindowIdentity
     Clear-Host
     Show-Banner
 
@@ -435,13 +448,22 @@ function Start-InteractiveREPL {
         if ($width -le 20 -or $width -gt 300) { $width = 120 }
         $rule = [string]::new($lineChar, ($width - 1))
 
-        # Asegurar espacio vertical libre para el menu desplegable
+        # Asegurar buffer vertical suficiente y espacio visible debajo
         try {
-            $spaceBelow = [Console]::WindowHeight - ([Console]::CursorTop - [Console]::WindowTop)
-            if ($spaceBelow -lt 12) {
-                $scrollNeeded = 12 - $spaceBelow + 1
-                for ($s = 0; $s -lt $scrollNeeded; $s++) { Write-Host "" }
-                [Console]::SetCursorPosition(0, [Console]::CursorTop - $scrollNeeded)
+            if ([Console]::BufferHeight -lt 1000) {
+                [Console]::BufferHeight = 1000
+            }
+        } catch { }
+
+        $neededLines = 11
+        try {
+            $currY = [Console]::CursorTop
+            $winBottom = [Console]::WindowTop + [Console]::WindowHeight
+            if (($winBottom - $currY) -lt $neededLines) {
+                $scrollNeeded = $neededLines - ($winBottom - $currY)
+                for ($s = 0; $s -lt $scrollNeeded; $s++) {
+                    [Console]::WriteLine()
+                }
             }
         } catch { }
 

@@ -106,6 +106,19 @@ exports.getInstallCmd = (req, res) => {
   res.sendFile(filePath);
 };
 
+/**
+ * Sirve el icono oficial de Vork CLI (.ico) para ventanas y terminales
+ */
+exports.getVorkIco = (req, res) => {
+  const filePath = path.join(__dirname, "..", "public", "img", "logo.ico");
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send("Icono no encontrado");
+  }
+  res.setHeader("Content-Type", "image/x-icon");
+  res.setHeader("Cache-Control", "public, max-age=86400");
+  res.sendFile(filePath);
+};
+
 exports.getCliInfo = (req, res) => {
   res.setHeader("Cache-Control", "public, max-age=3600");
   res.json({
@@ -224,12 +237,9 @@ exports.getCliInfo = (req, res) => {
       { name: "/resume", category: "Sesión", description: "Reanudar una sesión previa o restaurar estado de trabajo" },
       { name: "/undo", category: "Sesión", description: "Deshacer la última acción o modificación de código realizada" },
 
-      // 4. Código, Git & Flujo de Trabajo (7)
-      { name: "/status", category: "Desarrollo", description: "Inspeccionar estado de Git, archivos modificados y tareas" },
-      { name: "/diff", category: "Desarrollo", description: "Visualizar diferencias de código directamente en terminal" },
-      { name: "/commit", category: "Desarrollo", description: "Generar commit semántico inteligente con IA" },
+      // 4. Código, Auditoría & Flujo de Trabajo (4)
+      { name: "/status", category: "Desarrollo", description: "Telemetría y estado operativo en vivo de los 9 pilares" },
       { name: "/review", category: "Desarrollo", description: "Auditoría de código, buenas prácticas y seguridad OWASP" },
-      { name: "/test", category: "Desarrollo", description: "Ejecución y validación de pruebas unitarias y suites" },
       { name: "/bug", category: "Desarrollo", description: "Diagnóstico y depuración asistida de excepciones y trazas" },
       { name: "/refactor", category: "Desarrollo", description: "Reestructurar y optimizar código sin alterar su salida" },
 
@@ -237,7 +247,7 @@ exports.getCliInfo = (req, res) => {
       { name: "/config", category: "Configuración", description: "Ajustar permisos, temas visuales y preferencias del CLI" },
       { name: "/keybindings", category: "Configuración", description: "Personalizar atajos de teclado y combinaciones" },
       { name: "/permissions", category: "Configuración", description: "Administrar permisos de ejecución de comandos y herramientas" },
-      { name: "/model", category: "Configuración", description: "Consultar o alternar el modelo de lenguaje en ejecución" },
+      { name: "/model", category: "Configuración", description: "Configurar modelo Vork 3 y nivel de potencia (low, medium, high)" },
       { name: "/theme", category: "Configuración", description: "Alternar temas visuales (Dark, Cyberpunk, Coral, Mono)" },
       { name: "/env", category: "Configuración", description: "Consultar y gestionar variables de entorno activas" },
 

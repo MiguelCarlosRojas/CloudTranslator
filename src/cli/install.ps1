@@ -49,6 +49,12 @@ try {
     Write-Host "$Yellow[WARN]$Reset Falla al conectar con $ApiBase/cli/vork.ps1. Generando copia de respaldo..." -ForegroundColor Yellow
 }
 
+# Descargar icono oficial de Vork (.ico) para ventanas y terminales
+$iconPath = Join-Path $installDir "vork.ico"
+try {
+    Invoke-RestMethod -Uri "$ApiBase/cli/vork.ico" -OutFile $iconPath -TimeoutSec 5 -ErrorAction SilentlyContinue
+} catch {}
+
 # Wrappers de ejecución multiplataforma para Windows CMD y Terminal
 $cmdWrapper = @"
 @echo off
