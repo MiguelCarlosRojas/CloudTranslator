@@ -94,6 +94,19 @@ exports.getVorkPs1 = (req, res) => {
 };
 
 /**
+ * Sirve el script instalador para macOS y Linux (Bash / Zsh)
+ */
+exports.getInstallSh = (req, res) => {
+  const filePath = path.join(CLI_DIR, "install.sh");
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).type("text/plain").send("# Error: install.sh no encontrado en el backend\n");
+  }
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=3600");
+  res.sendFile(filePath);
+};
+
+/**
  * Sirve el script instalador para Command Prompt (CMD)
  */
 exports.getInstallCmd = (req, res) => {
@@ -127,13 +140,21 @@ exports.getCliInfo = (req, res) => {
     version: "3.0.2",
     description: "Entorno centrado en la terminal para interactuar con los 9 pilares operacionales de Vork y agentes autónomos.",
     installers: {
-      powershell: {
+      windows_powershell: {
         command: "irm https://vork-st1k.onrender.com/cli/install.ps1 | iex",
         url: "https://vork-st1k.onrender.com/cli/install.ps1"
       },
-      cmd: {
+      windows_cmd: {
         command: "curl -fsSL https://vork-st1k.onrender.com/cli/install.cmd -o install.cmd && install.cmd && del install.cmd",
         url: "https://vork-st1k.onrender.com/cli/install.cmd"
+      },
+      macos: {
+        command: "curl -fsSL https://vork-st1k.onrender.com/cli/install.sh | bash",
+        url: "https://vork-st1k.onrender.com/cli/install.sh"
+      },
+      linux: {
+        command: "curl -fsSL https://vork-st1k.onrender.com/cli/install.sh | bash",
+        url: "https://vork-st1k.onrender.com/cli/install.sh"
       }
     },
     operationalPillars: [

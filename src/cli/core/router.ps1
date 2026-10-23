@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Vork CLI - Modulo Core: Despachador y Consola Interactiva REPL
 #>
@@ -200,6 +200,9 @@ function Read-InteractiveVorkLine {
     $windowSize = 5
     $menuHeight = 9
 
+    try { [Console]::TreatControlCAsInput = $true } catch { }
+    $lastCtrlC = [DateTime]::MinValue
+
     $downArrow = [char]0x2193
     $upArrow   = [char]0x2191
     $dotCh     = [char]0x00B7
@@ -323,6 +326,66 @@ function Read-InteractiveVorkLine {
 
         $key = [Console]::ReadKey($true)
 
+        # Intercepción de Ctrl+C (Evita mensaje "¿Desea terminar el trabajo por lotes (S/N)?" y ofrece doble confirmación)
+        $isCtrlC = ($key.KeyChar -eq [char]3) -or ($key.Key -eq [ConsoleKey]::C -and ($key.Modifiers -band [ConsoleModifiers]::Control))
+        if ($isCtrlC) {
+            if ($slashMenuOpen) {
+                & $clearMenu
+                $slashMenuOpen = $false
+            }
+            if ($buf.Length -gt 0) {
+                try {
+                    [Console]::SetCursorPosition(2, $PromptRow)
+                    Write-Host ([string]::new(" ", [Math]::Max(1, $buf.Length + 4))) -NoNewline
+                    [Console]::SetCursorPosition(2, $PromptRow)
+                } catch { }
+                $buf.Clear() | Out-Null
+                $lastCtrlC = [DateTime]::MinValue
+                continue
+            }
+
+            # Buffer vacío: comprobar doble pulsación
+            $now = [DateTime]::UtcNow
+            if (($now - $lastCtrlC).TotalSeconds -lt 2.5) {
+                try {
+                    [Console]::SetCursorPosition(0, $PromptRow + 2)
+                    Write-Host ([string]::new(" ", [Math]::Min(80, $Width - 1))) -NoNewline
+                    [Console]::SetCursorPosition(0, $PromptRow + 2)
+                } catch { }
+                Write-Host ""
+                Write-Host "  ${Cyan}Sesion de Vork CLI finalizada.${Reset}"
+                exit 0
+            } else {
+                $lastCtrlC = $now
+                try {
+                    [Console]::SetCursorPosition(0, $PromptRow + 2)
+                    $warnMsg = "press ctrl+c again to exit"
+                    $padLen = [Math]::Max(0, ($Width - 1) - $warnMsg.Length)
+                    Write-Host "${Coral}${Bold}$warnMsg${Reset}$([string]::new(' ', $padLen))" -NoNewline
+                    [Console]::SetCursorPosition(2, $PromptRow)
+                } catch { }
+                continue
+            }
+        }
+
+        # Restaurar footer si estaba visible el aviso de ctrl+c y se pulsó otra tecla
+        if ($lastCtrlC -ne [DateTime]::MinValue) {
+            try {
+                [Console]::SetCursorPosition(0, $PromptRow + 2)
+                Write-Host "${LeadLight}$Footer${Reset}" -NoNewline
+                [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
+            } catch { }
+            $lastCtrlC = [DateTime]::MinValue
+        }
+
+        # Intercepción de Ctrl+D
+        $isCtrlD = ($key.KeyChar -eq [char]4) -or ($key.Key -eq [ConsoleKey]::D -and ($key.Modifiers -band [ConsoleModifiers]::Control))
+        if ($isCtrlD -and $buf.Length -eq 0) {
+            Write-Host ""
+            Write-Host "  ${Cyan}Sesion de Vork CLI finalizada.${Reset}"
+            exit 0
+        }
+
         if ($key.Key -eq [ConsoleKey]::Enter) {
             if ($isSlash -and $filtered.Count -gt 0) {
                 $chosen = $filtered[$selIdx].Cmd
@@ -376,7 +439,7 @@ function Read-InteractiveVorkLine {
                 & $clearMenu
                 $slashMenuOpen = $false
             }
-            if ($isSlash) {
+            if ($buf.Length -gt 0) {
                 try {
                     [Console]::SetCursorPosition(2, $PromptRow)
                     Write-Host ([string]::new(" ", [Math]::Max(1, $buf.Length + 4))) -NoNewline
@@ -384,6 +447,12 @@ function Read-InteractiveVorkLine {
                 } catch { }
                 $buf.Clear() | Out-Null
             }
+            try {
+                [Console]::SetCursorPosition(0, $PromptRow + 2)
+                Write-Host "${LeadLight}$Footer${Reset}" -NoNewline
+                [Console]::SetCursorPosition(2, $PromptRow)
+            } catch { }
+            $lastCtrlC = [DateTime]::MinValue
             continue
         }
 

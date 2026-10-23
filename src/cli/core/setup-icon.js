@@ -3,7 +3,7 @@ const path = require('path');
 const os = require('os');
 
 const home = os.homedir();
-const iconPath = path.join(home, '.vork', 'vork.ico');
+const iconPath = path.join(home, '.vork', 'vork.png').replace(/\\/g, '/');
 const localAppData = process.env.LOCALAPPDATA;
 
 // 1. Windows Terminal Integration
@@ -29,7 +29,7 @@ if (localAppData) {
             commandline: cmdLine,
             icon: iconPath,
             tabTitle: 'Vork CLI',
-            startingDirectory: path.join(home, 'Videos', 'Visual Studio Code', 'CloudTranslator'),
+            startingDirectory: null,
             hidden: false
           };
 
@@ -39,6 +39,7 @@ if (localAppData) {
             list.push(profileObj);
           }
           json.profiles.list = list;
+          json.defaultProfile = '{a72886bb-f17e-4ca0-84b6-b5cb1af0c3f9}';
           fs.writeFileSync(sPath, JSON.stringify(json, null, 4), 'utf8');
           console.log('[OK] Windows Terminal profile registered with Vork icon in:', sPath);
         } catch (err) {

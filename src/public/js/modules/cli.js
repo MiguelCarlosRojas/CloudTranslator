@@ -6,48 +6,54 @@
 (function (window, document) {
   "use strict";
 
+  function detectUserOS() {
+    try {
+      const ua = (window.navigator && window.navigator.userAgent) || "";
+      const plat = (window.navigator && window.navigator.platform) || "";
+      if (/Mac|iPhone|iPad|iPod/i.test(plat) || /Macintosh/i.test(ua)) return "sh";
+      if (/Linux/i.test(plat) || /Linux/i.test(ua)) return "sh";
+    } catch (e) {}
+    return "ps";
+  }
+
   function switchInstallTab(type) {
     const btnPs = document.getElementById("tab-ps-btn");
+    const btnSh = document.getElementById("tab-sh-btn");
     const btnCmd = document.getElementById("tab-cmd-btn");
     const panelPs = document.getElementById("panel-ps");
+    const panelSh = document.getElementById("panel-sh");
     const panelCmd = document.getElementById("panel-cmd");
 
-    if (!panelPs || !panelCmd) return;
+    const tabs = [
+      { id: "ps", btn: btnPs, panel: panelPs },
+      { id: "sh", btn: btnSh, panel: panelSh },
+      { id: "cmd", btn: btnCmd, panel: panelCmd }
+    ];
 
-    if (type === "ps") {
-      if (btnPs) {
-        btnPs.classList.add("active");
-        btnPs.setAttribute("aria-selected", "true");
+    tabs.forEach(t => {
+      if (t.btn && t.panel) {
+        if (t.id === type) {
+          t.btn.classList.add("active");
+          t.btn.setAttribute("aria-selected", "true");
+          t.panel.classList.add("active");
+          t.panel.style.display = "block";
+        } else {
+          t.btn.classList.remove("active");
+          t.btn.setAttribute("aria-selected", "false");
+          t.panel.classList.remove("active");
+          t.panel.style.display = "none";
+        }
       }
-      if (btnCmd) {
-        btnCmd.classList.remove("active");
-        btnCmd.setAttribute("aria-selected", "false");
-      }
-      panelPs.classList.add("active");
-      panelCmd.classList.remove("active");
-      panelPs.style.display = "block";
-      panelCmd.style.display = "none";
-    } else {
-      if (btnCmd) {
-        btnCmd.classList.add("active");
-        btnCmd.setAttribute("aria-selected", "true");
-      }
-      if (btnPs) {
-        btnPs.classList.remove("active");
-        btnPs.setAttribute("aria-selected", "false");
-      }
-      panelCmd.classList.add("active");
-      panelPs.classList.remove("active");
-      panelCmd.style.display = "block";
-      panelPs.style.display = "none";
-    }
+    });
   }
 
   // Exponer globalmente en window de inmediato
   window.switchInstallTab = switchInstallTab;
+  window.detectUserOS = detectUserOS;
 
   function initInstallTabs() {
     const btnPs = document.getElementById("tab-ps-btn");
+    const btnSh = document.getElementById("tab-sh-btn");
     const btnCmd = document.getElementById("tab-cmd-btn");
 
     if (btnPs && !btnPs._tabBound) {
@@ -59,6 +65,15 @@
       });
     }
 
+    if (btnSh && !btnSh._tabBound) {
+      btnSh._tabBound = true;
+      btnSh.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        switchInstallTab("sh");
+      });
+    }
+
     if (btnCmd && !btnCmd._tabBound) {
       btnCmd._tabBound = true;
       btnCmd.addEventListener("click", function (e) {
@@ -67,6 +82,10 @@
         switchInstallTab("cmd");
       });
     }
+
+    // Auto-detectar sistema operativo y activar la pestaña adecuada
+    const detected = detectUserOS();
+    switchInstallTab(detected);
 
     // Inicializar traductor Vork si existe
     if (window.Vork && !window.translator) {

@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Vork CLI - Modulo de Configuracion y Paleta Tipografica ANSI
 #>
@@ -25,10 +25,12 @@ $Italic = "$ESC[3m"
 $White  = "$ESC[38;2;240;246;252m"
 $Gray   = "$ESC[38;2;120;128;140m"
 
+$global:IsWinPlatform = ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT)
+
 # ========================================================
 # IDENTIDAD VISUAL: ICONO Y TÍTULO DE VENTANA / PESTAÑA
 # ========================================================
-if (-not ([System.Management.Automation.PSTypeName]'VorkWin32').Type) {
+if ($global:IsWinPlatform -and -not ([System.Management.Automation.PSTypeName]'VorkWin32').Type) {
     $csharp = @'
 using System;
 using System.Runtime.InteropServices;
@@ -62,23 +64,25 @@ public static class VorkWin32 {
 }
 
 function Set-VorkWindowIdentity {
-    # 1. Establecer título de ventana PowerShell
+    # 1. Establecer título de ventana
     try {
-        $Host.UI.RawUI.WindowTitle = "Vork CLI · 9 Pilares Operacionales"
+        $Host.UI.RawUI.WindowTitle = "Vork CLI"
     } catch {}
 
-    # 2. Secuencia OSC para pestañas modernas (Windows Terminal, VS Code, WezTerm)
+    # 2. Secuencia OSC para pestañas modernas (Windows Terminal, iTerm2, WezTerm, GNOME)
     try {
-        Write-Host "$ESC]0;Vork CLI · 9 Pilares Operacionales`a" -NoNewline
+        Write-Host "$ESC]0;Vork CLI`a" -NoNewline
     } catch {}
 
-    # 3. Asignar icono oficial de Vork a la ventana y barra de tareas (Win32)
-    try {
-        $vorkIco = Join-Path $HOME ".vork\vork.ico"
-        if (Test-Path $vorkIco) {
-            [VorkWin32]::SetIcon($vorkIco)
-        }
-    } catch {}
+    # 3. Asignar icono oficial de Vork a la ventana (en Windows)
+    if ($global:IsWinPlatform) {
+        try {
+            $vorkIco = Join-Path $HOME ".vork\vork.ico"
+            if (Test-Path $vorkIco) {
+                [VorkWin32]::SetIcon($vorkIco)
+            }
+        } catch {}
+    }
 }
 
 # Aplicar identidad visual inmediatamente
