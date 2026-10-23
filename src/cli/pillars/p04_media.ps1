@@ -29,22 +29,30 @@ function Invoke-PillarMedia {
         }
         $url = $url.Trim()
 
-        Write-Host "  ${Lead}│${Reset} ${Cyan}Formato deseado (mp3 / mp4) [mp3]:${Reset} " -NoNewline
-        $fmtInput = [Console]::ReadLine()
-        if ($fmtInput -and $fmtInput.Trim()) { $fmt = $fmtInput.Trim().ToLower() }
+        $mediaOptions = @(
+            @{ Value = "mp3:320";      Label = "[1] mp3 320k (Audio MP3 Máxima Fidelidad 320 kbps)" },
+            @{ Value = "mp3:192";      Label = "[2] mp3 192k (Audio MP3 Balanceado 192 kbps)" },
+            @{ Value = "mp4:1080";     Label = "[3] mp4 1080p (Video Full HD 1080p)" },
+            @{ Value = "mp4:720";      Label = "[4] mp4 720p  (Video HD 720p)" },
+            @{ Value = "m4a:256";      Label = "[5] m4a 256k  (Audio AAC Apple compatible)" },
+            @{ Value = "wav:lossless"; Label = "[6] wav       (Audio PCM sin compresión)" }
+        )
 
-        Write-Host "  ${Lead}│${Reset} ${Cyan}Calidad (128 / 192 / 320) [320]:${Reset} " -NoNewline
-        $qInput = [Console]::ReadLine()
-        if ($qInput -and $qInput.Trim()) { $quality = $qInput.Trim() }
+        $chosenFmt = Select-InteractiveOption -PromptTitle "Selecciona el formato y calidad de salida:" -Options $mediaOptions -DefaultIndex 0
+        if ($chosenFmt) {
+            $parts = $chosenFmt -split ":"
+            $fmt = $parts[0]
+            if ($parts.Length -gt 1) { $quality = $parts[1] }
+        }
     }
 
     Write-Host ""
     Write-Host "  $Cyan╭─ [04] VORK CONVERSOR MULTIMEDIA ──────────────────$Reset"
     Write-Host "  $Cyan│$Reset  $Gray URL:$Reset      $White$url$Reset"
-    Write-Host "  $Cyan│$Reset  $Gray Formato:$Reset  $Yellow$fmt (Alta calidad)$Reset"
+    Write-Host "  $Cyan│$Reset  $Gray Formato:$Reset  $Yellow$fmt ($quality)$Reset"
     Write-Host "  $Cyan├───────────────────────────────────────────────────$Reset"
 
-    $body = @{ url = $url; format = $fmt; quality = "320" } | ConvertTo-Json
+    $body = @{ url = $url; format = $fmt; quality = $quality } | ConvertTo-Json
     try {
         $res = Invoke-RestMethod -Uri "$ApiBase/api/media/convert" -Method Post -Body $body -ContentType "application/json"
         Write-Host "  $Cyan│$Reset  $Green✓ Conversión lista:$Reset"

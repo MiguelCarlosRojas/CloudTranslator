@@ -1,15 +1,15 @@
-<#
-.SYNOPSIS
-    Vork CLI - Modulo de Configuracion y Paleta Tipografica ANSI
-#>
-
-param(
+﻿param(
     [Parameter(Position=0)]
     [string]$Command = "",
 
     [Parameter(Position=1, ValueFromRemainingArguments=$true)]
     [string[]]$Arguments
 )
+
+<#
+.SYNOPSIS
+    Vork CLI - Modulo de Configuracion y Paleta Tipografica ANSI
+#>
 
 $VorkVersion = "3.0.2"
 $ApiBase = if ($env:VORK_API) { $env:VORK_API } elseif ($env:CLOUDTRANSLATOR_API) { $env:CLOUDTRANSLATOR_API } else { "https://vork-st1k.onrender.com" }
@@ -255,8 +255,24 @@ $cTriR = [char]0x25B6 # ▶
 $cTriL = [char]0x25C0 # ◀
 
 # ========================================================
-# PERFIL DE POTENCIA VORK: LOW, MEDIUM, HIGH
+# MODELO ACTIVO & PERFIL DE ESFUERZO / TIER
 # ========================================================
+$modelFile = Join-Path $HOME ".vork\.model"
+if (-not $global:VorkModel) {
+    if (Test-Path $modelFile) {
+        $savedModel = try { (Get-Content -Path $modelFile -Raw).Trim() } catch { "Vork 3" }
+        if ($savedModel) {
+            $global:VorkModel = $savedModel
+        }
+    }
+    if (-not $global:VorkModel) {
+        $global:VorkModel = if ($env:VORK_MODEL) { $env:VORK_MODEL } else { "Vork 3" }
+    }
+}
+if (-not $global:VorkModel -or $global:VorkModel -ne "Vork 3") {
+    $global:VorkModel = "Vork 3"
+}
+
 $tierFile = Join-Path $HOME ".vork\.tier"
 if (-not $global:VorkTier) {
     if (Test-Path $tierFile) {
@@ -271,6 +287,24 @@ if (-not $global:VorkTier) {
 }
 if ($global:VorkTier -notin @("low", "medium", "high")) {
     $global:VorkTier = "medium"
+}
+
+# ========================================================
+# HISTORIAL PERSISTENTE DE COMANDOS DE LA TERMINAL
+# ========================================================
+$histFile = Join-Path $HOME ".vork\history.txt"
+if (Test-Path $histFile) {
+    try {
+        $lines = @(Get-Content -Path $histFile -Encoding UTF8 | Where-Object { $_ -and $_.Trim() })
+        if ($lines.Count -gt 200) {
+            $lines = @($lines[($lines.Count - 200)..($lines.Count - 1)])
+        }
+        $global:VorkSessionHistory = [System.Collections.ArrayList]@($lines)
+    } catch {
+        $global:VorkSessionHistory = [System.Collections.ArrayList]@()
+    }
+} else {
+    $global:VorkSessionHistory = [System.Collections.ArrayList]@()
 }
 
 function Show-InteractiveModeSelector {

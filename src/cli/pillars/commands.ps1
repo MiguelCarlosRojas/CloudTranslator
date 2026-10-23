@@ -310,21 +310,22 @@ function Invoke-CmdKeybindings {
 }
 
 # ========================================================
-# GESTIÓN GRANULAR DE PERMISOS (9 PERMISOS CONMUTABLES)
+# GESTIÓN GRANULAR DE PERMISOS (14 PERMISOS CONMUTABLES)
 # ========================================================
 
 function Get-VorkPermissions {
     $permFile = Join-Path $HOME ".vork\permissions.json"
     $perms = [ordered]@{
-        "fs_read"      = @{ Name = "Lectura de Workspace";       Desc = "Acceso a leer archivos, canciones e imagenes"; Enabled = $true }
-        "fs_write"     = @{ Name = "Escritura & Exportación";   Desc = "Guardar stems Demucs, audios TTS e imagenes";   Enabled = $true }
-        "net_cloud"    = @{ Name = "Conexión API Vork Cloud";   Desc = "Llamadas remotas a servicios en la nube";       Enabled = $true }
-        "ps_exec"      = @{ Name = "PowerShell Local";          Desc = "Ejecucion de scripts locales y herramientas";   Enabled = $true }
-        "media_dl"     = @{ Name = "Descargas Multimedia";      Desc = "Descarga streams YouTube, TikTok, Reels, IG";  Enabled = $true }
-        "voice_clone"  = @{ Name = "Modelado & Clonación IA";   Desc = "Extraccion de formantes y modelado timbrico F0"; Enabled = $true }
-        "agents_loop"  = @{ Name = "Agentes Autónomos";         Desc = "Bucles continuos autonomos (/goal, /teamwork)"; Enabled = $true }
-        "browser_auto" = @{ Name = "Automatización Web / DJ";   Desc = "Apertura de navegador para consola DJ y web";   Enabled = $true }
-        "telemetry"    = @{ Name = "Telemetría & Diagnóstico";  Desc = "Comprobacion de latencia y salud de pilares";   Enabled = $true }
+        "workspace_read"    = @{ Name = "Lectura de Workspace";        Desc = "Inspección de archivos y lectura de contexto en el proyecto"; Enabled = $true }
+        "workspace_write"   = @{ Name = "Escritura de Archivos";      Desc = "Creación, edición y refactorización de código en disco";      Enabled = $true }
+        "terminal_exec"     = @{ Name = "Ejecución de Terminal";       Desc = "Lanzamiento de comandos PowerShell, scripts y procesos";      Enabled = $true }
+        "cloud_ai"          = @{ Name = "Servicios Vork Cloud IA";    Desc = "Inferencia remota, traducción neuronal y separación Demucs";  Enabled = $true }
+        "media_download"    = @{ Name = "Descargas Multimedia";       Desc = "Extracción de audio/video desde YouTube, TikTok, Reels e IG"; Enabled = $true }
+        "voice_synthesis"   = @{ Name = "Síntesis y Modelado F0";     Desc = "Generación TTS 24kHz y extracción acústica de timbre vocal";  Enabled = $true }
+        "autonomous_agents" = @{ Name = "Agentes Autónomos";          Desc = "Ejecución de bucles continuos con /goal, /plan y subagentes"; Enabled = $true }
+        "notifications"     = @{ Name = "Notificaciones del Sistema"; Desc = "Alertas sonoras y avisos toast al concluir tareas de fondo"; Enabled = $true }
+        "clipboard_sync"    = @{ Name = "Acceso a Portapapeles";      Desc = "Copia automática de traducciones, streams y enlaces útiles";  Enabled = $true }
+        "browser_launch"    = @{ Name = "Apertura de Navegador";      Desc = "Lanzamiento de consolas interactivas Web Audio y dashboards"; Enabled = $true }
     }
 
     if (Test-Path $permFile) {
@@ -363,7 +364,7 @@ function Invoke-CmdPermissions {
     $subCmd = if ($ArgsList -and $ArgsList.Count -gt 0) { $ArgsList[0].ToLower() } else { "" }
     $target = if ($ArgsList -and $ArgsList.Count -gt 1) { $ArgsList[1].ToLower() } else { "" }
 
-    # Manejar comandos directos: allow, deny, toggle
+    # Subcomandos directos: allow, deny, o numero directo sin interfaz interactiva
     if ($subCmd -in "allow", "enable", "activar", "permitir") {
         $tIdx = -1
         if ([int]::TryParse($target, [ref]$tIdx) -and $tIdx -ge 1 -and $tIdx -le $keys.Count) {
@@ -404,7 +405,6 @@ function Invoke-CmdPermissions {
         }
     }
 
-    # Si se paso un numero directo como argumento: /permissions 1
     $directIdx = -1
     if ([int]::TryParse($subCmd, [ref]$directIdx) -and $directIdx -ge 1 -and $directIdx -le $keys.Count) {
         $k = $keys[$directIdx - 1]
@@ -417,41 +417,10 @@ function Invoke-CmdPermissions {
         return
     }
 
-    # Modo Interactivo de Permisos
+    # Selector interactivo con teclas Arriba/Abajo y Enter/Espacio
+    Select-InteractivePermissions -PermsHash $perms | Out-Null
+    Write-Host "  ${Green}✓ Permisos actualizados y sincronizados en ~/.vork/permissions.json${Reset}"
     Write-Host ""
-    Write-Host "  ${White}${Bold}PERMISOS DE SEGURIDAD Y SANDBOX · VORK CLI${Reset}"
-    Write-Host "  ${LeadLight}Configuración persistente guardada en ~/.vork/permissions.json${Reset}"
-    Write-Host ""
-
-    for ($i = 0; $i -lt $keys.Count; $i++) {
-        $k = $keys[$i]
-        $item = $perms[$k]
-        $num = "[$($i + 1)]"
-        $statusBadge = if ($item.Enabled) {
-            "$ESC[42;30;1m [OK] PERMITIDO $Reset"
-        } else {
-            "$ESC[41;97;1m [X] DENEGADO  $Reset"
-        }
-        $kName = $k.PadRight(13)
-        $title = $item.Name.PadRight(25)
-        Write-Host "  ${Cyan}$num${Reset} $statusBadge  ${White}${Bold}$title${Reset} ${LeadLight}· $($item.Desc)${Reset}"
-    }
-
-    Write-Host ""
-    Write-Host "  ${LeadLight}Ingresa el número (1-9) para alternar el permiso (o Enter para salir):${Reset} " -NoNewline
-    $sel = [Console]::ReadLine()
-    if ($sel -and $sel.Trim()) {
-        $chosen = -1
-        if ([int]::TryParse($sel.Trim(), [ref]$chosen) -and $chosen -ge 1 -and $chosen -le $keys.Count) {
-            $chKey = $keys[$chosen - 1]
-            $perms[$chKey].Enabled = -not $perms[$chKey].Enabled
-            Save-VorkPermissions -PermsHash $perms
-            $st = if ($perms[$chKey].Enabled) { "${Green}PERMITIDO${Reset}" } else { "${Coral}DENEGADO${Reset}" }
-            Write-Host ""
-            Write-Host "  $ESC[42;30;1m ACTUALIZADO $Reset Permiso [$chosen] '$chKey' ahora está: $st"
-            Write-Host ""
-        }
-    }
 }
 
 # ========================================================
@@ -503,47 +472,19 @@ function Invoke-CmdTheme {
         }
     }
 
-    # Despliegue del catalogo de 10 temas
-    Write-Host ""
-    Write-Host "  ${White}${Bold}CATÁLOGO DE LOS 10 TEMAS VISUALES DE VORK CLI:${Reset}"
-    Write-Host "  ${LeadLight}Tema activo actualmente: ${Cyan}${Bold}$($global:VorkThemeName)${Reset}"
-    Write-Host ""
+    # Selector interactivo con teclas Arriba/Abajo y Enter
+    $chosenThemeId = Select-InteractiveTheme -Themes $themes -ActiveThemeId $global:VorkThemeId
+    if ($chosenThemeId) {
+        Apply-VorkTheme -ThemeName $chosenThemeId
+        try {
+            $tDir = Join-Path $HOME ".vork"
+            if (-not (Test-Path $tDir)) { New-Item -ItemType Directory -Path $tDir -Force | Out-Null }
+            Set-Content -Path (Join-Path $tDir ".theme") -Value $chosenThemeId -Force -Encoding UTF8
+        } catch { }
 
-    for ($i = 0; $i -lt $themes.Count; $i++) {
-        $th = $themes[$i]
-        $num = "[$($i + 1)]"
-        $isActive = ($global:VorkThemeId -eq $th.Id)
-        $badge = if ($isActive) { "$ESC[42;30;1m [ACTIVO] $Reset" } else { "         " }
-        $namePadded = $th.Name.PadRight(26)
-        Write-Host "  ${Cyan}$num${Reset} $badge $($th.Dot) ${White}${Bold}$namePadded${Reset} ${LeadLight}· $($th.Acentos)${Reset}"
-    }
-
-    Write-Host ""
-    Write-Host "  ${LeadLight}Ingresa el número (1-10) o nombre del tema a activar (o Enter para mantener):${Reset} " -NoNewline
-    $inputChoice = [Console]::ReadLine()
-    if ($inputChoice -and $inputChoice.Trim()) {
-        $inClean = $inputChoice.Trim().ToLower()
-        $mId = $null
-        $numVal = -1
-        if ([int]::TryParse($inClean, [ref]$numVal) -and $numVal -ge 1 -and $numVal -le $themes.Count) {
-            $mId = $themes[$numVal - 1].Id
-        } else {
-            $found = @($themes | Where-Object { $_.Id -eq $inClean -or $_.Id.StartsWith($inClean) })
-            if ($found.Count -gt 0) { $mId = $found[0].Id }
-        }
-
-        if ($mId) {
-            Apply-VorkTheme -ThemeName $mId
-            try {
-                $tDir = Join-Path $HOME ".vork"
-                if (-not (Test-Path $tDir)) { New-Item -ItemType Directory -Path $tDir -Force | Out-Null }
-                Set-Content -Path (Join-Path $tDir ".theme") -Value $mId -Force -Encoding UTF8
-            } catch { }
-
-            Write-Host ""
-            Write-Host "  $ESC[42;30;1m TEMA APLICADO $Reset ${Green}Ahora usando: ${Bold}$($global:VorkThemeName)${Reset}"
-            Write-Host ""
-        }
+        Write-Host "  $ESC[42;30;1m TEMA APLICADO $Reset ${Green}Ahora usando: ${Bold}$($global:VorkThemeName)${Reset}"
+        Write-Host "  ${LeadLight}Preferencia persistida en ~/.vork/.theme${Reset}"
+        Write-Host ""
     }
 }
 

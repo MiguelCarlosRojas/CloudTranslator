@@ -27,17 +27,24 @@ function Invoke-PillarSeparate {
         }
         $target = $target.Trim()
 
-        Write-Host "  ${Lead}│${Reset} ${Cyan}Modo de separación (2stems: voz+base / 4stems) [2stems]:${Reset} " -NoNewline
-        $mInput = [Console]::ReadLine()
-        if ($mInput -and $mInput.Trim()) { $mode = $mInput.Trim() }
+        $sepOptions = @(
+            @{ Value = "2stems";  Label = "[1] 2 stems (Voz Acapella + Pista Instrumental / Karaoke)" },
+            @{ Value = "4stems";  Label = "[2] 4 stems (Vocals, Batería, Bajo, Otros instrumentos)" },
+            @{ Value = "vocals";  Label = "[3] Sólo Acapella (Aislamiento vocal puro con reducción de ruido)" },
+            @{ Value = "karaoke"; Label = "[4] Sólo Instrumental (Eliminación estricta de voz)" }
+        )
+
+        $chosenMode = Select-InteractiveOption -PromptTitle "Selecciona el modo de separación de stems:" -Options $sepOptions -DefaultIndex 0
+        if ($chosenMode) { $mode = $chosenMode }
     }
 
     Write-Host ""
     Write-Host "  $Cyan╭─ [05] VORK SEPARADOR DE STEMS (DEMUCS V4) ───────$Reset"
     Write-Host "  $Cyan│$Reset  $Gray Pista:$Reset    $White$target$Reset"
+    Write-Host "  $Cyan│$Reset  $Gray Modo:$Reset     $Yellow$mode$Reset"
     Write-Host "  $Cyan├───────────────────────────────────────────────────$Reset"
 
-    $body = @{ url = $target; quality = "lossless" } | ConvertTo-Json
+    $body = @{ url = $target; quality = "lossless"; mode = $mode } | ConvertTo-Json
     try {
         $res = Invoke-RestMethod -Uri "$ApiBase/api/separator/process" -Method Post -Body $body -ContentType "application/json"
         Write-Host "  $Cyan│$Reset  $Green✓ Stems aislados con éxito:$Reset"

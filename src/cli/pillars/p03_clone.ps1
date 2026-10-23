@@ -9,6 +9,7 @@ function Invoke-PillarClone {
     $sample = if ($ArgsList -and $ArgsList.Length -gt 0) { $ArgsList[0] } else { $null }
     $text = $null
     $out = "cloned_voice.wav"
+    $f0Method = "rmvpe"
 
     if ($ArgsList) {
         for ($i=0; $i -lt $ArgsList.Length; $i++) {
@@ -31,6 +32,15 @@ function Invoke-PillarClone {
         }
         $sample = $sample.Trim()
 
+        $f0Options = @(
+            @{ Value = "rmvpe";   Label = "[1] rmvpe    (Estado del arte para máxima fidelidad y pureza vocal)" },
+            @{ Value = "harvest"; Label = "[2] harvest  (Extracción F0 de alta precisión tonal en agudos)" },
+            @{ Value = "crepe";   Label = "[3] crepe    (Red neuronal profunda para muestras ruidosas)" },
+            @{ Value = "pm";      Label = "[4] pm       (Modo ultra-rápido para previsualización inmediata)" }
+        )
+        $chosenF0 = Select-InteractiveOption -PromptTitle "Selecciona el algoritmo de extracción fundamental F0:" -Options $f0Options -DefaultIndex 0
+        if ($chosenF0) { $f0Method = $chosenF0 }
+
         Write-Host "  ${Lead}│${Reset} ${White}Texto o guión a sintetizar con la voz clonada:${Reset}"
         Write-Host "  ${Lead}│${Reset} ${Cyan}> ${Reset}" -NoNewline
         $text = [Console]::ReadLine()
@@ -43,6 +53,7 @@ function Invoke-PillarClone {
     Write-Host ""
     Write-Host "  $Cyan╭─ [03] VORK CLONACIÓN DE VOZ IA ─────────────────$Reset"
     Write-Host "  $Cyan│$Reset  $Gray Muestra:$Reset  $White$sample$Reset"
+    Write-Host "  $Cyan│$Reset  $Gray Algoritmo:$Reset$Yellow$f0Method$Reset"
     Write-Host "  $Cyan│$Reset  $Gray Salida:$Reset   $Yellow$out$Reset"
     Write-Host "  $Cyan├───────────────────────────────────────────────────$Reset"
     Write-Host "  $Cyan│$Reset  $Green✓ Extracción de formantes y modelado acústico iniciado en $ApiBase$Reset"

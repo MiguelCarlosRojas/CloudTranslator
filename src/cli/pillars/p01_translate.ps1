@@ -27,23 +27,20 @@ function Invoke-PillarTranslate {
         }
         $text = $text.Trim()
 
-        Write-Host "  ${Lead}│${Reset} ${White}Selecciona el idioma destino:${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${LeadLight}[1] en (Inglés)  [2] es (Español)  [3] fr (Francés)  [4] de (Alemán)${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${LeadLight}[5] it (Italiano)[6] pt (Portugués)[7] ja (Japonés)  [8] zh (Chino)${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}Idioma destino (1-8 o código ISO) [en]:${Reset} " -NoNewline
-        $langInput = [Console]::ReadLine()
-        if ($langInput -and $langInput.Trim()) {
-            switch ($langInput.Trim()) {
-                "1" { $to = "en" }
-                "2" { $to = "es" }
-                "3" { $to = "fr" }
-                "4" { $to = "de" }
-                "5" { $to = "it" }
-                "6" { $to = "pt" }
-                "7" { $to = "ja" }
-                "8" { $to = "zh" }
-                default { $to = $langInput.Trim().ToLower() }
-            }
+        $langOptions = @(
+            @{ Value = "en"; Label = "[1] en (Inglés)" },
+            @{ Value = "es"; Label = "[2] es (Español)" },
+            @{ Value = "fr"; Label = "[3] fr (Francés)" },
+            @{ Value = "de"; Label = "[4] de (Alemán)" },
+            @{ Value = "it"; Label = "[5] it (Italiano)" },
+            @{ Value = "pt"; Label = "[6] pt (Portugués)" },
+            @{ Value = "ja"; Label = "[7] ja (Japonés)" },
+            @{ Value = "zh"; Label = "[8] zh (Chino)" }
+        )
+
+        $chosenLang = Select-InteractiveOption -PromptTitle "Selecciona el idioma destino:" -Options $langOptions -DefaultIndex 0
+        if ($chosenLang) {
+            $to = $chosenLang
         }
     }
 

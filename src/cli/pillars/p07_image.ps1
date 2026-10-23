@@ -29,13 +29,16 @@ function Invoke-PillarImage {
         }
         $file = $fileInput.Trim()
 
-        Write-Host "  ${Lead}│${Reset} ${Cyan}Formato destino (webp, png, jpg, ico, avif) [webp]:${Reset} " -NoNewline
-        $fmtInput = [Console]::ReadLine()
-        if ($fmtInput -and $fmtInput.Trim()) { $fmt = $fmtInput.Trim().ToLower() }
+        $imgOptions = @(
+            @{ Value = "webp"; Label = "[1] webp (WebP Next-Gen - Máxima compresión y fidelidad visual)" },
+            @{ Value = "png";  Label = "[2] png  (PNG Lossless con canal alfa transparente)" },
+            @{ Value = "jpg";  Label = "[3] jpg  (JPEG estándar optimizado para fotografía)" },
+            @{ Value = "ico";  Label = "[4] ico  (Icono Windows Favicon multirresolución)" },
+            @{ Value = "avif"; Label = "[5] avif (AVIF Ultra-HD de nueva generación)" }
+        )
 
-        Write-Host "  ${Lead}│${Reset} ${Cyan}Calidad de compresión (1-100) [90]:${Reset} " -NoNewline
-        $qInput = [Console]::ReadLine()
-        if ($qInput -and $qInput.Trim()) { $quality = [int]$qInput.Trim() }
+        $chosenFmt = Select-InteractiveOption -PromptTitle "Selecciona el formato de imagen destino:" -Options $imgOptions -DefaultIndex 0
+        if ($chosenFmt) { $fmt = $chosenFmt }
     }
 
     Write-Host ""
@@ -46,7 +49,7 @@ function Invoke-PillarImage {
 
     $bytes = [System.IO.File]::ReadAllBytes((Resolve-Path $file))
     $b64 = [System.Convert]::ToBase64String($bytes)
-    $body = @{ image = "data:image/png;base64,$b64"; format = $fmt; quality = 90 } | ConvertTo-Json
+    $body = @{ image = "data:image/png;base64,$b64"; format = $fmt; quality = $quality } | ConvertTo-Json
     try {
         $res = Invoke-RestMethod -Uri "$ApiBase/api/image/convert" -Method Post -Body $body -ContentType "application/json"
         Write-Host "  $Cyan│$Reset  $Green✓ Imagen convertida con éxito:$Reset"

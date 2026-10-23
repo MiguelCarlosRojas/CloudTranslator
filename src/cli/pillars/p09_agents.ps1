@@ -6,6 +6,28 @@
 function Invoke-PillarAgents {
     param([string[]]$ArgsList)
 
+    if (-not $ArgsList -or $ArgsList.Length -eq 0) {
+        $agentOptions = @(
+            @{ Value = "status";   Label = "[1] Ver estado del clúster de agentes y conectividad" },
+            @{ Value = "goal";     Label = "[2] Ejecutar /goal (Tarea autónoma de bucle continuo)" },
+            @{ Value = "plan";     Label = "[3] Ejecutar /plan (Desglose guiado de arquitectura)" },
+            @{ Value = "teamwork"; Label = "[4] Activar /teamwork (Coordinación de múltiples subagentes)" },
+            @{ Value = "boost";    Label = "[5] Alternar /boost (Razonamiento profundo con verificación)" },
+            @{ Value = "learn";    Label = "[6] Registrar regla con /learn (Persistencia en ~/.vork)" }
+        )
+
+        $chosenAction = Select-InteractiveOption -PromptTitle "Selecciona una operación de Agentes Autónomos:" -Options $agentOptions -DefaultIndex 0
+        if ($chosenAction -and $chosenAction -ne "status") {
+            switch ($chosenAction) {
+                "goal" { Invoke-CmdGoal @(); return }
+                "plan" { Invoke-CmdPlan @(); return }
+                "teamwork" { Invoke-CmdTeamwork @(); return }
+                "boost" { Invoke-CmdBoost; return }
+                "learn" { Invoke-CmdLearn @(); return }
+            }
+        }
+    }
+
     Write-Host ""
     Write-Host "  ${Cyan}╭─ ${Bold}[09] VORK AGENTES AUTÓNOMOS & ORQUESTACIÓN IA${Reset} ─────────"
     Write-Host "  ${Cyan}│${Reset}  ${White}${Bold}Motor de Agentes:${Reset} ${Green}● ONLINE${Reset} ${LeadLight}(Bucle de Agentes Autónomos Vork 3)${Reset}"

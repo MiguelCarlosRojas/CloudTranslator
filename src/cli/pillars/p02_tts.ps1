@@ -29,25 +29,18 @@ function Invoke-PillarTTS {
         }
         $text = $text.Trim()
 
-        Write-Host "  ${Lead}│${Reset} ${White}Selecciona una voz neuronal:${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${LeadLight}[1] es-ES-AlvaroNeural (España, Masculino)${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${LeadLight}[2] es-ES-ElviraNeural (España, Femenino)${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${LeadLight}[3] es-MX-JorgeNeural  (México, Masculino)${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${LeadLight}[4] es-MX-DaliaNeural  (México, Femenino)${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${LeadLight}[5] en-US-JennyNeural  (USA, Femenino)${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${LeadLight}[6] en-US-GuyNeural    (USA, Masculino)${Reset}"
-        Write-Host "  ${Lead}│${Reset} ${Cyan}Voz (1-6 o ID completo) [1]:${Reset} " -NoNewline
-        $voiceInput = [Console]::ReadLine()
-        if ($voiceInput -and $voiceInput.Trim()) {
-            switch ($voiceInput.Trim()) {
-                "1" { $voice = "es-ES-AlvaroNeural" }
-                "2" { $voice = "es-ES-ElviraNeural" }
-                "3" { $voice = "es-MX-JorgeNeural" }
-                "4" { $voice = "es-MX-DaliaNeural" }
-                "5" { $voice = "en-US-JennyNeural" }
-                "6" { $voice = "en-US-GuyNeural" }
-                default { $voice = $voiceInput.Trim() }
-            }
+        $ttsOptions = @(
+            @{ Value = "es-ES-AlvaroNeural"; Label = "[1] es-ES-AlvaroNeural (España, Masculino)" },
+            @{ Value = "es-ES-ElviraNeural"; Label = "[2] es-ES-ElviraNeural (España, Femenino)" },
+            @{ Value = "es-MX-JorgeNeural";  Label = "[3] es-MX-JorgeNeural  (México, Masculino)" },
+            @{ Value = "es-MX-DaliaNeural";  Label = "[4] es-MX-DaliaNeural  (México, Femenino)" },
+            @{ Value = "en-US-JennyNeural";  Label = "[5] en-US-JennyNeural  (USA, Femenino)" },
+            @{ Value = "en-US-GuyNeural";    Label = "[6] en-US-GuyNeural    (USA, Masculino)" }
+        )
+
+        $chosenVoice = Select-InteractiveOption -PromptTitle "Selecciona una voz neuronal:" -Options $ttsOptions -DefaultIndex 0
+        if ($chosenVoice) {
+            $voice = $chosenVoice
         }
 
         Write-Host "  ${Lead}│${Reset} ${Cyan}Archivo de salida [voz.mp3]:${Reset} " -NoNewline
