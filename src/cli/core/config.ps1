@@ -5,14 +5,14 @@
 
 param(
     [Parameter(Position=0)]
-    [string]$Command = "help",
+    [string]$Command = "",
 
     [Parameter(Position=1, ValueFromRemainingArguments=$true)]
     [string[]]$Arguments
 )
 
-$VorkVersion = "3.0.0"
-$ApiBase = if ($env:VORK_API) { $env:VORK_API } else { "https://vork-st1k.onrender.com" }
+$VorkVersion = "3.0.1"
+$ApiBase = if ($env:VORK_API) { $env:VORK_API } elseif ($env:CLOUDTRANSLATOR_API) { $env:CLOUDTRANSLATOR_API } else { "https://vork-st1k.onrender.com" }
 
 # ========================================================
 # PALETA TIPOGRÁFICA ANSI PROFESIONAL

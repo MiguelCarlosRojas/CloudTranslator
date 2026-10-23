@@ -111,7 +111,7 @@ exports.getCliInfo = (req, res) => {
   res.json({
     status: "online",
     name: "Vork CLI",
-    version: "3.0.0",
+    version: "3.0.1",
     description: "Entorno centrado en la terminal para interactuar con los 9 pilares operacionales de Vork y agentes autónomos.",
     installers: {
       powershell: {
