@@ -141,48 +141,88 @@ function Read-InteractiveVorkLine {
     }
 
     $allCommands = @(
-        @{ Cmd = "/mode";      Desc = "Selector interactivo de potencia (low, medium, high)" },
-        @{ Cmd = "/modal";     Desc = "Selector interactivo de potencia (low, medium, high)" },
-        @{ Cmd = "/high";      Desc = "Activar Modo Estudio / Ultra (maxima fidelidad, 320k)" },
-        @{ Cmd = "/medium";    Desc = "Activar Modo Balanceado (recomendado, 24kHz)" },
-        @{ Cmd = "/low";       Desc = "Activar Modo Rapido / Eco (baja latencia, 16kHz)" },
-        @{ Cmd = "/translate"; Desc = "Traduccion neuronal por lotes (+200 idiomas)" },
-        @{ Cmd = "/tts";       Desc = "Sintesis vocal fluida con 24 voces humanas" },
-        @{ Cmd = "/clone";     Desc = "Clonacion vocal IA y modelado espectral F0" },
-        @{ Cmd = "/media";     Desc = "Conversor universal YouTube, TikTok, IG a MP3/MP4" },
-        @{ Cmd = "/separate";  Desc = "Aislar Stems Acapella y Karaoke (Demucs v4)" },
-        @{ Cmd = "/dj";        Desc = "Mezclador virtual en vivo y grafos Web Audio" },
-        @{ Cmd = "/image";     Desc = "Conversion universal PNG, JPG, WEBP, ICO, AVIF" },
-        @{ Cmd = "/remove-bg"; Desc = "Silueta inteligente y remocion de fondo IA" },
-        @{ Cmd = "/agents";    Desc = "Orquestacion de subagentes en terminal" },
-        @{ Cmd = "/clear";     Desc = "Limpiar pantalla de terminal" },
-        @{ Cmd = "/help";      Desc = "Manual y catalogo detallado de los 9 pilares" },
-        @{ Cmd = "/health";    Desc = "Telemetria en tiempo real de los 9 pilares" },
-        @{ Cmd = "/ping";      Desc = "Prueba de latencia de red hacia Vork Cloud" },
-        @{ Cmd = "/update";    Desc = "Actualizar Vork CLI a la ultima version" },
-        @{ Cmd = "/exit";      Desc = "Cerrar la sesion de terminal de forma segura" }
+        # Categoria 1: Pilares (9)
+        @{ Cmd = "/translate";   Desc = "Traduccion neuronal por lotes en +200 idiomas" },
+        @{ Cmd = "/tts";         Desc = "Sintesis de voz con 24 voces neuronales humanas" },
+        @{ Cmd = "/clone";       Desc = "Clonacion vocal IA y modelado espectral F0" },
+        @{ Cmd = "/media";       Desc = "Conversion multimedia YouTube, TikTok, IG a MP3/MP4" },
+        @{ Cmd = "/separate";    Desc = "Aislamiento de Stems Acapella/Karaoke (Demucs v4)" },
+        @{ Cmd = "/dj";          Desc = "Mezclador virtual interactivo y grafos Web Audio" },
+        @{ Cmd = "/image";       Desc = "Conversor universal PNG, JPG, WEBP, ICO, AVIF" },
+        @{ Cmd = "/remove-bg";   Desc = "Silueta inteligente y eliminacion de fondo IA" },
+        @{ Cmd = "/agents";      Desc = "Orquestacion de subagentes en terminal interactiva" },
+
+        # Categoria 2: Agentes & Planificacion (8)
+        @{ Cmd = "/goal";        Desc = "Modo autonomo continuo para tareas exhaustivas" },
+        @{ Cmd = "/plan";        Desc = "Planificacion guiada y desglose paso a paso" },
+        @{ Cmd = "/grill-me";    Desc = "Entrevista interactiva para decisiones de diseño" },
+        @{ Cmd = "/teamwork";    Desc = "Coordinacion con multiples subagentes concurrentes" },
+        @{ Cmd = "/boost";       Desc = "Razonamiento profundo con verificacion estricta" },
+        @{ Cmd = "/learn";       Desc = "Persistir reglas, correcciones y preferencias" },
+        @{ Cmd = "/browser";     Desc = "Navegacion e interaccion web automatizada" },
+        @{ Cmd = "/automation";  Desc = "Diseñar y programar tareas en segundo plano" },
+
+        # Categoria 3: Sesion & Memoria (7)
+        @{ Cmd = "/compact";     Desc = "Compactar historial para liberar ventana de contexto" },
+        @{ Cmd = "/clear";       Desc = "Limpiar pantalla de terminal conservando la sesion" },
+        @{ Cmd = "/reset";       Desc = "Reiniciar variables y contexto de la sesion a cero" },
+        @{ Cmd = "/history";     Desc = "Explorar historial cronologico de comandos ejecutados" },
+        @{ Cmd = "/save";        Desc = "Guardar estado de sesion, artefactos y contexto" },
+        @{ Cmd = "/resume";      Desc = "Reanudar una sesion previa o restaurar estado" },
+        @{ Cmd = "/undo";        Desc = "Deshacer la ultima accion o cambio de codigo" },
+
+        # Categoria 4: Desarrollo, Git & Codigo (7)
+        @{ Cmd = "/status";      Desc = "Inspeccionar estado de Git, archivos y tareas activas" },
+        @{ Cmd = "/diff";        Desc = "Visualizar diferencias de codigo directamente en terminal" },
+        @{ Cmd = "/commit";      Desc = "Generar commit semantico inteligente con IA" },
+        @{ Cmd = "/review";      Desc = "Auditoria de codigo, buenas practicas y seguridad" },
+        @{ Cmd = "/test";        Desc = "Ejecucion y validacion de pruebas unitarias" },
+        @{ Cmd = "/bug";         Desc = "Diagnostico y depuracion asistida de excepciones" },
+        @{ Cmd = "/refactor";    Desc = "Reestructurar y optimizar codigo sin alterar salida" },
+
+        # Categoria 5: Configuracion & Preferencias (7)
+        @{ Cmd = "/config";      Desc = "Ajustar permisos, temas visuales y preferencias" },
+        @{ Cmd = "/keybindings"; Desc = "Personalizar atajos de teclado y combinaciones" },
+        @{ Cmd = "/permissions"; Desc = "Administrar permisos de herramientas y comandos" },
+        @{ Cmd = "/mode";        Desc = "Alternar perfil de potencia de Vork (low, medium, high)" },
+        @{ Cmd = "/modal";       Desc = "Selector interactivo con flechas <- / ->" },
+        @{ Cmd = "/model";       Desc = "Consultar o alternar el modelo de lenguaje activo" },
+        @{ Cmd = "/theme";       Desc = "Alternar temas visuales (Dark, Cyberpunk, Coral)" },
+        @{ Cmd = "/env";         Desc = "Consultar y gestionar variables de entorno activas" },
+        @{ Cmd = "/low";         Desc = "Activar Modo Rapido / Eco (baja latencia, 16kHz)" },
+        @{ Cmd = "/medium";      Desc = "Activar Modo Balanceado (recomendado, 24kHz)" },
+        @{ Cmd = "/high";        Desc = "Activar Modo Estudio / Ultra (maxima fidelidad, 320k)" },
+
+        # Categoria 6: Sistema, Telemetria & Utilidades (6)
+        @{ Cmd = "/help";        Desc = "Manual interactivo de comandos y atajos de teclado" },
+        @{ Cmd = "/update";      Desc = "Sincronizar y actualizar Vork CLI a la ultima version" },
+        @{ Cmd = "/health";      Desc = "Telemetria en tiempo real de los 9 pilares" },
+        @{ Cmd = "/ping";        Desc = "Prueba de latencia ultrarrapida hacia la nube" },
+        @{ Cmd = "/docs";        Desc = "Abrir la documentacion oficial de Vork en el navegador" },
+        @{ Cmd = "/exit";        Desc = "Cerrar la sesion de terminal de forma segura" }
     )
 
     $buf = [System.Text.StringBuilder]::new()
     $selIdx = 0
-    $dropdownOpen = $false
-    $maxDropdownLines = 8
+    $topIdx = 0
+    $slashMenuOpen = $false
+    $windowSize = 5
+    $menuHeight = 9
 
-    $clearRowsBelow = {
-        for ($r = 1; $r -le ($maxDropdownLines + 1); $r++) {
+    $downArrow = [char]0x2193
+    $upArrow   = [char]0x2191
+    $dotCh     = [char]0x00B7
+
+    $clearMenu = {
+        for ($r = 1; $r -le $menuHeight; $r++) {
             try {
-                [Console]::SetCursorPosition(0, $PromptRow + $r)
-                Write-Host ([string]::new(" ", [Math]::Min(120, $Width - 1))) -NoNewline
+                [Console]::SetCursorPosition(0, $PromptRow + 1 + $r)
+                Write-Host ([string]::new(" ", [Math]::Min(140, $Width - 1))) -NoNewline
             } catch { }
         }
-    }
-
-    $restoreFooter = {
         try {
-            [Console]::SetCursorPosition(0, $PromptRow + 1)
-            Write-Host "${Lead}$Rule${Reset}"
             [Console]::SetCursorPosition(0, $PromptRow + 2)
-            Write-Host "${LeadLight}$Footer${Reset}"
+            Write-Host "${LeadLight}$Footer${Reset}" -NoNewline
         } catch { }
     }
 
@@ -195,48 +235,91 @@ function Read-InteractiveVorkLine {
             if ($filtered.Count -eq 0) { $filtered = $allCommands }
             if ($selIdx -ge $filtered.Count) { $selIdx = 0 }
 
-            $dropdownOpen = $true
-            $showCount = [Math]::Min(6, $filtered.Count)
+            # Adjust scrolling window
+            if ($selIdx -lt $topIdx) {
+                $topIdx = $selIdx
+            } elseif ($selIdx -ge ($topIdx + $windowSize)) {
+                $topIdx = $selIdx - $windowSize + 1
+            }
+            if ($topIdx -gt ($filtered.Count - $windowSize) -and ($filtered.Count -gt $windowSize)) {
+                $topIdx = $filtered.Count - $windowSize
+            }
+            if ($topIdx -lt 0) { $topIdx = 0 }
 
-            $boxW = 72
-            $topBorder = "  " + $cTL + ([string]::new($cH, 2)) + " Comandos / (Arriba/Abajo para navegar, Enter para seleccionar) " + ([string]::new($cH, ($boxW - 67))) + $cTR
-            
-            try {
-                [Console]::SetCursorPosition(0, $PromptRow + 1)
-                Write-Host "${Lead}$topBorder${Reset}"
-            } catch { }
+            $slashMenuOpen = $true
 
-            for ($i = 0; $i -lt $showCount; $i++) {
-                $it = $filtered[$i]
-                $cmdPart = $it.Cmd.PadRight(12)
-                $descPart = $it.Desc.PadRight(52)
-                if ($i -eq $selIdx) {
-                    $row = "  " + $cV + " " + $cTriR + " " + $cmdPart + " " + $descPart + " " + $cV
-                    try {
-                        [Console]::SetCursorPosition(0, $PromptRow + 2 + $i)
-                        Write-Host "${BgSel}${Cyan}${Bold}$row${Reset}"
-                    } catch { }
+            # Render the 5 visible items
+            for ($k = 0; $k -lt $windowSize; $k++) {
+                $itemIdx = $topIdx + $k
+                $rowY = $PromptRow + 2 + $k
+                try { [Console]::SetCursorPosition(0, $rowY) } catch { }
+
+                if ($itemIdx -lt $filtered.Count) {
+                    $item = $filtered[$itemIdx]
+                    $cmdStr = $item.Cmd.PadRight(20)
+                    $descStr = $item.Desc
+
+                    if ($itemIdx -eq $selIdx) {
+                        $txt = "> " + $cmdStr + $descStr
+                        $padLen = [Math]::Max(1, ($Width - 1) - $txt.Length)
+                        Write-Host "${Cyan}${Bold}> ${White}${Bold}$cmdStr${LeadLight}$descStr$([string]::new(' ', $padLen))${Reset}" -NoNewline
+                    } else {
+                        $txt = "  " + $cmdStr + $descStr
+                        $padLen = [Math]::Max(1, ($Width - 1) - $txt.Length)
+                        Write-Host "  ${White}$cmdStr${LeadLight}$descStr$([string]::new(' ', $padLen))${Reset}" -NoNewline
+                    }
                 } else {
-                    $row = "  " + $cV + "   " + $cmdPart + " " + $descPart + " " + $cV
-                    try {
-                        [Console]::SetCursorPosition(0, $PromptRow + 2 + $i)
-                        Write-Host "${Lead}$row${Reset}"
-                    } catch { }
+                    Write-Host ([string]::new(" ", [Math]::Min(140, $Width - 1))) -NoNewline
                 }
             }
 
-            $botBorder = "  " + $cBL + ([string]::new($cH, $boxW)) + $cBR
+            # Row 6: More indicator
+            $remBelow = $filtered.Count - ($topIdx + $windowSize)
+            $remAbove = $topIdx
+            $moreText = ""
+            if ($remBelow -gt 0 -and $remAbove -gt 0) {
+                $moreText = "   $upArrow $remAbove / $downArrow $remBelow more"
+            } elseif ($remBelow -gt 0) {
+                $moreText = "   $downArrow $remBelow more"
+            } elseif ($remAbove -gt 0) {
+                $moreText = "   $upArrow $remAbove more"
+            }
             try {
-                [Console]::SetCursorPosition(0, $PromptRow + 2 + $showCount)
-                Write-Host "${Lead}$botBorder${Reset}"
+                [Console]::SetCursorPosition(0, $PromptRow + 2 + $windowSize)
+                $padLen = [Math]::Max(1, ($Width - 1) - $moreText.Length)
+                Write-Host "${LeadDark}$moreText$([string]::new(' ', $padLen))${Reset}" -NoNewline
             } catch { }
 
+            # Row 7: Blank separator
+            try {
+                [Console]::SetCursorPosition(0, $PromptRow + 2 + $windowSize + 1)
+                Write-Host ([string]::new(" ", [Math]::Min(140, $Width - 1))) -NoNewline
+            } catch { }
+
+            # Row 8: Navigation hints
+            $navRaw = "  $upArrow/$downArrow Navigate $dotCh enter Select $dotCh tab Complete"
+            $navPad = [Math]::Max(1, ($Width - 1) - $navRaw.Length)
+            try {
+                [Console]::SetCursorPosition(0, $PromptRow + 2 + $windowSize + 2)
+                Write-Host "  ${Cyan}$upArrow/$downArrow${Reset} ${LeadLight}Navigate ${LeadDark}$dotCh${Reset} ${Cyan}enter${Reset} ${LeadLight}Select ${LeadDark}$dotCh${Reset} ${Cyan}tab${Reset} ${LeadLight}Complete$([string]::new(' ', $navPad))${Reset}" -NoNewline
+            } catch { }
+
+            # Row 9: Footer (esc to cancel ... Vork 3 · medium)
+            $tierName = if ($global:VorkTier) { $global:VorkTier.ToLower() } else { "medium" }
+            $leftEsc = "esc to cancel"
+            $rightVork = "Vork 3 " + $dotCh + " " + $tierName
+            $escPad = [Math]::Max(1, ($Width - 1) - $leftEsc.Length - $rightVork.Length)
+            try {
+                [Console]::SetCursorPosition(0, $PromptRow + 2 + $windowSize + 3)
+                Write-Host "${LeadLight}${leftEsc}$([string]::new(' ', $escPad))${rightVork}${Reset}" -NoNewline
+            } catch { }
+
+            # Reposition cursor cleanly on prompt row
             try { [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow) } catch { }
         } else {
-            if ($dropdownOpen) {
-                & $clearRowsBelow
-                & $restoreFooter
-                $dropdownOpen = $false
+            if ($slashMenuOpen) {
+                & $clearMenu
+                $slashMenuOpen = $false
                 try { [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow) } catch { }
             }
         }
@@ -246,7 +329,7 @@ function Read-InteractiveVorkLine {
         if ($key.Key -eq [ConsoleKey]::Enter) {
             if ($isSlash -and $filtered.Count -gt 0) {
                 $chosen = $filtered[$selIdx].Cmd
-                & $clearRowsBelow
+                & $clearMenu
                 try {
                     [Console]::SetCursorPosition(2, $PromptRow)
                     Write-Host "$chosen" -NoNewline
@@ -256,7 +339,7 @@ function Read-InteractiveVorkLine {
                 return $chosen
             }
 
-            & $clearRowsBelow
+            if ($slashMenuOpen) { & $clearMenu }
             try { [Console]::SetCursorPosition(0, $PromptRow + 3) } catch { }
             Write-Host ""
             return $buf.ToString()
@@ -265,8 +348,7 @@ function Read-InteractiveVorkLine {
         if ($key.Key -eq [ConsoleKey]::Tab) {
             if ($isSlash -and $filtered.Count -gt 0) {
                 $chosen = $filtered[$selIdx].Cmd + " "
-                & $clearRowsBelow
-                & $restoreFooter
+                & $clearMenu
                 $buf.Clear() | Out-Null
                 $buf.Append($chosen) | Out-Null
                 try {
@@ -280,30 +362,27 @@ function Read-InteractiveVorkLine {
 
         if ($key.Key -eq [ConsoleKey]::UpArrow) {
             if ($isSlash -and $filtered.Count -gt 0) {
-                $maxVis = [Math]::Min(6, $filtered.Count)
-                $selIdx = if ($selIdx -gt 0) { $selIdx - 1 } else { $maxVis - 1 }
+                $selIdx = if ($selIdx -gt 0) { $selIdx - 1 } else { $filtered.Count - 1 }
                 continue
             }
         }
 
         if ($key.Key -eq [ConsoleKey]::DownArrow) {
             if ($isSlash -and $filtered.Count -gt 0) {
-                $maxVis = [Math]::Min(6, $filtered.Count)
-                $selIdx = if ($selIdx -lt ($maxVis - 1)) { $selIdx + 1 } else { 0 }
+                $selIdx = if ($selIdx -lt ($filtered.Count - 1)) { $selIdx + 1 } else { 0 }
                 continue
             }
         }
 
         if ($key.Key -eq [ConsoleKey]::Escape) {
-            if ($dropdownOpen) {
-                & $clearRowsBelow
-                & $restoreFooter
-                $dropdownOpen = $false
+            if ($slashMenuOpen) {
+                & $clearMenu
+                $slashMenuOpen = $false
             }
             if ($isSlash) {
                 try {
                     [Console]::SetCursorPosition(2, $PromptRow)
-                    Write-Host ([string]::new(" ", $buf.Length + 4)) -NoNewline
+                    Write-Host ([string]::new(" ", [Math]::Max(1, $buf.Length + 4))) -NoNewline
                     [Console]::SetCursorPosition(2, $PromptRow)
                 } catch { }
                 $buf.Clear() | Out-Null
@@ -323,10 +402,9 @@ function Read-InteractiveVorkLine {
                     }
                 } catch { }
                 if ($buf.Length -eq 0 -or -not $buf.ToString().StartsWith("/")) {
-                    if ($dropdownOpen) {
-                        & $clearRowsBelow
-                        & $restoreFooter
-                        $dropdownOpen = $false
+                    if ($slashMenuOpen) {
+                        & $clearMenu
+                        $slashMenuOpen = $false
                         try { [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow) } catch { }
                     }
                 }
@@ -339,6 +417,7 @@ function Read-InteractiveVorkLine {
             $buf.Append($ch) | Out-Null
             Write-Host $ch -NoNewline
             $selIdx = 0
+            $topIdx = 0
         }
     }
 }
