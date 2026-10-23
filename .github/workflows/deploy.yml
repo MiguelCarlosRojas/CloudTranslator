@@ -1,0 +1,29 @@
+name: Render Deploy Status
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+  statuses: write
+
+jobs:
+  deploy:
+    name: Monitorear Despliegue en Render
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Disparar y rastrear despliegue en Render
+        uses: JorgeLNJunior/render-deploy@v1.5.0
+        with:
+          service_id: ${{ secrets.RENDER_SERVICE_ID }}
+          api_key: ${{ secrets.RENDER_API_KEY }}
+          wait_deploy: true
+          github_deployment: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          deployment_environment: 'production'
