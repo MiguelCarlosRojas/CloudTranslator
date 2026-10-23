@@ -30,7 +30,8 @@ function Check-And-AutoUpdate {
             $remoteInfo = Invoke-RestMethod -Uri "$ApiBase/api/cli/info" -TimeoutSec 2 -ErrorAction Stop
             Set-Content -Path $checkFile -Value (Get-Date).ToString("o") -ErrorAction SilentlyContinue
             
-            if ($remoteInfo -and $remoteInfo.version -and ($remoteInfo.version -ne $VorkVersion -or $Force)) {
+            $isNewer = try { [version]$remoteInfo.version -gt [version]$VorkVersion } catch { $remoteInfo.version -ne $VorkVersion }
+            if ($remoteInfo -and $remoteInfo.version -and ($isNewer -or $Force)) {
                 Write-Host ""
                 Write-Host "  $ESC[43;30;1m AUTO-UPDATE $Reset $Yellow Sincronizando Vork CLI con backend v$($remoteInfo.version)...$Reset"
                 $targetScript = if ($PSCommandPath) { $PSCommandPath } else { Join-Path $cacheDir "bin\vork.ps1" }

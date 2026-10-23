@@ -3,6 +3,22 @@
     Vork CLI - Modulo UI: Catalogo Visual de los 9 Pilares Operacionales
 #>
 
+function Show-Shortcuts {
+    Write-Host ""
+    Write-Host "  ${White}${Bold}VORK CLI · ATAJOS & COMANDOS RAPIDOS${Reset}"
+    Write-Host "  ${Cyan}  /slash${Reset}          ${Dim}Ver los 43 comandos con barra (/)${Reset}"
+    Write-Host "  ${Cyan}  /modal, /mode${Reset}     ${Dim}Selector interactivo con flechas <- / -> (low, medium, high)${Reset}"
+    Write-Host "  ${Cyan}  /low, /high, /medium${Reset}${Dim}Cambiar nivel de potencia directamente${Reset}"
+    Write-Host "  ${Cyan}  /help${Reset}           ${Dim}Ver catalogo detallado de los 9 pilares${Reset}"
+    Write-Host "  ${Cyan}  /clear, cls${Reset}     ${Dim}Limpiar pantalla y refrescar banner${Reset}"
+    Write-Host "  ${Cyan}  /exit, quit, q${Reset}  ${Dim}Salir de la sesion interactiva${Reset}"
+    Write-Host "  ${Cyan}  /ping, /health${Reset}  ${Dim}Comprobar conexion con el backend ($ApiBase)${Reset}"
+    Write-Host "  ${Cyan}  /update${Reset}         ${Dim}Actualizar Vork CLI al instante${Reset}"
+    Write-Host ""
+    Write-Host "  ${Dim}Pilares directos: translate, tts, clone, media, separate, dj, image, remove-bg, agents${Reset}"
+    Write-Host ""
+}
+
 function Show-Help {
     Show-Banner
     Write-Host "$White$Bold  SINTAXIS:$Reset"
@@ -132,6 +148,7 @@ function Show-SlashCommands {
     Write-Host "  ${Cyan}│${Reset}  ${Yellow}/config${Reset}     ${White}· Ajustar permisos, temas visuales y preferencias${Reset}"
     Write-Host "  ${Cyan}│${Reset}  ${Yellow}/keybindings${Reset}${White}· Personalizar atajos de teclado y combinaciones${Reset}"
     Write-Host "  ${Cyan}│${Reset}  ${Yellow}/permissions${Reset}${White}· Administrar permisos de herramientas y comandos${Reset}"
+    Write-Host "  ${Cyan}│${Reset}  ${Yellow}/mode${Reset}       ${White}· Alternar perfil de potencia de Vork (low, medium, high)${Reset}"
     Write-Host "  ${Cyan}│${Reset}  ${Yellow}/model${Reset}      ${White}· Consultar o alternar el modelo de lenguaje activo${Reset}"
     Write-Host "  ${Cyan}│${Reset}  ${Yellow}/theme${Reset}      ${White}· Alternar temas visuales (Dark, Cyberpunk, Coral)${Reset}"
     Write-Host "  ${Cyan}│${Reset}  ${Yellow}/env${Reset}        ${White}· Consultar y gestionar variables de entorno activas${Reset}"
