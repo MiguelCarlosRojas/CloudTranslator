@@ -113,8 +113,7 @@ function Dispatch-CLICommand {
             Invoke-PillarVersion
         }
         { $_ -in "exit", "quit", "q" } {
-            Write-Host "  ${Cyan}Sesion de Vork CLI finalizada.${Reset}"
-            exit 0
+            Exit-VorkSession -ExitCode 0
         }
 
         default {
@@ -346,9 +345,7 @@ function Read-InteractiveVorkLine {
                     Write-Host ([string]::new(" ", [Math]::Min(80, $Width - 1))) -NoNewline
                     [Console]::SetCursorPosition(0, $PromptRow + 2)
                 } catch { }
-                Write-Host ""
-                Write-Host "  ${Cyan}Sesion de Vork CLI finalizada.${Reset}"
-                exit 0
+                Exit-VorkSession -ExitCode 0
             } else {
                 $lastCtrlC = $now
                 try {
@@ -379,9 +376,7 @@ function Read-InteractiveVorkLine {
         # Intercepción de Ctrl+D
         $isCtrlD = ($key.KeyChar -eq [char]4) -or ($key.Key -eq [ConsoleKey]::D -and ($key.Modifiers -band [ConsoleModifiers]::Control))
         if ($isCtrlD -and $buf.Length -eq 0) {
-            Write-Host ""
-            Write-Host "  ${Cyan}Sesion de Vork CLI finalizada.${Reset}"
-            exit 0
+            Exit-VorkSession -ExitCode 0
         }
 
         if ($key.Key -eq [ConsoleKey]::Enter) {
@@ -647,8 +642,7 @@ function Start-InteractiveREPL {
         $elbow = [char]0x23BF
 
         if ($cmdCheck -in "exit", "quit", "q") {
-            Write-Host "  ${Cyan}Sesion de Vork CLI finalizada.${Reset}"
-            break
+            Exit-VorkSession -ExitCode 0
         }
 
         if ($cmdCheck -in "clear", "cls") {

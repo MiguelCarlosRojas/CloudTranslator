@@ -356,7 +356,6 @@ function Show-InteractiveModelSwitcher {
     $renderAll = {
         # Filtrar modelos según $searchBuf
         $filtered = @($models | Where-Object { -not $searchBuf -or $_.ToLower().Contains($searchBuf.ToLower()) })
-        if ($filtered.Count -eq 0) { $filtered = $models }
         $selModelIdx = 0
 
         $row = $baseRow
@@ -385,12 +384,8 @@ function Show-InteractiveModelSwitcher {
 
         # Search Box
         try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "  ${LeadLight}Search:${Reset}$ESC[K"
-        $row++
-
-        try { [Console]::SetCursorPosition(0, $row) } catch { }
-        $searchDisplay = if ($searchBuf) { $searchBuf } else { " " }
-        Write-Host "          ${White}${Bold}$searchDisplay${Reset}$ESC[K"
+        $searchLabel = if ($searchBuf) { "  ${LeadLight}Search: ${White}${Bold}$searchBuf${Reset}" } else { "  ${LeadLight}Search:${Reset}" }
+        Write-Host "$searchLabel$ESC[K"
         $row++
 
         try { [Console]::SetCursorPosition(0, $row) } catch { }
@@ -401,60 +396,79 @@ function Show-InteractiveModelSwitcher {
         Write-Host "$ESC[K"
         $row++
 
-        # Único Modelo: Vork 3
-        try { [Console]::SetCursorPosition(0, $row) } catch { }
-        $mName = $filtered[0]
-        $padName = $mName.PadRight(28)
-        Write-Host "${Cyan}${Bold}> ${White}${Bold}$padName ${LeadLight}(current)${Reset}    $ESC[K"
-        $row++
+        if ($filtered.Count -gt 0) {
+            # Único Modelo: Vork 3
+            try { [Console]::SetCursorPosition(0, $row) } catch { }
+            $mName = $filtered[0]
+            $padName = $mName.PadRight(28)
+            Write-Host "${Cyan}${Bold}> ${White}${Bold}$padName ${LeadLight}(current)${Reset}    $ESC[K"
+            $row++
 
-        try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "$ESC[K"
-        $row++
+            try { [Console]::SetCursorPosition(0, $row) } catch { }
+            Write-Host "$ESC[K"
+            $row++
 
-        # Slider de Effort
-        # low:    ◂        ◉──────────────○──────────────○        ▸
-        # medium: ◂        ●━━━━━━━━━━━━━━◉──────────────○        ▸
-        # high:   ◂        ●━━━━━━━━━━━━━━●━━━━━━━━━━━━━━◉        ▸
-        $triL = [char]0x25C2 # ◂
-        $triR = [char]0x25B8 # ▸
-        $dDot = [char]0x25CF # ●
-        $cTar = [char]0x25C9 # ◉
-        $cEmp = [char]0x25CB # ○
-        $bHvy = [string]::new([char]0x2501, 14) # ━━━━━━
-        $bThn = [string]::new([char]0x2500, 14) # ──────
+            # Slider de Effort
+            # low:    ◂        ◉──────────────○──────────────○        ▸
+            # medium: ◂        ●━━━━━━━━━━━━━━◉──────────────○        ▸
+            # high:   ◂        ●━━━━━━━━━━━━━━●━━━━━━━━━━━━━━◉        ▸
+            $triL = [char]0x25C2 # ◂
+            $triR = [char]0x25B8 # ▸
+            $dDot = [char]0x25CF # ●
+            $cTar = [char]0x25C9 # ◉
+            $cEmp = [char]0x25CB # ○
+            $bHvy = [string]::new([char]0x2501, 14) # ━━━━━━
+            $bThn = [string]::new([char]0x2500, 14) # ──────
 
-        $sliderGraphic = ""
-        if ($effortIdx -eq 0) {
-            $sliderGraphic = "$cTar$bThn$cEmp$bThn$cEmp"
-        } elseif ($effortIdx -eq 1) {
-            $sliderGraphic = "$dDot$bHvy$cTar$bThn$cEmp"
+            $sliderGraphic = ""
+            if ($effortIdx -eq 0) {
+                $sliderGraphic = "$cTar$bThn$cEmp$bThn$cEmp"
+            } elseif ($effortIdx -eq 1) {
+                $sliderGraphic = "$dDot$bHvy$cTar$bThn$cEmp"
+            } else {
+                $sliderGraphic = "$dDot$bHvy$dDot$bHvy$cTar"
+            }
+
+            try { [Console]::SetCursorPosition(0, $row) } catch { }
+            Write-Host "  ${LeadLight}Effort  ${Cyan}$triL${Reset}        ${White}$sliderGraphic${Reset}        ${Cyan}$triR${Reset}$ESC[K"
+            $row++
+
+            try { [Console]::SetCursorPosition(0, $row) } catch { }
+            Write-Host "                  ${LeadLight}low          medium          high${Reset}$ESC[K"
+            $row++
+
+            try { [Console]::SetCursorPosition(0, $row) } catch { }
+            $currEffort = $efforts[$effortIdx]
+            $effDesc = $effortDescs[$currEffort]
+            Write-Host "            ${LeadLight}$effDesc${Reset}$ESC[K"
+            $row++
+
+            try { [Console]::SetCursorPosition(0, $row) } catch { }
+            Write-Host "$ESC[K"
+            $row++
+
+            # Footer con instrucciones normales
+            try { [Console]::SetCursorPosition(0, $row) } catch { }
+            Write-Host "${LeadLight}Keyboard: ${Cyan}↑/↓${Reset} ${LeadLight}Navigate  ${Cyan}←/→${Reset} ${LeadLight}Effort  ${Cyan}enter${Reset} ${LeadLight}Select  ${Cyan}esc${Reset} ${LeadLight}Go Back${Reset}$ESC[K"
+            $row++
         } else {
-            $sliderGraphic = "$dDot$bHvy$dDot$bHvy$cTar"
+            # Sin coincidencias
+            try { [Console]::SetCursorPosition(0, $row) } catch { }
+            Write-Host "  ${LeadLight}No models match `"$searchBuf`"${Reset}$ESC[K"
+            $row++
+
+            # Limpiar filas restantes
+            for ($c = 0; $c -lt 5; $c++) {
+                try { [Console]::SetCursorPosition(0, $row) } catch { }
+                Write-Host "$ESC[K"
+                $row++
+            }
+
+            # Footer esc Clear search
+            try { [Console]::SetCursorPosition(0, $row) } catch { }
+            Write-Host "${LeadLight}Keyboard: ${Cyan}esc${Reset} ${LeadLight}Clear search${Reset}$ESC[K"
+            $row++
         }
-
-        try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "  ${LeadLight}Effort  ${Cyan}$triL${Reset}        ${White}$sliderGraphic${Reset}        ${Cyan}$triR${Reset}$ESC[K"
-        $row++
-
-        try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "                  ${LeadLight}low          medium          high${Reset}$ESC[K"
-        $row++
-
-        try { [Console]::SetCursorPosition(0, $row) } catch { }
-        $currEffort = $efforts[$effortIdx]
-        $effDesc = $effortDescs[$currEffort]
-        Write-Host "            ${LeadLight}$effDesc${Reset}$ESC[K"
-        $row++
-
-        try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "$ESC[K"
-        $row++
-
-        # Footer con instrucciones
-        try { [Console]::SetCursorPosition(0, $row) } catch { }
-        Write-Host "${LeadLight}Keyboard: ${Cyan}↑/↓${Reset} ${LeadLight}Navigate  ${Cyan}←/→${Reset} ${LeadLight}Effort  ${Cyan}enter${Reset} ${LeadLight}Select  ${Cyan}esc${Reset} ${LeadLight}Go Back${Reset}$ESC[K"
-        $row++
 
         # Footer derecho con modelo y potencia actual
         try { [Console]::SetCursorPosition(0, $row) } catch { }
@@ -467,47 +481,56 @@ function Show-InteractiveModelSwitcher {
 
     try {
         while ($true) {
+            $filtered = @($models | Where-Object { -not $searchBuf -or $_.ToLower().Contains($searchBuf.ToLower()) })
             $k = [Console]::ReadKey($true)
 
-            if ($k.Key -eq [ConsoleKey]::LeftArrow) {
-                $effortIdx = if ($effortIdx -gt 0) { $effortIdx - 1 } else { 0 }
-                & $renderAll
-                continue
-            }
+            if ($filtered.Count -gt 0) {
+                if ($k.Key -eq [ConsoleKey]::LeftArrow) {
+                    $effortIdx = if ($effortIdx -gt 0) { $effortIdx - 1 } else { 0 }
+                    & $renderAll
+                    continue
+                }
 
-            if ($k.Key -eq [ConsoleKey]::RightArrow) {
-                $effortIdx = if ($effortIdx -lt 2) { $effortIdx + 1 } else { 2 }
-                & $renderAll
-                continue
-            }
+                if ($k.Key -eq [ConsoleKey]::RightArrow) {
+                    $effortIdx = if ($effortIdx -lt 2) { $effortIdx + 1 } else { 2 }
+                    & $renderAll
+                    continue
+                }
 
-            if ($k.Key -eq [ConsoleKey]::Enter) {
-                $chosenModel = "Vork 3"
-                $chosenEffort = $efforts[$effortIdx]
+                if ($k.Key -eq [ConsoleKey]::Enter) {
+                    $chosenModel = "Vork 3"
+                    $chosenEffort = $efforts[$effortIdx]
 
-                $global:VorkModel = "Vork 3"
-                $global:VorkTier = $chosenEffort
+                    $global:VorkModel = "Vork 3"
+                    $global:VorkTier = $chosenEffort
 
-                try {
-                    $vDir = Join-Path $HOME ".vork"
-                    if (-not (Test-Path $vDir)) { New-Item -ItemType Directory -Path $vDir -Force | Out-Null }
-                    Set-Content -Path (Join-Path $vDir ".model") -Value "Vork 3" -Force -Encoding UTF8
-                    Set-Content -Path (Join-Path $vDir ".tier") -Value $chosenEffort -Force -Encoding UTF8
-                } catch { }
+                    try {
+                        $vDir = Join-Path $HOME ".vork"
+                        if (-not (Test-Path $vDir)) { New-Item -ItemType Directory -Path $vDir -Force | Out-Null }
+                        Set-Content -Path (Join-Path $vDir ".model") -Value "Vork 3" -Force -Encoding UTF8
+                        Set-Content -Path (Join-Path $vDir ".tier") -Value $chosenEffort -Force -Encoding UTF8
+                    } catch { }
 
-                # Limpiar área del switcher
-                try {
-                    for ($c = 0; $c -lt $neededRows; $c++) {
-                        [Console]::SetCursorPosition(0, $baseRow + $c)
-                        Write-Host ([string]::new(" ", $width - 1)) -NoNewline
-                    }
-                    [Console]::SetCursorPosition(0, $baseRow)
-                } catch { }
+                    # Limpiar área del switcher
+                    try {
+                        for ($c = 0; $c -lt $neededRows; $c++) {
+                            [Console]::SetCursorPosition(0, $baseRow + $c)
+                            Write-Host ([string]::new(" ", $width - 1)) -NoNewline
+                        }
+                        [Console]::SetCursorPosition(0, $baseRow)
+                    } catch { }
 
-                return @{ Action = "selected"; Model = "Vork 3"; Tier = $chosenEffort }
+                    return @{ Action = "selected"; Model = "Vork 3"; Tier = $chosenEffort }
+                }
             }
 
             if ($k.Key -eq [ConsoleKey]::Escape) {
+                if ($searchBuf.Length -gt 0) {
+                    $searchBuf = ""
+                    & $renderAll
+                    continue
+                }
+
                 # Limpiar área del switcher
                 try {
                     for ($c = 0; $c -lt $neededRows; $c++) {

@@ -3,13 +3,95 @@
     [string]$Command = "",
 
     [Parameter(Position=1, ValueFromRemainingArguments=$true)]
-    [string[]]$Arguments
+    [string[]]$Arguments,
+
+    [Alias("c")]
+    [switch]$Resume,
+
+    [string]$Conversation = ""
 )
 
 <#
 .SYNOPSIS
     Vork CLI - Modulo de Configuracion y Paleta Tipografica ANSI
 #>
+
+# Detección y normalización de flags de reanudación de sesión (-c, --conversation)
+if ($Command -in "-c", "--resume", "-resume") {
+    $Resume = $true
+    $Command = if ($Arguments -and $Arguments.Count -gt 0) { $Arguments[0] } else { "" }
+    $Arguments = if ($Arguments -and $Arguments.Count -gt 1) { @($Arguments[1..($Arguments.Count - 1)]) } else { @() }
+} elseif ($Command -like "--conversation=*") {
+    $Conversation = $Command.Substring(15)
+    $Command = if ($Arguments -and $Arguments.Count -gt 0) { $Arguments[0] } else { "" }
+    $Arguments = if ($Arguments -and $Arguments.Count -gt 1) { @($Arguments[1..($Arguments.Count - 1)]) } else { @() }
+} elseif ($Command -in "--conversation", "-conversation") {
+    if ($Arguments -and $Arguments.Count -gt 0) {
+        $Conversation = $Arguments[0]
+        $Command = if ($Arguments.Count -gt 1) { $Arguments[1] } else { "" }
+        $Arguments = if ($Arguments.Count -gt 2) { @($Arguments[2..($Arguments.Count - 1)]) } else { @() }
+    } else {
+        $Command = ""
+    }
+}
+
+if ($Arguments) {
+    $cleanArgs = @()
+    for ($aIdx = 0; $aIdx -lt $Arguments.Count; $aIdx++) {
+        $argItem = $Arguments[$aIdx]
+        if ($argItem -in "-c", "--resume", "-resume") {
+            $Resume = $true
+        } elseif ($argItem -like "--conversation=*") {
+            $Conversation = $argItem.Substring(15)
+        } elseif ($argItem -in "--conversation", "-conversation") {
+            if ($aIdx + 1 -lt $Arguments.Count) {
+                $Conversation = $Arguments[$aIdx + 1]
+                $aIdx++
+            }
+        } else {
+            $cleanArgs += $argItem
+        }
+    }
+    $Arguments = $cleanArgs
+}
+
+# ========================================================
+# GESTIÓN DE ID DE CONVERSACIÓN & SESIÓN PERSISTENTE
+# ========================================================
+$convDir = Join-Path $HOME ".vork"
+if (-not (Test-Path $convDir)) { New-Item -ItemType Directory -Path $convDir -Force | Out-Null }
+$lastConvFile = Join-Path $convDir "last_conversation.txt"
+
+if ($Conversation) {
+    $global:VorkConversationId = $Conversation.Trim()
+    $global:VorkIsResumed = $true
+} elseif ($Resume) {
+    if (Test-Path $lastConvFile) {
+        $savedConv = try { (Get-Content -Path $lastConvFile -Raw).Trim() } catch { "" }
+        if ($savedConv) {
+            $global:VorkConversationId = $savedConv
+            $global:VorkIsResumed = $true
+        }
+    }
+}
+
+if (-not $global:VorkConversationId) {
+    $global:VorkConversationId = [System.Guid]::NewGuid().ToString()
+    $global:VorkIsResumed = $false
+}
+
+try {
+    Set-Content -Path $lastConvFile -Value $global:VorkConversationId -Force -Encoding UTF8
+} catch { }
+
+function Exit-VorkSession {
+    param([int]$ExitCode = 0)
+    Write-Host ""
+    Write-Host "${LeadLight}Resume with -c (or command below):${Reset}"
+    Write-Host "${White}vk --conversation=$global:VorkConversationId${Reset}"
+    Write-Host ""
+    exit $ExitCode
+}
 
 $VorkVersion = "3.0.2"
 $ApiBase = if ($env:VORK_API) { $env:VORK_API } elseif ($env:CLOUDTRANSLATOR_API) { $env:CLOUDTRANSLATOR_API } else { "https://vork-st1k.onrender.com" }
