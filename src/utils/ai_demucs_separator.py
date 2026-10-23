@@ -1,6 +1,6 @@
 """
 AI Demucs v4 Neural Stem Separator (HT-Demucs ONNX)
-CloudTranslator Engine - State-of-the-Art Source Separation
+Vork Engine - State-of-the-Art Source Separation
 Pure Deep Neural Network Stem Extraction (Vocals vs Instrumental / Karaoke)
 """
 

@@ -1,10 +1,10 @@
 /**
- * MediaEngine - Motor de Conversión y Descarga Multimedia de CloudTranslator
+ * MediaEngine - Motor de Conversión y Descarga Multimedia de Vork
  * Pilar 04: Conversión Universal de Video y Audio para YouTube, TikTok, Instagram,
  * Facebook, Twitter/X, Pinterest, Reddit y Enlaces Directos hacia MP3 y MP4.
  * 
  * Procesamiento 100% nativo en Backend con FFmpeg para garantizar archivos válidos,
- * metadatos exactos de duración y descargas servidas directamente desde CloudTranslator.
+ * metadatos exactos de duración y descargas servidas directamente desde Vork.
  */
 
 const fs = require("fs");
@@ -13,6 +13,7 @@ const { spawn } = require("child_process");
 const axios = require("axios");
 const btch = require("btch-downloader");
 const logger = require("./logger");
+const { validateSafeUrl } = require("./ssrfGuard");
 
 // Ruta al binario de FFmpeg con fallback a binario de sistema
 let ffmpegPath = "ffmpeg";
@@ -367,6 +368,9 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
   }
 
   const cleanUrl = url.trim();
+
+  // Validación y mitigación SSRF de URLs entrantes
+  await validateSafeUrl(cleanUrl);
 
   // Comprobar caché en RAM para acelerar conversiones consecutivas del mismo enlace
   const cached = mediaInfoCache.get(cleanUrl);
@@ -902,7 +906,7 @@ async function processConversion(options = {}) {
   const cleanTitle = sanitizeFilename(mediaInfo.title, `${mediaInfo.platformId}-media`);
   const extension = selectedFormat;
   const mimeType = selectedFormat === "mp4" ? "video/mp4" : "audio/mpeg";
-  const downloadFilename = `CloudTranslator_${cleanTitle}.${extension}`;
+  const downloadFilename = `Vork_${cleanTitle}.${extension}`;
   const outputPath = path.join(MEDIA_CACHE_DIR, `${jobId}.${extension}`);
 
   // Construir lista de candidatos según formato y plataforma
@@ -1037,7 +1041,7 @@ async function processConversion(options = {}) {
     mimeType,
     sizeBytes,
     sizeFormatted: formatBytes(sizeBytes),
-    message: `Conversión completada a formato ${selectedFormat.toUpperCase()} (${quality}). Descarga directa disponible desde CloudTranslator.`
+    message: `Conversión completada a formato ${selectedFormat.toUpperCase()} (${quality}). Descarga directa disponible desde Vork.`
   };
 }
 
@@ -1059,6 +1063,7 @@ function getMediaById(id) {
 }
 
 module.exports = {
+  MEDIA_CACHE_DIR,
   SUPPORTED_PLATFORMS,
   detectPlatform,
   extractMediaInfo,

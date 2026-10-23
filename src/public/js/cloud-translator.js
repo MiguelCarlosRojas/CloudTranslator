@@ -16,6 +16,7 @@
     module.exports = factory();
   } else {
     root.CloudTranslator = factory();
+    root.Vork = root.CloudTranslator;
   }
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
@@ -77,7 +78,7 @@
      * @param {Function} [options.onError] - Callback en caso de error
      */
     constructor(options = {}) {
-      this.endpoint = options.endpoint || "https://cloudtranslator.onrender.com/api/translate";
+      this.endpoint = options.endpoint || "https://vork-st1k.onrender.com/api/translate";
       this.rootSelector = options.rootSelector || "body";
       this.defaultLanguage = options.defaultLanguage || "en";
       this.batchSize = Math.max(50, options.batchSize || 500);

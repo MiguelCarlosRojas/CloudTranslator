@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <radialGradient id="imgBgGrad" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#261d18" />
+      <stop offset="60%" stop-color="#14100d" />
+      <stop offset="100%" stop-color="#090706" />
+    </radialGradient>
+    <linearGradient id="imgBorderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff7a3d" stop-opacity="0.85" />
+      <stop offset="50%" stop-color="#f4ece1" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#a99cff" stop-opacity="0.6" />
+    </linearGradient>
+    <filter id="imgGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="20" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    <filter id="imgShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.6" />
+    </filter>
+  </defs>
+
+  <circle cx="256" cy="240" r="130" fill="#ff7a3d" opacity="0.14" filter="url(#imgGlow)" />
+  <rect x="36" y="36" width="440" height="440" rx="104" ry="104" fill="url(#imgBgGrad)" stroke="url(#imgBorderGrad)" stroke-width="4" filter="url(#imgShadow)" />
+
+  <!-- Picture Frame & Image Conversion Core -->
+  <g filter="url(#imgShadow)">
+    <!-- Backing Card (Layered Formats) -->
+    <rect x="180" y="140" width="180" height="150" rx="18" ry="18" fill="#1b1824" stroke="#a99cff" stroke-width="2" transform="rotate(8 270 215)" opacity="0.6" />
+
+    <!-- Main Active Picture Frame -->
+    <rect x="145" y="145" width="222" height="160" rx="20" ry="20" fill="#201814" stroke="#ff7a3d" stroke-width="3.5" />
+
+    <!-- Mountain Landscape & Sun Inside Photo Frame -->
+    <g clip-path="url(#picClip)">
+      <circle cx="195" cy="190" r="18" fill="#ff7a3d" />
+      <!-- Mountains -->
+      <polygon points="145,290 220,205 270,265" fill="#f4ece1" opacity="0.85" />
+      <polygon points="230,290 295,195 367,290" fill="#ff7a3d" opacity="0.7" />
+    </g>
+  </g>
+
+  <!-- Multi-Format Badges Floating -->
+  <g transform="translate(135, 335)" filter="url(#imgShadow)">
+    <rect x="-35" y="-16" width="70" height="32" rx="10" ry="10" fill="#241b18" stroke="#ff7a3d" stroke-width="2" />
+    <text x="0" y="6" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="800" fill="#f4ece1" text-anchor="middle">WEBP</text>
+  </g>
+  <g transform="translate(256, 335)" filter="url(#imgShadow)">
+    <rect x="-35" y="-16" width="70" height="32" rx="10" ry="10" fill="#1f1826" stroke="#a99cff" stroke-width="2" />
+    <text x="0" y="6" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="800" fill="#a99cff" text-anchor="middle">PNG</text>
+  </g>
+  <g transform="translate(377, 335)" filter="url(#imgShadow)">
+    <rect x="-35" y="-16" width="70" height="32" rx="10" ry="10" fill="#172224" stroke="#00f0ff" stroke-width="2" />
+    <text x="0" y="6" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="800" fill="#00f0ff" text-anchor="middle">SVG</text>
+  </g>
+
+  <!-- Status Pill -->
+  <g transform="translate(256, 400)" filter="url(#imgShadow)">
+    <rect x="-85" y="-18" width="170" height="36" rx="18" ry="18" fill="#1b1613" stroke="#ff7a3d" stroke-width="1.8" />
+    <circle cx="-60" cy="0" r="5" fill="#ff7a3d">
+      <animate attributeName="opacity" values="1;0.3;1" dur="1.8s" repeatCount="indefinite" />
+    </circle>
+    <text x="8" y="5" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="700" letter-spacing="1.5" fill="#f4ece1" text-anchor="middle">IMAGE • VECTOR</text>
+  </g>
+</svg>

@@ -1,5 +1,5 @@
 /**
- * VocalSeparator - Motor de Separación de Voz e Instrumental de CloudTranslator
+ * VocalSeparator - Motor de Separación de Voz e Instrumental de Vork
  * Pilar 05: Extracción y División de Stems de Audio (Vocal vs Instrumental / Karaoke)
  * a partir de Enlaces de Plataformas Multimedia (YouTube, TikTok, etc.) o Archivos Subidos.
  * 
@@ -561,8 +561,8 @@ async function processSeparation(options = {}) {
     logger.info(`Separador: Iniciando división DSP de stems para "${safeTitle}"...`);
     const sepRes = await separateAudioChannels(masterAudioPath, outInstrumentalPath, outVocalsPath, quality);
 
-    const vocalsFilename = `CloudTranslator_${safeTitle}_[VOCAL_ACAPELLA].mp3`;
-    const instrumentalFilename = `CloudTranslator_${safeTitle}_[PISTA_INSTRUMENTAL].mp3`;
+    const vocalsFilename = `Vork_${safeTitle}_[VOCAL_ACAPELLA].mp3`;
+    const instrumentalFilename = `Vork_${safeTitle}_[PISTA_INSTRUMENTAL].mp3`;
 
     // Registrar en almacén en RAM
     stemsBufferStore.set(jobId, {
@@ -642,6 +642,7 @@ function getStemById(id) {
 }
 
 module.exports = {
+  STEMS_CACHE_DIR,
   processSeparation,
   getStemById
 };

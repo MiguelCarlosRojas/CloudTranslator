@@ -1,0 +1,115 @@
+/* ==========================================================================
+   Pie de Página (Footer Aligned & Structured)
+   ========================================================================== */
+footer,
+.footer-full {
+  width: 100%;
+  border-top: 1px solid var(--border-card);
+  background: rgba(6, 8, 15, 0.98);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  margin-top: 0;
+  position: static;
+  clear: both;
+  display: block;
+  z-index: 1;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.footer-inner-full {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: clamp(44px, 5vw, 64px) clamp(20px, 4vw, 48px) 36px;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  align-items: start;
+  gap: clamp(28px, 4vw, 64px);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.footer-col-brand {
+  max-width: 440px;
+}
+
+.footer-col {
+  min-width: 0;
+}
+
+.footer-col-brand h4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.15rem;
+  margin-bottom: 12px;
+  color: var(--text-white);
+}
+
+.footer-col-brand p {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.footer-col h4 {
+  font-size: 0.82rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-white);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-col a {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none !important;
+}
+
+.footer-col a:hover {
+  color: var(--primary);
+  text-decoration: none !important;
+  transform: translateX(3px);
+}
+
+.footer-col a.active {
+  color: var(--primary) !important;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.45);
+}
+
+.footer-col a.active::before {
+  content: "•";
+  color: var(--primary);
+  font-size: 1.2rem;
+  line-height: 0.8;
+}
+
+.footer-bottom-full {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 22px clamp(16px, 4vw, 48px);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  flex-wrap: wrap;
+  gap: 14px;
+}

@@ -1,183 +1,42 @@
-const express = require("express");
-const path = require("path");
-const compression = require("compression");
-const cors = require("./config/cors");
-const errorHandler = require("./middlewares/errorHandler");
-const translateRoutes = require("./routes/translateRoutes");
+/**
+ * server.js
+ * Punto de entrada del servidor Vork con protección anti-crash y graceful shutdown.
+ */
+const app = require("./app");
 const { PORT } = require("./config/config");
 const logger = require("./utils/logger");
 
-const app = express();
-
-// 1. Compresión de respuestas HTTP (Gzip/Deflate) optimizada para conexiones lentas y bajo ancho de banda
-app.use(compression({
-  threshold: 256, // Comprimir respuestas mayores a 256 bytes
-  filter: (req, res) => {
-    if (req.headers["x-no-compression"]) return false;
-    return compression.filter(req, res);
-  }
-}));
-
-// 2. Parsers, Seguridad y Políticas CORS (Límite 50MB para muestras de audio en base64 de alta resolución)
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ limit: "50mb", extended: true }));
-app.use(cors);
-app.options("*", cors);
-
-app.use((req, res, next) => {
-  res.setHeader("X-Content-Type-Options", "nosniff");
-  res.setHeader("X-Frame-Options", "SAMEORIGIN");
-  res.setHeader("X-XSS-Protection", "1; mode=block");
-  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
-  next();
-});
-
-// 3. Middleware de URLs limpias: Redirige permanentemente (301) cualquier petición con extensión .html
-app.use((req, res, next) => {
-  if (req.path.endsWith(".html")) {
-    const rawPath = req.path.slice(0, -5);
-    const cleanPath = (rawPath === "/index" || rawPath === "") ? "/" : rawPath;
-    const queryString = req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "";
-    return res.redirect(301, cleanPath + queryString);
-  }
-  next();
-});
-
-// 4. Endpoint de ping ultrarrápido (0ms) para keep-alive en Render Free Tier (evita reposo con cron/monitores)
-app.get("/api/ping", (req, res) => {
-  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  res.status(200).send("pong");
-});
-
-// 5. Ruta raíz: Landing page para navegadores web o JSON descriptivo para clientes API
-app.get("/", (req, res) => {
-  if (req.accepts("html")) {
-    return res.sendFile(path.join(__dirname, "public", "index.html"));
-  }
-  res.json({
-    service: "CloudTranslator API",
-    status: "online",
-    pillars: [
-      "1. Traductor en la Nube (+200 idiomas por lotes)",
-      "2. Texto a Voz Neuronal (TTS Studio)",
-      "3. Clonación de Voz por Inteligencia Artificial",
-      "4. Conversor Multimedia Universal (YouTube, TikTok, Instagram a MP3 / MP4)",
-      "5. Separador de Voz e Instrumental (Extracción de Stems Acapella / Karaoke)",
-      "6. CloudDJ (Mezclador Virtual en Vivo con Crossfade y Cola de Reproducción)"
-    ],
-    documentation: "https://cloudtranslator.onrender.com/docs",
-    endpoints: {
-      translate: "POST /api/translate",
-      tts: "POST /api/tts",
-      voiceClone: "POST /api/voice-clone",
-      mediaInfo: "POST /api/media/info",
-      mediaConvert: "POST /api/media/convert",
-      mediaBatch: "POST /api/media/batch",
-      mediaStream: "GET /api/media/stream",
-      mediaDownload: "GET /api/media/download",
-      mediaPlatforms: "GET /api/media/platforms",
-      separatorProcess: "POST /api/separator/process",
-      separatorStream: "GET /api/separator/stream",
-      separatorDownload: "GET /api/separator/download",
-      languages: "GET /api/languages",
-      health: "GET /api/health",
-      ping: "GET /api/ping"
-    }
-  });
-});
-
-// 6. Ruta /api: Documentación interactiva para navegadores o JSON informativo para peticiones API directas
-app.get("/api", (req, res, next) => {
-  if (req.accepts("html")) {
-    return res.sendFile(path.join(__dirname, "public", "api.html"));
-  }
-  res.json({
-    service: "CloudTranslator API REST",
-    status: "online",
-    pillars: [
-      "1. Traductor en la Nube (+200 idiomas por lotes)",
-      "2. Texto a Voz Neuronal (TTS Studio)",
-      "3. Clonación de Voz por Inteligencia Artificial",
-      "4. Conversor Multimedia Universal (YouTube, TikTok, Instagram a MP3 / MP4)",
-      "5. Separador de Voz e Instrumental (Extracción de Stems Acapella / Karaoke)",
-      "6. CloudDJ (Mezclador Virtual en Vivo con Crossfade y Cola de Reproducción)"
-    ],
-    documentation: "https://cloudtranslator.onrender.com/api",
-    endpoints: {
-      translate: "POST /api/translate",
-      tts: "POST /api/tts",
-      voiceClone: "POST /api/voice-clone",
-      mediaInfo: "POST /api/media/info",
-      mediaConvert: "POST /api/media/convert",
-      mediaBatch: "POST /api/media/batch",
-      mediaStream: "GET /api/media/stream",
-      mediaDownload: "GET /api/media/download",
-      mediaPlatforms: "GET /api/media/platforms",
-      separatorProcess: "POST /api/separator/process",
-      separatorStream: "GET /api/separator/stream",
-      separatorDownload: "GET /api/separator/download",
-      languages: "GET /api/languages",
-      health: "GET /api/health",
-      ping: "GET /api/ping"
-    }
-  });
-});
-
-// 7. Endpoints del Microservicio (/api/translate, /api/languages, /api/health)
-app.use("/api", translateRoutes);
-
-// 8. Rutas limpias directas para todas las páginas del portal
-const pageRoutes = [
-  { path: "/translator", file: "translator.html" },
-  { path: "/tts", file: "tts.html" },
-  { path: "/voice-clone", file: "voice-clone.html" },
-  { path: "/converter", file: "converter.html" },
-  { path: "/media", file: "converter.html" },
-  { path: "/vocal-remover", file: "vocal-remover.html" },
-  { path: "/separator", file: "vocal-remover.html" },
-  { path: "/stems", file: "vocal-remover.html" },
-  { path: "/dj", file: "dj.html" },
-  { path: "/cloud-dj", file: "dj.html" },
-  { path: "/donate", file: "donate.html" },
-  { path: "/docs", file: "docs.html" },
-  { path: "/learn", file: "learn.html" },
-  { path: "/support", file: "support.html" },
-  { path: "/help", file: "help.html" },
-  { path: "/status", file: "status.html" },
-  { path: "/privacy", file: "privacy.html" },
-  { path: "/security", file: "security.html" },
-  { path: "/terms", file: "terms.html" }
-];
-
-pageRoutes.forEach(({ path: routePath, file }) => {
-  app.get(routePath, (req, res) => {
-    res.sendFile(path.join(__dirname, "public", file));
-  });
-});
-
-// 9. Archivos estáticos optimizados con caché HTTP, ETag y stale-while-revalidate para conexiones lentas
-app.use(express.static(path.join(__dirname, "public"), {
-  extensions: ["html"],
-  index: false,
-  maxAge: "1d",
-  etag: true,
-  lastModified: true,
-  setHeaders: (res, filePath) => {
-    if (filePath.match(/\.(css|js|png|jpg|jpeg|svg|ico|woff2|woff)$/i)) {
-      res.setHeader("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
-    }
-  }
-}));
-
-// 10. Manejo global de errores
-app.use(errorHandler);
-
-// 11. Inicio del servidor con timeouts ajustados para Render Free Tier (evita caídas 502 por Keep-Alive)
+// Inicio del servidor con timeouts ajustados para Render Free Tier (evita caídas 502 por Keep-Alive)
 const server = app.listen(PORT, () => {
-  logger.info(`Servidor CloudTranslator escuchando en puerto ${PORT}`);
+  logger.info(`Servidor Vork escuchando en puerto ${PORT}`);
 });
 
 server.keepAliveTimeout = 65000; // Supera el timeout de 60s del reverse proxy de Render
 server.headersTimeout = 66000;
+
+// Cierre Seguro y Captura de Errores Globales (Graceful Shutdown & Anti-Crash)
+function handleGracefulShutdown(signal) {
+  logger.info(`Recibida señal ${signal}. Cerrando servidor HTTP de forma ordenada...`);
+  server.close(() => {
+    logger.info("Servidor HTTP cerrado exitosamente.");
+    process.exit(0);
+  });
+
+  setTimeout(() => {
+    logger.error("Tiempo de espera agotado para el cierre graceful. Forzando terminación.");
+    process.exit(1);
+  }, 10000).unref();
+}
+
+process.on("SIGTERM", () => handleGracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => handleGracefulShutdown("SIGINT"));
+
+process.on("uncaughtException", (err) => {
+  logger.error(`Excepción no capturada (uncaughtException): ${err.message}\n${err.stack}`);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  logger.error(`Promesa rechazada no manejada (unhandledRejection) en ${promise}: ${reason}`);
+});
 
 module.exports = { app, server };

@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Estudio de Clonación de Voz por Inteligencia Artificial de CloudTranslator | Graba tu voz con el micrófono o sube un archivo, extrae tu timbre acústico y sintetiza mensajes con descarga real en WAV.">
-  <meta property="og:title" content="Clonación de Voz IA - CloudTranslator">
+  <meta name="description" content="Estudio de Clonación de Voz por Inteligencia Artificial de Vork | Graba tu voz con el micrófono o sube un archivo, extrae tu timbre acústico y sintetiza mensajes con descarga real en WAV.">
+  <meta property="og:title" content="Clonación de Voz IA - Vork">
   <meta property="og:description" content="Plataforma de clonación vocal neuronal y análisis acústico F0 con descarga directa de archivos WAV.">
-  <title>Clonación de Voz (IA) - CloudTranslator</title>
+  <title>Clonación de Voz (IA) - Vork</title>
   <link rel="icon" type="image/png" sizes="192x192" href="/img/logo.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/img/logo.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/img/logo.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/img/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <script>
     (function(){try{var m=document.cookie.match(/(?:^|; )cloud_translator_lang=([^;]*)/);var l=m?decodeURIComponent(m[1]):null;if(l&&l!=="original"&&l!=="es"){document.documentElement.classList.add("ct-pending");setTimeout(function(){document.documentElement.classList.remove("ct-pending");},800);}}catch(e){}})();
@@ -20,111 +23,12 @@
 </head>
 <body>
 
+  <!-- Textura de grano sutil Huella -->
+  <div class="grain" aria-hidden="true"></div>
+
+
   <!-- Barra Superior -->
-  <header class="top-nav">
-    <div class="nav-container">
-      <a href="/" class="brand-wrapper">
-        <span class="brand-logo">
-          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="38" height="38">
-          CloudTranslator
-        </span>
-        <span class="brand-badge">v2.5.0</span>
-      </a>
-
-      <nav class="desktop-nav">
-        <ul class="main-menu">
-          <li><a href="/">Inicio</a></li>
-          <li><a href="/docs">Docs</a></li>
-          <li><a href="/support">Soporte</a></li>
-          <li><a href="/status">Estado</a></li>
-        </ul>
-      </nav>
-
-      <!-- Barra de Herramientas de Traducción Activa -->
-      <div class="toolbar-controls no-translate" data-no-translate>
-        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
-          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
-          English
-        </button>
-
-        <div class="selector-box">
-          <div class="selector-dropdown">
-            <select id="select-lang" aria-label="Seleccionar idioma">
-              <option value="en">English (en)</option>
-              <option value="es">Español (es)</option>
-              <option value="fr">Français (fr)</option>
-              <option value="de">Deutsch (de)</option>
-              <option value="it">Italiano (it)</option>
-              <option value="pt">Portugués (pt)</option>
-              <option value="ja">日本語 (ja)</option>
-              <option value="zh-CN">中文 (zh-CN)</option>
-              <option value="ru">Русский (ru)</option>
-            </select>
-          </div>
-          <div class="custom-lang-group">
-            <input type="text" id="input-custom-lang" placeholder="ISO" maxlength="5" title="Código ISO personalizado">
-            <button id="btn-translate-custom" class="btn btn-primary" title="Traducir">GO</button>
-          </div>
-        </div>
-
-        <button id="btn-restore" class="btn btn-outline" title="Restaurar idioma original">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
-          Original
-        </button>
-
-        <div id="status-pill" class="status-pill" title="Estado del microservicio">
-          <span class="spinner"></span>
-          <span id="status-text">LISTO</span>
-        </div>
-      </div>
-
-      <!-- Botón Hamburguesa Móvil -->
-      <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Abrir Menú de Navegación">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
-    </div>
-
-    <!-- Backdrop para Barra Lateral -->
-    <div id="drawer-backdrop"></div>
-
-    <!-- Barra de Navegación Lateral Móvil -->
-    <aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
-      <div class="drawer-header">
-        <a href="/" class="drawer-brand">
-          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
-          <span>CloudTranslator</span>
-        </a>
-        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </div>
-
-      <div class="drawer-body">
-        <div class="drawer-section">
-          <span class="drawer-title">NAVEGACIÓN DEL PORTAL</span>
-          <ul class="drawer-menu">
-            <li><a href="/"><svg class="icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Inicio</a></li>
-            <li><a href="/docs"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Documentación</a></li>
-            <li><a href="/support"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Soporte</a></li>
-            <li><a href="/status"><svg class="icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Estado Servidor</a></li>
-          </ul>
-        </div>
-
-        <div class="drawer-section">
-          <span class="drawer-title">LOS 6 PILARES</span>
-          <ul class="drawer-menu">
-            <li><a href="/translator"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traductor en la Nube</a></li>
-            <li><a href="/tts"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS)</a></li>
-            <li><a href="/voice-clone" class="active"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz (IA)</a></li>
-            <li><a href="/converter"><svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="8" cy="12" r="2"/></svg> Conversor Multimedia (MP3 / MP4)</a></li>
-            <li><a href="/vocal-remover"><svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Separador de Voz (Pilar 05)</a></li>
-            <li><a href="/dj"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg> CloudDJ Mezclador (Pilar 06)</a></li>
-            <li><a href="/donate"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
-          </ul>
-        </div>
-      </div>
-    </aside>
-  </header>
+  <header id="header-placeholder" data-component="header" data-active="voice-clone"></header>
 
   <main class="full-container">
 
@@ -132,10 +36,10 @@
     <section class="hero-full">
       <div class="hero-split">
         <div class="hero-split-content">
-          <span class="hero-tag-glow">PILAR 03 // CLONACIÓN VOCAL POR IA [ ALPHA ]</span>
-          <h1 style="font-size: clamp(2rem, 4.4vw, 3rem); font-weight: 800;">Estudio de Clonación de Voz con Inteligencia Artificial <span class="badge" style="background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4); font-size: 0.8rem; font-weight: 800; padding: 3px 9px; border-radius: 4px; vertical-align: middle; letter-spacing: 0.05em; margin-left: 8px;">ALPHA</span></h1>
-          <p class="lead">
-            Graba tu voz con el micrófono o sube un archivo de audio. Escucha tu grabación, extrae tu timbre y frecuencia fundamental (F0), escribe lo que desees sintetizar y descarga el audio real generado en formato WAV.
+          <span class="label">(03) Clonación Vocal IA</span>
+          <h1 class="h-section">Extracción biométrica de timbre y frecuencia fundamental para generar <em>voces personalizadas</em>.</h1>
+          <p class="lead" style="text-align: left; margin: 0;">
+            Replica tu identidad sonora en pocos pasos directamente desde tu navegador:
           </p>
           <div class="hero-actions">
             <a href="#voice-clone-studio" class="btn btn-primary">Iniciar Clonación de Voz</a>
@@ -147,7 +51,7 @@
         <div class="hero-split-media">
           <div class="hero-logo-wrapper">
             <div class="hero-logo-glow" style="background: radial-gradient(circle, rgba(168, 85, 247, 0.45) 0%, rgba(0, 240, 255, 0.2) 60%, transparent 80%);"></div>
-            <img src="/img/logo.png" alt="CloudTranslator Voice Clone" class="hero-logo-big" width="290" height="290">
+            <img src="/img/voice-clone-hero.png" alt="Vork Clonación Vocal IA" class="hero-media-img" width="290" height="290">
           </div>
         </div>
       </div>
@@ -172,7 +76,7 @@
           <div style="width: 12px; height: 12px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981;" id="engine-status-dot"></div>
           <div>
             <div style="font-size: 0.86rem; font-weight: 700; color: #ffffff;">
-              Motor de IA: <span id="current-engine-label" style="color: var(--secondary);">CloudTranslator Bio-Acoustic Voice Clone v3.0</span>
+              Motor de IA: <span id="current-engine-label" style="color: var(--secondary);">Vork Bio-Acoustic Voice Clone v3.0</span>
             </div>
             <div style="font-size: 0.76rem; color: var(--text-muted);" id="current-engine-desc">
               IA Biométrica Propia • Tu voz auténtica 100% personalizada • Sin APIs de terceros • Ilimitado
@@ -290,13 +194,13 @@
             <span id="clone-char-count">85 caracteres</span>
           </div>
 
-          <textarea id="clone-input-script" class="studio-textarea" style="height: 110px;" placeholder="Escribe el mensaje que la voz clonada debe decir...">Esta es mi voz clonada mediante el motor de inteligencia artificial de CloudTranslator.</textarea>
+          <textarea id="clone-input-script" class="studio-textarea" style="height: 110px;" placeholder="Escribe el mensaje que la voz clonada debe decir...">Esta es mi voz clonada mediante el motor de inteligencia artificial de Vork.</textarea>
 
           <div class="studio-controls-row" style="grid-template-columns: 1fr 1fr; gap: 10px;">
             <div class="studio-control-col">
               <label for="clone-lang-select" style="display: block; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;">IDIOMA DE SÍNTESIS</label>
               <div class="select-wrapper">
-                <select id="clone-lang-select" class="form-select-custom studio-select" style="width: 100%; padding: 10px 32px 10px 14px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.85rem; outline: none;">
+                <select id="clone-lang-select" class="form-select-custom select-sm select-w-full">
                   <option value="es" selected>Español (es)</option>
                   <option value="en">English (en)</option>
                   <option value="fr">Français (fr)</option>
@@ -310,7 +214,7 @@
             <div class="studio-control-col">
               <label for="clone-similarity-select" style="display: block; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;">FIDELIDAD TÍMBRICA</label>
               <div class="select-wrapper">
-                <select id="clone-similarity-select" class="form-select-custom studio-select" style="width: 100%; padding: 10px 32px 10px 14px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.85rem; outline: none;">
+                <select id="clone-similarity-select" class="form-select-custom select-sm select-w-full">
                   <option value="high" selected>Alta (Formantes Exactos y F0)</option>
                   <option value="balanced">Equilibrada (Fluidez Adaptativa)</option>
                   <option value="expressive">Expresiva (Prosodia Dinámica)</option>
@@ -323,7 +227,7 @@
             <div class="studio-control-col">
               <label for="clone-format-select" style="display: block; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;">FORMATO DE SALIDA</label>
               <div class="select-wrapper">
-                <select id="clone-format-select" class="form-select-custom studio-select" style="width: 100%; padding: 10px 32px 10px 14px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.85rem; outline: none;">
+                <select id="clone-format-select" class="form-select-custom select-sm select-w-full">
                   <option value="wav" selected>WAV (PCM Estudio 24kHz)</option>
                   <option value="mp3">MP3 (320 kbps Ultra HQ)</option>
                 </select>
@@ -333,7 +237,7 @@
             <div class="studio-control-col">
               <label for="clone-pitch-select" style="display: block; font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;">AJUSTE DE TONO</label>
               <div class="select-wrapper">
-                <select id="clone-pitch-select" class="form-select-custom studio-select" style="width: 100%; padding: 10px 32px 10px 14px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.85rem; outline: none;">
+                <select id="clone-pitch-select" class="form-select-custom select-sm select-w-full">
                   <option value="1.0" selected>Tono Natural (100% fiel)</option>
                   <option value="0.95">Ligeramente más grave (-5%)</option>
                   <option value="0.90">Grave pronunciado (-10%)</option>
@@ -401,7 +305,7 @@
           <span>cURL - Síntesis de Clonación de Voz</span>
           <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.72rem;" onclick="navigator.clipboard.writeText(document.getElementById('code-clone-curl').textContent)">Copiar</button>
         </div>
-        <pre class="code-panel" id="code-clone-curl">curl -X POST https://cloudtranslator.onrender.com/api/voice-clone \
+        <pre class="code-panel" id="code-clone-curl">curl -X POST https://vork-st1k.onrender.com/api/voice-clone \
   -H "Content-Type: application/json" \
   -d '{
     "text": "Mensaje sintetizado con el timbre de voz de referencia",
@@ -412,102 +316,144 @@
       </div>
     </section>
 
-        <!-- Sección Informativa: Los 6 Pilares del Ecosistema -->
-    <section style="margin-top: 36px;">
-      <div class="section-full-title">
-        <h2>Los 6 Pilares de CloudTranslator</h2>
-        <p>Herramientas especializadas con consolas dedicadas a cada disciplina lingüística, vocal, multimedia y de mezcla musical.</p>
+        <!-- LOS 9 PILARES DE VORK -->
+    <section class="workbench-wrap" id="pilares" style="margin-top: 48px; margin-bottom: 40px;">
+      <div class="section-head">
+        <span class="label">Pilares Operacionales</span>
+        <h2 class="h-section">Los 9 Pilares de <em>Vork</em></h2>
+        <p class="lead">Herramientas especializadas con consolas dedicadas a cada disciplina lingüística, vocal, multimedia y de mezcla musical.</p>
       </div>
 
-      <div class="pillars-grid">
-        <!-- Pilar 1 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 01 // TEXT</span>
+      <div class="services-grid">
+        <!-- Pilar 01 -->
+        <article class="card tilt" style="--tone:#22b0a0">
+          <div class="card-top">
+            <span class="card-num">01</span>
+            <span class="card-tag">Lenguaje</span>
           </div>
           <h3>Traductor en la Nube</h3>
-          <p>
-            Traducción por lotes de alta velocidad (+200 idiomas). Nuestro algoritmo agrupa todos los textos del DOM y envía un único arreglo <code>texts: [...]</code> a <code>/api/translate</code>. Persistencia estricta en cookies y 0ms desde memoria RAM.
-          </p>
-          <a href="/translator" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Traductor en la Nube</a>
-        </div>
-
-        <!-- Pilar 2 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 02 // AUDIO</span>
+          <p>Traducción por lotes de alta velocidad (+200 idiomas). Extrae los nodos con TreeWalker y envía una sola petición consolidada.</p>
+          <div class="card-foot">
+            <a href="/translator"><span>Abrir Traductor</span></a>
+            <a href="/translator" class="card-arrow" aria-label="Ir al Traductor"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
           </div>
-          <h3>Texto a Voz Multilingüe (TTS)</h3>
-          <p>
-            Convierte cualquier texto en audio fluido y natural. Selecciona el idioma, elige entre 24 voces humanas neuronales, calibra velocidad y tono en tiempo real con reproductor, ondas sonoras y descarga en formato WAV o MP3.
-          </p>
-          <a href="/tts" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Estudio TTS</a>
-        </div>
+        </article>
 
-        <!-- Pilar 3 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 03 // VOICE AI</span>
+        <!-- Pilar 02 -->
+        <article class="card tilt" style="--tone:#ff8fa3">
+          <div class="card-top">
+            <span class="card-num">02</span>
+            <span class="card-tag">Acústica</span>
           </div>
-          <h3>Clonación de Voz con IA <span class="badge" style="background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4); font-size: 0.68rem; font-weight: 800; padding: 2px 7px; border-radius: 4px; vertical-align: middle; letter-spacing: 0.05em; margin-left: 6px;">ALPHA</span></h3>
-          <p>
-            Graba con micrófono o sube tu archivo de audio. Escucha tu muestra de referencia, edítala o elimínala con un clic, escribe tu guion y descarga el archivo WAV sintetizado recreando tu timbre vocal único.
-          </p>
-          <a href="/voice-clone" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Clonación de Voz</a>
-        </div>
+          <h3>Texto a Voz Neuronal</h3>
+          <p>Síntesis vocal fluida con 24 voces humanas multilingües, calibración de pitch y rate, y descarga física en WAV y MP3.</p>
+          <div class="card-foot">
+            <a href="/tts"><span>Abrir Estudio TTS</span></a>
+            <a href="/tts" class="card-arrow" aria-label="Ir a TTS"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
 
-        <!-- Pilar 4 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 04 // MEDIA CONVERTER</span>
+        <!-- Pilar 04 -->
+        <article class="card tilt" style="--tone:#ffc23d">
+          <div class="card-top">
+            <span class="card-num">04</span>
+            <span class="card-tag">Media</span>
           </div>
-          <h3>Conversor Multimedia (MP3 / MP4)</h3>
-          <p>
-            Pega enlaces de YouTube, TikTok, Instagram Reels, Facebook o Twitter y conviértelos a MP3 (hasta 320 kbps) o video MP4 sin marcas de agua. Detección automática, streaming con rango HTTP y descarga física directa.
-          </p>
-          <a href="/converter" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Conversor MP3/MP4</a>
-        </div>
+          <h3>Conversor Multimedia</h3>
+          <p>Convierte enlaces de YouTube, TikTok, Instagram Reels a MP3 hasta 320 kbps y video MP4 HD con streaming de rangos.</p>
+          <div class="card-foot">
+            <a href="/converter"><span>Abrir Conversor</span></a>
+            <a href="/converter" class="card-arrow" aria-label="Ir a Conversor"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
 
-        <!-- Pilar 5 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 05 // STEMS SPLITTER</span>
+        <!-- Pilar 05 -->
+        <article class="card tilt" style="--tone:#ff5a5f">
+          <div class="card-top">
+            <span class="card-num">05</span>
+            <span class="card-tag">Stems</span>
           </div>
-          <h3>Separador de Voz e Instrumental</h3>
-          <p>
-            Aísla la voz (Acapella) o la pista instrumental (Karaoke) a partir de cualquier enlace o archivo de audio/video. Descarga ambos stems por separado con cancelación de fase estéreo DSP y reproductor dual sincronizado.
-          </p>
-          <a href="/vocal-remover" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Separador de Voz</a>
-        </div>
+          <h3>Separador de Stems</h3>
+          <p>Aislamiento de voz (Acapella) y pista instrumental (Karaoke) mediante redes neuronales Demucs v4 y cancelación de fase.</p>
+          <div class="card-foot">
+            <a href="/vocal-remover"><span>Abrir Separador</span></a>
+            <a href="/vocal-remover" class="card-arrow" aria-label="Ir a Separador"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
 
-        <!-- Pilar 6 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 06 // CLOUDDJ</span>
+        <!-- Pilar 06 -->
+        <article class="card tilt" style="--tone:#22b0a0">
+          <div class="card-top">
+            <span class="card-num">06</span>
+            <span class="card-tag">En Vivo</span>
           </div>
-          <h3>CloudDJ: Mezclador Virtual en Vivo</h3>
-          <p>
-            Mezcla música en vivo con dos tornamesas interactivas, efecto scratch, ecualizador de 3 bandas, crossfader suave, transición automática Auto-DJ y una cola interactiva para preparar lo que va a ir después.
+          <h3>Vork DJ Mezclador</h3>
+          <p>Mezcla interactiva en vivo con doble tornamesa, simulación de scratch, crossfader ultrasuave y cola de pistas.</p>
+          <div class="card-foot">
+            <a href="/dj"><span>Abrir Consola DJ</span></a>
+            <a href="/dj" class="card-arrow" aria-label="Ir a Vork DJ"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
+
+        <!-- Pilar 07 -->
+        <article class="card tilt" style="--tone:#ff7a3d">
+          <div class="card-top">
+            <span class="card-num">07</span>
+            <span class="card-tag">Imágenes</span>
+          </div>
+          <h3>Procesador de Imágenes</h3>
+          <p>Conversión universal entre PNG, JPG, WEBP, GIF, BMP, TIFF e ICO con control de compresión y redimensionado.</p>
+          <div class="card-foot">
+            <a href="/image-converter"><span>Abrir Conversor</span></a>
+            <a href="/image-converter" class="card-arrow" aria-label="Ir a Imágenes"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
+
+        <!-- Pilar 08 -->
+        <article class="card tilt" style="--tone:#a99cff">
+          <div class="card-top">
+            <span class="card-num">08</span>
+            <span class="card-tag">Visión IA</span>
+          </div>
+          <h3>Estudio y Fondo IA</h3>
+          <p>Eliminación inteligente de siluetas con transparencia nítida y reemplazo de fondos creativos con modelos generativos.</p>
+          <div class="card-foot">
+            <a href="/background-remover"><span>Abrir Fondo IA</span></a>
+            <a href="/background-remover" class="card-arrow" aria-label="Ir a Fondo IA"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
+
+        <!-- Pilar 09 -->
+        <article class="card tilt" style="--tone:#ff7a3d">
+          <div class="card-top">
+            <span class="card-num">09</span>
+            <span class="card-tag">Terminal</span>
+          </div>
+          <h3>Vork CLI & Agentes</h3>
+          <p>Consola de comandos completa para invocar los 9 pilares desde la terminal y orquestar sesiones de agentes autónomos.</p>
+          <div class="card-foot">
+            <a href="/cli"><span>Abrir Documentación CLI</span></a>
+            <a href="/cli" class="card-arrow" aria-label="Ir a Vork CLI"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- SECCIÓN VORK CLI -->
+    <section class="workbench-wrap" style="margin-top: 48px; margin-bottom: 40px;">
+      <div class="workbench-card" style="background: linear-gradient(135deg, rgba(22, 27, 34, 0.96) 0%, rgba(13, 17, 23, 0.98) 100%); border: 1px solid rgba(255, 122, 61, 0.22); box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.5), 0 0 24px -6px rgba(255, 122, 61, 0.08); display: flex; align-items: center; justify-content: space-between; gap: 28px; flex-wrap: wrap; padding: clamp(28px, 4vw, 40px);">
+        <div style="flex: 1 1 540px; max-width: 780px;">
+          <span class="label" style="color: var(--accent); display: inline-block; margin-bottom: 8px;">(09) Terminal &amp; Automatización</span>
+          <h2 class="h-section" style="color: #ffffff; margin: 0 0 12px 0; font-size: clamp(1.8rem, 3.2vw, 2.3rem); line-height: 1.2;">Vork <em>CLI</em></h2>
+          <p style="color: #a59a8f; margin: 0; font-size: 1.02rem; line-height: 1.65;">
+            Entorno centrado en la terminal para interactuar con agentes Vork en lenguaje natural. Orquesta subagentes paralelos, atajos configurables y comandos con diagonal sin cambiar de contexto.
           </p>
-          <a href="/dj" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Abrir Consola CloudDJ</a>
+        </div>
+        <div style="flex-shrink: 0;">
+          <a href="/cli" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px; font-size: 0.95rem; font-weight: 700; box-shadow: 0 6px 20px rgba(255, 102, 0, 0.35); text-decoration: none;">
+            <span>Ir a Vork CLI</span>
+            <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
         </div>
       </div>
     </section>
@@ -517,692 +463,8 @@
   <!-- Pie de Página Horizontal Alineado -->
   <footer id="footer-placeholder" data-component="footer" data-active="voice-clone"></footer>
 
-  <script src="/js/cloud-translator.js"></script>
-  <script>
-    (function initVoiceCloneModule() {
-      // Helper de Cookies Seguras (Zero localStorage para cumplimiento estricto)
-      function getCookie(name) {
-        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-        return match ? decodeURIComponent(match[2]) : null;
-      }
-
-      function setCookie(name, value, days = 30) {
-        let expires = "";
-        if (days) {
-          const d = new Date();
-          d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
-          expires = "; expires=" + d.toUTCString();
-        }
-        document.cookie = name + "=" + encodeURIComponent(value || "") + expires + "; path=/; SameSite=Lax";
-      }
-
-      function deleteCookie(name) {
-        document.cookie = name + "=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=Lax";
-      }
-
-      // Estado de grabación y variables globales
-      let mediaRecorder = null;
-      let audioStream = null;
-      let audioChunks = [];
-      let recordInterval = null;
-      let recordStartTime = 0;
-      let audioCtx = null;
-      let analyser = null;
-      let meterAnimId = null;
-
-      let currentSampleBlob = null;
-      let currentSampleUrl = null;
-      let currentSampleBase64 = null;
-      let userAnalyzedF0 = 140;
-
-      let generatedVoiceBlob = null;
-      let generatedVoiceExt = "wav";
-
-      // Detectar el mejor MIME soportado por el navegador
-      function getBestAudioMimeType() {
-        if (typeof MediaRecorder === "undefined") return "";
-        const candidates = [
-          "audio/webm;codecs=opus",
-          "audio/webm",
-          "audio/mp4",
-          "audio/ogg;codecs=opus",
-          "audio/ogg",
-          "audio/aac",
-          "audio/wav"
-        ];
-        for (const candidate of candidates) {
-          if (typeof MediaRecorder.isTypeSupported === "function" && MediaRecorder.isTypeSupported(candidate)) {
-            return candidate;
-          }
-        }
-        return "";
-      }
-
-      function showRecordError(msg) {
-        const errorBox = document.getElementById("record-error-msg");
-        if (errorBox) {
-          errorBox.innerHTML = `<strong>Aviso de micrófono:</strong> ${msg}`;
-          errorBox.style.display = "block";
-        }
-      }
-
-      function hideRecordError() {
-        const errorBox = document.getElementById("record-error-msg");
-        if (errorBox) errorBox.style.display = "none";
-      }
-
-      // Detención y limpieza de recursos de grabación
-      function stopMediaTracks() {
-        if (meterAnimId) {
-          cancelAnimationFrame(meterAnimId);
-          meterAnimId = null;
-        }
-        if (audioCtx && audioCtx.state !== "closed") {
-          try { audioCtx.close(); } catch (e) {}
-          audioCtx = null;
-        }
-        if (audioStream) {
-          try {
-            audioStream.getTracks().forEach(track => track.stop());
-          } catch (e) {}
-          audioStream = null;
-        }
-        const meterContainer = document.getElementById("mic-meter-container");
-        if (meterContainer) meterContainer.style.display = "none";
-        const meterBar = document.getElementById("mic-meter-bar");
-        if (meterBar) meterBar.style.width = "0%";
-      }
-
-      // FUNCIÓN GLOBAL: INICIAR GRABACIÓN
-      window.startVoiceRecording = async function () {
-        hideRecordError();
-        const btnStart = document.getElementById("btn-start-record");
-        const btnStop = document.getElementById("btn-stop-record");
-        const timer = document.getElementById("record-timer");
-        const badge = document.getElementById("record-status-badge");
-        const indicator = document.getElementById("mic-indicator");
-        const meterContainer = document.getElementById("mic-meter-container");
-        const meterBar = document.getElementById("mic-meter-bar");
-
-        // 1. Validar soporte de getUserMedia
-        const getUserMediaFn = (navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
-          ? (c) => navigator.mediaDevices.getUserMedia(c)
-          : (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
-
-        if (!getUserMediaFn) {
-          showRecordError("Tu navegador no soporta captura de audio directa o la página necesita ejecutarse bajo HTTPS o localhost. Por favor usa el botón de <strong>Subir Archivo de Audio</strong>.");
-          return;
-        }
-
-        if (btnStart) {
-          btnStart.disabled = true;
-          btnStart.innerHTML = `<span class="spinner" style="display:inline-block; margin-right:6px;"></span> Solicitando micrófono...`;
-        }
-
-        try {
-          // Solicitar acceso al micrófono
-          const streamPromise = (navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
-            ? navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } })
-            : new Promise((res, rej) => getUserMediaFn.call(navigator, { audio: true }, res, rej));
-
-          audioStream = await streamPromise;
-
-          // 2. Iniciar MediaRecorder con compresión ligera (32 kbps) para alta velocidad en redes lentas
-          const mime = getBestAudioMimeType();
-          const recorderOptions = mime ? { mimeType: mime, audioBitsPerSecond: 32000 } : { audioBitsPerSecond: 32000 };
-          audioChunks = [];
-          mediaRecorder = new MediaRecorder(audioStream, recorderOptions);
-
-          mediaRecorder.ondataavailable = (e) => {
-            if (e.data && e.data.size > 0) {
-              audioChunks.push(e.data);
-            }
-          };
-
-          mediaRecorder.onstop = () => {
-            stopMediaTracks();
-            clearInterval(recordInterval);
-
-            if (btnStart) {
-              btnStart.disabled = false;
-              btnStart.style.display = "inline-flex";
-              btnStart.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg> Grabar de Nuevo`;
-            }
-            if (btnStop) btnStop.style.display = "none";
-            if (badge) badge.style.display = "none";
-            if (indicator) {
-              indicator.style.background = "rgba(168, 85, 247, 0.15)";
-              indicator.style.boxShadow = "none";
-            }
-
-            if (audioChunks.length === 0) {
-              showRecordError("No se capturaron datos de audio. Intenta hablar más cerca del micrófono.");
-              return;
-            }
-
-            const recordedMime = mediaRecorder.mimeType || mime || "audio/webm";
-            const recordedBlob = new Blob(audioChunks, { type: recordedMime });
-            const ext = recordedMime.includes("mp4") ? "m4a" : (recordedMime.includes("ogg") ? "ogg" : "webm");
-            setSampleAudio(recordedBlob, `grabacion-voz.${ext}`);
-          };
-
-          // Iniciar captura continua de trozos cada 250ms
-          mediaRecorder.start(250);
-
-          // 3. Medidor visual de decibelios en tiempo real
-          try {
-            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-            if (AudioContextClass) {
-              audioCtx = new AudioContextClass();
-              if (audioCtx.state === "suspended") {
-                await audioCtx.resume();
-              }
-              const source = audioCtx.createMediaStreamSource(audioStream);
-              analyser = audioCtx.createAnalyser();
-              analyser.fftSize = 256;
-              source.connect(analyser);
-
-              if (meterContainer) meterContainer.style.display = "block";
-              const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-              const updateMeter = () => {
-                if (!analyser) return;
-                analyser.getByteFrequencyData(dataArray);
-                let sum = 0;
-                for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-                const avg = sum / dataArray.length;
-                const percent = Math.min(Math.round((avg / 128) * 100), 100);
-                if (meterBar) meterBar.style.width = `${percent}%`;
-                if (indicator) {
-                  indicator.style.transform = `scale(${1 + (percent / 400)})`;
-                }
-                meterAnimId = requestAnimationFrame(updateMeter);
-              };
-              updateMeter();
-            }
-          } catch (audioErr) {
-            console.warn("Visualizador de audio no disponible:", audioErr);
-          }
-
-          // 4. Cambiar UI a modo grabando
-          if (btnStart) btnStart.style.display = "none";
-          if (btnStop) btnStop.style.display = "inline-flex";
-          if (badge) badge.style.display = "inline-block";
-          if (indicator) {
-            indicator.style.background = "rgba(239, 68, 68, 0.4)";
-            indicator.style.boxShadow = "0 0 20px rgba(239, 68, 68, 0.7)";
-          }
-
-          // Temporizador de grabación
-          recordStartTime = Date.now();
-          if (timer) timer.textContent = "00:00";
-          recordInterval = setInterval(() => {
-            const elapsed = Math.floor((Date.now() - recordStartTime) / 1000);
-            const m = String(Math.floor(elapsed / 60)).padStart(2, "0");
-            const s = String(elapsed % 60).padStart(2, "0");
-            if (timer) timer.textContent = `${m}:${s}`;
-
-            // Auto-stop de seguridad a los 30 segundos
-            if (elapsed >= 30) {
-              window.stopVoiceRecording();
-            }
-          }, 250);
-
-        } catch (err) {
-          console.error("Error al acceder al micrófono:", err);
-          stopMediaTracks();
-          if (btnStart) {
-            btnStart.disabled = false;
-            btnStart.style.display = "inline-flex";
-            btnStart.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg> Iniciar Grabación`;
-          }
-          if (btnStop) btnStop.style.display = "none";
-          if (badge) badge.style.display = "none";
-
-          let friendlyMsg = err.message;
-          if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
-            friendlyMsg = "Permiso de micrófono denegado. Haz clic en el icono del candado en la barra de tu navegador y selecciona 'Permitir micrófono', luego reintenta.";
-          } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
-            friendlyMsg = "No se encontró ningún micrófono conectado en tu dispositivo.";
-          } else if (err.name === "NotReadableError" || err.name === "TrackStartError") {
-            friendlyMsg = "El micrófono está siendo ocupado por otra aplicación.";
-          } else if (err.name === "SecurityError") {
-            friendlyMsg = "Tu navegador requiere una conexión segura HTTPS para capturar audio. Si estás en local o red, usa localhost o sube tu archivo abajo.";
-          }
-          showRecordError(friendlyMsg);
-        }
-      };
-
-      // FUNCIÓN GLOBAL: DETENER GRABACIÓN
-      window.stopVoiceRecording = function () {
-        if (mediaRecorder && mediaRecorder.state !== "inactive") {
-          try {
-            mediaRecorder.stop();
-          } catch (e) {
-            console.warn("Error al detener recorder:", e);
-          }
-        } else {
-          stopMediaTracks();
-        }
-      };
-
-      // Gestión de estado de bloqueo e inactividad de la interfaz
-      function setAnalyzingState(isAnalyzing) {
-        const btnSynthesize = document.getElementById("btn-synthesize-clone");
-        if (!btnSynthesize) return;
-        if (isAnalyzing) {
-          btnSynthesize.disabled = true;
-          btnSynthesize.style.opacity = "0.7";
-          btnSynthesize.style.cursor = "not-allowed";
-          btnSynthesize.innerHTML = `<span class="spinner" style="display:inline-block; margin-right:8px;"></span> Analizando huella vocal...`;
-        } else {
-          btnSynthesize.disabled = false;
-          btnSynthesize.style.opacity = "1";
-          btnSynthesize.style.cursor = "pointer";
-          btnSynthesize.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Sintetizar Voz Clonada`;
-        }
-      }
-
-      function setFormLockedState(locked) {
-        const controls = [
-          document.getElementById("btn-record"),
-          document.getElementById("btn-select-file"),
-          document.getElementById("input-audio-file"),
-          document.getElementById("btn-delete-sample"),
-          document.getElementById("clone-input-script"),
-          document.getElementById("clone-lang-select"),
-          document.getElementById("clone-similarity-select"),
-          document.getElementById("clone-format-select"),
-          document.getElementById("clone-pitch-select"),
-          document.getElementById("btn-synthesize-clone")
-        ];
-
-        const dropzone = document.getElementById("audio-dropzone");
-        if (dropzone) {
-          dropzone.style.pointerEvents = locked ? "none" : "auto";
-          dropzone.style.opacity = locked ? "0.6" : "1";
-        }
-
-        controls.forEach(ctrl => {
-          if (ctrl) {
-            ctrl.disabled = locked;
-            ctrl.style.pointerEvents = locked ? "none" : "auto";
-            ctrl.style.opacity = locked ? "0.65" : "1";
-            ctrl.style.cursor = locked ? "not-allowed" : "pointer";
-          }
-        });
-
-        const textarea = document.getElementById("clone-input-script");
-        if (textarea) {
-          textarea.readOnly = locked;
-          textarea.style.cursor = locked ? "not-allowed" : "text";
-        }
-      }
-
-      // Análisis acústico en segundo plano
-      async function analyzeVoiceSampleOnBackend(base64Data) {
-        const userVoiceTag = document.getElementById("user-voice-tag");
-        const userVoiceF0 = document.getElementById("user-voice-f0");
-        const userVoiceRange = document.getElementById("user-voice-range");
-        const userVoiceDuration = document.getElementById("user-voice-duration");
-        const userVoiceFidelity = document.getElementById("user-voice-fidelity");
-
-        if (userVoiceTag) {
-          userVoiceTag.textContent = "ANALIZANDO HUELLA...";
-          userVoiceTag.style.color = "var(--primary)";
-        }
-        setAnalyzingState(true);
-
-        try {
-          const resp = await fetch("/api/voice-clone/analyze", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ audioSampleBase64: base64Data })
-          });
-          const res = await resp.json();
-          if (res.status === "success" && res.analysis) {
-            userAnalyzedF0 = res.analysis.fundamentalFrequencyHz;
-            if (userVoiceF0) userVoiceF0.textContent = `${res.analysis.fundamentalFrequencyHz} Hz`;
-            if (userVoiceRange) userVoiceRange.textContent = `${res.analysis.detectedGender} • ${res.analysis.voiceClassification}`;
-            if (userVoiceDuration) userVoiceDuration.textContent = `${res.analysis.durationSeconds} s`;
-            if (userVoiceTag) {
-              userVoiceTag.textContent = "HUELLA EXTRAÍDA";
-              userVoiceTag.style.color = "#10b981";
-            }
-            if (userVoiceFidelity) {
-              if (res.analysis.formants) {
-                userVoiceFidelity.textContent = `F1: ${res.analysis.formants.f1}Hz • F2: ${res.analysis.formants.f2}Hz • F3: ${res.analysis.formants.f3}Hz`;
-              } else {
-                userVoiceFidelity.textContent = "F0 y formantes 100% sincronizados";
-              }
-              userVoiceFidelity.style.color = "#10b981";
-            }
-          }
-        } catch (e) {
-          console.warn("Análisis acústico en background:", e);
-          if (userVoiceTag) userVoiceTag.textContent = "MUESTRA CARGADA";
-        } finally {
-          setAnalyzingState(false);
-        }
-      }
-
-      function setSampleAudio(blob, filename = "muestra-voz.wav") {
-        const audioSamplePlayer = document.getElementById("audio-sample-player");
-        const samplePreviewContainer = document.getElementById("sample-preview-container");
-        const cloneSampleStatus = document.getElementById("clone-sample-status");
-
-        if (currentSampleUrl) URL.revokeObjectURL(currentSampleUrl);
-        currentSampleBlob = blob;
-        currentSampleUrl = URL.createObjectURL(blob);
-
-        if (audioSamplePlayer) {
-          audioSamplePlayer.src = currentSampleUrl;
-          audioSamplePlayer.load();
-        }
-        if (samplePreviewContainer) samplePreviewContainer.style.display = "block";
-        if (cloneSampleStatus) {
-          cloneSampleStatus.textContent = `Muestra lista (${(blob.size / 1024).toFixed(1)} KB)`;
-          cloneSampleStatus.style.color = "var(--secondary)";
-        }
-
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          currentSampleBase64 = reader.result;
-          analyzeVoiceSampleOnBackend(currentSampleBase64);
-        };
-        reader.readAsDataURL(blob);
-      }
-
-      function clearCurrentSample() {
-        const audioSamplePlayer = document.getElementById("audio-sample-player");
-        const samplePreviewContainer = document.getElementById("sample-preview-container");
-        const cloneSampleStatus = document.getElementById("clone-sample-status");
-
-        if (currentSampleUrl) {
-          URL.revokeObjectURL(currentSampleUrl);
-          currentSampleUrl = null;
-        }
-        currentSampleBlob = null;
-        currentSampleBase64 = null;
-        if (audioSamplePlayer) {
-          audioSamplePlayer.src = "";
-          audioSamplePlayer.load();
-        }
-        if (samplePreviewContainer) samplePreviewContainer.style.display = "none";
-        if (cloneSampleStatus) {
-          cloneSampleStatus.textContent = "Sin muestra cargada";
-          cloneSampleStatus.style.color = "var(--text-muted)";
-        }
-      }
-
-      // Inicialización de la consola y bindings
-      function bindEvents() {
-        const btnDeleteSample = document.getElementById("btn-delete-sample");
-        if (btnDeleteSample) btnDeleteSample.onclick = clearCurrentSample;
-
-        // Subida de archivos
-        const dropzone = document.getElementById("audio-dropzone");
-        const fileInput = document.getElementById("input-audio-file");
-        const btnSelectFile = document.getElementById("btn-select-file");
-
-        if (btnSelectFile && fileInput) {
-          btnSelectFile.onclick = (e) => {
-            e.stopPropagation();
-            fileInput.click();
-          };
-        }
-
-        if (dropzone && fileInput) {
-          dropzone.onclick = () => fileInput.click();
-
-          ["dragenter", "dragover"].forEach(evtName => {
-            dropzone.addEventListener(evtName, (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              dropzone.style.borderColor = "var(--primary)";
-              dropzone.style.background = "rgba(0, 240, 255, 0.08)";
-            });
-          });
-
-          ["dragleave", "drop"].forEach(evtName => {
-            dropzone.addEventListener(evtName, (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              dropzone.style.borderColor = "rgba(168, 85, 247, 0.4)";
-              dropzone.style.background = "rgba(8, 10, 18, 0.6)";
-            });
-          });
-
-          dropzone.addEventListener("drop", (e) => {
-            const dt = e.dataTransfer;
-            if (dt && dt.files && dt.files.length > 0) {
-              const file = dt.files[0];
-              if (file.type.startsWith("audio/") || /\.(wav|mp3|ogg|m4a|aac|flac)$/i.test(file.name)) {
-                setSampleAudio(file, file.name);
-              } else {
-                alert("Por favor arrastra un archivo de audio válido (.mp3, .wav, .ogg, .m4a).");
-              }
-            }
-          });
-
-          fileInput.onchange = (e) => {
-            if (e.target.files && e.target.files.length > 0) {
-              setSampleAudio(e.target.files[0], e.target.files[0].name);
-            }
-          };
-        }
-
-        // Contador de caracteres del guion
-        const cloneInputScript = document.getElementById("clone-input-script");
-        const cloneCharCount = document.getElementById("clone-char-count");
-        if (cloneInputScript && cloneCharCount) {
-          cloneInputScript.oninput = () => {
-            cloneCharCount.textContent = `${cloneInputScript.value.length} caracteres`;
-          };
-        }
-
-        // Síntesis de voz clonada con Motor de IA Propio de CloudTranslator
-        const btnSynthesizeClone = document.getElementById("btn-synthesize-clone");
-        if (btnSynthesizeClone) {
-          btnSynthesizeClone.onclick = async () => {
-            const text = (cloneInputScript ? cloneInputScript.value : "").trim();
-            if (!text) {
-              alert("Por favor escribe el guion o texto que deseas sintetizar.");
-              return;
-            }
-
-            if (!currentSampleBase64) {
-              alert("Por favor graba o sube primero tu muestra de voz de referencia.");
-              return;
-            }
-
-            const cloneLangSelect = document.getElementById("clone-lang-select");
-            const cloneFormatSelect = document.getElementById("clone-format-select");
-            const clonePitchSelect = document.getElementById("clone-pitch-select");
-            const cloneSimilarity = document.getElementById("clone-similarity-select");
-
-            const selectedLang = cloneLangSelect ? cloneLangSelect.value : "es";
-            const selectedFormat = cloneFormatSelect ? cloneFormatSelect.value : "wav";
-            const selectedPitch = clonePitchSelect ? Number(clonePitchSelect.value) : 1.0;
-            const selectedSimilarity = cloneSimilarity ? cloneSimilarity.value : "high";
-
-            setFormLockedState(true);
-            btnSynthesizeClone.innerHTML = `<span class="spinner" style="display:inline-block; margin-right:8px;"></span> Clonando tu voz con IA biométrica propia...`;
-
-            try {
-              const resp = await fetch("/api/voice-clone", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  text,
-                  lang: selectedLang,
-                  format: selectedFormat,
-                  pitch: selectedPitch,
-                  similarity: selectedSimilarity,
-                  audioSampleBase64: currentSampleBase64
-                })
-              });
-
-              if (!resp.ok) {
-                const errJson = await resp.json().catch(() => ({}));
-                throw new Error(errJson.error || `Error del servidor HTTP ${resp.status}`);
-              }
-
-              const data = await resp.json();
-
-              if (data.audioBase64 || data.streamUrl) {
-                let resultUrl = data.streamUrl;
-                window.lastCloneStreamUrl = data.streamUrl || null;
-                window.lastCloneDownloadUrl = data.downloadUrl || data.streamUrl || null;
-                if (data.audioBase64) {
-                  const base64Data = data.audioBase64.includes(",") ? data.audioBase64.split(",")[1] : data.audioBase64;
-                  const byteCharacters = atob(base64Data);
-                  const byteNumbers = new Array(byteCharacters.length);
-                  for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                  }
-                  const byteArray = new Uint8Array(byteNumbers);
-                  const mimeType = data.mimeType || (data.format === "mp3" ? "audio/mpeg" : "audio/wav");
-                  generatedVoiceBlob = new Blob([byteArray], { type: mimeType });
-                  generatedVoiceExt = data.format || (mimeType.includes("wav") ? "wav" : "mp3");
-                  if (!resultUrl) resultUrl = URL.createObjectURL(generatedVoiceBlob);
-                }
-
-                const cloneResultAudio = document.getElementById("clone-result-audio");
-                const cloneResultBox = document.getElementById("clone-result-box");
-                const cloneFilesizeBadge = document.getElementById("clone-filesize-badge");
-                const resF0 = document.getElementById("res-f0");
-                const resProfile = document.getElementById("res-profile");
-                const resSimilarity = document.getElementById("res-similarity");
-
-                if (cloneResultAudio) {
-                  cloneResultAudio.src = resultUrl;
-                  cloneResultAudio.load();
-                  cloneResultAudio.play().catch(() => {});
-                }
-
-                if (cloneFilesizeBadge) {
-                  const formatLabel = (data.format || generatedVoiceExt || "WAV").toUpperCase();
-                  cloneFilesizeBadge.textContent = `100% TU VOZ REAL • ${formatLabel}`;
-                  cloneFilesizeBadge.style.background = "rgba(16, 185, 129, 0.2)";
-                  cloneFilesizeBadge.style.borderColor = "#10b981";
-                  cloneFilesizeBadge.style.color = "#10b981";
-                }
-
-                const resModel = document.getElementById("res-model");
-                if (resModel) {
-                  resModel.textContent = data.model || "CloudTranslator Bio-Acoustic Neural Voice Clone (Identidad Vocal del Usuario)";
-                  resModel.style.color = "#10b981";
-                }
-
-                if (data.acousticAnalysis) {
-                  if (resF0) resF0.textContent = data.acousticAnalysis.userFundamentalFrequency || `${userAnalyzedF0} Hz`;
-                  if (resProfile) resProfile.textContent = data.acousticAnalysis.voiceClassification || "Personalizada";
-                  if (resSimilarity) resSimilarity.textContent = data.acousticAnalysis.timbreMatchScore || "100% (Identidad Vocal Auténtica)";
-                }
-
-                if (cloneResultBox) cloneResultBox.style.display = "block";
-
-                btnSynthesizeClone.innerHTML = `¡Voz Clonada con Éxito!`;
-                setTimeout(() => {
-                  setFormLockedState(false);
-                  btnSynthesizeClone.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Sintetizar Voz Clonada`;
-                }, 2000);
-              } else {
-                throw new Error("No se recibió el buffer de audio sintetizado");
-              }
-            } catch (e) {
-              alert("Error en la clonación de voz: " + e.message);
-              setFormLockedState(false);
-              btnSynthesizeClone.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Sintetizar Voz Clonada`;
-        }
-
-        // Acciones: Descarga física y Copiar Enlace Directo
-        const btnDownloadClone = document.getElementById("btn-download-clone");
-        if (btnDownloadClone) {
-          btnDownloadClone.onclick = () => {
-            if (!generatedVoiceBlob) {
-              alert("Primero sintetiza una voz para poder descargar el archivo.");
-              return;
-            }
-
-            const ext = generatedVoiceExt || "wav";
-            const downloadUrl = URL.createObjectURL(generatedVoiceBlob);
-            const a = document.createElement("a");
-            a.href = downloadUrl;
-            a.download = `voz-clonada-cloudtranslator-${Date.now()}.${ext}`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            setTimeout(() => URL.revokeObjectURL(downloadUrl), 2000);
-
-            const origHtml = btnDownloadClone.innerHTML;
-            btnDownloadClone.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ¡Descargado!`;
-            setTimeout(() => {
-              btnDownloadClone.innerHTML = origHtml;
-            }, 2000);
-          };
-        }
-
-        const btnCopyStreamClone = document.getElementById("btn-copy-stream-clone");
-        if (btnCopyStreamClone) {
-          btnCopyStreamClone.onclick = () => {
-            const targetUrl = window.lastCloneDownloadUrl || window.lastCloneStreamUrl;
-            if (!targetUrl) {
-              alert("Primero sintetiza una voz para poder copiar su enlace directo.");
-              return;
-            }
-
-            const downloadFull = targetUrl.startsWith("http") ? targetUrl : window.location.origin + targetUrl;
-            navigator.clipboard.writeText(downloadFull);
-            const origHtml = btnCopyStreamClone.innerHTML;
-            const origBg = btnCopyStreamClone.style.background;
-            const origColor = btnCopyStreamClone.style.color;
-            const origBorder = btnCopyStreamClone.style.borderColor;
-            btnCopyStreamClone.innerHTML = `<svg class="icon" viewBox="0 0 24 24" style="stroke: #000; width: 16px; height: 16px;"><polyline points="20 6 9 17 4 12"/></svg> <span>¡Enlace Copiado!</span>`;
-            btnCopyStreamClone.style.background = "var(--primary)";
-            btnCopyStreamClone.style.color = "#000000";
-            btnCopyStreamClone.style.borderColor = "var(--primary)";
-            btnCopyStreamClone.style.fontWeight = "700";
-            setTimeout(() => {
-              btnCopyStreamClone.innerHTML = origHtml;
-              btnCopyStreamClone.style.background = origBg;
-              btnCopyStreamClone.style.color = origColor;
-              btnCopyStreamClone.style.borderColor = origBorder;
-              btnCopyStreamClone.style.fontWeight = "";
-            }, 2000);
-          };
-        }
-
-        // Barra de traducción superior
-        try {
-          const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";
-          if (window.CloudTranslator) {
-            window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
-            const btnEn = document.getElementById("btn-english");
-            if (btnEn) btnEn.onclick = () => window.translator.translateToEnglish();
-            const btnRest = document.getElementById("btn-restore");
-            if (btnRest) btnRest.onclick = () => window.translator.restoreOriginal();
-            const selLang = document.getElementById("select-lang");
-            if (selLang) selLang.onchange = (e) => window.translator.translatePage(e.target.value);
-            const btnCustom = document.getElementById("btn-translate-custom");
-            if (btnCustom) {
-              btnCustom.onclick = () => {
-                const val = document.getElementById("input-custom-lang").value.trim().toLowerCase();
-                if (val) window.translator.translatePage(val);
-              };
-            }
-          }
-        } catch (e) {}
-      }
-
-      // Ejecutar inmediatamente o esperar DOM listo
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", bindEvents);
-      } else {
-        bindEvents();
-      }
-    })();
-  </script>
+  <script src="/js/vork.js"></script>
+  <script src="/js/vork.js"></script>
+    <script src="/js/modules/voice-clone.js" defer></script>
 </body>
 </html>

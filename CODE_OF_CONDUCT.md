@@ -1,9 +1,9 @@
-# Código de Conducta de Contribución - CloudTranslator
+# Código de Conducta de Contribución - Vork
 *(Contributor Covenant Code of Conduct v2.1)*
 
 ## Nuestro Compromiso
 
-Nosotros, como miembros, contribuyentes y líderes del proyecto **CloudTranslator** — ecosistema unificado para traducción en la nube por lotes, texto a voz (TTS), clonación de voz por IA y conversor universal multimedia MP3/MP4 —, nos comprometemos a hacer que la participación en nuestra comunidad y el uso ético de nuestras herramientas sea una experiencia libre de acoso para todas las personas, independientemente de su edad, tamaño corporal, discapacidad visible o invisible, origen étnico, características sexuales, identidad y expresión de género, nivel de experiencia, educación, nivel socioeconómico, nacionalidad, apariencia personal, raza, casta, color, religión o identidad y orientación sexual.
+Nosotros, como miembros, contribuyentes y líderes del proyecto **Vork** — ecosistema unificado para traducción en la nube por lotes, texto a voz (TTS), clonación de voz por IA y conversor universal multimedia MP3/MP4 —, nos comprometemos a hacer que la participación en nuestra comunidad y el uso ético de nuestras herramientas sea una experiencia libre de acoso para todas las personas, independientemente de su edad, tamaño corporal, discapacidad visible o invisible, origen étnico, características sexuales, identidad y expresión de género, nivel de experiencia, educación, nivel socioeconómico, nacionalidad, apariencia personal, raza, casta, color, religión o identidad y orientación sexual.
 
 Nos comprometemos a actuar e interactuar de formas que contribuyan a una comunidad abierta, acogedora, diversa, inclusiva y saludable.
 
@@ -47,7 +47,7 @@ Cualquier conducta abusiva, de acoso o inaceptable puede ser reportada de forma 
 
 * **Mantenedor Principal:** Miguel Angel Carlos Rojas
 * **Correo Electrónico:** [isakiangel6@gmail.com](mailto:isakiangel6@gmail.com)
-* **Repositorio Oficial:** [https://github.com/MiguelCarlosRojas/CloudTranslator](https://github.com/MiguelCarlosRojas/CloudTranslator)
-* **Servicio Web:** [https://cloudtranslator.onrender.com](https://cloudtranslator.onrender.com)
+* **Repositorio Oficial:** [https://github.com/MiguelCarlosRojas/Vork](https://github.com/MiguelCarlosRojas/Vork)
+* **Servicio Web:** [https://vork-st1k.onrender.com](https://vork-st1k.onrender.com)
 
 Todas las quejas serán revisadas e investigadas de manera justa, oportuna y bajo estricta confidencialidad.

@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Estudio de Texto a Voz (TTS Multilingüe) de CloudTranslator | Convierte texto en locución fluida y natural, selecciona voces humanas, calibra tono, velocidad y visualiza ondas sonoras.">
-  <meta property="og:title" content="Texto a Voz (TTS Studio) - CloudTranslator">
+  <meta name="description" content="Estudio de Texto a Voz (TTS Multilingüe) de Vork | Convierte texto en locución fluida y natural, selecciona voces humanas, calibra tono, velocidad y visualiza ondas sonoras.">
+  <meta property="og:title" content="Texto a Voz (TTS Studio) - Vork">
   <meta property="og:description" content="Síntesis vocal en tiempo real con ecualizador animado y API REST de audio PCM.">
-  <title>Texto a Voz (TTS) - CloudTranslator</title>
+  <title>Texto a Voz (TTS) - Vork</title>
   <link rel="icon" type="image/png" sizes="192x192" href="/img/logo.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/img/logo.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/img/logo.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/img/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <script>
     (function(){try{var m=document.cookie.match(/(?:^|; )cloud_translator_lang=([^;]*)/);var l=m?decodeURIComponent(m[1]):null;if(l&&l!=="original"&&l!=="es"){document.documentElement.classList.add("ct-pending");setTimeout(function(){document.documentElement.classList.remove("ct-pending");},800);}}catch(e){}})();
@@ -20,111 +23,12 @@
 </head>
 <body>
 
+  <!-- Textura de grano sutil Huella -->
+  <div class="grain" aria-hidden="true"></div>
+
+
   <!-- Barra Superior -->
-  <header class="top-nav">
-    <div class="nav-container">
-      <a href="/" class="brand-wrapper">
-        <span class="brand-logo">
-          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="38" height="38">
-          CloudTranslator
-        </span>
-        <span class="brand-badge">v2.5.0</span>
-      </a>
-
-      <nav class="desktop-nav">
-        <ul class="main-menu">
-          <li><a href="/">Inicio</a></li>
-          <li><a href="/docs">Docs</a></li>
-          <li><a href="/support">Soporte</a></li>
-          <li><a href="/status">Estado</a></li>
-        </ul>
-      </nav>
-
-      <!-- Barra de Herramientas de Traducción Activa -->
-      <div class="toolbar-controls no-translate" data-no-translate>
-        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
-          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
-          English
-        </button>
-
-        <div class="selector-box">
-          <div class="selector-dropdown">
-            <select id="select-lang" aria-label="Seleccionar idioma">
-              <option value="en">English (en)</option>
-              <option value="es">Español (es)</option>
-              <option value="fr">Français (fr)</option>
-              <option value="de">Deutsch (de)</option>
-              <option value="it">Italiano (it)</option>
-              <option value="pt">Portugués (pt)</option>
-              <option value="ja">日本語 (ja)</option>
-              <option value="zh-CN">中文 (zh-CN)</option>
-              <option value="ru">Русский (ru)</option>
-            </select>
-          </div>
-          <div class="custom-lang-group">
-            <input type="text" id="input-custom-lang" placeholder="ISO" maxlength="5" title="Código ISO personalizado">
-            <button id="btn-translate-custom" class="btn btn-primary" title="Traducir">GO</button>
-          </div>
-        </div>
-
-        <button id="btn-restore" class="btn btn-outline" title="Restaurar idioma original">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
-          Original
-        </button>
-
-        <div id="status-pill" class="status-pill" title="Estado del microservicio">
-          <span class="spinner"></span>
-          <span id="status-text">LISTO</span>
-        </div>
-      </div>
-
-      <!-- Botón Hamburguesa Móvil -->
-      <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Abrir Menú de Navegación">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
-    </div>
-
-    <!-- Backdrop para Barra Lateral -->
-    <div id="drawer-backdrop"></div>
-
-    <!-- Barra de Navegación Lateral Móvil -->
-    <aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
-      <div class="drawer-header">
-        <a href="/" class="drawer-brand">
-          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
-          <span>CloudTranslator</span>
-        </a>
-        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </div>
-
-      <div class="drawer-body">
-        <div class="drawer-section">
-          <span class="drawer-title">NAVEGACIÓN DEL PORTAL</span>
-          <ul class="drawer-menu">
-            <li><a href="/"><svg class="icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Inicio</a></li>
-            <li><a href="/docs"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Documentación</a></li>
-            <li><a href="/support"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Soporte</a></li>
-            <li><a href="/status"><svg class="icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Estado Servidor</a></li>
-          </ul>
-        </div>
-
-        <div class="drawer-section">
-          <span class="drawer-title">LOS 6 PILARES</span>
-          <ul class="drawer-menu">
-            <li><a href="/translator"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traductor en la Nube</a></li>
-            <li><a href="/tts" class="active"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS)</a></li>
-            <li><a href="/voice-clone"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz (IA)</a></li>
-            <li><a href="/converter"><svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="8" cy="12" r="2"/></svg> Conversor Multimedia (MP3 / MP4)</a></li>
-            <li><a href="/vocal-remover"><svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Separador de Voz (Pilar 05)</a></li>
-            <li><a href="/dj"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg> CloudDJ Mezclador (Pilar 06)</a></li>
-            <li><a href="/donate"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
-          </ul>
-        </div>
-      </div>
-    </aside>
-  </header>
+  <header id="header-placeholder" data-component="header" data-active="tts"></header>
 
   <main class="full-container">
 
@@ -132,10 +36,10 @@
     <section class="hero-full">
       <div class="hero-split">
         <div class="hero-split-content">
-          <span class="hero-tag-glow">PILAR 02 // SÍNTESIS VOCAL (TTS)</span>
-          <h1 style="font-size: clamp(2rem, 4.4vw, 3rem); font-weight: 800;">Estudio de Texto a Voz (TTS Multilingüe)</h1>
-          <p class="lead">
-            Convierte cualquier texto o guion en audio natural de alta fidelidad. Personaliza el idioma, selecciona el timbre de voz, ajusta velocidad y tono en tiempo real con reproductor y ecualizador visual.
+          <span class="label">(02) Síntesis Vocal (TTS)</span>
+          <h1 class="h-section">Generación de locuciones humanas y modulación acústica de lectura con <em>alta fidelidad</em>.</h1>
+          <p class="lead" style="text-align: left; margin: 0;">
+            Produce archivos de audio claros y naturales directamente desde tu navegador:
           </p>
           <div class="hero-actions">
             <a href="#tts-studio" class="btn btn-primary">Iniciar Síntesis de Voz</a>
@@ -147,7 +51,7 @@
         <div class="hero-split-media">
           <div class="hero-logo-wrapper">
             <div class="hero-logo-glow" style="background: radial-gradient(circle, rgba(0, 240, 255, 0.4) 0%, rgba(168, 85, 247, 0.25) 60%, transparent 80%);"></div>
-            <img src="/img/logo.png" alt="CloudTranslator TTS" class="hero-logo-big" width="290" height="290">
+            <img src="/img/tts-hero.png" alt="Vork Síntesis Vocal TTS" class="hero-media-img" width="290" height="290">
           </div>
         </div>
       </div>
@@ -163,7 +67,7 @@
           </h2>
           <p>Escribe tu mensaje, elige la voz deseada y haz clic en Reproducir para escuchar al instante.</p>
         </div>
-        <span class="pillar-tag" style="background: rgba(0, 240, 255, 0.1); color: var(--primary); border-color: rgba(0, 240, 255, 0.3);">MOTOR ACTIVO // WEB SPEECH + NEURAL PCM</span>
+        <span class="pillar-tag" style="background: rgba(255, 122, 61, 0.12); color: var(--primary); border-color: rgba(255, 122, 61, 0.3);">MOTOR ACTIVO // WEB SPEECH + NEURAL PCM</span>
       </div>
 
       <div class="studio-grid">
@@ -173,13 +77,13 @@
             <span>TEXTO A SINTETIZAR</span>
             <span id="tts-char-count">108 caracteres</span>
           </div>
-          <textarea id="tts-input-text" class="studio-textarea" placeholder="Escribe aquí el texto que deseas escuchar...">¡Hola! Bienvenido a CloudTranslator. Ahora puedes generar audio natural en varios idiomas con solo escribir tu texto.</textarea>
+          <textarea id="tts-input-text" class="studio-textarea" placeholder="Escribe aquí el texto que deseas escuchar...">¡Hola! Bienvenido a Vork. Ahora puedes generar audio natural en varios idiomas con solo escribir tu texto.</textarea>
 
           <div class="studio-controls-row">
             <div class="studio-control-col">
               <label for="tts-lang-select" style="display: block; font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;">IDIOMA</label>
               <div class="select-wrapper">
-                <select id="tts-lang-select" class="form-select-custom studio-select" style="width: 100%; padding: 12px 38px 12px 16px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.9rem; outline: none;">
+                <select id="tts-lang-select" class="form-select-custom select-md select-w-full">
                   <option value="es-ES">Español (España / América)</option>
                   <option value="en-US">English (United States)</option>
                   <option value="en-GB">English (United Kingdom)</option>
@@ -199,7 +103,7 @@
             <div class="studio-control-col">
               <label for="tts-voice-select" style="display: block; font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;">VOZ</label>
               <div class="select-wrapper">
-                <select id="tts-voice-select" class="form-select-custom studio-select" style="width: 100%; padding: 12px 38px 12px 16px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.9rem; outline: none;">
+                <select id="tts-voice-select" class="form-select-custom select-md select-w-full">
                   <option value="default">Cargando catálogo neural...</option>
                 </select>
               </div>
@@ -316,10 +220,10 @@
           <span>cURL - Síntesis de Texto a Voz</span>
           <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.72rem;" onclick="navigator.clipboard.writeText(document.getElementById('code-tts-curl').textContent)">Copiar</button>
         </div>
-        <pre class="code-panel" id="code-tts-curl">curl -X POST https://cloudtranslator.onrender.com/api/tts \
+        <pre class="code-panel" id="code-tts-curl">curl -X POST https://vork-st1k.onrender.com/api/tts \
   -H "Content-Type: application/json" \
   -d '{
-    "text": "Hola, este es un mensaje sintetizado con CloudTranslator",
+    "text": "Hola, este es un mensaje sintetizado con Vork",
     "lang": "es",
     "rate": 1.0,
     "pitch": 1.0
@@ -327,102 +231,144 @@
       </div>
     </section>
 
-        <!-- Sección Informativa: Los 6 Pilares del Ecosistema -->
-    <section style="margin-top: 36px;">
-      <div class="section-full-title">
-        <h2>Los 6 Pilares de CloudTranslator</h2>
-        <p>Herramientas especializadas con consolas dedicadas a cada disciplina lingüística, vocal, multimedia y de mezcla musical.</p>
+        <!-- LOS 9 PILARES DE VORK -->
+    <section class="workbench-wrap" id="pilares" style="margin-top: 48px; margin-bottom: 40px;">
+      <div class="section-head">
+        <span class="label">Pilares Operacionales</span>
+        <h2 class="h-section">Los 9 Pilares de <em>Vork</em></h2>
+        <p class="lead">Herramientas especializadas con consolas dedicadas a cada disciplina lingüística, vocal, multimedia y de mezcla musical.</p>
       </div>
 
-      <div class="pillars-grid">
-        <!-- Pilar 1 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 01 // TEXT</span>
+      <div class="services-grid">
+        <!-- Pilar 01 -->
+        <article class="card tilt" style="--tone:#22b0a0">
+          <div class="card-top">
+            <span class="card-num">01</span>
+            <span class="card-tag">Lenguaje</span>
           </div>
           <h3>Traductor en la Nube</h3>
-          <p>
-            Traducción por lotes de alta velocidad (+200 idiomas). Nuestro algoritmo agrupa todos los textos del DOM y envía un único arreglo <code>texts: [...]</code> a <code>/api/translate</code>. Persistencia estricta en cookies y 0ms desde memoria RAM.
-          </p>
-          <a href="/translator" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Traductor en la Nube</a>
-        </div>
-
-        <!-- Pilar 2 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 02 // AUDIO</span>
+          <p>Traducción por lotes de alta velocidad (+200 idiomas). Extrae los nodos con TreeWalker y envía una sola petición consolidada.</p>
+          <div class="card-foot">
+            <a href="/translator"><span>Abrir Traductor</span></a>
+            <a href="/translator" class="card-arrow" aria-label="Ir al Traductor"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
           </div>
-          <h3>Texto a Voz Multilingüe (TTS)</h3>
-          <p>
-            Convierte cualquier texto en audio fluido y natural. Selecciona el idioma, elige entre 24 voces humanas neuronales, calibra velocidad y tono en tiempo real con reproductor, ondas sonoras y descarga en formato WAV o MP3.
-          </p>
-          <a href="/tts" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Estudio TTS</a>
-        </div>
+        </article>
 
-        <!-- Pilar 3 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 03 // VOICE AI</span>
+        <!-- Pilar 03 -->
+        <article class="card tilt" style="--tone:#a99cff">
+          <div class="card-top">
+            <span class="card-num">03</span>
+            <span class="card-tag">Voz IA</span>
           </div>
-          <h3>Clonación de Voz con IA <span class="badge" style="background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4); font-size: 0.68rem; font-weight: 800; padding: 2px 7px; border-radius: 4px; vertical-align: middle; letter-spacing: 0.05em; margin-left: 6px;">ALPHA</span></h3>
-          <p>
-            Graba con micrófono o sube tu archivo de audio. Escucha tu muestra de referencia, edítala o elimínala con un clic, escribe tu guion y descarga el archivo WAV sintetizado recreando tu timbre vocal único.
-          </p>
-          <a href="/voice-clone" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Clonación de Voz</a>
-        </div>
+          <h3>Clonación de Voz IA</h3>
+          <p>Extracción de timbre y frecuencia fundamental F0 con micrófono o archivo. Generación de síntesis espectral clonada.</p>
+          <div class="card-foot">
+            <a href="/voice-clone"><span>Abrir Clonador</span></a>
+            <a href="/voice-clone" class="card-arrow" aria-label="Ir a Clonación"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
 
-        <!-- Pilar 4 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 04 // MEDIA CONVERTER</span>
+        <!-- Pilar 04 -->
+        <article class="card tilt" style="--tone:#ffc23d">
+          <div class="card-top">
+            <span class="card-num">04</span>
+            <span class="card-tag">Media</span>
           </div>
-          <h3>Conversor Multimedia (MP3 / MP4)</h3>
-          <p>
-            Pega enlaces de YouTube, TikTok, Instagram Reels, Facebook o Twitter y conviértelos a MP3 (hasta 320 kbps) o video MP4 sin marcas de agua. Detección automática, streaming con rango HTTP y descarga física directa.
-          </p>
-          <a href="/converter" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Conversor MP3/MP4</a>
-        </div>
+          <h3>Conversor Multimedia</h3>
+          <p>Convierte enlaces de YouTube, TikTok, Instagram Reels a MP3 hasta 320 kbps y video MP4 HD con streaming de rangos.</p>
+          <div class="card-foot">
+            <a href="/converter"><span>Abrir Conversor</span></a>
+            <a href="/converter" class="card-arrow" aria-label="Ir a Conversor"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
 
-        <!-- Pilar 5 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 05 // STEMS SPLITTER</span>
+        <!-- Pilar 05 -->
+        <article class="card tilt" style="--tone:#ff5a5f">
+          <div class="card-top">
+            <span class="card-num">05</span>
+            <span class="card-tag">Stems</span>
           </div>
-          <h3>Separador de Voz e Instrumental</h3>
-          <p>
-            Aísla la voz (Acapella) o la pista instrumental (Karaoke) a partir de cualquier enlace o archivo de audio/video. Descarga ambos stems por separado con cancelación de fase estéreo DSP y reproductor dual sincronizado.
-          </p>
-          <a href="/vocal-remover" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Separador de Voz</a>
-        </div>
+          <h3>Separador de Stems</h3>
+          <p>Aislamiento de voz (Acapella) y pista instrumental (Karaoke) mediante redes neuronales Demucs v4 y cancelación de fase.</p>
+          <div class="card-foot">
+            <a href="/vocal-remover"><span>Abrir Separador</span></a>
+            <a href="/vocal-remover" class="card-arrow" aria-label="Ir a Separador"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
 
-        <!-- Pilar 6 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 06 // CLOUDDJ</span>
+        <!-- Pilar 06 -->
+        <article class="card tilt" style="--tone:#22b0a0">
+          <div class="card-top">
+            <span class="card-num">06</span>
+            <span class="card-tag">En Vivo</span>
           </div>
-          <h3>CloudDJ: Mezclador Virtual en Vivo</h3>
-          <p>
-            Mezcla música en vivo con dos tornamesas interactivas, efecto scratch, ecualizador de 3 bandas, crossfader suave, transición automática Auto-DJ y una cola interactiva para preparar lo que va a ir después.
+          <h3>Vork DJ Mezclador</h3>
+          <p>Mezcla interactiva en vivo con doble tornamesa, simulación de scratch, crossfader ultrasuave y cola de pistas.</p>
+          <div class="card-foot">
+            <a href="/dj"><span>Abrir Consola DJ</span></a>
+            <a href="/dj" class="card-arrow" aria-label="Ir a Vork DJ"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
+
+        <!-- Pilar 07 -->
+        <article class="card tilt" style="--tone:#ff7a3d">
+          <div class="card-top">
+            <span class="card-num">07</span>
+            <span class="card-tag">Imágenes</span>
+          </div>
+          <h3>Procesador de Imágenes</h3>
+          <p>Conversión universal entre PNG, JPG, WEBP, GIF, BMP, TIFF e ICO con control de compresión y redimensionado.</p>
+          <div class="card-foot">
+            <a href="/image-converter"><span>Abrir Conversor</span></a>
+            <a href="/image-converter" class="card-arrow" aria-label="Ir a Imágenes"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
+
+        <!-- Pilar 08 -->
+        <article class="card tilt" style="--tone:#a99cff">
+          <div class="card-top">
+            <span class="card-num">08</span>
+            <span class="card-tag">Visión IA</span>
+          </div>
+          <h3>Estudio y Fondo IA</h3>
+          <p>Eliminación inteligente de siluetas con transparencia nítida y reemplazo de fondos creativos con modelos generativos.</p>
+          <div class="card-foot">
+            <a href="/background-remover"><span>Abrir Fondo IA</span></a>
+            <a href="/background-remover" class="card-arrow" aria-label="Ir a Fondo IA"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
+
+        <!-- Pilar 09 -->
+        <article class="card tilt" style="--tone:#ff7a3d">
+          <div class="card-top">
+            <span class="card-num">09</span>
+            <span class="card-tag">Terminal</span>
+          </div>
+          <h3>Vork CLI & Agentes</h3>
+          <p>Consola de comandos completa para invocar los 9 pilares desde la terminal y orquestar sesiones de agentes autónomos.</p>
+          <div class="card-foot">
+            <a href="/cli"><span>Abrir Documentación CLI</span></a>
+            <a href="/cli" class="card-arrow" aria-label="Ir a Vork CLI"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- SECCIÓN VORK CLI -->
+    <section class="workbench-wrap" style="margin-top: 48px; margin-bottom: 40px;">
+      <div class="workbench-card" style="background: linear-gradient(135deg, rgba(22, 27, 34, 0.96) 0%, rgba(13, 17, 23, 0.98) 100%); border: 1px solid rgba(255, 122, 61, 0.22); box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.5), 0 0 24px -6px rgba(255, 122, 61, 0.08); display: flex; align-items: center; justify-content: space-between; gap: 28px; flex-wrap: wrap; padding: clamp(28px, 4vw, 40px);">
+        <div style="flex: 1 1 540px; max-width: 780px;">
+          <span class="label" style="color: var(--accent); display: inline-block; margin-bottom: 8px;">(09) Terminal &amp; Automatización</span>
+          <h2 class="h-section" style="color: #ffffff; margin: 0 0 12px 0; font-size: clamp(1.8rem, 3.2vw, 2.3rem); line-height: 1.2;">Vork <em>CLI</em></h2>
+          <p style="color: #a59a8f; margin: 0; font-size: 1.02rem; line-height: 1.65;">
+            Entorno centrado en la terminal para interactuar con agentes Vork en lenguaje natural. Orquesta subagentes paralelos, atajos configurables y comandos con diagonal sin cambiar de contexto.
           </p>
-          <a href="/dj" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Abrir Consola CloudDJ</a>
+        </div>
+        <div style="flex-shrink: 0;">
+          <a href="/cli" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px; font-size: 0.95rem; font-weight: 700; box-shadow: 0 6px 20px rgba(255, 102, 0, 0.35); text-decoration: none;">
+            <span>Ir a Vork CLI</span>
+            <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
         </div>
       </div>
     </section>
@@ -432,545 +378,8 @@
   <!-- Pie de Página Horizontal Alineado -->
   <footer id="footer-placeholder" data-component="footer" data-active="tts"></footer>
 
-  <script src="/js/cloud-translator.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";
-      window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
-      document.getElementById("btn-english").onclick = () => window.translator.translateToEnglish();
-      document.getElementById("btn-restore").onclick = () => window.translator.restoreOriginal();
-      document.getElementById("select-lang").onchange = (e) => window.translator.translatePage(e.target.value);
-      document.getElementById("btn-translate-custom").onclick = () => {
-        const val = document.getElementById("input-custom-lang").value.trim().toLowerCase();
-        if (val) window.translator.translatePage(val);
-      };
-
-      // ==========================================
-      // LÓGICA DE SÍNTESIS VOCAL (BACKEND NEURAL)
-      // ==========================================
-      const ttsInput = document.getElementById("tts-input-text");
-      const ttsCharCount = document.getElementById("tts-char-count");
-      const ttsLang = document.getElementById("tts-lang-select");
-      const ttsVoice = document.getElementById("tts-voice-select");
-      const ttsRate = document.getElementById("tts-rate-slider");
-      const ttsRateVal = document.getElementById("tts-rate-val");
-      const ttsPitch = document.getElementById("tts-pitch-slider");
-      const ttsPitchVal = document.getElementById("tts-pitch-val");
-      const ttsBtnPlay = document.getElementById("tts-btn-play");
-      const ttsBtnPause = document.getElementById("tts-btn-pause");
-      const ttsBtnStop = document.getElementById("tts-btn-stop");
-      const ttsBtnDownload = document.getElementById("tts-btn-download");
-      const ttsBtnCopyStream = document.getElementById("tts-btn-copy-stream");
-      const ttsStatusLabel = document.getElementById("tts-status-label");
-      const ttsTimeLabel = document.getElementById("tts-time-label");
-      const ttsBars = document.getElementById("tts-bars-container");
-      const audioPlayer = document.getElementById("backend-audio-player");
-      const catalogGrid = document.getElementById("voices-cards-grid");
-
-      let backendVoices = [];
-      let lastGeneratedAudio = null;
-      let playStartTime = 0;
-      let timerInterval = null;
-      let isStoppingPlayback = false;
-
-      function updateCharCount() {
-        if (ttsInput && ttsCharCount) {
-          ttsCharCount.textContent = `${ttsInput.value.length} caracteres`;
-        }
-      }
-      if (ttsInput) ttsInput.addEventListener("input", updateCharCount);
-
-      function stopCurrentPlayback() {
-        if (audioPlayer) {
-          isStoppingPlayback = true;
-          audioPlayer.pause();
-          audioPlayer.currentTime = 0;
-          setStatus("DETENIDO", false);
-          stopTimer();
-          setTTSPlaybackLock(false);
-        }
-      }
-
-      function setTTSPlaybackLock(isLocked) {
-        const lockableElements = [
-          ttsInput,
-          ttsLang,
-          ttsVoice,
-          ttsRate,
-          ttsPitch,
-          ttsBtnPlay,
-          ttsBtnDownload,
-          ttsBtnCopyStream
-        ];
-
-        lockableElements.forEach(el => {
-          if (el) {
-            el.disabled = isLocked;
-            el.style.pointerEvents = isLocked ? "none" : "auto";
-            el.style.opacity = isLocked ? "0.6" : "1";
-          }
-        });
-
-        if (ttsInput) {
-          ttsInput.readOnly = isLocked;
-          ttsInput.style.cursor = isLocked ? "not-allowed" : "text";
-        }
-
-        document.querySelectorAll(".btn-select-voice, .btn-sample-play, .btn-filter-voice").forEach(btn => {
-          btn.disabled = isLocked;
-          btn.style.pointerEvents = isLocked ? "none" : "auto";
-          btn.style.opacity = isLocked ? "0.6" : "1";
-        });
-
-        // Asegurar que Pausar y Detener SIEMPRE estén activos para interactuar durante la reproducción
-        if (ttsBtnPause) {
-          ttsBtnPause.disabled = false;
-          ttsBtnPause.style.pointerEvents = "auto";
-          ttsBtnPause.style.opacity = "1";
-          ttsBtnPause.style.cursor = "pointer";
-        }
-        if (ttsBtnStop) {
-          ttsBtnStop.disabled = false;
-          ttsBtnStop.style.pointerEvents = "auto";
-          ttsBtnStop.style.opacity = "1";
-          ttsBtnStop.style.cursor = "pointer";
-        }
-      }
-
-      if (ttsRate) {
-        ttsRate.addEventListener("input", (e) => {
-          ttsRateVal.textContent = parseFloat(e.target.value).toFixed(1) + "x";
-          stopCurrentPlayback();
-        });
-      }
-
-      if (ttsPitch) {
-        ttsPitch.addEventListener("input", (e) => {
-          ttsPitchVal.textContent = parseFloat(e.target.value).toFixed(1);
-          stopCurrentPlayback();
-        });
-      }
-
-      function setStatus(text, isPlaying = false) {
-        if (ttsStatusLabel) {
-          ttsStatusLabel.textContent = text;
-          if (isPlaying) {
-            ttsStatusLabel.className = "eq-status-badge active";
-            if (ttsBars) ttsBars.classList.add("animating");
-          } else {
-            ttsStatusLabel.className = "eq-status-badge";
-            if (ttsBars) ttsBars.classList.remove("animating");
-          }
-        }
-      }
-
-      function startTimer() {
-        playStartTime = Date.now();
-        if (timerInterval) clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-          const elapsed = Math.floor((Date.now() - playStartTime) / 1000);
-          const m = String(Math.floor(elapsed / 60)).padStart(2, "0");
-          const s = String(elapsed % 60).padStart(2, "0");
-          if (ttsTimeLabel) ttsTimeLabel.textContent = `${m}:${s}`;
-        }, 500);
-      }
-
-      function stopTimer() {
-        if (timerInterval) clearInterval(timerInterval);
-        if (ttsTimeLabel) ttsTimeLabel.textContent = "00:00";
-      }
-
-      // Cargar Catálogo de 24 Voces desde el Backend
-      async function loadVoicesCatalog() {
-        try {
-          const res = await fetch("/api/tts/voices");
-          const data = await res.json();
-          if (data && data.voices) {
-            backendVoices = data.voices;
-            renderVoiceSelector();
-            renderVoiceCatalogCards("all");
-          }
-        } catch (err) {
-          console.warn("Error al cargar catálogo de voces:", err);
-        }
-      }
-
-      function renderVoiceSelector() {
-        if (!ttsVoice) return;
-        ttsVoice.innerHTML = "";
-
-        const groups = {};
-        backendVoices.forEach(v => {
-          const langKey = v.country ? v.country.split(" ")[0] : v.lang;
-          if (!groups[langKey]) groups[langKey] = [];
-          groups[langKey].push(v);
-        });
-
-        Object.keys(groups).forEach(grp => {
-          const optGroup = document.createElement("optgroup");
-          optGroup.label = grp;
-          groups[grp].forEach(v => {
-            const opt = document.createElement("option");
-            opt.value = v.id;
-            opt.textContent = `${v.name} (${v.gender === "femenina" ? "Femenina" : "Masculina"} - ${v.style}) - ${v.country}`;
-            optGroup.appendChild(opt);
-          });
-          ttsVoice.appendChild(optGroup);
-        });
-      }
-
-      function renderVoiceCatalogCards(filter = "all") {
-        if (!catalogGrid) return;
-        catalogGrid.innerHTML = "";
-
-        const filtered = filter === "all" ? backendVoices : backendVoices.filter(v => v.lang === filter);
-        filtered.forEach(v => {
-          const card = document.createElement("div");
-          card.className = "tech-card";
-          card.style.padding = "20px";
-          card.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-              <div>
-                <span class="tech-card-tag" style="margin-bottom: 4px;">${v.country}</span>
-                <h3 style="font-size: 1.1rem; margin: 0; color: #fff;">${v.name}</h3>
-              </div>
-              <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: var(--primary); font-size: 0.7rem; padding: 3px 8px; border-radius: 99px;">
-                ${v.gender === "femenina" ? "Femenina" : "Masculina"}
-              </span>
-            </div>
-            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5;">${v.description}</p>
-            <div style="margin-top: auto; display: flex; gap: 8px;">
-              <button class="btn btn-outline btn-sample-play" data-voice="${v.id}" data-text="${encodeURIComponent(v.sampleText)}" style="flex: 1; padding: 7px 10px; font-size: 0.75rem;">
-                <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                Muestra
-              </button>
-              <button class="btn btn-primary btn-select-voice" data-voice="${v.id}" style="flex: 1; padding: 7px 10px; font-size: 0.75rem;">
-                Usar Voz
-              </button>
-            </div>
-          `;
-          catalogGrid.appendChild(card);
-        });
-
-        // Eventos de botones en tarjetas
-        document.querySelectorAll(".btn-select-voice").forEach(b => {
-          b.addEventListener("click", (e) => {
-            stopCurrentPlayback();
-            const vId = e.currentTarget.getAttribute("data-voice");
-            if (ttsVoice) ttsVoice.value = vId;
-            const foundVoice = backendVoices.find(v => v.id === vId);
-            if (foundVoice && ttsLang) {
-              const matchedOpt = Array.from(ttsLang.options).find(o => o.value.startsWith(foundVoice.lang));
-              if (matchedOpt) ttsLang.value = matchedOpt.value;
-            }
-            document.querySelector(".studio-wrapper").scrollIntoView({ behavior: "smooth" });
-          });
-        });
-
-        document.querySelectorAll(".btn-sample-play").forEach(b => {
-          b.addEventListener("click", async (e) => {
-            stopCurrentPlayback();
-            const vId = e.currentTarget.getAttribute("data-voice");
-            const sampleTxt = decodeURIComponent(e.currentTarget.getAttribute("data-text"));
-            e.currentTarget.disabled = true;
-            try {
-              const res = await fetch("/api/tts", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: sampleTxt, voiceId: vId })
-              });
-              const d = await res.json();
-              if (d.audioBase64) {
-                audioPlayer.src = d.audioBase64;
-                await audioPlayer.play();
-                setStatus(`REPRODUCIENDO (${vId})`, true);
-                startTimer();
-              }
-            } catch (err) {}
-            setTimeout(() => { e.currentTarget.disabled = false; }, 1000);
-          });
-        });
-      }
-
-      // Sincronización bidireccional entre selector de idioma y selector de voz
-      if (ttsLang) {
-        ttsLang.addEventListener("change", () => {
-          stopCurrentPlayback();
-          const lCode = ttsLang.value.slice(0, 2);
-          const firstMatching = backendVoices.find(v => v.lang === lCode);
-          if (firstMatching && ttsVoice) {
-            ttsVoice.value = firstMatching.id;
-          }
-        });
-      }
-
-      if (ttsVoice) {
-        ttsVoice.addEventListener("change", () => {
-          stopCurrentPlayback();
-          const vObj = backendVoices.find(v => v.id === ttsVoice.value);
-          if (vObj && ttsLang) {
-            const matchedOpt = Array.from(ttsLang.options).find(o => o.value.startsWith(vObj.lang));
-            if (matchedOpt) ttsLang.value = matchedOpt.value;
-          }
-        });
-      }
-
-      // Filtros de categoría de voz
-      document.querySelectorAll(".btn-filter-voice").forEach(btn => {
-        btn.addEventListener("click", (e) => {
-          document.querySelectorAll(".btn-filter-voice").forEach(b => {
-            b.className = "btn btn-outline btn-filter-voice";
-          });
-          e.currentTarget.className = "btn btn-primary btn-filter-voice active";
-          renderVoiceCatalogCards(e.currentTarget.getAttribute("data-filter"));
-        });
-      });
-
-      // Eventos del Audio Player HTML5 con bloqueo automático
-      audioPlayer.addEventListener("play", () => {
-        isStoppingPlayback = false;
-        setStatus("REPRODUCIENDO", true);
-        startTimer();
-        setTTSPlaybackLock(true);
-      });
-      audioPlayer.addEventListener("pause", () => {
-        if (isStoppingPlayback) {
-          isStoppingPlayback = false;
-          setStatus("DETENIDO", false);
-          stopTimer();
-          setTTSPlaybackLock(false);
-          return;
-        }
-        setStatus("PAUSADO", false);
-        if (timerInterval) clearInterval(timerInterval);
-        setTTSPlaybackLock(false);
-      });
-      audioPlayer.addEventListener("ended", () => {
-        setStatus("COMPLETADO", false);
-        stopTimer();
-        setTTSPlaybackLock(false);
-      });
-      audioPlayer.addEventListener("error", () => {
-        setStatus("ERROR", false);
-        stopTimer();
-        setTTSPlaybackLock(false);
-      });
-
-      // Caché local en memoria del cliente para respuestas en 0ms
-      const ttsClientCache = new Map();
-
-      // Botón Reproducir / Generar con Backend 100% Real
-      if (ttsBtnPlay) {
-        ttsBtnPlay.addEventListener("click", async () => {
-          const text = (ttsInput.value || "").trim();
-          if (!text) {
-            alert("Escribe un texto para generar locución.");
-            return;
-          }
-
-          if (audioPlayer.paused && audioPlayer.src && audioPlayer.currentTime > 0) {
-            audioPlayer.play();
-            return;
-          }
-
-          const selectedVoiceId = ttsVoice.value;
-          const rateVal = parseFloat(ttsRate.value) || 1.0;
-          const pitchVal = parseFloat(ttsPitch.value) || 1.0;
-          const clientCacheKey = `${selectedVoiceId}:${rateVal}:${pitchVal}:${text}`;
-
-          // Si ya lo tenemos en memoria, reproducir al instante en 0ms sin consumir red
-          if (ttsClientCache.has(clientCacheKey)) {
-            const cached = ttsClientCache.get(clientCacheKey);
-            lastGeneratedAudio = cached;
-            audioPlayer.src = cached.streamUrl || cached.audioBase64;
-            await audioPlayer.play();
-            setStatus("REPRODUCIENDO (0ms CACHÉ)", true);
-            return;
-          }
-
-          setTTSPlaybackLock(true);
-          ttsBtnPlay.innerHTML = `<span class="spinner" style="display:inline-block; margin-right:8px;"></span> Sintetizando...`;
-          setStatus("SINTETIZANDO EN BACKEND...", true);
-
-          try {
-            const resp = await fetch("/api/tts", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                text,
-                voiceId: selectedVoiceId,
-                rate: rateVal,
-                pitch: pitchVal
-              })
-            });
-
-            const data = await resp.json();
-            if (data.status === "success" && (data.streamUrl || data.audioBase64)) {
-              lastGeneratedAudio = data;
-              ttsClientCache.set(clientCacheKey, data);
-              // Usar streamUrl para inicio de reproducción inmediato por HTTP 206 en redes lentas
-              audioPlayer.src = data.streamUrl || data.audioBase64;
-              await audioPlayer.play();
-              setStatus("REPRODUCIENDO", true);
-            } else {
-              throw new Error(data.error || "No se pudo generar la síntesis vocal");
-            }
-          } catch (err) {
-            alert("Error al sintetizar voz: " + err.message);
-            setStatus("ERROR", false);
-            setTTSPlaybackLock(false);
-          } finally {
-            ttsBtnPlay.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg> Reproducir`;
-          }
-        });
-      }
-
-      if (ttsBtnPause) {
-        ttsBtnPause.addEventListener("click", () => {
-          if (!audioPlayer.paused) {
-            audioPlayer.pause();
-            setTTSPlaybackLock(false);
-          }
-        });
-      }
-
-      if (ttsBtnStop) {
-        ttsBtnStop.addEventListener("click", () => {
-          stopCurrentPlayback();
-        });
-      }
-
-      // Descarga Real del Archivo de Audio
-      if (ttsBtnDownload) {
-        ttsBtnDownload.addEventListener("click", async () => {
-          const text = (ttsInput.value || "").trim();
-          if (!text) {
-            alert("Escribe un texto antes de descargar el audio.");
-            return;
-          }
-
-          ttsBtnDownload.disabled = true;
-          const origDownloadHtml = ttsBtnDownload.innerHTML;
-          ttsBtnDownload.innerHTML = `<span class="spinner" style="display:inline-block;width:14px;height:14px;margin-right:6px;"></span> Descargando...`;
-
-          try {
-            let audioData = lastGeneratedAudio;
-            if (!audioData || audioData.text !== text) {
-              const resp = await fetch("/api/tts", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  text,
-                  voiceId: ttsVoice.value,
-                  lang: ttsLang.value.slice(0, 2),
-                  rate: parseFloat(ttsRate.value) || 1.0,
-                  pitch: parseFloat(ttsPitch.value) || 1.0
-                })
-              });
-              audioData = await resp.json();
-              if (audioData.status === "success") {
-                lastGeneratedAudio = audioData;
-              }
-            }
-
-            if (audioData && audioData.audioBase64) {
-              const byteCharacters = atob(audioData.audioBase64.split(",")[1]);
-              const byteNumbers = new Array(byteCharacters.length);
-              for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-              }
-              const byteArray = new Uint8Array(byteNumbers);
-              const ext = audioData.format || "mp3";
-              const mime = audioData.mimeType || "audio/mpeg";
-              const blob = new Blob([byteArray], { type: mime });
-              const url = URL.createObjectURL(blob);
-
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = `voz-tts-cloudtranslator-${Date.now()}.${ext}`;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-              setTimeout(() => URL.revokeObjectURL(url), 2000);
-
-              ttsBtnDownload.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ¡Descargado!`;
-              setTimeout(() => {
-                ttsBtnDownload.innerHTML = origDownloadHtml;
-                ttsBtnDownload.disabled = false;
-              }, 2000);
-            } else {
-              throw new Error("No se pudo obtener el buffer de audio");
-            }
-          } catch (e) {
-            alert("Error al descargar audio: " + e.message);
-            ttsBtnDownload.disabled = false;
-            ttsBtnDownload.innerHTML = origDownloadHtml;
-          }
-        });
-      }
-
-      // Copiar Enlace Directo
-      if (ttsBtnCopyStream) {
-        ttsBtnCopyStream.onclick = async () => {
-          const text = (ttsInput.value || "").trim();
-          if (!text) {
-            alert("Escribe un texto antes de copiar el enlace directo.");
-            return;
-          }
-
-          let audioData = lastGeneratedAudio;
-          if (!audioData || audioData.text !== text) {
-            try {
-              const resp = await fetch("/api/tts", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  text,
-                  voiceId: ttsVoice.value,
-                  lang: ttsLang.value.slice(0, 2),
-                  rate: parseFloat(ttsRate.value) || 1.0,
-                  pitch: parseFloat(ttsPitch.value) || 1.0
-                })
-              });
-              audioData = await resp.json();
-              if (audioData.status === "success") {
-                lastGeneratedAudio = audioData;
-              }
-            } catch (e) {
-              alert("Error al obtener enlace: " + e.message);
-              return;
-            }
-          }
-
-          const targetUrl = (audioData && audioData.downloadUrl) ? audioData.downloadUrl : (audioData && audioData.streamUrl ? audioData.streamUrl : null);
-          if (targetUrl) {
-            const downloadFull = targetUrl.startsWith("http") ? targetUrl : window.location.origin + targetUrl;
-            navigator.clipboard.writeText(downloadFull);
-            const origHtml = ttsBtnCopyStream.innerHTML;
-            const origBg = ttsBtnCopyStream.style.background;
-            const origColor = ttsBtnCopyStream.style.color;
-            const origBorder = ttsBtnCopyStream.style.borderColor;
-            ttsBtnCopyStream.innerHTML = `<svg class="icon" viewBox="0 0 24 24" style="stroke: #000; width: 16px; height: 16px;"><polyline points="20 6 9 17 4 12"/></svg> <span>¡Enlace Copiado!</span>`;
-            ttsBtnCopyStream.style.background = "var(--primary)";
-            ttsBtnCopyStream.style.color = "#000000";
-            ttsBtnCopyStream.style.borderColor = "var(--primary)";
-            ttsBtnCopyStream.style.fontWeight = "700";
-            setTimeout(() => {
-              ttsBtnCopyStream.innerHTML = origHtml;
-              ttsBtnCopyStream.style.background = origBg;
-              ttsBtnCopyStream.style.color = origColor;
-              ttsBtnCopyStream.style.borderColor = origBorder;
-              ttsBtnCopyStream.style.fontWeight = "";
-            }, 2000);
-          } else {
-            alert("No se pudo obtener el enlace directo.");
-          }
-        };
-      }
-
-      // Cargar voces al inicio
-      loadVoicesCatalog();
-    });
-  </script>
+  <script src="/js/vork.js"></script>
+  <script src="/js/vork.js"></script>
+    <script src="/js/modules/tts.js" defer></script>
 </body>
 </html>

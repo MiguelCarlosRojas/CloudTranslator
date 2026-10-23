@@ -38,5 +38,10 @@ CloudTranslator.postman_collection.json
 
 # Cache temporal multimedia
 data/media_cache/
+temp_media/
 *.mp3
-*.mp4
+*.mp4
+
+# Directorios de pruebas locales y scripts de desarrollo
+src/scratch/
+src/scripts/

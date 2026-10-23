@@ -1,5 +1,5 @@
 /**
- * Generador y sintetizador acústico multimodal de CloudTranslator.
+ * Generador y sintetizador acústico multimodal de Vork.
  * Soporta síntesis vocal neuronal de alta fidelidad (Microsoft Edge Neural Voices),
  * catálogo expandido de voces humanas reales masculinas y femeninas,
  * motor de clonación vocal neuronal con análisis espectral F0 y fallback resiliente.
@@ -46,7 +46,7 @@ const VOICE_CATALOG = [
     description: "Voz femenina con acento castellano impecable, tono claro y ritmo profesional.",
     pitch: 1.0,
     rate: 1.0,
-    sampleText: "Bienvenido a CloudTranslator, tu plataforma de síntesis y traducción en la nube."
+    sampleText: "Bienvenido a Vork, tu plataforma de síntesis y traducción en la nube."
   },
   {
     id: "es-ES-alvaro",
@@ -200,7 +200,7 @@ const VOICE_CATALOG = [
     description: "Voz masculina neutral para medios de comunicación, asistentes virtuales y noticias.",
     pitch: 0.95,
     rate: 1.0,
-    sampleText: "CloudTranslator integra los tres pilares lingüísticos en un microservicio autónomo."
+    sampleText: "Vork integra los tres pilares lingüísticos en un microservicio autónomo."
   },
 
   // --- English ---
@@ -216,7 +216,7 @@ const VOICE_CATALOG = [
     description: "Ultra-clear American female voice tailored for assistants and media narration.",
     pitch: 1.0,
     rate: 1.0,
-    sampleText: "Welcome to CloudTranslator, powering high performance neural speech synthesis."
+    sampleText: "Welcome to Vork, powering high performance neural speech synthesis."
   },
   {
     id: "en-US-liam",
@@ -288,7 +288,7 @@ const VOICE_CATALOG = [
     description: "Voix féminine parisienne fluide, douce et naturelle pour narration et dialogue.",
     pitch: 1.0,
     rate: 1.0,
-    sampleText: "Bienvenue sur CloudTranslator, votre écosystème de synthèse vocale en nuage."
+    sampleText: "Bienvenue sur Vork, votre écosystème de synthèse vocale en nuage."
   },
   {
     id: "fr-FR-henri",
@@ -318,7 +318,7 @@ const VOICE_CATALOG = [
     description: "Klare weibliche deutsche Stimme mit exzellenter Aussprache und Rhythmus.",
     pitch: 1.0,
     rate: 1.0,
-    sampleText: "CloudTranslator bietet modernste Sprachgenerierung für Entwickler weltweit."
+    sampleText: "Vork bietet modernste Sprachgenerierung für Entwickler weltweit."
   },
   {
     id: "de-DE-lukas",
@@ -1284,7 +1284,7 @@ function decodeBase64Audio(base64String) {
 }
 
 /**
- * Motor de IA Acústico Espectral Propio de CloudTranslator (100% Autónomo y Nativo).
+ * Motor de IA Acústico Espectral Propio de Vork (100% Autónomo y Nativo).
  * Realiza desconvolución espectral profunda del portador fonético (whitening),
  * transfiere la envolvente espectral continua en 36 bandas Bark (rango dinámico ±34 dB),
  * inyecta las frecuencias resonantes biológicas del tracto vocal del usuario (F1-F4)
@@ -1436,7 +1436,7 @@ function setCachedVoiceClone(cacheKey, data) {
 }
 
 /**
- * Pilar 03: Motor Propio de Clonación de Voz por Inteligencia Artificial de CloudTranslator.
+ * Pilar 03: Motor Propio de Clonación de Voz por Inteligencia Artificial de Vork.
  * 100% Nativo, Autónomo e Independiente de APIs externas de pago o cuotas de terceros.
  * Transfiere la huella biométrica vocal exacta del usuario al texto generado.
  */
@@ -1519,9 +1519,9 @@ async function cloneVoice(text, options = {}) {
 
   const successResponse = {
     status: "success",
-    service: "CloudTranslator Bio-Acoustic Neural Identity Engine v3.0",
+    service: "Vork Bio-Acoustic Neural Identity Engine v3.0",
     voiceProfileId: profileId,
-    model: "CloudTranslator Bio-Acoustic Neural Voice Clone (Identidad Vocal del Usuario)",
+    model: "Vork Bio-Acoustic Neural Voice Clone (Identidad Vocal del Usuario)",
     modelType: "proprietary-bioacoustic-neural",
     isNeural: true,
     text,

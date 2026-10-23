@@ -1,0 +1,506 @@
+/**
+ * converter.js
+ * Lógica modular del front-end para converter.html
+ */
+
+(function (window, document) {
+  "use strict";
+
+document.addEventListener("DOMContentLoaded", () => {
+      // Cargar Footer modular
+      if (window.CloudComponents && document.getElementById("footer-placeholder")) {
+        document.getElementById("footer-placeholder").innerHTML = window.CloudComponents.getFooterHTML("converter");
+      }
+
+      // Estado del Estudio
+      let selectedFormat = "mp3";
+      let isBatchMode = false;
+
+      const inputUrl = document.getElementById("input-video-url");
+      const btnClear = document.getElementById("btn-clear-url");
+      const btnPaste = document.getElementById("btn-paste-clipboard");
+      const btnToggleBatch = document.getElementById("btn-toggle-batch");
+      const singleBox = document.getElementById("single-link-box");
+      const batchBox = document.getElementById("batch-link-box");
+      const batchUrls = document.getElementById("input-batch-urls");
+
+      const btnFormatMp3 = document.getElementById("btn-format-mp3");
+      const btnFormatMp4 = document.getElementById("btn-format-mp4");
+      const selectQuality = document.getElementById("select-quality");
+
+      const btnConvert = document.getElementById("btn-convert");
+      const btnConvertText = document.getElementById("btn-convert-text");
+
+      const progressBox = document.getElementById("conversion-progress-box");
+      const progressStatus = document.getElementById("progress-status-text");
+      const progressPercent = document.getElementById("progress-percent");
+      const progressBar = document.getElementById("progress-bar-fill");
+
+      const resultCard = document.getElementById("result-card");
+      const resThumbnail = document.getElementById("res-thumbnail");
+      const resPlatform = document.getElementById("res-platform-badge");
+      const resDuration = document.getElementById("res-duration-badge");
+      const resFormat = document.getElementById("res-format-badge");
+      const resTitle = document.getElementById("res-title");
+      const resAuthor = document.getElementById("res-author");
+      const resSize = document.getElementById("res-size");
+      const btnDownload = document.getElementById("btn-download-file");
+      const btnCopyStream = document.getElementById("btn-copy-stream");
+
+      const audioWrapper = document.getElementById("audio-player-wrapper");
+      const audioPlayer = document.getElementById("html5-audio-player");
+      const videoWrapper = document.getElementById("video-player-wrapper");
+      const videoPlayer = document.getElementById("html5-video-player");
+
+      // Calidades según formato
+      const qualityOptions = {
+        mp3: [
+          { value: "320k", label: "320 kbps (Alta Fidelidad / Studio Master)" },
+          { value: "192k", label: "192 kbps (Estándar Recomendado)" },
+          { value: "128k", label: "128 kbps (Ahorro de Datos)" }
+        ],
+        mp4: [
+          { value: "1080p", label: "1080p Full HD (60fps)" },
+          { value: "720p", label: "720p HD Estándar" },
+          { value: "480p", label: "480p SD" },
+          { value: "360p", label: "360p Móvil" }
+        ]
+      };
+
+      const qualityBadge = document.getElementById("quality-badge");
+
+      function updateQualityOptions(fmt) {
+        selectQuality.innerHTML = "";
+        qualityOptions[fmt].forEach(opt => {
+          const el = document.createElement("option");
+          el.value = opt.value;
+          el.textContent = opt.label;
+          selectQuality.appendChild(el);
+        });
+        if (qualityBadge) {
+          qualityBadge.textContent = fmt === "mp3" ? "STUDIO MASTER (320 kbps)" : "FULL HD (1080p)";
+        }
+      }
+
+      // Detener y limpiar reproductores de medios
+      function stopMediaPlayback() {
+        if (audioPlayer) {
+          audioPlayer.pause();
+          audioPlayer.currentTime = 0;
+          audioPlayer.removeAttribute("src");
+          try { audioPlayer.load(); } catch {}
+        }
+        if (videoPlayer) {
+          videoPlayer.pause();
+          videoPlayer.currentTime = 0;
+          videoPlayer.removeAttribute("src");
+          try { videoPlayer.load(); } catch {}
+        }
+      }
+
+      // Ocultar resultado anterior y detener reproducción
+      function hidePreviousResult() {
+        resultCard.style.display = "none";
+        stopMediaPlayback();
+      }
+
+      // Deshabilitar / Habilitar todos los controles mientras se procesa
+      function setFormDisabled(disabled) {
+        inputUrl.disabled = disabled;
+        batchUrls.disabled = disabled;
+        btnClear.disabled = disabled;
+        btnPaste.disabled = disabled;
+        btnToggleBatch.disabled = disabled;
+        btnFormatMp3.disabled = disabled;
+        btnFormatMp4.disabled = disabled;
+        selectQuality.disabled = disabled;
+        btnConvert.disabled = disabled;
+
+        const interactiveBtns = [
+          btnFormatMp3,
+          btnFormatMp4,
+          selectQuality,
+          btnConvert,
+          btnClear,
+          btnPaste,
+          btnToggleBatch
+        ];
+
+        interactiveBtns.forEach(el => {
+          if (el) {
+            el.style.pointerEvents = disabled ? "none" : "auto";
+            el.style.opacity = disabled ? "0.55" : "1";
+            el.style.cursor = disabled ? "not-allowed" : "pointer";
+          }
+        });
+
+        if (inputUrl) {
+          inputUrl.style.opacity = disabled ? "0.6" : "1";
+          inputUrl.style.cursor = disabled ? "not-allowed" : "text";
+        }
+        if (batchUrls) {
+          batchUrls.style.opacity = disabled ? "0.6" : "1";
+          batchUrls.style.cursor = disabled ? "not-allowed" : "text";
+        }
+      }
+
+      // Reinicia y oculta la barra de estado y mensaje de conversión previa
+      function resetProgressBox() {
+        progressBox.style.display = "none";
+        progressStatus.innerHTML = "";
+        progressPercent.textContent = "0%";
+        progressBar.style.width = "0%";
+      }
+
+      // Conmutar Pestaña de Formato (NO detiene la reproducción previa para permitir escuchar mientras se navega)
+      btnFormatMp3.addEventListener("click", () => {
+        resetProgressBox();
+        selectedFormat = "mp3";
+        btnFormatMp3.classList.add("active");
+        btnFormatMp3.style.borderColor = "var(--primary)";
+        btnFormatMp3.style.background = "rgba(0, 240, 255, 0.12)";
+        btnFormatMp3.style.color = "#ffffff";
+
+        btnFormatMp4.classList.remove("active");
+        btnFormatMp4.style.borderColor = "var(--border-subtle)";
+        btnFormatMp4.style.background = "rgba(10, 12, 18, 0.95)";
+        btnFormatMp4.style.color = "var(--text-secondary)";
+
+        updateQualityOptions("mp3");
+      });
+
+      btnFormatMp4.addEventListener("click", () => {
+        resetProgressBox();
+        selectedFormat = "mp4";
+        btnFormatMp4.classList.add("active");
+        btnFormatMp4.style.borderColor = "var(--primary)";
+        btnFormatMp4.style.background = "rgba(0, 240, 255, 0.12)";
+        btnFormatMp4.style.color = "#ffffff";
+
+        btnFormatMp3.classList.remove("active");
+        btnFormatMp3.style.borderColor = "var(--border-subtle)";
+        btnFormatMp3.style.background = "rgba(10, 12, 18, 0.95)";
+        btnFormatMp3.style.color = "var(--text-secondary)";
+
+        updateQualityOptions("mp4");
+      });
+
+      // Si el usuario cambia la calidad o tasa de bits, resetear el mensaje de éxito anterior y actualizar badge
+      selectQuality.addEventListener("change", () => {
+        resetProgressBox();
+        if (qualityBadge && selectQuality.selectedOptions.length > 0) {
+          const text = selectQuality.selectedOptions[0].textContent;
+          qualityBadge.textContent = text.split("(")[0].trim().toUpperCase();
+        }
+      });
+
+      // Detección automática en tiempo real de la plataforma según la URL
+      function detectPlatformFromUrl(url) {
+        const u = (url || "").trim().toLowerCase();
+        if (!u) return null;
+        if (u.includes("youtube.com") || u.includes("youtu.be")) return "youtube";
+        if (u.includes("tiktok.com")) return "tiktok";
+        if (u.includes("instagram.com")) return "instagram";
+        if (u.includes("facebook.com") || u.includes("fb.watch")) return "facebook";
+        if (u.includes("twitter.com") || u.includes("x.com")) return "twitter";
+        if (u.includes("pinterest.com") || u.includes("pin.it")) return "pinterest";
+        if (u.startsWith("http://") || u.startsWith("https://")) return "direct";
+        return null;
+      }
+
+      // Sincronizar estado visual de los botones de plataforma según la URL
+      function syncDetectedPlatform(url) {
+        const detected = detectPlatformFromUrl(url);
+        const badge = document.getElementById("detected-platform-badge");
+        document.querySelectorAll(".platform-chip").forEach(c => {
+          if (detected && c.getAttribute("data-platform") === detected) {
+            c.classList.add("active");
+          } else {
+            c.classList.remove("active");
+          }
+        });
+
+        if (detected && platformNames[detected]) {
+          if (badge) badge.textContent = `${platformNames[detected]} DETECTADO`;
+          if (platformHoverLabel) platformHoverLabel.textContent = platformNames[detected];
+        } else {
+          if (badge) badge.textContent = "DETECCIÓN AUTOMÁTICA";
+          if (platformHoverLabel) platformHoverLabel.textContent = "7 PLATAFORMAS";
+        }
+      }
+
+      // Si el usuario edita o cambia la URL, resetear el progreso, ocultar resultado previo y sincronizar plataforma
+      inputUrl.addEventListener("input", () => {
+        resetProgressBox();
+        hidePreviousResult();
+        syncDetectedPlatform(inputUrl.value);
+      });
+
+      batchUrls.addEventListener("input", () => {
+        resetProgressBox();
+        hidePreviousResult();
+      });
+
+      // Limpiar URL
+      btnClear.addEventListener("click", () => {
+        inputUrl.value = "";
+        resetProgressBox();
+        hidePreviousResult();
+        syncDetectedPlatform("");
+        inputUrl.focus();
+      });
+
+      // Pegar Enlace del Portapapeles
+      btnPaste.addEventListener("click", async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          if (text) {
+            inputUrl.value = text.trim();
+            resetProgressBox();
+            hidePreviousResult();
+            syncDetectedPlatform(inputUrl.value);
+          }
+        } catch {
+          inputUrl.focus();
+        }
+      });
+
+      // Toggle Modo Lote
+      btnToggleBatch.addEventListener("click", () => {
+        resetProgressBox();
+        hidePreviousResult();
+        isBatchMode = !isBatchMode;
+        if (isBatchMode) {
+          singleBox.style.display = "none";
+          batchBox.style.display = "block";
+          btnToggleBatch.textContent = "Modo Enlace Único";
+          btnConvertText.textContent = "Convertir Lote";
+        } else {
+          singleBox.style.display = "block";
+          batchBox.style.display = "none";
+          btnToggleBatch.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg> Modo Lote (Múltiples Enlaces)`;
+          btnConvertText.textContent = "Convertir";
+        }
+      });
+
+      // Chips de Plataforma: Indicadores informativos con hover
+      const platformHoverLabel = document.getElementById("platform-hover-label");
+      const platformNames = {
+        youtube: "YOUTUBE / SHORTS",
+        tiktok: "TIKTOK",
+        instagram: "INSTAGRAM REELS",
+        facebook: "FACEBOOK",
+        twitter: "TWITTER / X",
+        pinterest: "PINTEREST",
+        direct: "ENLACE DIRECTO"
+      };
+
+      document.querySelectorAll(".platform-chip").forEach(chip => {
+        const plat = chip.getAttribute("data-platform");
+
+        chip.addEventListener("mouseenter", () => {
+          if (platformHoverLabel && platformNames[plat]) {
+            platformHoverLabel.textContent = platformNames[plat];
+          }
+        });
+
+        chip.addEventListener("mouseleave", () => {
+          if (platformHoverLabel) {
+            const detected = detectPlatformFromUrl(inputUrl.value);
+            if (detected && platformNames[detected]) {
+              platformHoverLabel.textContent = platformNames[detected];
+            } else {
+              platformHoverLabel.textContent = "7 PLATAFORMAS";
+            }
+          }
+        });
+
+        // Al hacer clic, simplemente enfocar el campo de enlace sin rellenar ninguna URL por defecto
+        chip.addEventListener("click", () => {
+          inputUrl.focus();
+        });
+      });
+
+      // Función: Convertir
+      btnConvert.addEventListener("click", async () => {
+        const quality = selectQuality.value;
+
+        if (isBatchMode) {
+          const rawLines = batchUrls.value.trim().split("\n").map(l => l.trim()).filter(Boolean);
+          if (rawLines.length === 0) {
+            alert("Introduce al menos un enlace en el modo lote.");
+            return;
+          }
+
+          hidePreviousResult();
+          setFormDisabled(true);
+          progressBox.style.display = "block";
+          progressBar.style.width = "40%";
+          progressPercent.textContent = "40%";
+          progressStatus.innerHTML = `<span class="spinner"></span> Procesando lote de ${rawLines.length} enlaces...`;
+
+          try {
+            const res = await fetch("/api/media/batch", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ urls: rawLines, format: selectedFormat, quality })
+            });
+            const data = await res.json();
+            progressBar.style.width = "100%";
+            progressPercent.textContent = "100%";
+
+            if (data.status === "success" && data.items && data.items.length > 0) {
+              const firstSuccess = data.items.find(i => i.status === "success") || data.items[0];
+              displayResult(firstSuccess);
+              progressStatus.textContent = `¡Lote completado! ${data.items.length} videos procesados.`;
+            } else {
+              alert(data.error || "Error al procesar el lote.");
+            }
+          } catch (err) {
+            alert("Error en proceso por lotes: " + err.message);
+          } finally {
+            setFormDisabled(false);
+          }
+          return;
+        }
+
+        const url = inputUrl.value.trim();
+        if (!url) {
+          alert("Por favor introduce un enlace de video.");
+          return;
+        }
+
+        hidePreviousResult();
+        setFormDisabled(true);
+        progressBox.style.display = "block";
+        progressBar.style.width = "25%";
+        progressPercent.textContent = "25%";
+        progressStatus.innerHTML = `<span class="spinner"></span> Analizando protocolo y extrayendo stream...`;
+
+        try {
+          setTimeout(() => {
+            if (progressBar.style.width === "25%") {
+              progressBar.style.width = "65%";
+              progressPercent.textContent = "65%";
+              progressStatus.innerHTML = `<span class="spinner"></span> Transcodificando a ${selectedFormat.toUpperCase()} (${quality})...`;
+            }
+          }, 600);
+
+          const res = await fetch("/api/media/convert", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url, format: selectedFormat, quality })
+          });
+          const data = await res.json();
+
+          progressBar.style.width = "100%";
+          progressPercent.textContent = "100%";
+
+          if (data.status === "success") {
+            progressStatus.textContent = "¡Conversión exitosa!";
+            displayResult(data);
+            if (btnConvert && btnConvertText) {
+              btnConvert.classList.add("btn-copied");
+              const origText = btnConvertText.textContent;
+              btnConvertText.innerHTML = '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> <span>¡Listo!</span>';
+              setTimeout(() => {
+                btnConvert.classList.remove("btn-copied");
+                btnConvertText.textContent = origText;
+              }, 1800);
+            }
+          } else {
+            alert(data.error || "Error en la conversión del video.");
+          }
+        } catch (err) {
+          alert("Error de red: " + err.message);
+        } finally {
+          setFormDisabled(false);
+        }
+      });
+
+      // Actualizar visualización de duración de audio y video
+      function updateDurationDisplay(seconds) {
+        if (!seconds || isNaN(seconds) || !isFinite(seconds) || seconds <= 0) return;
+        const m = Math.floor(seconds / 60);
+        const s = Math.floor(seconds % 60);
+        const durStr = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        resDuration.textContent = durStr;
+        const dText = document.getElementById("res-duration-text");
+        if (dText) dText.textContent = durStr;
+      }
+
+      audioPlayer.addEventListener("loadedmetadata", () => {
+        updateDurationDisplay(audioPlayer.duration);
+      });
+      audioPlayer.addEventListener("durationchange", () => {
+        updateDurationDisplay(audioPlayer.duration);
+      });
+
+      videoPlayer.addEventListener("loadedmetadata", () => {
+        updateDurationDisplay(videoPlayer.duration);
+      });
+      videoPlayer.addEventListener("durationchange", () => {
+        updateDurationDisplay(videoPlayer.duration);
+      });
+
+      function displayResult(item) {
+        resultCard.style.display = "block";
+        resTitle.textContent = item.title;
+        resAuthor.textContent = item.author || "Autor";
+        resThumbnail.src = item.thumbnail || `/api/media/thumbnail-proxy?title=${encodeURIComponent(item.title)}&platform=${encodeURIComponent(item.platform)}&author=${encodeURIComponent(item.author || "")}`;
+        resThumbnail.onerror = () => {
+          resThumbnail.onerror = null;
+          resThumbnail.src = `/api/media/thumbnail-proxy?title=${encodeURIComponent(item.title)}&platform=${encodeURIComponent(item.platform)}&author=${encodeURIComponent(item.author || "")}`;
+        };
+        resPlatform.textContent = item.platform || "MEDIA";
+        resDuration.textContent = item.duration || "00:00";
+        const resDurationText = document.getElementById("res-duration-text");
+        if (resDurationText) resDurationText.textContent = item.duration || "00:00";
+        resFormat.textContent = `${item.format.toUpperCase()} ${item.quality.toUpperCase()}`;
+        resSize.textContent = item.sizeFormatted || "4.5 MB";
+
+        btnDownload.style.display = "inline-flex";
+        btnDownload.href = item.downloadUrl;
+        btnDownload.setAttribute("download", item.filename || `media.${item.format}`);
+        btnDownload.removeAttribute("target");
+
+        btnCopyStream.onclick = () => {
+          const downloadFull = window.location.origin + item.downloadUrl;
+          navigator.clipboard.writeText(downloadFull);
+          const origHtml = btnCopyStream.innerHTML;
+          const origBg = btnCopyStream.style.background;
+          const origColor = btnCopyStream.style.color;
+          const origBorder = btnCopyStream.style.borderColor;
+          btnCopyStream.classList.add("btn-copied");
+          btnCopyStream.innerHTML = `<svg class="icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> <span>¡Copiado!</span>`;
+          btnCopyStream.style.background = "var(--primary)";
+          btnCopyStream.style.color = "#000000";
+          btnCopyStream.style.borderColor = "var(--primary)";
+          btnCopyStream.style.fontWeight = "700";
+          setTimeout(() => {
+            btnCopyStream.classList.remove("btn-copied");
+            btnCopyStream.innerHTML = origHtml;
+            btnCopyStream.style.background = origBg;
+            btnCopyStream.style.color = origColor;
+            btnCopyStream.style.borderColor = origBorder;
+            btnCopyStream.style.fontWeight = "";
+          }, 2000);
+        };
+
+        if (item.format === "mp4") {
+          audioWrapper.style.display = "none";
+          videoWrapper.style.display = "block";
+          videoPlayer.src = item.streamUrl;
+          try { videoPlayer.load(); } catch {}
+        } else {
+          videoWrapper.style.display = "none";
+          audioWrapper.style.display = "block";
+          audioPlayer.src = item.streamUrl;
+          try { audioPlayer.load(); } catch {}
+        }
+
+        resultCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    });
+
+})(window, document);

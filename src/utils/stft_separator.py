@@ -1,6 +1,6 @@
 """
 STFT Spectral Vocal and Instrumental Separator
-CloudTranslator Engine - High-Fidelity Center-Pan Spectral Decomposition
+Vork Engine - High-Fidelity Center-Pan Spectral Decomposition
 """
 
 import sys

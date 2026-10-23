@@ -1,0 +1,79 @@
+/* ==========================================================================
+   Contenedores Principales y Estructura
+   ========================================================================== */
+.full-container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: clamp(24px, 4vw, 56px) clamp(16px, 4vw, 48px);
+  flex: 1;
+}
+
+/* Hero Principal */
+.hero-full {
+  position: relative;
+  background: linear-gradient(180deg, rgba(18, 21, 33, 0.7) 0%, rgba(13, 15, 24, 0.4) 100%);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl);
+  padding: clamp(32px, 6vw, 64px) clamp(20px, 5vw, 56px);
+  margin-bottom: clamp(36px, 6vw, 56px);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.hero-full::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.6), transparent);
+}
+
+.hero-tag-glow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--primary);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 18px;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+}
+
+.hero-full h1 {
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 18px;
+  background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.lead {
+  font-size: clamp(0.95rem, 1.8vw, 1.18rem);
+  color: var(--text-secondary);
+  max-width: 820px;
+  line-height: 1.65;
+  margin-bottom: 28px;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.hero-actions .btn {
+  padding: 10px 22px;
+  font-size: 0.88rem;
+}

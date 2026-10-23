@@ -1,9 +1,9 @@
-# Declaración de Derechos de Autor - CloudTranslator
+# Declaración de Derechos de Autor - Vork
 
-**© 2026 CloudTranslator. Todos los derechos reservados.**  
+**© 2026 Vork. Todos los derechos reservados.**  
 * **Autor y Desarrollador:** Miguel Angel Carlos Rojas  
-* **Repositorio Oficial:** [https://github.com/MiguelCarlosRojas/CloudTranslator](https://github.com/MiguelCarlosRojas/CloudTranslator)  
-* **URL del Servicio:** [https://cloudtranslator.onrender.com](https://cloudtranslator.onrender.com)  
+* **Repositorio Oficial:** [https://github.com/MiguelCarlosRojas/Vork](https://github.com/MiguelCarlosRojas/Vork)  
+* **URL del Servicio:** [https://vork-st1k.onrender.com](https://vork-st1k.onrender.com)  
 * **Contacto:** [isakiangel6@gmail.com](mailto:isakiangel6@gmail.com)  
 
 ---
@@ -43,4 +43,4 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
    Las dependencias de código abierto utilizadas en este proyecto (`express`, `google-translate-api-x`, `msedge-tts`, `@ffmpeg-installer/ffmpeg`, `fluent-ffmpeg`, `youtubei.js`, `btch-downloader`, `rahad-all-downloader-v2`, `snapsave-media-downloader`, `axios`, `form-data`, `@gradio/client`, `cors`, `compression`, `winston`, `nodemon`) pertenecen a sus respectivos autores y se rigen bajo sus licencias correspondientes (MIT, ISC, Apache-2.0, LGPL/GPL).
 
 4. **Uso de la API y Servicio en la Nube:**  
-   Se permite la libre integración de aplicaciones web, móviles o de backend con los servicios y endpoints públicos de `https://cloudtranslator.onrender.com/api/*` bajo políticas de uso justo y sin fines maliciosos.
+   Se permite la libre integración de aplicaciones web, móviles o de backend con los servicios y endpoints públicos de `https://vork-st1k.onrender.com/api/*` bajo políticas de uso justo y sin fines maliciosos.

@@ -1,124 +1,82 @@
 /**
- * CloudComponents - Sistema Modular de Componentes Reutilizables
- * Centraliza la estructura de Encabezado (Navbar), Pie de Página (Footer),
- * Selectores de Voz/Idioma y Controles de Interfaz para todo CloudTranslator.
+ * Vork Components - Sistema Modular de Componentes Reutilizables
+ * Centraliza la estructura de Encabezado (Navbar), Cajón Móvil (Mobile Drawer),
+ * Pie de Página (Footer) y Controles de Interfaz para todo el ecosistema Vork.
+ * Diseñado bajo la estética editorial orgánica y cálida inspirada en Huella.
  */
 
 (function (window, document) {
   "use strict";
 
   const CloudComponents = {
-    version: "2.5.0",
+    version: "3.0.0",
 
     /**
-     * Plantilla HTML del Encabezado y Barra Lateral Móvil
+     * Detecta la pestaña activa según la URL actual
+     */
+    detectActiveNav() {
+      try {
+        const p = (window.location.pathname || "/").toLowerCase();
+        if (p === "/" || p === "/index.html") return "home";
+        if (p.startsWith("/docs")) return "docs";
+        if (p.startsWith("/support")) return "support";
+        if (p.startsWith("/status")) return "status";
+        if (p.startsWith("/translator")) return "translator";
+        if (p.startsWith("/tts")) return "tts";
+        if (p.startsWith("/voice-clone")) return "voice-clone";
+        if (p.startsWith("/converter") || p.startsWith("/media")) return "converter";
+        if (p.startsWith("/vocal-remover") || p.startsWith("/separator") || p.startsWith("/stems")) return "vocal-remover";
+        if (p.startsWith("/dj") || p.startsWith("/cloud-dj")) return "dj";
+        if (p.startsWith("/image-converter") || p.startsWith("/img")) return "image-converter";
+        if (p.startsWith("/background-remover") || p.startsWith("/bg-remover") || p.startsWith("/ai-background")) return "background-remover";
+        if (p.startsWith("/cli") || p.startsWith("/terminal")) return "cli";
+        if (p.startsWith("/donate")) return "donate";
+        if (p.startsWith("/api")) return "api";
+        if (p.startsWith("/learn")) return "learn";
+        if (p.startsWith("/help")) return "help";
+        if (p.startsWith("/terms")) return "terms";
+        if (p.startsWith("/privacy")) return "privacy";
+        if (p.startsWith("/security")) return "security";
+        return "";
+      } catch (e) {
+        return "home";
+      }
+    },
+
+    /**
+     * Plantilla HTML del Encabezado y Barra Flotante
      */
     getHeaderHTML(activeNav = "home") {
+      const active = activeNav || this.detectActiveNav();
       return `
-<div class="header-inner-full">
-  <div class="brand-group">
-    <a href="/" class="brand-link" title="CloudTranslator - Inicio">
-      <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="38" height="38">
-      <span class="brand-title">CloudTranslator</span>
-    </a>
-    <span class="badge badge-brand">v2.5.0</span>
-  </div>
-
-  <nav class="nav-links-full" aria-label="Navegación Principal">
-    <a href="/" class="${activeNav === "home" ? "active" : ""}">Inicio</a>
-    <a href="/docs" class="${activeNav === "docs" ? "active" : ""}">Docs</a>
-    <a href="/support" class="${activeNav === "support" ? "active" : ""}">Soporte</a>
-    <a href="/status" class="${activeNav === "status" ? "active" : ""}">Estado</a>
-  </nav>
-
-  <div class="translation-controls-full">
-    <button id="btn-english" class="btn btn-english" title="Traducir instantáneamente al inglés">
-      <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
-      English
-    </button>
-
-    <div class="lang-selector-group">
-      <div class="select-wrapper">
-        <select id="select-lang" aria-label="Seleccionar idioma de traducción" title="Seleccionar idioma">
-          <option value="es">Español (es)</option>
-          <option value="en">English (en)</option>
-          <option value="fr">Français (fr)</option>
-          <option value="de">Deutsch (de)</option>
-          <option value="it">Italiano (it)</option>
-          <option value="pt">Portugués (pt)</option>
-          <option value="ja">日本語 (ja)</option>
-          <option value="zh-CN">中文 (zh-CN)</option>
-          <option value="ru">Русский (ru)</option>
-        </select>
-      </div>
-      <div class="custom-lang-group">
-        <input type="text" id="input-custom-lang" placeholder="ISO" maxlength="5" title="Código ISO personalizado">
-        <button id="btn-translate-custom" class="btn btn-primary" title="Traducir a código ISO">GO</button>
-      </div>
+<header class="top-nav no-translate" data-no-translate id="main-header" data-mounted="true">
+  <div class="nav-container header-inner-full">
+    <div class="brand-group">
+      <a href="/" class="brand-link brand-wrapper" title="Vork - Inicio">
+        <span class="brand-logo-mark"><img src="/img/logo.png" alt="Vork Logo" class="brand-img" width="36" height="36"></span>
+        <span class="brand-title">vork<i>.</i></span>
+        <span class="brand-subtitle">ecosistema<br>multimodal</span>
+      </a>
+      <span class="badge badge-brand">v3.0.0</span>
     </div>
 
-    <button id="btn-restore" class="btn btn-outline" title="Restaurar idioma original">
-      <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
-      Original
-    </button>
+    <nav class="desktop-nav nav-links-full" aria-label="Navegación Principal">
+      <a href="/" class="${active === "home" ? "active" : ""}">Inicio</a>
+      <a href="/docs" class="${active === "docs" ? "active" : ""}">Docs</a>
+      <a href="/support" class="${active === "support" ? "active" : ""}">Soporte</a>
+      <a href="/status" class="${active === "status" ? "active" : ""}">Estado</a>
+    </nav>
 
-    <div id="status-pill" class="status-pill" title="Estado del microservicio">
-      <span class="spinner"></span>
-      <span id="status-text">LISTO</span>
-    </div>
-  </div>
+    <div class="toolbar-controls translation-controls-full">
+      <button id="btn-english" class="btn btn-english btn-sm" title="Traducir instantáneamente al inglés">
+        <svg class="icon" viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
+        <span>English</span>
+      </button>
 
-  <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Abrir Menú de Navegación Lateral">
-    <span class="hamburger-line"></span>
-    <span class="hamburger-line"></span>
-    <span class="hamburger-line"></span>
-  </button>
-</div>
-
-<div id="drawer-backdrop"></div>
-
-<aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
-  <div class="drawer-header">
-    <a href="/" class="drawer-brand">
-      <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
-      <span>CloudTranslator</span>
-    </a>
-    <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-  </div>
-
-  <div class="drawer-body">
-    <div class="drawer-section">
-      <span class="drawer-title">NAVEGACIÓN DEL PORTAL</span>
-      <ul class="drawer-menu">
-        <li><a href="/" class="${activeNav === "home" ? "active" : ""}"><svg class="icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Inicio</a></li>
-        <li><a href="/docs" class="${activeNav === "docs" ? "active" : ""}"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Documentación</a></li>
-        <li><a href="/support" class="${activeNav === "support" ? "active" : ""}"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Soporte</a></li>
-        <li><a href="/status" class="${activeNav === "status" ? "active" : ""}"><svg class="icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Estado Servidor</a></li>
-      </ul>
-    </div>
-
-    <div class="drawer-section">
-      <span class="drawer-title">LOS 6 PILARES</span>
-      <ul class="drawer-menu">
-        <li><a href="/translator" class="${activeNav === "translator" ? "active" : ""}"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Traductor en la Nube</a></li>
-        <li><a href="/tts" class="${activeNav === "tts" ? "active" : ""}"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS)</a></li>
-        <li><a href="/voice-clone" class="${activeNav === "voice-clone" ? "active" : ""}"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz (IA)</a></li>
-        <li><a href="/converter" class="${activeNav === "converter" ? "active" : ""}"><svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="8" cy="12" r="2"/></svg> Conversor Multimedia (MP3 / MP4)</a></li>
-        <li><a href="/vocal-remover" class="${activeNav === "vocal-remover" ? "active" : ""}"><svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Separador de Voz</a></li>
-        <li><a href="/dj" class="${activeNav === "dj" ? "active" : ""}"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg> CloudDJ Mezclador</a></li>
-        <li><a href="/donate" class="${activeNav === "donate" ? "active" : ""}"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
-      </ul>
-    </div>
-
-    <div class="drawer-section">
-      <span class="drawer-title">CENTRO DE TRADUCCIÓN</span>
-      <div class="drawer-toolbar">
-        <button class="btn btn-english w-full" onclick="window.translator && window.translator.translateToEnglish()">
-          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traducir a English
-        </button>
-        <div class="drawer-select-group">
-          <select class="drawer-select" onchange="if(window.translator){ if(this.value==='es') window.translator.restoreOriginal(); else window.translator.translatePage(this.value); }">
-            <option value="es">Español (es) - Original</option>
+      <div class="selector-box lang-selector-group">
+        <div class="selector-dropdown select-wrapper">
+          <select id="select-lang" class="select-sm" aria-label="Seleccionar idioma de traducción" title="Seleccionar idioma">
+            <option value="es">Español (es)</option>
             <option value="en">English (en)</option>
             <option value="fr">Français (fr)</option>
             <option value="de">Deutsch (de)</option>
@@ -129,10 +87,69 @@
             <option value="ru">Русский (ru)</option>
           </select>
         </div>
-        <button class="btn btn-outline w-full" onclick="window.translator && window.translator.restoreOriginal()">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg> Restaurar Original
-        </button>
+        <div class="custom-lang-group">
+          <input type="text" id="input-custom-lang" placeholder="ISO" maxlength="5" title="Código ISO personalizado (ej: ja, fr, de)">
+          <button id="btn-translate-custom" class="btn btn-primary btn-sm" title="Traducir a código ISO">GO</button>
+        </div>
       </div>
+
+      <button id="btn-restore" class="btn btn-outline btn-sm" title="Restaurar idioma original">
+        <svg class="icon" viewBox="0 0 24 24" width="15" height="15"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+        <span>Original</span>
+      </button>
+
+      <div id="status-pill" class="status-pill" title="Estado del microservicio Vork">
+        <span class="pulse"></span>
+        <span id="status-text">LISTO</span>
+      </div>
+    </div>
+
+    <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Abrir Menú de Navegación Lateral">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+  </div>
+</header>
+
+<div id="drawer-backdrop"></div>
+
+<aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
+  <div class="drawer-header">
+    <a href="/" class="drawer-brand">
+      <span class="brand-logo-mark"><img src="/img/logo.png" alt="Vork Logo" class="brand-img" width="36" height="36"></span>
+      <span class="brand-title">vork<i>.</i></span>
+    </a>
+    <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral">
+      <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <div class="drawer-body">
+    <div class="drawer-section">
+      <span class="drawer-title">LOS 9 PILARES DE VORK</span>
+      <ul class="drawer-menu">
+        <li><a href="/translator" class="${active === "translator" ? "active" : ""}"><span class="nav-num">01</span> Traductor en la Nube</a></li>
+        <li><a href="/tts" class="${active === "tts" ? "active" : ""}"><span class="nav-num">02</span> Texto a Voz (TTS)</a></li>
+        <li><a href="/voice-clone" class="${active === "voice-clone" ? "active" : ""}"><span class="nav-num">03</span> Clonación de Voz IA</a></li>
+        <li><a href="/converter" class="${active === "converter" ? "active" : ""}"><span class="nav-num">04</span> Conversor Multimedia</a></li>
+        <li><a href="/vocal-remover" class="${active === "vocal-remover" ? "active" : ""}"><span class="nav-num">05</span> Separador de Stems</a></li>
+        <li><a href="/dj" class="${active === "dj" ? "active" : ""}"><span class="nav-num">06</span> Vork DJ Mezclador</a></li>
+        <li><a href="/image-converter" class="${active === "image-converter" ? "active" : ""}"><span class="nav-num">07</span> Conversor de Imágenes</a></li>
+        <li><a href="/background-remover" class="${active === "background-remover" ? "active" : ""}"><span class="nav-num">08</span> Estudio y Fondo IA</a></li>
+        <li><a href="/cli" class="${active === "cli" ? "active" : ""}"><span class="nav-num">09</span> Vork CLI Terminal</a></li>
+      </ul>
+    </div>
+
+    <div class="drawer-section">
+      <span class="drawer-title">NAVEGACIÓN DEL PORTAL</span>
+      <ul class="drawer-menu">
+        <li><a href="/" class="${active === "home" ? "active" : ""}"><svg class="icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Inicio</a></li>
+        <li><a href="/docs" class="${active === "docs" ? "active" : ""}"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Documentación</a></li>
+        <li><a href="/support" class="${active === "support" ? "active" : ""}"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Soporte</a></li>
+        <li><a href="/status" class="${active === "status" ? "active" : ""}"><svg class="icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Estado Servidor</a></li>
+        <li><a href="/donate" class="${active === "donate" ? "active" : ""}"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
+      </ul>
     </div>
   </div>
 </aside>
@@ -143,55 +160,96 @@
      * Plantilla HTML del Pie de Página Horizontal
      */
     getFooterHTML(activePage = "") {
+      const active = activePage || this.detectActiveNav();
       return `
-<div class="footer-inner-full">
-  <div class="footer-col footer-col-brand">
-    <h4>
-      <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="30" height="30">
-      CloudTranslator
-    </h4>
-    <p>Ecosistema cloud de procesamiento lingüístico y multimedia de alto rendimiento: traducción neuronal distribuida (+200 idiomas), Texto a Voz (TTS), Clonación de Voz por IA, Conversor Universal MP3/MP4, Separador de Voz y CloudDJ.</p>
-    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
-      Microservicio libre en Render • <span class="badge badge-online">ONLINE</span>
-    </p>
+<footer class="footer-full site-footer" id="main-footer" data-mounted="true">
+  <div class="footer-inner-full">
+    <div class="footer-col footer-col-brand">
+      <h4>
+        <span class="brand-logo-mark"><img src="/img/logo.png" alt="Vork Logo" class="brand-img" width="36" height="36"></span>
+        <span>vork<i>.</i></span>
+      </h4>
+      <p>Ecosistema cloud multimodal de alto rendimiento: traducción neuronal distribuida (+200 idiomas), Voz Neuronal TTS, Clonación Vocal IA, Conversor Multimedia Universal MP3/MP4, Separador de Stems, Vork DJ y Vork CLI con Agentes Autónomos.</p>
+      <p style="font-size: 0.85rem; color: var(--muted); margin-top: 14px; display: flex; align-items: center; gap: 8px;">
+        <span class="pulse"></span>
+        <span>Microservicio autónomo activo • <b>v3.0.0 ONLINE</b></span>
+      </p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Servicios</h4>
+      <ul>
+        <li><a href="/voice-clone" class="${active === "voice-clone" ? "active" : ""}">Clonación de Voz IA</a></li>
+        <li><a href="/dj" class="${active === "dj" ? "active" : ""}">Vork DJ Mezclador</a></li>
+        <li><a href="/image-converter" class="${active === "image-converter" ? "active" : ""}">Conversor de Imágenes</a></li>
+        <li><a href="/background-remover" class="${active === "background-remover" ? "active" : ""}">Estudio de Fondo IA</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Recursos</h4>
+      <ul>
+        <li><a href="/api" class="${active === "api" ? "active" : ""}">API REST Vork</a></li>
+        <li><a href="/docs" class="${active === "docs" ? "active" : ""}">Documentación</a></li>
+        <li><a href="/learn" class="${active === "learn" ? "active" : ""}">Guías de Integración</a></li>
+        <li><a href="/help" class="${active === "help" ? "active" : ""}">Centro de Ayuda</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Información Legal</h4>
+      <ul>
+        <li><a href="/terms" class="${active === "terms" ? "active" : ""}">Términos del Servicio</a></li>
+        <li><a href="/privacy" class="${active === "privacy" ? "active" : ""}">Política de Privacidad</a></li>
+        <li><a href="/security" class="${active === "security" ? "active" : ""}">Seguridad y Cookies</a></li>
+        <li><a href="/donate" class="${active === "donate" ? "active" : ""}">Donaciones y Apoyo</a></li>
+      </ul>
+    </div>
   </div>
 
-  <div class="footer-col">
-    <h4>Servicios</h4>
-    <ul>
-      <li><a href="/translator" class="${activePage === "translator" ? "active" : ""}">Traductor en la Nube</a></li>
-      <li><a href="/tts" class="${activePage === "tts" ? "active" : ""}">Texto a Voz (TTS)</a></li>
-      <li><a href="/voice-clone" class="${activePage === "voice-clone" ? "active" : ""}">Clonación de Voz IA</a></li>
-      <li><a href="/converter" class="${activePage === "converter" ? "active" : ""}">Conversor MP3 / MP4</a></li>
-      <li><a href="/vocal-remover" class="${activePage === "vocal-remover" ? "active" : ""}">Separador de Voz</a></li>
-      <li><a href="/dj" class="${activePage === "dj" ? "active" : ""}">CloudDJ Mezclador</a></li>
-    </ul>
+  <div class="footer-bottom-full">
+    <span>© 2026 Vork. Todos los derechos reservados.</span>
+    <span>Plataforma Multimodal de Alto Rendimiento</span>
   </div>
-
-  <div class="footer-col">
-    <h4>Recursos</h4>
-    <ul>
-      <li><a href="/api" class="${activePage === "api" ? "active" : ""}">API REST</a></li>
-      <li><a href="/learn" class="${activePage === "learn" ? "active" : ""}">Guías de Integración</a></li>
-      <li><a href="/help" class="${activePage === "help" ? "active" : ""}">Centro de Ayuda</a></li>
-    </ul>
-  </div>
-
-  <div class="footer-col">
-    <h4>Información Legal</h4>
-    <ul>
-      <li><a href="/terms" class="${activePage === "terms" ? "active" : ""}">Términos del Servicio</a></li>
-      <li><a href="/privacy" class="${activePage === "privacy" ? "active" : ""}">Política de Privacidad</a></li>
-      <li><a href="/security" class="${activePage === "security" ? "active" : ""}">Seguridad y Cookies</a></li>
-    </ul>
-  </div>
-</div>
-
-<div class="footer-bottom-full">
-  <span>© 2026 CloudTranslator. Todos los derechos reservados.</span>
-  <span>Desarrollado por Miguel Angel Carlos Rojas</span>
-</div>
+</footer>
 `;
+    },
+
+    /**
+     * Monta o reemplaza el Encabezado en los contenedores especificados
+     */
+    renderHeader() {
+      const targets = document.querySelectorAll("#header-placeholder, #vork-header, [data-component='header']");
+      targets.forEach(target => {
+        if (target.getAttribute("data-mounted") === "true") return;
+        const activeNav = target.getAttribute("data-active") || this.detectActiveNav();
+        target.outerHTML = this.getHeaderHTML(activeNav);
+      });
+    },
+
+    /**
+     * Monta o reemplaza el Pie de Página en los contenedores especificados
+     */
+    renderFooter() {
+      const targets = document.querySelectorAll("#footer-placeholder, #vork-footer, [data-component='footer']");
+      targets.forEach(target => {
+        if (target.getAttribute("data-mounted") === "true") return;
+        const activePage = target.getAttribute("data-active") || this.detectActiveNav();
+        target.outerHTML = this.getFooterHTML(activePage);
+      });
+    },
+
+    /**
+     * Sincroniza el idioma en el selector según la cookie o estado global
+     */
+    syncLanguageState() {
+      try {
+        const savedLang = window.translator ? window.translator.getSavedLanguage() : null;
+        const select = document.getElementById("select-lang");
+        if (select && savedLang) {
+          select.value = savedLang;
+        }
+      } catch (e) {}
     },
 
     /**
@@ -254,173 +312,115 @@
     },
 
     /**
-     * Aplica automáticamente el diseño del componente select-wrapper y form-select-custom a los selects de consolas
+     * Delegación de eventos para la barra de traducción del encabezado
      */
-    decorateSelects() {
-      document.querySelectorAll(".studio-panel select, .voice-selector").forEach(select => {
-        if (!select.closest(".select-wrapper")) {
-          const wrapper = document.createElement("div");
-          wrapper.className = "select-wrapper";
-          select.parentNode.insertBefore(wrapper, select);
-          wrapper.appendChild(select);
-        }
-        if (!select.classList.contains("form-select-custom")) {
-          select.classList.add("form-select-custom");
-        }
-      });
-    },
-
-    /**
-     * Plantilla HTML del Modal QR Reutilizable
-     */
-    getQrModalHTML() {
-      return `
-<div id="qr-modal" class="custom-modal-overlay qr-modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" onclick="if(event.target===this) window.closeQrModal && window.closeQrModal();">
-  <div class="custom-modal-dialog qr-modal-dialog">
-    <div class="custom-modal-header qr-modal-header">
-      <h3 class="custom-modal-title">
-        <svg class="icon" viewBox="0 0 24 24" style="color: #d946ef; width: 22px; height: 22px;"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01M17 7h.01M7 17h.01M17 17h.01"/></svg>
-        Código QR Yape - Escaneo Directo
-      </h3>
-      <button id="qr-modal-close" class="custom-modal-close-btn btn-modal-close" aria-label="Cerrar ventana emergente" onclick="window.closeQrModal && window.closeQrModal();">
-        <svg class="icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="custom-modal-body qr-modal-body">
-      <img src="/img/yape-qr.png" alt="Código QR de Yape Ampliado" class="custom-modal-img qr-modal-img">
-      <p class="qr-modal-caption" style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin: 12px 0 0 0;">
-        Abre tu aplicación Yape en el teléfono celular, pulsa en el botón <strong>"Escanear QR"</strong> y enfoca este código directamente en tu pantalla.
-      </p>
-    </div>
-  </div>
-</div>`;
-    },
-
-    openQrModal() {
-      let modal = document.getElementById("qr-modal");
-      if (!modal) {
-        document.body.insertAdjacentHTML("beforeend", this.getQrModalHTML());
-        modal = document.getElementById("qr-modal");
-      }
-      if (modal) {
-        modal.classList.add("open");
-        modal.classList.add("active");
-        modal.classList.add("is-visible");
-        modal.setAttribute("aria-hidden", "false");
-        document.body.style.overflow = "hidden";
-      }
-    },
-
-    closeQrModal() {
-      const modal = document.getElementById("qr-modal");
-      if (modal) {
-        modal.classList.remove("open");
-        modal.classList.remove("active");
-        modal.classList.remove("is-visible");
-        modal.setAttribute("aria-hidden", "true");
-        document.body.style.overflow = "";
-      }
-    },
-
-    initQrModalEvents() {
-      if (window._qrModalEventsBound) return;
-      window._qrModalEventsBound = true;
+    initToolbarEvents() {
+      if (window._toolbarEventsBound) return;
+      window._toolbarEventsBound = true;
 
       document.addEventListener("click", (e) => {
-        const trigger = e.target.closest("#btn-open-qr-page-modal, [data-open-qr-modal], #qr-box-trigger, .qr-box-full");
-        if (trigger) {
+        const btnEnglish = e.target.closest("#btn-english");
+        if (btnEnglish) {
           e.preventDefault();
-          CloudComponents.openQrModal();
+          if (window.translator) window.translator.translateToEnglish();
+          else if (window.CloudTranslator) window.CloudTranslator.translateToEnglish();
           return;
         }
 
-        const closeBtn = e.target.closest("#qr-modal-close, .btn-modal-close, .custom-modal-close-btn");
-        const backdrop = (e.target.id === "qr-modal") || e.target.classList.contains("qr-modal-backdrop") || e.target.classList.contains("custom-modal-overlay");
-        if (closeBtn || backdrop) {
+        const btnRestore = e.target.closest("#btn-restore");
+        if (btnRestore) {
           e.preventDefault();
-          CloudComponents.closeQrModal();
+          if (window.translator) window.translator.restoreOriginal();
+          else if (window.CloudTranslator) window.CloudTranslator.restoreOriginal();
+          return;
+        }
+
+        const btnTranslateCustom = e.target.closest("#btn-translate-custom");
+        if (btnTranslateCustom) {
+          e.preventDefault();
+          const input = document.getElementById("input-custom-lang");
+          const val = (input?.value || "").trim().toLowerCase();
+          if (val) {
+            if (window.translator) window.translator.translatePage(val);
+            else if (window.CloudTranslator) window.CloudTranslator.translatePage(val);
+          }
+          return;
+        }
+
+        const btnCopyCmd = e.target.closest("#btn-copy-install, .btn-terminal-copy");
+        if (btnCopyCmd) {
+          e.preventDefault();
+          const terminalBox = btnCopyCmd.closest(".vork-terminal-box") || document;
+          const codeEl = terminalBox.querySelector("#cli-install-cmd, .cli-install-cmd, code");
+          const cmdText = (codeEl?.innerText || codeEl?.textContent || "irm https://vork-st1k.onrender.com/cli/install.ps1 | iex").trim();
+          
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(cmdText).then(() => {
+              const origHTML = btnCopyCmd.innerHTML;
+              btnCopyCmd.classList.add("btn-copied");
+              btnCopyCmd.innerHTML = `<svg class="icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> <span>¡Copiado!</span>`;
+              setTimeout(() => {
+                btnCopyCmd.classList.remove("btn-copied");
+                btnCopyCmd.innerHTML = origHTML;
+              }, 2000);
+            }).catch(() => {});
+          }
+          return;
+        }
+      });
+
+      document.addEventListener("change", (e) => {
+        if (e.target && e.target.id === "select-lang") {
+          const val = e.target.value;
+          if (window.translator) window.translator.translatePage(val);
+          else if (window.CloudTranslator) window.CloudTranslator.translatePage(val);
         }
       });
 
       document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-          CloudComponents.closeQrModal();
+        if (e.target && e.target.id === "input-custom-lang" && e.key === "Enter") {
+          e.preventDefault();
+          const val = e.target.value.trim().toLowerCase();
+          if (val) {
+            if (window.translator) window.translator.translatePage(val);
+            else if (window.CloudTranslator) window.CloudTranslator.translatePage(val);
+          }
         }
       });
     },
 
     /**
-     * Renderiza encabezados si están vacíos o requieren actualización
+     * Inyecta el grano de textura (film grain) de Huella si no está presente
      */
-    renderHeaders() {
-      const headerContainers = document.querySelectorAll("[data-component='header'], #header-placeholder");
-      headerContainers.forEach(container => {
-        if (!container.innerHTML.trim() || !container.querySelector(".header-inner-full")) {
-          const activeNav = container.getAttribute("data-active") || "home";
-          container.innerHTML = this.getHeaderHTML(activeNav);
-          container.className = "header-full no-translate";
-          container.setAttribute("data-no-translate", "");
-        }
-      });
+    ensureGrain() {
+      if (!document.querySelector(".grain")) {
+        const grainDiv = document.createElement("div");
+        grainDiv.className = "grain";
+        grainDiv.setAttribute("aria-hidden", "true");
+        document.body.appendChild(grainDiv);
+      }
     },
 
     /**
-     * Renderiza pies de página si están vacíos o requieren actualización
-     */
-    renderFooters() {
-      const footerContainers = document.querySelectorAll("[data-component='footer'], #footer-placeholder, footer.main-footer[data-component='footer']");
-      footerContainers.forEach(container => {
-        if (!container.innerHTML.trim() || !container.querySelector(".footer-inner-full")) {
-          const activePage = container.getAttribute("data-active") || "";
-          container.innerHTML = this.getFooterHTML(activePage);
-          container.className = "footer-full";
-        }
-      });
-    },
-
-    /**
-     * Observador de mutaciones para garantizar renderizado inmediato en SPAs y cambios dinámicos
-     */
-    initObserver() {
-      if (window._cloudComponentsObserver) return;
-      const target = document.body || document.documentElement;
-      if (!target) return;
-      const observer = new MutationObserver(() => {
-        const emptyFooter = document.querySelector("[data-component='footer']:empty, #footer-placeholder:empty");
-        const emptyHeader = document.querySelector("[data-component='header']:empty, #header-placeholder:empty");
-        if (emptyFooter || emptyHeader) {
-          this.renderHeaders();
-          this.renderFooters();
-        }
-      });
-      observer.observe(target, { childList: true, subtree: true });
-      window._cloudComponentsObserver = observer;
-    },
-
-    /**
-     * Auto-inyecta encabezado, pie de página y decora controles si existen
+     * Inicializa componentes en el DOM
      */
     init() {
-      this.renderHeaders();
-      this.renderFooters();
-      this.decorateSelects();
+      this.renderHeader();
+      this.renderFooter();
       this.initDrawerEvents();
-      this.initQrModalEvents();
-      this.initObserver();
+      this.initToolbarEvents();
+      this.ensureGrain();
+      this.syncLanguageState();
     }
   };
 
   // Exponer a nivel global
   window.CloudComponents = CloudComponents;
-  window.openQrModal = () => CloudComponents.openQrModal();
-  window.closeQrModal = () => CloudComponents.closeQrModal();
+  window.VorkComponents = CloudComponents;
 
-  // Auto-inicializar cuando el DOM esté listo
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      CloudComponents.init();
-    });
+    document.addEventListener("DOMContentLoaded", () => CloudComponents.init());
   } else {
     CloudComponents.init();
   }
-})(window, document);
+})(typeof window !== "undefined" ? window : this, typeof document !== "undefined" ? document : {});

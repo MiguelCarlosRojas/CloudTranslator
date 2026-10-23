@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Guías de Aprendizaje e Integración - CloudTranslator | Ejemplos en JavaScript, Node.js, Python, PHP, cURL, Texto a Voz y Clonación de Voz por IA.">
-  <meta property="og:title" content="Aprender e Integrar - CloudTranslator">
-  <meta property="og:description" content="Aprende a integrar CloudTranslator en cualquier lenguaje de programación sin dependencias externas.">
-  <title>Aprender e Integrar - CloudTranslator</title>
+  <meta name="description" content="Guías de Aprendizaje e Integración - Vork | Ejemplos en JavaScript, Node.js, Python, PHP, cURL, Texto a Voz y Clonación de Voz por IA.">
+  <meta property="og:title" content="Aprender e Integrar - Vork">
+  <meta property="og:description" content="Aprende a integrar Vork en cualquier lenguaje de programación sin dependencias externas.">
+  <title>Aprender e Integrar - Vork</title>
   <link rel="icon" type="image/png" sizes="192x192" href="/img/logo.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/img/logo.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/img/logo.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/img/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <script>
     (function(){try{var m=document.cookie.match(/(?:^|; )cloud_translator_lang=([^;]*)/);var l=m?decodeURIComponent(m[1]):null;if(l&&l!=="original"&&l!=="es"){document.documentElement.classList.add("ct-pending");setTimeout(function(){document.documentElement.classList.remove("ct-pending");},800);}}catch(e){}})();
@@ -20,155 +23,33 @@
 </head>
 <body>
 
+  <!-- Textura de grano sutil Huella -->
+  <div class="grain" aria-hidden="true"></div>
+
+
   <!-- Barra Superior -->
-  <header class="top-nav">
-    <div class="nav-container">
-      <a href="/" class="brand-wrapper">
-        <span class="brand-logo">
-          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="38" height="38">
-          CloudTranslator
-        </span>
-        <span class="brand-badge">v2.5.0</span>
-      </a>
-
-      <nav class="desktop-nav">
-        <ul class="main-menu">
-          <li><a href="/">Inicio</a></li>
-          <li><a href="/docs">Docs</a></li>
-          <li><a href="/support">Soporte</a></li>
-          <li><a href="/status">Estado</a></li>
-        </ul>
-      </nav>
-
-      <!-- Barra de Herramientas de Traducción Activa (Protegida contra corrupción visual) -->
-      <div class="toolbar-controls no-translate" data-no-translate>
-        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
-          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
-          English
-        </button>
-
-        <div class="selector-box">
-          <div class="selector-dropdown">
-            <select id="select-lang" aria-label="Seleccionar idioma">
-              <option value="en">English (en)</option>
-              <option value="es">Español (es)</option>
-              <option value="fr">Français (fr)</option>
-              <option value="de">Deutsch (de)</option>
-              <option value="it">Italiano (it)</option>
-              <option value="pt">Portugués (pt)</option>
-              <option value="ja">日本語 (ja)</option>
-              <option value="zh-CN">中文 (zh-CN)</option>
-              <option value="ru">Русский (ru)</option>
-            </select>
-          </div>
-          <div class="custom-lang-group">
-            <input type="text" id="input-custom-lang" placeholder="ISO" maxlength="5" title="Código ISO personalizado (ej: ja, zh, ru, it)">
-            <button id="btn-translate-custom" class="btn btn-primary" title="Traducir">GO</button>
-          </div>
-        </div>
-
-        <button id="btn-restore" class="btn btn-outline" title="Restaurar idioma original">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
-          Original
-        </button>
-
-        <div id="status-pill" class="status-pill" title="Estado del microservicio">
-          <span class="spinner"></span>
-          <span id="status-text">LISTO</span>
-        </div>
-      </div>
-
-      <!-- Botón Hamburguesa Móvil -->
-      <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Abrir Menú de Navegación">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
-    </div>
-
-    <!-- Backdrop para Barra Lateral -->
-    <div id="drawer-backdrop"></div>
-
-    <!-- Barra de Navegación Lateral Móvil (Lateral Sliding Sidebar) -->
-    <aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
-      <div class="drawer-header">
-        <a href="/" class="drawer-brand">
-          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
-          <span>CloudTranslator</span>
-        </a>
-        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </div>
-
-      <div class="drawer-body">
-        <div class="drawer-section">
-          <span class="drawer-title">NAVEGACIÓN DEL PORTAL</span>
-          <ul class="drawer-menu">
-            <li><a href="/"><svg class="icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Inicio</a></li>
-            <li><a href="/docs"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Documentación</a></li>
-            <li><a href="/support"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Soporte</a></li>
-            <li><a href="/status"><svg class="icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Estado Servidor</a></li>
-          </ul>
-        </div>
-
-        <div class="drawer-section">
-          <span class="drawer-title">LOS 4 PILARES</span>
-          <ul class="drawer-menu">
-            <li><a href="/translator"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traductor en la Nube</a></li>
-            <li><a href="/tts"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS)</a></li>
-            <li><a href="/voice-clone"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz (IA)</a></li>
-            <li><a href="/converter"><svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="8" cy="12" r="2"/></svg> Conversor Multimedia (MP3 / MP4)</a></li>
-            <li><a href="/donate"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
-          </ul>
-        </div>
-
-        <div class="drawer-section">
-          <span class="drawer-title">CENTRO DE TRADUCCIÓN</span>
-          <div class="drawer-toolbar">
-            <button class="btn btn-english w-full" onclick="window.translator && window.translator.translateToEnglish()">
-              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traducir a English
-            </button>
-            <div class="drawer-select-group">
-              <select class="drawer-select" onchange="if(window.translator){ if(this.value==='es') window.translator.restoreOriginal(); else window.translator.translatePage(this.value); }">
-                <option value="es">Español (es) - Original</option>
-                <option value="en">English (en)</option>
-                <option value="fr">Français (fr)</option>
-                <option value="de">Deutsch (de)</option>
-                <option value="it">Italiano (it)</option>
-                <option value="pt">Portugués (pt)</option>
-                <option value="ja">日本語 (ja)</option>
-                <option value="zh-CN">中文 (zh-CN)</option>
-                <option value="ru">Русский (ru)</option>
-              </select>
-            </div>
-            <button class="btn btn-outline w-full" onclick="window.translator && window.translator.restoreOriginal()">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg> Restaurar Original
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="drawer-footer">
-        <span>CloudTranslator v2.5.0</span>
-        <span>Guías</span>
-      </div>
-    </aside>
-  </header>
+  <header id="header-placeholder" data-component="header" data-active="learn"></header>
 
   <main class="full-container">
-    <div class="hero-full">
-      <span class="hero-tag-glow">[ GUÍAS DE INTEGRACIÓN Y TUTORIALES ]</span>
-      <h1>Aprende a Integrar CloudTranslator</h1>
-      <p class="lead">
-        Guía técnica integral paso a paso. Aprende los fundamentos arquitectónicos, la integración en el navegador con el SDK JavaScript y el consumo directo en servidores (Node.js, Python, cURL) con micro-lotes y tolerancia a fallos.
-      </p>
-    </div>
+    <!-- Hero de Guías de Integración -->
+    <section class="hero-full">
+      <div class="hero-split hero-split-solo">
+        <div class="hero-split-content">
+          <span class="label">[ GUÍAS DE INTEGRACIÓN Y TUTORIALES ]</span>
+          <h1 class="h-section">Aprende a Integrar <em>Vork</em></h1>
+          <p class="lead" style="text-align: left; margin: 0;">
+            Guía técnica integral paso a paso. Aprende los fundamentos arquitectónicos, la integración en el navegador con el SDK JavaScript y el consumo directo en servidores con micro-lotes y tolerancia a fallos:
+          </p>
+        </div>
+      </div>
+    </section>
 
     <!-- Módulo 0: Arquitectura y Toma de Decisiones -->
     <article class="content-box-card">
       <span class="tech-card-tag">[ 00 // ARCHITECTURE_OVERVIEW ]</span>
-      <h2>0. ¿Cómo Funciona la Integración en los 4 Pilares?</h2>
+      <h2>0. ¿Cómo Funciona la Integración en los 9 Pilares?</h2>
       <p>
-        CloudTranslator opera bajo una arquitectura modular desacoplada de microservicios. Puedes integrar cada uno de los 4 pilares tecnológicos según las necesidades de tu sistema:
+        Vork opera bajo una arquitectura modular desacoplada de microservicios. Puedes integrar cada uno de los 9 pilares tecnológicos según las necesidades de tu sistema:
       </p>
 
       <div class="table-responsive">
@@ -184,7 +65,7 @@
           <tbody>
             <tr>
               <td><strong>Pilar 1: Traductor en la Nube</strong></td>
-              <td>SDK JS (<code>cloud-translator.js</code>) o REST POST <code>/api/translate</code>.</td>
+              <td>SDK JS (<code>vork.js</code>) o REST POST <code>/api/translate</code>.</td>
               <td>Traducción web en tiempo real, localización de catálogos y sistemas multilingües.</td>
               <td>1 sola consulta HTTP para todo el DOM, persistencia por cookie técnica, 0ms desde memoria RAM.</td>
             </tr>
@@ -225,10 +106,10 @@
         <span>HTML / ETIQUETA SCRIPT CDN</span>
         <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-1')">Copiar</button>
       </div>
-      <pre class="code-panel" id="code-learn-1">&lt;script src="https://cloudtranslator.onrender.com/js/cloud-translator.js"&gt;&lt;/script&gt;</pre>
+      <pre class="code-panel" id="code-learn-1">&lt;script src="https://vork-st1k.onrender.com/js/vork.js"&gt;&lt;/script&gt;</pre>
 
       <h3 style="color: #ffffff; font-size: 1.05rem; margin-top: 24px;">Paso 2: Opciones de Inicialización</h3>
-      <p>Al instanciar <code>new CloudTranslator(options)</code>, dispones de los siguientes parámetros configurables:</p>
+      <p>Al instanciar <code>new Vork(options)</code>, dispones de los siguientes parámetros configurables:</p>
       
       <div class="table-responsive">
         <table class="docs-table">
@@ -245,7 +126,7 @@
               <td><code>endpoint</code></td>
               <td>string</td>
               <td><code>"/api/translate"</code></td>
-              <td>URL absoluta o relativa del servicio de traducción. En producción usa: <code>https://cloudtranslator.onrender.com/api/translate</code>.</td>
+              <td>URL absoluta o relativa del servicio de traducción. En producción usa: <code>https://vork-st1k.onrender.com/api/translate</code>.</td>
             </tr>
             <tr>
               <td><code>useCookies</code></td>
@@ -306,15 +187,15 @@
   &lt;main&gt;
     &lt;h1&gt;Bienvenido a nuestra plataforma global&lt;/h1&gt;
     &lt;p&gt;Ofrecemos soluciones avanzadas de software empresarial en la nube.&lt;/p&gt;
-    &lt;p class="notranslate"&gt;Esta marca CloudTranslator no se traduce nunca.&lt;/p&gt;
+    &lt;p class="notranslate"&gt;Esta marca Vork no se traduce nunca.&lt;/p&gt;
   &lt;/main&gt;
 
   &lt;!-- Inclusión del SDK --&gt;
-  &lt;script src="https://cloudtranslator.onrender.com/js/cloud-translator.js"&gt;&lt;/script&gt;
+  &lt;script src="https://vork-st1k.onrender.com/js/vork.js"&gt;&lt;/script&gt;
   &lt;script&gt;
     // 1. Inicialización del traductor
-    const translator = new CloudTranslator({
-      endpoint: "https://cloudtranslator.onrender.com/api/translate",
+    const translator = new Vork({
+      endpoint: "https://vork-st1k.onrender.com/api/translate",
       useCookies: true,
       batchSize: 500,
       onStart: () => {
@@ -347,7 +228,7 @@
         <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-exclude')">Copiar</button>
       </div>
       <pre class="code-panel" id="code-learn-exclude">&lt;!-- Opción A: Mediante clase CSS --&gt;
-&lt;span class="notranslate"&gt;CloudTranslator Enterprise&lt;/span&gt;
+&lt;span class="notranslate"&gt;Vork Enterprise&lt;/span&gt;
 
 &lt;!-- Opción B: Mediante atributo estándar HTML5 --&gt;
 &lt;div translate="no"&gt;
@@ -369,7 +250,7 @@
         <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-3')">Copiar</button>
       </div>
       <pre class="code-panel" id="code-learn-3">async function traducirTexto(texto, idiomaDestino) {
-  const url = "https://cloudtranslator.onrender.com/api/translate";
+  const url = "https://vork-st1k.onrender.com/api/translate";
   const respuesta = await fetch(url, {
     method: "POST",
     headers: {
@@ -404,7 +285,7 @@ traducirTexto("Servicio de traducción en tiempo real", "en")
         <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-batch-node')">Copiar</button>
       </div>
       <pre class="code-panel" id="code-learn-batch-node">async function traducirLote(listaTextos, idiomaDestino) {
-  const url = "https://cloudtranslator.onrender.com/api/translate";
+  const url = "https://vork-st1k.onrender.com/api/translate";
   const respuesta = await fetch(url, {
     method: "POST",
     headers: {
@@ -438,7 +319,7 @@ traducirLote(["Inicio", "Configuración", "Cerrar Sesión"], "en")
         <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-retry')">Copiar</button>
       </div>
       <pre class="code-panel" id="code-learn-retry">async function traducirConReintento(texto, idioma, maxIntentos = 3) {
-  const url = "https://cloudtranslator.onrender.com/api/translate";
+  const url = "https://vork-st1k.onrender.com/api/translate";
 
   for (let intento = 1; intento <= maxIntentos; intento++) {
     try {
@@ -477,7 +358,7 @@ traducirLote(["Inicio", "Configuración", "Cerrar Sesión"], "en")
       <pre class="code-panel" id="code-learn-4">import requests
 from typing import List, Union
 
-API_URL = "https://cloudtranslator.onrender.com/api/translate"
+API_URL = "https://vork-st1k.onrender.com/api/translate"
 
 def traducir(contenido: Union[str, List[str]], idioma_destino: str) -> Union[str, List[str]]:
     headers = {"Content-Type": "application/json"}
@@ -518,7 +399,7 @@ print(traducir(["Facturación", "Inventario", "Reportes"], "fr"))
         <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-curl')">Copiar</button>
       </div>
       <pre class="code-panel" id="code-learn-curl"># 1. Traducción directa e impresión limpia del resultado con jq
-curl -s -X POST "https://cloudtranslator.onrender.com/api/translate" \
+curl -s -X POST "https://vork-st1k.onrender.com/api/translate" \
   -H "Content-Type: application/json" \
   -d '{"text": "Despliegue completado con éxito", "targetLanguage": "en"}' \
   | jq -r '.translatedText'
@@ -538,7 +419,7 @@ curl -s -X POST "https://cloudtranslator.onrender.com/api/translate" \
       </div>
       <pre class="code-panel" id="code-learn-tts">// 1. Sintetizar y reproducir audio en el navegador
 async function reproducirTexto(texto, voz = "es-ES-AlvaroNeural") {
-  const res = await fetch("https://cloudtranslator.onrender.com/api/tts", {
+  const res = await fetch("https://vork-st1k.onrender.com/api/tts", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -556,7 +437,7 @@ async function reproducirTexto(texto, voz = "es-ES-AlvaroNeural") {
 }
 
 // 2. Consultar catálogo de 24 voces disponibles
-fetch("https://cloudtranslator.onrender.com/api/tts/voices")
+fetch("https://vork-st1k.onrender.com/api/tts/voices")
   .then(r => r.json())
   .then(data => console.log("Voces disponibles:", data.voices));</pre>
     </article>
@@ -583,7 +464,7 @@ async function clonarVoz(rutaAudioMuestra, guionTexto) {
   form.append("text", guionTexto);
   form.append("stability", "0.75");
 
-  const res = await axios.post("https://cloudtranslator.onrender.com/api/voice-clone", form, {
+  const res = await axios.post("https://vork-st1k.onrender.com/api/voice-clone", form, {
     headers: form.getHeaders(),
     responseType: "arraybuffer"
   });
@@ -606,7 +487,7 @@ async function clonarVoz(rutaAudioMuestra, guionTexto) {
         <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-learn-media')">Copiar</button>
       </div>
       <pre class="code-panel" id="code-learn-media">// 1. Obtener metadatos y formatos del video
-const infoRes = await fetch("https://cloudtranslator.onrender.com/api/media/info", {
+const infoRes = await fetch("https://vork-st1k.onrender.com/api/media/info", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" })
@@ -615,7 +496,7 @@ const mediaInfo = await infoRes.json();
 console.log("Título:", mediaInfo.title, "Formatos:", mediaInfo.formats);
 
 // 2. Solicitar conversión a MP3 de alta fidelidad (320 kbps)
-const convertRes = await fetch("https://cloudtranslator.onrender.com/api/media/convert", {
+const convertRes = await fetch("https://vork-st1k.onrender.com/api/media/convert", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
@@ -633,7 +514,7 @@ console.log("Enlace de descarga directa:", result.downloadUrl);</pre>
       <span class="tech-card-tag">[ 08 // STATUS_CODES_TROUBLESHOOTING ]</span>
       <h2>8. Códigos de Respuesta y Diagnóstico de Errores</h2>
       <p>
-        El gateway de CloudTranslator emite códigos de estado HTTP estándar acompañados de un mensaje aclaratorio en JSON para todos los servicios:
+        El gateway de Vork emite códigos de estado HTTP estándar acompañados de un mensaje aclaratorio en JSON para todos los servicios:
       </p>
 
       <div class="table-responsive">
@@ -680,38 +561,8 @@ console.log("Enlace de descarga directa:", result.downloadUrl);</pre>
   <!-- Pie de Página Aliniado y Estructurado -->
   <footer id="footer-placeholder" data-component="footer" data-active="learn"></footer>
 
-  <script src="/js/cloud-translator.js"></script>
-  <script>
-    window.copiarAlPortapapeles = function(btn, elementId) {
-      const el = document.getElementById(elementId);
-      if (!el) return;
-      const text = el.innerText || el.textContent;
-      navigator.clipboard.writeText(text).then(() => {
-        const originalText = btn.textContent;
-        btn.textContent = "COPIADO";
-        btn.style.borderColor = "#ffffff";
-        btn.style.color = "#ffffff";
-        setTimeout(() => {
-          btn.textContent = originalText;
-          btn.style.borderColor = "";
-          btn.style.color = "";
-        }, 1500);
-      }).catch(err => {
-        console.error("Error al copiar:", err);
-      });
-    };
-
-    document.addEventListener("DOMContentLoaded", () => {
-      const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";
-      window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
-      document.getElementById("btn-english").onclick = () => window.translator.translateToEnglish();
-      document.getElementById("btn-restore").onclick = () => window.translator.restoreOriginal();
-      document.getElementById("select-lang").onchange = (e) => window.translator.translatePage(e.target.value);
-      document.getElementById("btn-translate-custom").onclick = () => {
-        const val = document.getElementById("input-custom-lang").value.trim().toLowerCase();
-        if (val) window.translator.translatePage(val);
-      };
-    });
-  </script>
+  <script src="/js/vork.js"></script>
+  <script src="/js/vork.js"></script>
+    <script src="/js/modules/common.js" defer></script>
 </body>
 </html>

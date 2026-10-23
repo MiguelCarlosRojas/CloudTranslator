@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Documentación Técnica de Ingeniería de CloudTranslator v2.5.0 | Arquitectura de los 6 Pilares: Traducción Neural por Lotes, Texto a Voz (TTS), Clonación de Voz IA, Conversor Multimedia, Separador de Voz Demucs v4 y CloudDJ Mezclador.">
-  <meta property="og:title" content="Documentación Técnica - CloudTranslator">
-  <meta property="og:description" content="Especificación de arquitectura, algoritmos acústicos, flujo DOM y manual de integración de CloudTranslator v2.5.0.">
-  <title>Documentación Técnica - CloudTranslator</title>
+  <meta name="description" content="Documentación Técnica de Ingeniería de Vork v2.5.0 | Arquitectura de los 9 Pilares: Traducción Neural por Lotes, Texto a Voz (TTS), Clonación de Voz IA, Conversor Multimedia, Separador de Voz Demucs v4 y Vork DJ Mezclador.">
+  <meta property="og:title" content="Documentación Técnica - Vork">
+  <meta property="og:description" content="Especificación de arquitectura, algoritmos acústicos, flujo DOM y manual de integración de Vork v2.5.0.">
+  <title>Documentación Técnica - Vork</title>
   <link rel="icon" type="image/png" sizes="192x192" href="/img/logo.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/img/logo.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/img/logo.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/img/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css?v=2.5.2">
   <script>
     (function(){try{var m=document.cookie.match(/(?:^|; )cloud_translator_lang=([^;]*)/);var l=m?decodeURIComponent(m[1]):null;if(l&&l!=="original"&&l!=="es"){document.documentElement.classList.add("ct-pending");setTimeout(function(){document.documentElement.classList.remove("ct-pending");},800);}}catch(e){}})();
@@ -20,116 +23,12 @@
 </head>
 <body>
 
+  <!-- Textura de grano sutil Huella -->
+  <div class="grain" aria-hidden="true"></div>
+
+
   <!-- Barra Superior -->
-  <header class="top-nav" id="main-header">
-    <div class="nav-container">
-      <a href="/" class="brand-wrapper">
-        <span class="brand-logo">
-          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="38" height="38">
-          CloudTranslator
-        </span>
-        <span class="brand-badge">v2.5.0</span>
-      </a>
-
-      <nav class="desktop-nav">
-        <ul class="main-menu">
-          <li><a href="/">Inicio</a></li>
-          <li><a href="/docs" class="active">Docs</a></li>
-          <li><a href="/support">Soporte</a></li>
-          <li><a href="/status">Estado</a></li>
-        </ul>
-      </nav>
-
-      <!-- Barra de Herramientas de Traducción Activa -->
-      <div class="toolbar-controls no-translate" data-no-translate>
-        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
-          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
-          English
-        </button>
-
-        <div class="selector-box">
-          <div class="selector-dropdown">
-            <select id="select-lang" aria-label="Seleccionar idioma">
-              <option value="en">English (en)</option>
-              <option value="es">Español (es)</option>
-              <option value="fr">Français (fr)</option>
-              <option value="de">Deutsch (de)</option>
-              <option value="it">Italiano (it)</option>
-              <option value="pt">Portugués (pt)</option>
-              <option value="ja">日本語 (ja)</option>
-              <option value="zh-CN">中文 (zh-CN)</option>
-              <option value="ru">Русский (ru)</option>
-            </select>
-          </div>
-          <div class="custom-lang-group">
-            <input type="text" id="input-custom-lang" placeholder="ISO" maxlength="5" title="Código ISO personalizado (ej: ja, zh, ru, it)">
-            <button id="btn-translate-custom" class="btn btn-primary" title="Traducir">GO</button>
-          </div>
-        </div>
-
-        <button id="btn-restore" class="btn btn-outline" title="Restaurar idioma original">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
-          Original
-        </button>
-
-        <div id="status-pill" class="status-pill" title="Estado del microservicio">
-          <span class="spinner"></span>
-          <span id="status-text">LISTO</span>
-        </div>
-      </div>
-
-      <!-- Botón Hamburguesa Móvil -->
-      <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Abrir Menú de Navegación">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
-    </div>
-
-    <!-- Backdrop para Barra Lateral -->
-    <div id="drawer-backdrop"></div>
-
-    <!-- Barra de Navegación Lateral Móvil -->
-    <aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
-      <div class="drawer-header">
-        <a href="/" class="drawer-brand">
-          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
-          <span>CloudTranslator</span>
-        </a>
-        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </div>
-
-      <div class="drawer-body">
-        <div class="drawer-section">
-          <span class="drawer-title">NAVEGACIÓN DEL PORTAL</span>
-          <ul class="drawer-menu">
-            <li><a href="/"><svg class="icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Inicio</a></li>
-            <li><a href="/docs" class="active"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Documentación</a></li>
-            <li><a href="/support"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Soporte</a></li>
-            <li><a href="/status"><svg class="icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Estado Servidor</a></li>
-          </ul>
-        </div>
-
-        <div class="drawer-section">
-          <span class="drawer-title">LOS 6 PILARES</span>
-          <ul class="drawer-menu">
-            <li><a href="/translator"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traductor en la Nube (Pilar 01)</a></li>
-            <li><a href="/tts"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS) (Pilar 02)</a></li>
-            <li><a href="/voice-clone"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz IA (Pilar 03)</a></li>
-            <li><a href="/converter"><svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="8" cy="12" r="2"/></svg> Conversor Multimedia (Pilar 04)</a></li>
-            <li><a href="/vocal-remover"><svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Separador de Voz (Pilar 05)</a></li>
-            <li><a href="/dj"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg> CloudDJ Mezclador (Pilar 06)</a></li>
-            <li><a href="/donate"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="drawer-footer">
-        <span>CloudTranslator v2.5.0</span>
-        <span>Documentación</span>
-      </div>
-    </aside>
-  </header>
+  <header id="header-placeholder" data-component="header" data-active="docs"></header>
 
   <!-- CONTENEDOR DE DOS COLUMNAS (SIDEBAR FIJO + PANEL DE CONTENIDO FIJO CON SCROLL INDEPENDIENTE) -->
   <div class="docs-layout-container">
@@ -259,7 +158,7 @@
 
         <!-- Sesión 07 -->
         <div class="docs-sidebar-group">
-          <span class="docs-group-label">07 / Pilar 6: CloudDJ Mezclador</span>
+          <span class="docs-group-label">07 / Pilar 6: Vork DJ Mezclador</span>
           <a href="#session-pilar-7" class="docs-sidebar-session" data-target="session-pilar-7">
             <span class="session-badge">S.07</span> Web Audio Graph &amp; DJ
           </a>
@@ -269,6 +168,54 @@
             </a>
             <a href="#sub-p6-crossfader" class="docs-sidebar-sublink" data-target="sub-p6-crossfader">
               <span class="sub-num">7.2</span> Curva de Potencia Constante
+            </a>
+          </div>
+        </div>
+
+        <!-- Sesión 08: Pilar 7: Vork CLI -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">08 / Pilar 7: Vork CLI</span>
+          <a href="#session-pilar-8" class="docs-sidebar-session" data-target="session-pilar-8">
+            <span class="session-badge">S.08</span> Terminal CLI &amp; Agentes
+          </a>
+          <div class="docs-sidebar-subsessions">
+            <a href="#sub-p7-terminal-arch" class="docs-sidebar-sublink" data-target="sub-p7-terminal-arch">
+              <span class="sub-num">8.1</span> Arquitectura TUI &amp; Subagentes
+            </a>
+            <a href="#sub-p7-install" class="docs-sidebar-sublink" data-target="sub-p7-install">
+              <span class="sub-num">8.2</span> Instalación PowerShell &amp; CMD
+            </a>
+          </div>
+        </div>
+
+        <!-- Sesión 09: Pilar 8: Conversor de Imágenes -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">09 / Pilar 8: Conversor de Imágenes</span>
+          <a href="#session-pilar-img" class="docs-sidebar-session" data-target="session-pilar-img">
+            <span class="session-badge">S.09</span> Image Studio &amp; Formatos
+          </a>
+          <div class="docs-sidebar-subsessions">
+            <a href="#sub-p8-image-engine" class="docs-sidebar-sublink" data-target="sub-p8-image-engine">
+              <span class="sub-num">9.1</span> Motor Pillow &amp; LANCZOS
+            </a>
+            <a href="#sub-p8-formats" class="docs-sidebar-sublink" data-target="sub-p8-formats">
+              <span class="sub-num">9.2</span> Formatos PNG, WebP, JPG, ICO
+            </a>
+          </div>
+        </div>
+
+        <!-- Sesión 10: Pilar 9: Estudio de Fondo IA -->
+        <div class="docs-sidebar-group">
+          <span class="docs-group-label">10 / Pilar 9: Estudio de Fondo IA</span>
+          <a href="#session-pilar-bg" class="docs-sidebar-session" data-target="session-pilar-bg">
+            <span class="session-badge">S.10</span> Segmentación rembg U2-Net
+          </a>
+          <div class="docs-sidebar-subsessions">
+            <a href="#sub-p9-neural-bg" class="docs-sidebar-sublink" data-target="sub-p9-neural-bg">
+              <span class="sub-num">10.1</span> Red U2-Net y Canal Alfa
+            </a>
+            <a href="#sub-p9-replacement" class="docs-sidebar-sublink" data-target="sub-p9-replacement">
+              <span class="sub-num">10.2</span> Reemplazo Color y Fondos IA
             </a>
           </div>
         </div>
@@ -305,14 +252,14 @@
     
       <!-- Encabezado de la Documentación Técnica -->
       <section class="docs-section" style="padding-top: 10px;">
-        <span class="hero-tag-glow">[ ARCHITECTURE MANUAL // 6 PILARES DE CLOUDTRANSLATOR ]</span>
+        <span class="hero-tag-glow">[ ARCHITECTURE MANUAL // 9 PILARES DE CLOUDTRANSLATOR ]</span>
         <h1 style="font-size: clamp(1.8rem, 3.2vw, 2.5rem); margin: 12px 0 16px 0; color: #ffffff;">
           Manual de Ingeniería y Arquitectura de Sistemas
         </h1>
         <p class="lead">
-          Guía técnica exhaustiva sobre los <strong>6 pilares tecnológicos</strong> de CloudTranslator v2.5.0: principios algorítmicos, procesamiento acústico en tiempo real, manipulación recursiva del DOM, transcodificación multimedia y grafos Web Audio API.
+          Guía técnica exhaustiva sobre los <strong>9 pilares tecnológicos</strong> de Vork v2.5.0: principios algorítmicos, procesamiento acústico en tiempo real, manipulación recursiva del DOM, transcodificación multimedia y grafos Web Audio API.
         </p>
-        <div style="background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.25); border-radius: var(--radius-md); padding: 14px 18px; margin-top: 18px; font-size: 0.88rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+        <div style="background: rgba(255, 122, 61, 0.06); border: 1px solid rgba(255, 122, 61, 0.25); border-radius: var(--radius-md); padding: 14px 18px; margin-top: 18px; font-size: 0.88rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
           <span>¿Buscas los parámetros exactos JSON, cabeceras HTTP y consolas de prueba cURL de los endpoints?</span>
           <a href="/api" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem;">Ir a API REST &rarr;</a>
         </div>
@@ -332,7 +279,7 @@
             <li><a href="#session-pilar-3" style="font-weight: 700; color: #fff;">S.04 // Pilar 3: Clonación Vocal IA [ALPHA]</a></li>
             <li><a href="#session-pilar-4" style="font-weight: 700; color: #fff;">S.05 // Pilar 4: Conversor Multimedia</a></li>
             <li><a href="#session-pilar-6" style="font-weight: 700; color: #fff;">S.06 // Pilar 5: Separador de Voz e Instrumental</a></li>
-            <li><a href="#session-pilar-7" style="font-weight: 700; color: #fff;">S.07 // Pilar 6: CloudDJ Mezclador en Vivo</a></li>
+            <li><a href="#session-pilar-7" style="font-weight: 700; color: #fff;">S.07 // Pilar 6: Vork DJ Mezclador en Vivo</a></li>
             <li><a href="#session-sdk" style="font-weight: 700; color: #fff;">S.08 // Integración Frontend SDK</a></li>
           </ul>
         </div>
@@ -345,7 +292,7 @@
         <div class="section-full-title">
           <span class="session-badge">SESIÓN 01</span>
           <h2>Arquitectura Global y Filosofía de Diseño</h2>
-          <p>Principios fundamentales de CloudTranslator v2.5.0 como microservicio unificado de alto rendimiento.</p>
+          <p>Principios fundamentales de Vork v2.5.0 como microservicio unificado de alto rendimiento.</p>
         </div>
 
         <article class="docs-subsection" id="sub-consolidated-query">
@@ -354,14 +301,14 @@
             Los traductores tradicionales envían cientos de peticiones HTTP individuales (una por cada párrafo o etiqueta <code>&lt;span&gt;</code>), colapsando el pool de conexiones del navegador, activando límites de tasa (rate limiting) y provocando bloqueos de interfaz o saltos visuales desagradables (layout shift).
           </p>
           <p>
-            CloudTranslator implementa el <strong>Algoritmo de Consolidación Atómica</strong>: el SDK frontend escanea la totalidad del DOM en una sola pasada sincrónica, recopila todos los segmentos de texto en un array ordenado, y despacha <strong>una única petición HTTP POST</strong> al microservicio. El servidor traduce el lote en paralelo y devuelve el array simétrico, reinyectándose en el DOM en un único ciclo de renderizado.
+            Vork implementa el <strong>Algoritmo de Consolidación Atómica</strong>: el SDK frontend escanea la totalidad del DOM en una sola pasada sincrónica, recopila todos los segmentos de texto en un array ordenado, y despacha <strong>una única petición HTTP POST</strong> al microservicio. El servidor traduce el lote en paralelo y devuelve el array simétrico, reinyectándose en el DOM en un único ciclo de renderizado.
           </p>
         </article>
 
         <article class="docs-subsection" id="sub-cookie-persistence">
           <h3>1.2 Persistencia de Estado Técnica en Cookies HTTP (365 Días)</h3>
           <p>
-            A diferencia de Google Translate o widgets invasivos que insertan frames de terceros y pierden el estado al recargar, CloudTranslator almacena la selección del usuario en una cookie HTTP de primer nivel:
+            A diferencia de Google Translate o widgets invasivos que insertan frames de terceros y pierden el estado al recargar, Vork almacena la selección del usuario en una cookie HTTP de primer nivel:
           </p>
           <div class="code-box-wrapper">
             <div class="code-box-header">
@@ -422,7 +369,7 @@
         <article class="docs-subsection" id="sub-lru-cache">
           <h3>1.3 Sistema de Doble Caché LRU (0ms en Memoria RAM)</h3>
           <p>
-            CloudTranslator implementa una jerarquía de caché de dos niveles:
+            Vork implementa una jerarquía de caché de dos niveles:
           </p>
           <ol style="margin-left: 20px; line-height: 1.8; color: var(--text-secondary);">
             <li><strong>Caché en Memoria del Servidor (LRU Cache):</strong> Almacena hasta 2,000 bloques de traducción recientes indexados por hash criptográfico del contenido y lenguaje destino. Las peticiones coincidentes responden en <strong>0ms de latencia de cómputo</strong>.</li>
@@ -526,7 +473,7 @@
         <article class="docs-subsection" id="sub-p2-hybrid-engine">
           <h3>3.1 Arquitectura Híbrida Web Speech vs Backend Neural</h3>
           <p>
-            CloudTranslator opera con una arquitectura de síntesis en dos capas:
+            Vork opera con una arquitectura de síntesis en dos capas:
           </p>
           <ul style="margin-left: 20px; line-height: 1.8; color: var(--text-secondary);">
             <li><strong>Modo Frontend Web Speech API:</strong> Para retroalimentación acústica inmediata en navegadores modernos sin latencia de red.</li>
@@ -537,7 +484,7 @@
         <article class="docs-subsection" id="sub-p2-prosody-model">
           <h3>3.2 Modulación Prosódica y Modelado de Formantes F1-F4</h3>
           <p>
-            Para evitar el tono plano y robótico de los sintetizadores arcaicos, el motor de síntesis de CloudTranslator calcula en tiempo real:
+            Para evitar el tono plano y robótico de los sintetizadores arcaicos, el motor de síntesis de Vork calcula en tiempo real:
           </p>
           <ul style="margin-left: 20px; line-height: 1.8; color: var(--text-secondary);">
             <li><strong>Envolvente de Sílaba/Palabra:</strong> Atenuación de bordes mediante función semisinusoidal <code>sin(pi * t)</code> para evitar clics acústicos y discontinuidades DC.</li>
@@ -607,7 +554,7 @@
 
           <h3>3.4 Streaming de Audio con Soporte HTTP 206 Partial Content</h3>
           <p>
-            Los endpoints de audio de CloudTranslator procesan cabeceras de rango <code>Range: bytes=start-end</code>, respondiendo con el código <code>206 Partial Content</code> y cabecera <code>Content-Range</code>. Esto permite a los reproductores de audio comenzar a sonar al instante de solicitar el primer fragmento de 64 KB sin esperar a que el archivo completo se descargue.
+            Los endpoints de audio de Vork procesan cabeceras de rango <code>Range: bytes=start-end</code>, respondiendo con el código <code>206 Partial Content</code> y cabecera <code>Content-Range</code>. Esto permite a los reproductores de audio comenzar a sonar al instante de solicitar el primer fragmento de 64 KB sin esperar a que el archivo completo se descargue.
           </p>
         </article>
       </section>
@@ -689,7 +636,7 @@
 
           <h3>4.3 Alcance Autónomo sin Dependencias de Terceros</h3>
           <p>
-            El motor de clonación vocal de CloudTranslator es <strong>100% propietario y autosuficiente</strong>: opera dentro del entorno Node.js sin enviar la muestra de audio a servicios externos ni requerir suscripciones de terceros. Su etiqueta <code>ALPHA</code> refleja el trabajo continuo en la optimización de los formantes dinámicos de dicción rápida.
+            El motor de clonación vocal de Vork es <strong>100% propietario y autosuficiente</strong>: opera dentro del entorno Node.js sin enviar la muestra de audio a servicios externos ni requerir suscripciones de terceros. Su etiqueta <code>ALPHA</code> refleja el trabajo continuo en la optimización de los formantes dinámicos de dicción rápida.
           </p>
         </article>
       </section>
@@ -786,7 +733,7 @@
         <article class="docs-subsection" id="sub-p5-neural-demucs">
           <h3>6.1 Red Neuronal Demucs v4 (Meta AI) y Atenuación Cruzada</h3>
           <p>
-            A diferencia de los filtros clásicos de cancelación de fase central (Vocal Cutters analógicos de los 90) que destruyen el bajo estéreo y dejan ecos vocales, CloudTranslator utiliza la red neuronal <strong>Demucs v4</strong>:
+            A diferencia de los filtros clásicos de cancelación de fase central (Vocal Cutters analógicos de los 90) que destruyen el bajo estéreo y dejan ecos vocales, Vork utiliza la red neuronal <strong>Demucs v4</strong>:
           </p>
           <ul style="margin-left: 20px; line-height: 1.8; color: var(--text-secondary);">
             <li><strong>Espectrograma Bidimensional &amp; U-Net:</strong> La red procesa la onda continua en el dominio tiempo-frecuencia, identificando patrones armónicos de cuerdas vocales humanas frente a transientes de percusión, sintetizadores y cuerdas.</li>
@@ -824,7 +771,7 @@
 
           <h3>6.2 Reproductor Dual Sincronizado en Fase Estéreo</h3>
           <p>
-            El frontend de CloudTranslator levanta dos instancias de audio HTML5 sincronizadas por un <strong>Master Time Bus</strong>. Al ajustar los deslizadores de volumen o activar los modos interactivos (<em>Solo Instrumental</em>, <em>Solo Voz</em> o <em>Ambos</em>), la reproducción se mantiene bloqueada al milisegundo exacto sin desfases de fase audible (comb filtering).
+            El frontend de Vork levanta dos instancias de audio HTML5 sincronizadas por un <strong>Master Time Bus</strong>. Al ajustar los deslizadores de volumen o activar los modos interactivos (<em>Solo Instrumental</em>, <em>Solo Voz</em> o <em>Ambos</em>), la reproducción se mantiene bloqueada al milisegundo exacto sin desfases de fase audible (comb filtering).
           </p>
         </article>
       </section>
@@ -835,7 +782,7 @@
       <section class="docs-section" id="session-pilar-7">
         <div class="section-full-title">
           <span class="session-badge">SESIÓN 07</span>
-          <h2>Pilar 6: CloudDJ Mezclador en Vivo (Web Audio API Graph)</h2>
+          <h2>Pilar 6: Vork DJ Mezclador en Vivo (Web Audio API Graph)</h2>
           <p>Arquitectura de enrutamiento estéreo modular, ecualización biquad y crossfading en tiempo real.</p>
         </div>
 
@@ -905,7 +852,7 @@
         <article class="docs-subsection" id="sub-p6-crossfader">
           <h3>7.2 Curva de Crossfader de Potencia Constante (Equal Power Curve)</h3>
           <p>
-            Para evitar que la música pierda volumen acústico perceptible cuando el crossfader está centrado al 50%, CloudTranslator calcula la ganancia de cada Deck mediante funciones trigonométricas de potencia constante:
+            Para evitar que la música pierda volumen acústico perceptible cuando el crossfader está centrado al 50%, Vork calcula la ganancia de cada Deck mediante funciones trigonométricas de potencia constante:
           </p>
           <div class="code-box-wrapper">
             <div class="code-box-header">
@@ -930,7 +877,207 @@ function applyEqualPowerCrossfade(x, gainNodeA, gainNodeB, audioCtx) {
       </section>
 
       <!-- ========================================================================= -->
-      <!-- SESIÓN 08: INTEGRACIÓN FRONTEND SDK                                      -->
+      <!-- SESIÓN 08: PILAR 7 - CLOUDTRANSLATOR CLI & AGENTES AUTÓNOMOS              -->
+      <!-- ========================================================================= -->
+      <section class="docs-section" id="session-pilar-8">
+        <div class="section-full-title">
+          <span class="session-badge">SESIÓN 08</span>
+          <h2>Pilar 7: Vork CLI (Entorno Centrado en la Terminal)</h2>
+          <p>Orquestación de agentes autónomos, concurrencia de subagentes y comandos con diagonal en tu base de código.</p>
+        </div>
+
+        <article class="docs-subsection" id="sub-p7-terminal-arch">
+          <h3>8.1 Arquitectura del CLI y Modelo de Agentes</h3>
+          <p>
+            Vork CLI es un entorno ligero enfocado en la terminal para interactuar con agentes de inteligencia artificial directamente sobre tus archivos de código. Describe lo que necesitas en lenguaje natural y los agentes ejecutan, depuran y coordinan herramientas manteniendo la trazabilidad completa.
+          </p>
+          <div class="callout" style="margin: 16px 0;">
+            <strong>Control Concurrente con Subagentes:</strong> Permite delegar tareas pesadas en segundo plano a sesiones paralelas. Escribe <code>/agents</code> para abrir el panel de control y pulsa <code>ctrl+k</code> para autorizar comandos de terminal de forma instantánea.
+          </div>
+        </article>
+
+        <article class="docs-subsection" id="sub-p7-install">
+          <h3>8.2 Métodos Oficiales de Instalación en Windows</h3>
+          <p>Puedes instalar y activar Vork CLI ejecutando una sola instrucción:</p>
+
+          <div class="vork-terminal-box" style="margin-bottom: 20px;">
+            <div class="vork-terminal-bar">
+              <div class="vork-terminal-bar-left">
+                <div class="vork-terminal-dots">
+                  <span class="dot dot-red"></span>
+                  <span class="dot dot-yellow"></span>
+                  <span class="dot dot-green"></span>
+                </div>
+                <div class="vork-terminal-title">
+                  <svg class="icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                  <span>powershell (automatizado)</span>
+                </div>
+              </div>
+              <button class="btn btn-sm btn-terminal-copy" aria-label="Copiar comando PowerShell" onclick="copiarAlPortapapeles(this, 'code-doc-cli-ps')">
+                <svg class="icon" viewBox="0 0 24 24" width="14" height="14"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                <span>Copiar</span>
+              </button>
+            </div>
+            <div class="vork-terminal-body">
+              <span class="vork-terminal-prompt">PS &gt;</span>
+              <div class="vork-terminal-code-scroll">
+                <code id="code-doc-cli-ps">irm https://vork-st1k.onrender.com/cli/install.ps1 | iex</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="vork-terminal-box">
+            <div class="vork-terminal-bar">
+              <div class="vork-terminal-bar-left">
+                <div class="vork-terminal-dots">
+                  <span class="dot dot-red"></span>
+                  <span class="dot dot-yellow"></span>
+                  <span class="dot dot-green"></span>
+                </div>
+                <div class="vork-terminal-title">
+                  <svg class="icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><rect width="18" height="14" x="3" y="5" rx="2"/><path d="M7 15h10M7 9l3 3-3 3"/></svg>
+                  <span>cmd.exe (símbolo del sistema)</span>
+                </div>
+              </div>
+              <button class="btn btn-sm btn-terminal-copy" aria-label="Copiar comando CMD" onclick="copiarAlPortapapeles(this, 'code-doc-cli-cmd')">
+                <svg class="icon" viewBox="0 0 24 24" width="14" height="14"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                <span>Copiar</span>
+              </button>
+            </div>
+            <div class="vork-terminal-body">
+              <span class="vork-terminal-prompt">C:\&gt;</span>
+              <div class="vork-terminal-code-scroll">
+                <code id="code-doc-cli-cmd">curl -fsSL https://vork-st1k.onrender.com/cli/install.cmd -o install.cmd &amp;&amp; install.cmd &amp;&amp; del install.cmd</code>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SESIÓN 09: PILAR 8 - CONVERSOR Y PROCESADOR DE IMÁGENES UNIVERSAL         -->
+      <!-- ========================================================================= -->
+      <section class="docs-section" id="session-pilar-img">
+        <div class="section-full-title">
+          <span class="session-badge">SESIÓN 09</span>
+          <h2>Pilar 8: Conversor y Procesador de Imágenes Universal</h2>
+          <p>Motor de transcodificación, optimización y redimensionamiento LANCZOS multiformato con soporte de canal alfa.</p>
+        </div>
+
+        <article class="docs-subsection" id="sub-p8-image-engine">
+          <h3>9.1 Motor de Procesamiento Pillow y Resampling LANCZOS</h3>
+          <p>
+            El subsistema de imagen de Vork opera mediante un worker nativo en Python optimizado con la biblioteca Pillow (PIL). Procesa imágenes de hasta 50 MB con corrección automática de orientación basada en metadatos EXIF (<code>ImageOps.exif_transpose</code>) y filtrado antialiasing de 8 coeficientes <code>Image.Resampling.LANCZOS</code>.
+          </p>
+          <div class="table-responsive">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Formato</th>
+                  <th>Canal Alfa (RGBA)</th>
+                  <th>Compresión y Optimización</th>
+                  <th>Casos de Uso Recomendados</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>PNG</code></td>
+                  <td>Sí (Transparencia Completa)</td>
+                  <td>Compresión DEFLATE sin pérdida</td>
+                  <td>Iconos, logotipos, gráficos con fondos transparentes y capturas</td>
+                </tr>
+                <tr>
+                  <td><code>JPEG / JPG</code></td>
+                  <td>No (Composición sobre fondo blanco)</td>
+                  <td>Cuantización DCT ajustable (1 - 100)</td>
+                  <td>Fotografías de alta compresión y miniaturas de catálogo</td>
+                </tr>
+                <tr>
+                  <td><code>WEBP</code></td>
+                  <td>Sí (Con o sin pérdida)</td>
+                  <td>Compresión Google VP8X (method=6)</td>
+                  <td>Publicación web moderna de máximo rendimiento y menor peso</td>
+                </tr>
+                <tr>
+                  <td><code>GIF</code></td>
+                  <td>Sí (Paleta indexada de 256 colores)</td>
+                  <td>Adaptativa con dithering</td>
+                  <td>Animaciones cortas e imágenes gráficas simples</td>
+                </tr>
+                <tr>
+                  <td><code>ICO</code></td>
+                  <td>Sí (Multirresolución)</td>
+                  <td>16x16, 32x32, 48x48, 64x64, 128x128, 256x256</td>
+                  <td>Favicons para navegadores web y ejecutables Windows</td>
+                </tr>
+                <tr>
+                  <td><code>BMP / TIFF</code></td>
+                  <td>Sí (TIFF Deflate)</td>
+                  <td>Sin compresión / TIFF Deflate</td>
+                  <td>Impresión profesional y preservación fotográfica cruda</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="docs-subsection" id="sub-p8-formats">
+          <h3>9.2 Algoritmo de Conversión y Redimensionamiento Proporcional</h3>
+          <p>
+            El motor calcula automáticamente las proporciones originales si solo se especifica ancho (<code>width</code>) o alto (<code>height</code>), evitando deformaciones visuales:
+          </p>
+          <div class="code-box-wrapper">
+            <div class="code-box-header">
+              <span>// PYTHON - ALGORITMO DE ESCALADO Y GESTIÓN DE CANALES</span>
+              <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-doc-img-convert')">Copiar Código</button>
+            </div>
+            <pre class="code-panel" id="code-doc-img-convert"><code># Si se solicita redimensionamiento proporcional manteniendo la relación de aspecto
+if width and not height:
+    new_w = int(width)
+    new_h = int((new_w / orig_w) * orig_h)
+    img = img.resize((new_w, new_h), Image.Resampling.LANCZOS)
+elif height and not width:
+    new_h = int(height)
+    new_w = int((new_h / orig_h) * orig_w)
+    img = img.resize((new_w, new_h), Image.Resampling.LANCZOS)</code></pre>
+          </div>
+        </article>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SESIÓN 10: PILAR 9 - ESTUDIO Y ELIMINADOR DE FONDO IA                     -->
+      <!-- ========================================================================= -->
+      <section class="docs-section" id="session-pilar-bg">
+        <div class="section-full-title">
+          <span class="session-badge">SESIÓN 10</span>
+          <h2>Pilar 9: Estudio y Eliminador de Fondo IA (rembg U2-Net)</h2>
+          <p>Aislamiento biométrico y de objetos con redes neuronales profundas U2-Net, generación de máscaras alfa y sustitución compositiva.</p>
+        </div>
+
+        <article class="docs-subsection" id="sub-p9-neural-bg">
+          <h3>10.1 Red Neuronal Profunda U2-Net y Detección de Saliencia</h3>
+          <p>
+            A diferencia de los métodos heurísticos basados en color (Chroma Keying simple) que degradan los bordes de cabellos o prendas, el Pilar 9 utiliza la arquitectura de red neuronal profunda <strong>U2-Net</strong> de dos niveles a través del motor <code>rembg</code>. La red genera una máscara de probabilidad continua entre 0.0 y 1.0 (canal alfa flotante) logrando transiciones suaves sin bordes dentados.
+          </p>
+          <div class="callout" style="margin: 16px 0;">
+            <strong>Procesamiento Local Libre de Costos:</strong> Inferencia ejecutada directamente en el cluster backend sin cuotas de proveedores externos ni marcas de agua impuestas.
+          </div>
+        </article>
+
+        <article class="docs-subsection" id="sub-p9-replacement">
+          <h3>10.2 Modos de Modificación y Composición de Fondo</h3>
+          <p>Vork ofrece 4 modos de modificación de fondo:</p>
+          <ul style="margin-left: 20px; line-height: 1.8; color: var(--text-secondary);">
+            <li><strong>transparent:</strong> Genera un archivo PNG RGBA con el fondo completamente transparente. Ideal para diseño gráfico y catálogos.</li>
+            <li><strong>color:</strong> Reemplaza el fondo por un color sólido arbitrario especificado en código HEX (ejemplo: <code>#FFFFFF</code> o <code>#00F0FF</code>).</li>
+            <li><strong>custom_bg:</strong> Compone el sujeto recortado sobre cualquier imagen de fondo provista por el usuario, ajustando la escala con <code>ImageOps.fit</code>.</li>
+            <li><strong>prompt:</strong> Genera un fondo completamente nuevo a partir de una descripción en lenguaje natural mediante el cluster de difusión generativa Pollinations.</li>
+          </ul>
+        </article>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SESIÓN 11: INTEGRACIÓN FRONTEND SDK                                      -->
       <!-- ========================================================================= -->
       <section class="docs-section" id="session-sdk">
         <div class="section-full-title">
@@ -941,17 +1088,17 @@ function applyEqualPowerCrossfade(x, gainNodeA, gainNodeB, audioCtx) {
 
         <article class="docs-subsection" id="sub-sdk-vanilla">
           <h3>8.1 Integración en Vanilla JavaScript</h3>
-          <p>Descarga o importa el script cliente <code>cloud-translator.js</code> e inicializa la clase:</p>
+          <p>Descarga o importa el script cliente <code>vork.js</code> e inicializa la clase:</p>
           <div class="code-box-wrapper">
             <div class="code-box-header">
               <span>// HTML &amp; JAVASCRIPT VANILLA</span>
               <button class="btn-copy" onclick="copiarAlPortapapeles(this, 'code-doc-sdk-vanilla')">Copiar Código</button>
             </div>
-            <pre class="code-panel" id="code-doc-sdk-vanilla"><code>&lt;script src="https://cloudtranslator.onrender.com/js/cloud-translator.js"&gt;&lt;/script&gt;
+            <pre class="code-panel" id="code-doc-sdk-vanilla"><code>&lt;script src="https://vork-st1k.onrender.com/js/vork.js"&gt;&lt;/script&gt;
 &lt;script&gt;
   // Inicialización del cliente con persistencia en Cookies
-  const translator = new CloudTranslator({
-    endpoint: "https://cloudtranslator.onrender.com/api/translate",
+  const translator = new Vork({
+    endpoint: "https://vork-st1k.onrender.com/api/translate",
     useCookies: true,
     batchSize: 500,
     ignoreSelectors: [".no-translate", "[data-no-translate]"]
@@ -1019,9 +1166,9 @@ function applyEqualPowerCrossfade(x, gainNodeA, gainNodeB, audioCtx) {
 
 export default function Layout({ children }) {
   useEffect(() => {
-    if (window.CloudTranslator) {
-      window.ctInstance = new window.CloudTranslator({
-        endpoint: "https://cloudtranslator.onrender.com/api/translate",
+    if (window.Vork) {
+      window.ctInstance = new window.Vork({
+        endpoint: "https://vork-st1k.onrender.com/api/translate",
         useCookies: true,
         batchSize: 500
       });
@@ -1039,215 +1186,8 @@ export default function Layout({ children }) {
     </main>
   </div>
 
-  <script src="/js/cloud-translator.js"></script>
-  <script>
-    // Función global para copiar al portapapeles con feedback visual
-    function copiarAlPortapapeles(btn, elementId) {
-      const el = document.getElementById(elementId);
-      if (!el) return;
-      const texto = el.innerText || el.textContent;
-      navigator.clipboard.writeText(texto.trim()).then(() => {
-        const originalText = btn.textContent;
-        btn.textContent = "COPIADO";
-        btn.style.background = "#ffffff";
-        btn.style.color = "#000000";
-        setTimeout(() => {
-          btn.textContent = originalText;
-          btn.style.background = "";
-          btn.style.color = "";
-        }, 1500);
-      }).catch(err => {
-        console.error("Error al copiar:", err);
-      });
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      // 1. ScrollSpy y navegación con scroll interno en docs-main-content
-      const allTargets = Array.from(document.querySelectorAll(".docs-section[id], .docs-subsection[id]"));
-      const docsMain = document.querySelector(".docs-main-content");
-      const sidebar = document.querySelector(".docs-sidebar");
-
-      function setActiveNav(targetId) {
-        if (!targetId) return;
-
-        document.querySelectorAll(".docs-sidebar-session.active, .docs-sidebar-sublink.active").forEach(el => {
-          el.classList.remove("active");
-        });
-
-        const activeSub = document.querySelector(`.docs-sidebar-sublink[href="#${targetId}"], .docs-sidebar-sublink[data-target="${targetId}"]`);
-        const activeSession = document.querySelector(`.docs-sidebar-session[href="#${targetId}"], .docs-sidebar-session[data-target="${targetId}"]`);
-
-        let targetLink = null;
-
-        if (activeSub) {
-          activeSub.classList.add("active");
-          targetLink = activeSub;
-          const parentGroup = activeSub.closest(".docs-sidebar-group");
-          if (parentGroup) {
-            const parentSession = parentGroup.querySelector(".docs-sidebar-session");
-            if (parentSession) parentSession.classList.add("active");
-          }
-        } else if (activeSession) {
-          activeSession.classList.add("active");
-          targetLink = activeSession;
-        }
-
-        if (targetLink && sidebar) {
-          const sidebarRect = sidebar.getBoundingClientRect();
-          const linkRect = targetLink.getBoundingClientRect();
-          if (linkRect.top < sidebarRect.top + 50 || linkRect.bottom > sidebarRect.bottom - 50) {
-            targetLink.scrollIntoView({ behavior: "smooth", block: "nearest" });
-          }
-        }
-      }
-
-      function handleScroll() {
-        if (!allTargets.length) return;
-        const isDesktop = window.innerWidth > 860 && docsMain;
-
-        if (isDesktop) {
-          const mainScrollTop = docsMain.scrollTop;
-          const mainScrollHeight = docsMain.scrollHeight;
-          const mainClientHeight = docsMain.clientHeight;
-
-          if (mainClientHeight + mainScrollTop >= mainScrollHeight - 100) {
-            setActiveNav(allTargets[allTargets.length - 1].id);
-            return;
-          }
-
-          const mainTop = docsMain.getBoundingClientRect().top;
-          let currentId = null;
-
-          for (let i = 0; i < allTargets.length; i++) {
-            const el = allTargets[i];
-            const elTop = el.getBoundingClientRect().top;
-            if (elTop - mainTop <= 90) {
-              currentId = el.id;
-            } else {
-              break;
-            }
-          }
-
-          if (currentId) {
-            setActiveNav(currentId);
-          } else if (allTargets.length > 0 && mainScrollTop < 100) {
-            setActiveNav(allTargets[0].id);
-          }
-        } else {
-          const scrollY = window.scrollY || window.pageYOffset;
-          const windowHeight = window.innerHeight;
-          const documentHeight = document.documentElement.scrollHeight;
-
-          if (windowHeight + scrollY >= documentHeight - 120) {
-            setActiveNav(allTargets[allTargets.length - 1].id);
-            return;
-          }
-
-          let currentId = null;
-          for (let i = 0; i < allTargets.length; i++) {
-            const el = allTargets[i];
-            const top = el.getBoundingClientRect().top;
-            if (top <= 140) {
-              currentId = el.id;
-            } else {
-              break;
-            }
-          }
-
-          if (currentId) {
-            setActiveNav(currentId);
-          } else if (allTargets.length > 0 && scrollY < 150) {
-            setActiveNav(allTargets[0].id);
-          }
-        }
-      }
-
-      if (docsMain) {
-        docsMain.addEventListener("scroll", handleScroll, { passive: true });
-      }
-      window.addEventListener("scroll", handleScroll, { passive: true });
-      setTimeout(handleScroll, 120);
-
-      // 2. Navegación suave al hacer clic en enlaces
-      function scrollToTarget(targetId) {
-        if (!targetId) return;
-        const cleanId = targetId.replace(/^#/, '');
-        const targetEl = document.getElementById(cleanId);
-        if (!targetEl) return;
-
-        const isDesktop = window.innerWidth > 860 && docsMain;
-        if (isDesktop) {
-          const mainRect = docsMain.getBoundingClientRect();
-          const targetRect = targetEl.getBoundingClientRect();
-          const offset = targetRect.top - mainRect.top + docsMain.scrollTop - 24;
-          docsMain.scrollTo({
-            top: Math.max(0, offset),
-            behavior: "smooth"
-          });
-        } else {
-          const topOffset = targetEl.getBoundingClientRect().top + window.scrollY - 84;
-          window.scrollTo({
-            top: Math.max(0, topOffset),
-            behavior: "smooth"
-          });
-        }
-        setActiveNav(cleanId);
-      }
-
-      document.querySelectorAll('.docs-sidebar a[href^="#"], .docs-mobile-toc-bar a[href^="#"], .docs-main-content a[href^="#"]').forEach(link => {
-        link.addEventListener("click", (e) => {
-          const href = link.getAttribute("href");
-          if (href && href.startsWith("#") && href.length > 1) {
-            e.preventDefault();
-            scrollToTarget(href);
-            if (history.pushState) {
-              history.pushState(null, null, href);
-            }
-          }
-        });
-      });
-
-      if (window.location.hash && window.location.hash.length > 1) {
-        setTimeout(() => {
-          scrollToTarget(window.location.hash);
-        }, 150);
-      }
-
-
-      // 3. Control de Índice Rápido Móvil
-      const btnToggleToc = document.getElementById("btn-toggle-docs-toc");
-      const tocContent = document.getElementById("docs-mobile-toc-content");
-      if (btnToggleToc && tocContent) {
-        btnToggleToc.addEventListener("click", () => {
-          const isClosed = tocContent.style.display === "none";
-          tocContent.style.display = isClosed ? "block" : "none";
-        });
-        tocContent.querySelectorAll("a").forEach(a => {
-          a.addEventListener("click", () => {
-            tocContent.style.display = "none";
-          });
-        });
-      }
-
-      // 4. Inicialización del Traductor de la barra superior
-      try {
-        const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";
-        window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
-        const btnEn = document.getElementById("btn-english");
-        if (btnEn) btnEn.onclick = () => window.translator.translateToEnglish();
-        const btnRest = document.getElementById("btn-restore");
-        if (btnRest) btnRest.onclick = () => window.translator.restoreOriginal();
-        const selLang = document.getElementById("select-lang");
-        if (selLang) selLang.onchange = (e) => window.translator.translatePage(e.target.value);
-        const btnCustom = document.getElementById("btn-translate-custom");
-        if (btnCustom) {
-          btnCustom.onclick = () => {
-            const val = document.getElementById("input-custom-lang").value.trim().toLowerCase();
-            if (val) window.translator.translatePage(val);
-          };
-        }
-      } catch (e) {}
-    });
-  </script>
+  <script src="/js/vork.js"></script>
+  <script src="/js/vork.js"></script>
+    <script src="/js/modules/docs.js" defer></script>
 </body>
 </html>

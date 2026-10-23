@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Traductor en la Nube de CloudTranslator | Traducción por lotes de alta velocidad (+200 idiomas) con una sola petición HTTP consolidada, persistencia en cookies y 0ms desde memoria RAM.">
-  <meta property="og:title" content="Traductor en la Nube - CloudTranslator">
+  <meta name="description" content="Traductor en la Nube de Vork | Traducción por lotes de alta velocidad (+200 idiomas) con una sola petición HTTP consolidada, persistencia en cookies y 0ms desde memoria RAM.">
+  <meta property="og:title" content="Traductor en la Nube - Vork">
   <meta property="og:description" content="Plataforma de traducción neuronal por lotes en la nube sin saturación de red ni bloqueos de interfaz.">
-  <title>Traductor en la Nube - CloudTranslator</title>
+  <title>Traductor en la Nube - Vork</title>
   <link rel="icon" type="image/png" sizes="192x192" href="/img/logo.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/img/logo.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/img/logo.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/img/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <script>
     (function(){try{var m=document.cookie.match(/(?:^|; )cloud_translator_lang=([^;]*)/);var l=m?decodeURIComponent(m[1]):null;if(l&&l!=="original"&&l!=="es"){document.documentElement.classList.add("ct-pending");setTimeout(function(){document.documentElement.classList.remove("ct-pending");},800);}}catch(e){}})();
@@ -20,111 +23,12 @@
 </head>
 <body>
 
+  <!-- Textura de grano sutil Huella -->
+  <div class="grain" aria-hidden="true"></div>
+
+
   <!-- Barra Superior -->
-  <header class="top-nav">
-    <div class="nav-container">
-      <a href="/" class="brand-wrapper">
-        <span class="brand-logo">
-          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="38" height="38">
-          CloudTranslator
-        </span>
-        <span class="brand-badge">v2.5.0</span>
-      </a>
-
-      <nav class="desktop-nav">
-        <ul class="main-menu">
-          <li><a href="/">Inicio</a></li>
-          <li><a href="/docs">Docs</a></li>
-          <li><a href="/support">Soporte</a></li>
-          <li><a href="/status">Estado</a></li>
-        </ul>
-      </nav>
-
-      <!-- Barra de Herramientas de Traducción Activa -->
-      <div class="toolbar-controls no-translate" data-no-translate>
-        <button id="btn-english" class="btn btn-english" title="Traducir a Inglés">
-          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
-          English
-        </button>
-
-        <div class="selector-box">
-          <div class="selector-dropdown">
-            <select id="select-lang" aria-label="Seleccionar idioma">
-              <option value="en">English (en)</option>
-              <option value="es">Español (es)</option>
-              <option value="fr">Français (fr)</option>
-              <option value="de">Deutsch (de)</option>
-              <option value="it">Italiano (it)</option>
-              <option value="pt">Portugués (pt)</option>
-              <option value="ja">日本語 (ja)</option>
-              <option value="zh-CN">中文 (zh-CN)</option>
-              <option value="ru">Русский (ru)</option>
-            </select>
-          </div>
-          <div class="custom-lang-group">
-            <input type="text" id="input-custom-lang" placeholder="ISO" maxlength="5" title="Código ISO personalizado">
-            <button id="btn-translate-custom" class="btn btn-primary" title="Traducir">GO</button>
-          </div>
-        </div>
-
-        <button id="btn-restore" class="btn btn-outline" title="Restaurar idioma original">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
-          Original
-        </button>
-
-        <div id="status-pill" class="status-pill" title="Estado del microservicio">
-          <span class="spinner"></span>
-          <span id="status-text">LISTO</span>
-        </div>
-      </div>
-
-      <!-- Botón Hamburguesa Móvil -->
-      <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Abrir Menú de Navegación">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
-    </div>
-
-    <!-- Backdrop para Barra Lateral -->
-    <div id="drawer-backdrop"></div>
-
-    <!-- Barra de Navegación Lateral Móvil -->
-    <aside id="mobile-drawer" class="mobile-drawer no-translate" data-no-translate>
-      <div class="drawer-header">
-        <a href="/" class="drawer-brand">
-          <img src="/img/logo.png" alt="CloudTranslator Logo" class="brand-img" width="34" height="34">
-          <span>CloudTranslator</span>
-        </a>
-        <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar Menú Lateral"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </div>
-
-      <div class="drawer-body">
-        <div class="drawer-section">
-          <span class="drawer-title">NAVEGACIÓN DEL PORTAL</span>
-          <ul class="drawer-menu">
-            <li><a href="/"><svg class="icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Inicio</a></li>
-            <li><a href="/docs"><svg class="icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Documentación</a></li>
-            <li><a href="/support"><svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Soporte</a></li>
-            <li><a href="/status"><svg class="icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Estado Servidor</a></li>
-          </ul>
-        </div>
-
-        <div class="drawer-section">
-          <span class="drawer-title">LOS 6 PILARES</span>
-          <ul class="drawer-menu">
-            <li><a href="/translator" class="active"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg> Traductor en la Nube</a></li>
-            <li><a href="/tts"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Texto a Voz (TTS)</a></li>
-            <li><a href="/voice-clone"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Clonación de Voz (IA)</a></li>
-            <li><a href="/converter"><svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="8" cy="12" r="2"/></svg> Conversor Multimedia (MP3 / MP4)</a></li>
-            <li><a href="/vocal-remover"><svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Separador de Voz (Pilar 05)</a></li>
-            <li><a href="/dj"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg> CloudDJ Mezclador (Pilar 06)</a></li>
-            <li><a href="/donate"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Donaciones</a></li>
-          </ul>
-        </div>
-      </div>
-    </aside>
-  </header>
+  <header id="header-placeholder" data-component="header" data-active="translator"></header>
 
   <main class="full-container">
 
@@ -132,10 +36,10 @@
     <section class="hero-full">
       <div class="hero-split">
         <div class="hero-split-content">
-          <span class="hero-tag-glow">PILAR 01 // TEXT PROCESSING</span>
-          <h1 style="font-size: clamp(2rem, 4.4vw, 3rem); font-weight: 800;">Traductor en la Nube de Alto Rendimiento</h1>
-          <p class="lead">
-            Motor de traducción neural por lotes con extracción inteligente del DOM, persistencia técnica en cookies por 365 días y respuesta en 0ms desde la caché en memoria RAM.
+          <span class="label">(01) Traductor en la Nube</span>
+          <h1 class="h-section">Procesamiento lingüístico neural por lotes con persistencia técnica y <em>alto rendimiento</em>.</h1>
+          <p class="lead" style="text-align: left; margin: 0;">
+            Experimenta la velocidad de respuesta inmediata directamente desde tu navegador:
           </p>
           <div class="hero-actions">
             <a href="#console-section" class="btn btn-primary">Iniciar Traducción</a>
@@ -146,8 +50,8 @@
 
         <div class="hero-split-media">
           <div class="hero-logo-wrapper">
-            <div class="hero-logo-glow" style="background: radial-gradient(circle, rgba(0, 240, 255, 0.45) 0%, rgba(16, 185, 129, 0.2) 60%, transparent 80%);"></div>
-            <img src="/img/logo.png" alt="CloudTranslator Neural" class="hero-logo-big" width="290" height="290">
+            <div class="hero-logo-glow" style="background: radial-gradient(circle, rgba(255, 122, 61, 0.45) 0%, rgba(169, 156, 255, 0.25) 60%, transparent 80%);"></div>
+            <img src="/img/translator-hero.png" alt="Vork Traductor en la Nube" class="hero-media-img" width="290" height="290">
           </div>
         </div>
       </div>
@@ -165,7 +69,7 @@
           <p>Escribe cualquier texto o párrafo para ejecutar una consulta directa al endpoint <code>POST /api/translate</code>.</p>
         </div>
         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-          <span class="pillar-tag" style="background: rgba(0, 240, 255, 0.1); color: var(--primary); border-color: rgba(0, 240, 255, 0.3);">BATCH ENGINE // LRU RAM CACHE</span>
+          <span class="pillar-tag" style="background: rgba(255, 122, 61, 0.12); color: var(--primary); border-color: rgba(255, 122, 61, 0.3);">BATCH ENGINE // LRU RAM CACHE</span>
           <span id="translator-latency-badge" class="brand-badge" style="display: none; padding: 6px 12px; font-size: 0.82rem;">0ms</span>
         </div>
       </div>
@@ -177,13 +81,13 @@
             <span>TEXTO ORIGINAL (ESPAÑOL)</span>
             <span id="translator-char-count">112 caracteres</span>
           </div>
-          <textarea id="translator-input-text" class="studio-textarea" style="min-height: 140px; height: 140px;" placeholder="Escribe el texto que deseas traducir...">CloudTranslator permite integrar traducción web instantánea sin saturar la red con cientos de llamadas HTTP dispersas.</textarea>
+          <textarea id="translator-input-text" class="studio-textarea" style="min-height: 140px; height: 140px;" placeholder="Escribe el texto que deseas traducir...">Vork permite integrar traducción web instantánea sin saturar la red con cientos de llamadas HTTP dispersas.</textarea>
           
           <div class="studio-controls-row">
             <div class="studio-control-col">
               <label for="translator-target-lang" style="display: block; font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;">IDIOMA DESTINO</label>
               <div class="select-wrapper">
-                <select id="translator-target-lang" class="form-select-custom studio-select" style="width: 100%; padding: 12px 38px 12px 16px; background: rgba(10, 12, 18, 0.95); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #ffffff; font-size: 0.9rem; outline: none;">
+                <select id="translator-target-lang" class="form-select-custom select-md select-w-full">
                   <option value="en">English (en)</option>
                   <option value="fr">Français (fr)</option>
                   <option value="de">Deutsch (de)</option>
@@ -213,7 +117,7 @@
             <span>RESULTADO DE LA TRADUCCIÓN</span>
             <span id="translator-stats" style="color: var(--primary);">Listo para traducir</span>
           </div>
-          <div id="translator-output-text" class="studio-textarea" style="min-height: 140px; height: 140px; background: rgba(0, 240, 255, 0.03); border-color: rgba(0, 240, 255, 0.2); overflow-y: auto; color: var(--text-white); line-height: 1.6;">
+          <div id="translator-output-text" class="studio-textarea" style="min-height: 140px; height: 140px; background: rgba(255, 122, 61, 0.04); border-color: rgba(0, 240, 255, 0.2); overflow-y: auto; color: var(--text-white); line-height: 1.6;">
             Haz clic en "TRADUCIR TEXTO" para ver el resultado en tiempo real.
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 10px;">
@@ -234,7 +138,7 @@
         </div>
         <pre class="code-panel" id="translator-output-json">{
   "status": "ready",
-  "endpoint": "https://cloudtranslator.onrender.com/api/translate"
+  "endpoint": "https://vork-st1k.onrender.com/api/translate"
 }</pre>
       </div>
     </section>
@@ -243,7 +147,7 @@
     <section>
       <div class="section-full-title">
         <h2>Ventajas y Arquitectura del Motor</h2>
-        <p>Por qué CloudTranslator supera a los widgets tradicionales de traducción en la web.</p>
+        <p>Por qué Vork supera a los widgets tradicionales de traducción en la web.</p>
       </div>
 
       <div class="cards-full-grid">
@@ -288,12 +192,12 @@
           <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.72rem;" onclick="navigator.clipboard.writeText(document.getElementById('code-sdk-example').textContent)">Copiar</button>
         </div>
         <pre class="code-panel" id="code-sdk-example">&lt;!-- 1. Cargar el SDK cliente oficial --&gt;
-&lt;script src="https://cloudtranslator.onrender.com/js/cloud-translator.js"&gt;&lt;/script&gt;
+&lt;script src="https://vork-st1k.onrender.com/js/vork.js"&gt;&lt;/script&gt;
 &lt;script&gt;
   document.addEventListener("DOMContentLoaded", () => {
     // Inicializar traductor conectado al microservicio
-    window.translator = new CloudTranslator({
-      endpoint: "https://cloudtranslator.onrender.com/api/translate",
+    window.translator = new Vork({
+      endpoint: "https://vork-st1k.onrender.com/api/translate",
       useCookies: true // Persiste el idioma entre páginas y recargas
     });
 
@@ -304,102 +208,146 @@
   });
 &lt;/script&gt;</pre>
       </div>
-        <!-- Sección Informativa: Los 6 Pilares del Ecosistema -->
-    <section style="margin-top: 36px;">
-      <div class="section-full-title">
-        <h2>Los 6 Pilares de CloudTranslator</h2>
-        <p>Herramientas especializadas con consolas dedicadas a cada disciplina lingüística, vocal, multimedia y de mezcla musical.</p>
+    </section>
+
+    <!-- LOS 9 PILARES DE VORK -->
+    <section class="workbench-wrap" id="pilares" style="margin-top: 48px; margin-bottom: 40px;">
+      <div class="section-head">
+        <span class="label">Pilares Operacionales</span>
+        <h2 class="h-section">Los 9 Pilares de <em>Vork</em></h2>
+        <p class="lead">Herramientas especializadas con consolas dedicadas a cada disciplina lingüística, vocal, multimedia y de mezcla musical.</p>
       </div>
 
-      <div class="pillars-grid">
-        <!-- Pilar 1 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 01 // TEXT</span>
+      <div class="services-grid">
+        <!-- Pilar 02 -->
+        <article class="card tilt" style="--tone:#ff8fa3">
+          <div class="card-top">
+            <span class="card-num">02</span>
+            <span class="card-tag">Acústica</span>
           </div>
-          <h3>Traductor en la Nube</h3>
-          <p>
-            Traducción por lotes de alta velocidad (+200 idiomas). Nuestro algoritmo agrupa todos los textos del DOM y envía un único arreglo <code>texts: [...]</code> a <code>/api/translate</code>. Persistencia estricta en cookies y 0ms desde memoria RAM.
-          </p>
-          <a href="/translator" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Traductor en la Nube</a>
-        </div>
+          <h3>Texto a Voz Neuronal</h3>
+          <p>Síntesis vocal fluida con 24 voces humanas multilingües, calibración de pitch y rate, y descarga física en WAV y MP3.</p>
+          <div class="card-foot">
+            <a href="/tts"><span>Abrir Estudio TTS</span></a>
+            <a href="/tts" class="card-arrow" aria-label="Ir a TTS"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
 
-        <!-- Pilar 2 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 02 // AUDIO</span>
+        <!-- Pilar 03 -->
+        <article class="card tilt" style="--tone:#a99cff">
+          <div class="card-top">
+            <span class="card-num">03</span>
+            <span class="card-tag">Voz IA</span>
           </div>
-          <h3>Texto a Voz Multilingüe (TTS)</h3>
-          <p>
-            Convierte cualquier texto en audio fluido y natural. Selecciona el idioma, elige entre 24 voces humanas neuronales, calibra velocidad y tono en tiempo real con reproductor, ondas sonoras y descarga en formato WAV o MP3.
-          </p>
-          <a href="/tts" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Estudio TTS</a>
-        </div>
+          <h3>Clonación de Voz IA</h3>
+          <p>Extracción de timbre y frecuencia fundamental F0 con micrófono o archivo. Generación de síntesis espectral clonada.</p>
+          <div class="card-foot">
+            <a href="/voice-clone"><span>Abrir Clonador</span></a>
+            <a href="/voice-clone" class="card-arrow" aria-label="Ir a Clonación"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
 
-        <!-- Pilar 3 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 03 // VOICE AI</span>
+        <!-- Pilar 04 -->
+        <article class="card tilt" style="--tone:#ffc23d">
+          <div class="card-top">
+            <span class="card-num">04</span>
+            <span class="card-tag">Media</span>
           </div>
-          <h3>Clonación de Voz con IA <span class="badge" style="background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4); font-size: 0.68rem; font-weight: 800; padding: 2px 7px; border-radius: 4px; vertical-align: middle; letter-spacing: 0.05em; margin-left: 6px;">ALPHA</span></h3>
-          <p>
-            Graba con micrófono o sube tu archivo de audio. Escucha tu muestra de referencia, edítala o elimínala con un clic, escribe tu guion y descarga el archivo WAV sintetizado recreando tu timbre vocal único.
-          </p>
-          <a href="/voice-clone" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Clonación de Voz</a>
-        </div>
+          <h3>Conversor Multimedia</h3>
+          <p>Convierte enlaces de YouTube, TikTok, Instagram Reels a MP3 hasta 320 kbps y video MP4 HD con streaming de rangos.</p>
+          <div class="card-foot">
+            <a href="/converter"><span>Abrir Conversor</span></a>
+            <a href="/converter" class="card-arrow" aria-label="Ir a Conversor"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
 
-        <!-- Pilar 4 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 04 // MEDIA CONVERTER</span>
+        <!-- Pilar 05 -->
+        <article class="card tilt" style="--tone:#ff5a5f">
+          <div class="card-top">
+            <span class="card-num">05</span>
+            <span class="card-tag">Stems</span>
           </div>
-          <h3>Conversor Multimedia (MP3 / MP4)</h3>
-          <p>
-            Pega enlaces de YouTube, TikTok, Instagram Reels, Facebook o Twitter y conviértelos a MP3 (hasta 320 kbps) o video MP4 sin marcas de agua. Detección automática, streaming con rango HTTP y descarga física directa.
-          </p>
-          <a href="/converter" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Conversor MP3/MP4</a>
-        </div>
+          <h3>Separador de Stems</h3>
+          <p>Aislamiento de voz (Acapella) y pista instrumental (Karaoke) mediante redes neuronales Demucs v4 y cancelación de fase.</p>
+          <div class="card-foot">
+            <a href="/vocal-remover"><span>Abrir Separador</span></a>
+            <a href="/vocal-remover" class="card-arrow" aria-label="Ir a Separador"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
 
-        <!-- Pilar 5 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 05 // STEMS SPLITTER</span>
+        <!-- Pilar 06 -->
+        <article class="card tilt" style="--tone:#22b0a0">
+          <div class="card-top">
+            <span class="card-num">06</span>
+            <span class="card-tag">En Vivo</span>
           </div>
-          <h3>Separador de Voz e Instrumental</h3>
-          <p>
-            Aísla la voz (Acapella) o la pista instrumental (Karaoke) a partir de cualquier enlace o archivo de audio/video. Descarga ambos stems por separado con cancelación de fase estéreo DSP y reproductor dual sincronizado.
-          </p>
-          <a href="/vocal-remover" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Ir a Separador de Voz</a>
-        </div>
+          <h3>Vork DJ Mezclador</h3>
+          <p>Mezcla interactiva en vivo con doble tornamesa, simulación de scratch, crossfader ultrasuave y cola de pistas.</p>
+          <div class="card-foot">
+            <a href="/dj"><span>Abrir Consola DJ</span></a>
+            <a href="/dj" class="card-arrow" aria-label="Ir a Vork DJ"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
 
-        <!-- Pilar 6 -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon-box">
-              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
-            </div>
-            <span class="pillar-tag">PILAR 06 // CLOUDDJ</span>
+        <!-- Pilar 07 -->
+        <article class="card tilt" style="--tone:#ff7a3d">
+          <div class="card-top">
+            <span class="card-num">07</span>
+            <span class="card-tag">Imágenes</span>
           </div>
-          <h3>CloudDJ: Mezclador Virtual en Vivo</h3>
-          <p>
-            Mezcla música en vivo con dos tornamesas interactivas, efecto scratch, ecualizador de 3 bandas, crossfader suave, transición automática Auto-DJ y una cola interactiva para preparar lo que va a ir después.
+          <h3>Procesador de Imágenes</h3>
+          <p>Conversión universal entre PNG, JPG, WEBP, GIF, BMP, TIFF e ICO con control de compresión y redimensionado.</p>
+          <div class="card-foot">
+            <a href="/image-converter"><span>Abrir Conversor</span></a>
+            <a href="/image-converter" class="card-arrow" aria-label="Ir a Imágenes"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
+
+        <!-- Pilar 08 -->
+        <article class="card tilt" style="--tone:#a99cff">
+          <div class="card-top">
+            <span class="card-num">08</span>
+            <span class="card-tag">Visión IA</span>
+          </div>
+          <h3>Estudio y Fondo IA</h3>
+          <p>Eliminación inteligente de siluetas con transparencia nítida y reemplazo de fondos creativos con modelos generativos.</p>
+          <div class="card-foot">
+            <a href="/background-remover"><span>Abrir Fondo IA</span></a>
+            <a href="/background-remover" class="card-arrow" aria-label="Ir a Fondo IA"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
+
+        <!-- Pilar 09 -->
+        <article class="card tilt" style="--tone:#ff7a3d">
+          <div class="card-top">
+            <span class="card-num">09</span>
+            <span class="card-tag">Terminal</span>
+          </div>
+          <h3>Vork CLI & Agentes</h3>
+          <p>Consola de comandos completa para invocar los 9 pilares desde la terminal y orquestar sesiones de agentes autónomos.</p>
+          <div class="card-foot">
+            <a href="/cli"><span>Abrir Documentación CLI</span></a>
+            <a href="/cli" class="card-arrow" aria-label="Ir a Vork CLI"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- SECCIÓN VORK CLI -->
+    <section class="workbench-wrap" style="margin-top: 48px; margin-bottom: 40px;">
+      <div class="workbench-card" style="background: linear-gradient(135deg, rgba(22, 27, 34, 0.96) 0%, rgba(13, 17, 23, 0.98) 100%); border: 1px solid rgba(255, 122, 61, 0.22); box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.5), 0 0 24px -6px rgba(255, 122, 61, 0.08); display: flex; align-items: center; justify-content: space-between; gap: 28px; flex-wrap: wrap; padding: clamp(28px, 4vw, 40px);">
+        <div style="flex: 1 1 540px; max-width: 780px;">
+          <span class="label" style="color: var(--accent); display: inline-block; margin-bottom: 8px;">(09) Terminal &amp; Automatización</span>
+          <h2 class="h-section" style="color: #ffffff; margin: 0 0 12px 0; font-size: clamp(1.8rem, 3.2vw, 2.3rem); line-height: 1.2;">Vork <em>CLI</em></h2>
+          <p style="color: #a59a8f; margin: 0; font-size: 1.02rem; line-height: 1.65;">
+            Entorno centrado en la terminal para interactuar con agentes Vork en lenguaje natural. Orquesta subagentes paralelos, atajos configurables y comandos con diagonal sin cambiar de contexto.
           </p>
-          <a href="/dj" class="btn btn-primary" style="align-self: flex-start; padding: 10px 18px; font-size: 0.85rem;">Abrir Consola CloudDJ</a>
+        </div>
+        <div style="flex-shrink: 0;">
+          <a href="/cli" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px; font-size: 0.95rem; font-weight: 700; box-shadow: 0 6px 20px rgba(255, 102, 0, 0.35); text-decoration: none;">
+            <span>Ir a Vork CLI</span>
+            <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
         </div>
       </div>
     </section>
@@ -409,148 +357,8 @@
   <!-- Pie de Página Horizontal Alineado -->
   <footer id="footer-placeholder" data-component="footer" data-active="translator"></footer>
 
-  <script src="/js/cloud-translator.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const apiEndpoint = "https://cloudtranslator.onrender.com/api/translate";
-      window.translator = new CloudTranslator({ endpoint: apiEndpoint, useCookies: true, batchSize: 500 });
-      document.getElementById("btn-english").onclick = () => window.translator.translateToEnglish();
-      document.getElementById("btn-restore").onclick = () => window.translator.restoreOriginal();
-      document.getElementById("select-lang").onchange = (e) => window.translator.translatePage(e.target.value);
-      document.getElementById("btn-translate-custom").onclick = () => {
-        const val = document.getElementById("input-custom-lang").value.trim().toLowerCase();
-        if (val) window.translator.translatePage(val);
-      };
-
-      // Consola Interactiva
-      const btnRun = document.getElementById("btn-run-translator");
-      const btnRunText = document.getElementById("btn-run-translator-text");
-      const inputText = document.getElementById("translator-input-text");
-      const targetLang = document.getElementById("translator-target-lang");
-      const outputText = document.getElementById("translator-output-text");
-      const outputJson = document.getElementById("translator-output-json");
-      const latencyBadge = document.getElementById("translator-latency-badge");
-      const stats = document.getElementById("translator-stats");
-      const btnCopy = document.getElementById("btn-copy-result");
-      const charCount = document.getElementById("translator-char-count");
-
-      // Contador de caracteres en tiempo real
-      if (inputText && charCount) {
-        const updateCharCount = () => {
-          const len = (inputText.value || "").length;
-          charCount.textContent = `${len} caracteres`;
-        };
-        inputText.addEventListener("input", updateCharCount);
-        updateCharCount();
-      }
-
-      // Bloqueo y control estricto de UI durante la traducción
-      function setTranslatorLock(isTranslating) {
-        if (inputText) {
-          inputText.readOnly = isTranslating;
-          inputText.style.cursor = isTranslating ? "not-allowed" : "text";
-          inputText.style.opacity = isTranslating ? "0.6" : "1";
-        }
-        if (targetLang) {
-          targetLang.disabled = isTranslating;
-          targetLang.style.cursor = isTranslating ? "not-allowed" : "pointer";
-          targetLang.style.opacity = isTranslating ? "0.6" : "1";
-          if (targetLang.parentElement) {
-            targetLang.parentElement.style.pointerEvents = isTranslating ? "none" : "auto";
-          }
-        }
-        if (btnRun) {
-          btnRun.disabled = isTranslating;
-          btnRun.style.cursor = isTranslating ? "not-allowed" : "pointer";
-          btnRun.style.opacity = isTranslating ? "0.75" : "1";
-          if (btnRunText) {
-            if (isTranslating) {
-              btnRunText.innerHTML = '<span class="spinner" style="display:inline-block; width:13px; height:13px; border:2px solid #fff; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite; margin-right:8px; vertical-align:middle;"></span>Traduciendo...';
-            } else {
-              btnRunText.textContent = "TRADUCIR TEXTO";
-            }
-          }
-        }
-      }
-
-      // Caché en memoria del cliente para respuestas instantáneas en 0ms
-      const translatorClientCache = new Map();
-
-      if (btnRun) {
-        btnRun.addEventListener("click", async () => {
-          const text = (inputText.value || "").trim();
-          const to = targetLang.value;
-          if (!text) {
-            inputText.focus();
-            return;
-          }
-
-          const cacheKey = `${to}:${text}`;
-          if (translatorClientCache.has(cacheKey)) {
-            const cached = translatorClientCache.get(cacheKey);
-            latencyBadge.textContent = "LATENCIA: 0ms (CACHÉ LOCAL)";
-            latencyBadge.style.display = "inline-block";
-            outputJson.textContent = JSON.stringify(cached, null, 2);
-            outputText.textContent = cached.translatedText || text;
-            stats.textContent = `Éxito • ${(cached.translatedText || text).length} caracteres • 0ms (Caché local)`;
-            stats.style.color = "#10b981";
-            return;
-          }
-
-          setTranslatorLock(true);
-          outputText.textContent = "Traduciendo a través del microservicio de alto rendimiento...";
-          stats.textContent = "Conectando al microservicio...";
-          stats.style.color = "var(--primary)";
-          const t0 = performance.now();
-
-          try {
-            const resp = await fetch("/api/translate", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ text, to })
-            });
-
-            const latency = Math.round(performance.now() - t0);
-            const data = await resp.json();
-
-            latencyBadge.textContent = "LATENCIA: " + latency + "ms";
-            latencyBadge.style.display = "inline-block";
-            outputJson.textContent = JSON.stringify(data, null, 2);
-
-            if (data.translatedText) {
-              translatorClientCache.set(cacheKey, data);
-              outputText.textContent = data.translatedText;
-              stats.textContent = `Éxito • ${data.translatedText.length} caracteres • ${latency}ms`;
-              stats.style.color = "#10b981";
-            } else {
-              outputText.textContent = "Error al recibir respuesta: " + (data.error || "Formato inválido");
-              stats.textContent = "Error en respuesta";
-              stats.style.color = "#ef4444";
-            }
-          } catch (err) {
-            outputText.textContent = "Error de conexión: " + err.message;
-            outputJson.textContent = JSON.stringify({ error: err.message }, null, 2);
-            stats.textContent = "Fallo de red";
-            stats.style.color = "#ef4444";
-          } finally {
-            setTranslatorLock(false);
-          }
-        });
-      }
-
-      if (btnCopy) {
-        btnCopy.addEventListener("click", () => {
-          const txt = outputText.textContent;
-          if (txt && !txt.startsWith("Haz clic") && !txt.startsWith("Error") && !txt.startsWith("Traduciendo")) {
-            navigator.clipboard.writeText(txt);
-            btnCopy.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> <span>¡Copiado!</span>';
-            setTimeout(() => {
-              btnCopy.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> <span>Copiar Resultado</span>';
-            }, 1800);
-          }
-        });
-      }
-    });
-  </script>
+  <script src="/js/vork.js"></script>
+  <script src="/js/vork.js"></script>
+    <script src="/js/modules/translator.js" defer></script>
 </body>
 </html>
