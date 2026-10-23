@@ -18,10 +18,21 @@ jobs:
       - name: Checkout del código
         uses: actions/checkout@v4
 
+      - name: Verificar configuración de API Key
+        id: check_keys
+        run: |
+          if [ -z "${{ secrets.RENDER_API_KEY }}" ]; then
+            echo "::warning title=Falta RENDER_API_KEY::Falta agregar el secreto RENDER_API_KEY en GitHub (Settings > Secrets and variables > Actions > New repository secret)."
+            echo "has_key=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_key=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Disparar y rastrear despliegue en Render
+        if: steps.check_keys.outputs.has_key == 'true'
         uses: JorgeLNJunior/render-deploy@v1.5.0
         with:
-          service_id: ${{ secrets.RENDER_SERVICE_ID }}
+          service_id: ${{ secrets.RENDER_SERVICE_ID || 'srv-dbdmmron74is739arf9g' }}
           api_key: ${{ secrets.RENDER_API_KEY }}
           wait_deploy: true
           github_deployment: true
