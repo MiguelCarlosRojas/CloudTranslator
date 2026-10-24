@@ -676,7 +676,11 @@ async function synthesizeSpeech(text, options = {}) {
   const { voiceId, lang = "es", rate = 1.0, pitch = 1.0 } = options;
 
   // 1. Buscar configuración en el catálogo
-  let voiceMeta = VOICE_CATALOG.find(v => v.id === voiceId || v.edgeVoice === voiceId);
+  let voiceMeta = VOICE_CATALOG.find(v => 
+    v.id === voiceId || 
+    v.edgeVoice === voiceId || 
+    (voiceId && v.name.toLowerCase() === String(voiceId).toLowerCase())
+  );
   if (!voiceMeta) {
     voiceMeta = VOICE_CATALOG.find(v => v.lang === lang || v.locale.startsWith(lang)) || VOICE_CATALOG[0];
   }

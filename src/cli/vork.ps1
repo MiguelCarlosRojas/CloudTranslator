@@ -1093,6 +1093,228 @@ function Select-InteractiveMediaFormat {
     }
 }
 
+
+function Select-InteractiveTTSVoice {
+    param(
+        [string]$PromptTitle = "Selecciona el idioma y la voz neuronal:",
+        [string]$DefaultLang = "Español",
+        [string]$DefaultVoiceId = "es-ES-alvaro"
+    )
+
+    $savedCursor = try { [Console]::CursorVisible } catch { $true }
+    try { [Console]::CursorVisible = $false } catch { }
+
+    # Catálogo multilingüe con las 28+ voces neuronales de Vork TTS Studio
+    $catalog = @(
+        @{
+            Name = "Español";
+            Voices = @(
+                @{ Id = "es-ES-alvaro"; Edge = "es-ES-AlvaroNeural"; Name = "Álvaro"; Country = "España"; Gender = "Masculina"; Desc = "Sobria y madura corporativa" },
+                @{ Id = "es-ES-sofia";  Edge = "es-ES-ElviraNeural"; Name = "Sofía";  Country = "España"; Gender = "Femenina";  Desc = "Castellano impecable y claro" },
+                @{ Id = "es-MX-mateo";  Edge = "es-MX-JorgeNeural";  Name = "Mateo";  Country = "México"; Gender = "Masculina"; Desc = "Cálida para audiolibros" },
+                @{ Id = "es-MX-dalia";  Edge = "es-MX-DaliaNeural";  Name = "Dalia";  Country = "México"; Gender = "Femenina";  Desc = "Articulación y dicción moderna" },
+                @{ Id = "es-PE-diego";  Edge = "es-PE-AlexNeural";   Name = "Diego";  Country = "Perú";   Gender = "Masculina"; Desc = "Andina con articulación precisa" },
+                @{ Id = "es-PE-camila"; Edge = "es-PE-CamilaNeural"; Name = "Camila"; Country = "Perú";   Gender = "Femenina";  Desc = "Entonación neutra para tutoriales" },
+                @{ Id = "es-AR-lucia";  Edge = "es-AR-ElenaNeural";  Name = "Lucía";  Country = "Argentina"; Gender = "Femenina";  Desc = "Cadencia suave rioplatense" },
+                @{ Id = "es-AR-tomas";  Edge = "es-AR-TomasNeural";  Name = "Tomás";  Country = "Argentina"; Gender = "Masculina"; Desc = "Ritmo natural y timbre moderno" },
+                @{ Id = "es-CO-gonzalo";Edge = "es-CO-GonzaloNeural";Name = "Gonzalo";Country = "Colombia";  Gender = "Masculina"; Desc = "Pronunciación cristalina" },
+                @{ Id = "es-CO-salome"; Edge = "es-CO-SalomeNeural"; Name = "Salomé"; Country = "Colombia";  Gender = "Femenina";  Desc = "Timbre dulce y expresivo" },
+                @{ Id = "es-US-paloma"; Edge = "es-US-PalomaNeural"; Name = "Paloma"; Country = "Latinoamérica Neutra"; Gender = "Femenina"; Desc = "Neutral para toda América Latina" },
+                @{ Id = "es-US-alonso"; Edge = "es-US-AlonsoNeural"; Name = "Alonso"; Country = "Latinoamérica Neutra"; Gender = "Masculina"; Desc = "Institucional y sobria para noticias" }
+            )
+        },
+        @{
+            Name = "English";
+            Voices = @(
+                @{ Id = "en-US-emma";   Edge = "en-US-JennyNeural";  Name = "Emma";   Country = "United States"; Gender = "Femenina";  Desc = "Studio Neural clear narration" },
+                @{ Id = "en-US-liam";   Edge = "en-US-GuyNeural";    Name = "Liam";   Country = "United States"; Gender = "Masculina"; Desc = "Engaging and natural inflection" },
+                @{ Id = "en-GB-james";  Edge = "en-GB-RyanNeural";   Name = "James";  Country = "United Kingdom"; Gender = "Masculina"; Desc = "Distinguished BBC British tone" },
+                @{ Id = "en-GB-sonia";  Edge = "en-GB-SoniaNeural";  Name = "Sonia";  Country = "United Kingdom"; Gender = "Femenina";  Desc = "Classical rhythm and soothing timbre" },
+                @{ Id = "en-AU-olivia"; Edge = "en-AU-NatashaNeural";Name = "Olivia"; Country = "Australia"; Gender = "Femenina";  Desc = "Crisp Australian bright voice" }
+            )
+        },
+        @{
+            Name = "Français";
+            Voices = @(
+                @{ Id = "fr-FR-chloe";  Edge = "fr-FR-DeniseNeural"; Name = "Chloé";  Country = "France"; Gender = "Femenina";  Desc = "Parisienne fluide et naturelle" },
+                @{ Id = "fr-FR-henri";  Edge = "fr-FR-HenriNeural";  Name = "Henri";  Country = "France"; Gender = "Masculina"; Desc = "Diction soignée et expressive" }
+            )
+        },
+        @{
+            Name = "Deutsch";
+            Voices = @(
+                @{ Id = "de-DE-hanna";  Edge = "de-DE-KatjaNeural";  Name = "Hanna";  Country = "Deutschland"; Gender = "Femenina";  Desc = "Klare deutsche Aussprache" },
+                @{ Id = "de-DE-lukas";  Edge = "de-DE-ConradNeural"; Name = "Lukas";  Country = "Deutschland"; Gender = "Masculina"; Desc = "Kräftig für formelle Präsentationen" }
+            )
+        },
+        @{
+            Name = "Italiano";
+            Voices = @(
+                @{ Id = "it-IT-giulia"; Edge = "it-IT-ElsaNeural";   Name = "Giulia"; Country = "Italia"; Gender = "Femenina";  Desc = "Calda, espressiva e melodica" },
+                @{ Id = "it-IT-marco";  Edge = "it-IT-DiegoNeural";  Name = "Marco";  Country = "Italia"; Gender = "Masculina"; Desc = "Timbro profondo ed elegante" }
+            )
+        },
+        @{
+            Name = "Português";
+            Voices = @(
+                @{ Id = "pt-BR-isabella"; Edge = "pt-BR-FranciscaNeural"; Name = "Isabella"; Country = "Brasil"; Gender = "Femenina";  Desc = "Voz brasileira calorosa e vibrante" },
+                @{ Id = "pt-BR-antonio";  Edge = "pt-BR-AntonioNeural";   Name = "Antônio";  Country = "Brasil"; Gender = "Masculina"; Desc = "Grave e marcante para tutoriais" }
+            )
+        },
+        @{
+            Name = "日本語";
+            Voices = @(
+                @{ Id = "ja-JP-sakura"; Edge = "ja-JP-NanamiNeural"; Name = "さくら (Sakura)"; Country = "Japón"; Gender = "Femenina";  Desc = "スタジオ品質の自然な女性音声" },
+                @{ Id = "ja-JP-kenji";  Edge = "ja-JP-KeitaNeural";  Name = "健二 (Kenji)";  Country = "Japón"; Gender = "Masculina"; Desc = "落ち着いた深みのある男性音声" }
+            )
+        },
+        @{
+            Name = "中文";
+            Voices = @(
+                @{ Id = "zh-CN-liwei";  Edge = "zh-CN-XiaoxiaoNeural"; Name = "李薇 (Li Wei)"; Country = "China"; Gender = "Femenina";  Desc = "标准普通话自然清晰女声" },
+                @{ Id = "zh-CN-yunxi";  Edge = "zh-CN-YunxiNeural";    Name = "云希 (Yun Xi)"; Country = "China"; Gender = "Masculina"; Desc = "浑厚自然播报新闻专业男声" }
+            )
+        },
+        @{
+            Name = "Русский";
+            Voices = @(
+                @{ Id = "ru-RU-anastasia"; Edge = "ru-RU-SvetlanaNeural"; Name = "Анастасия (Anastasia)"; Country = "Rusia"; Gender = "Femenina";  Desc = "Бархатный тембр и артикуляция" },
+                @{ Id = "ru-RU-dmitry";    Edge = "ru-RU-DmitryNeural";   Name = "Дмитрий (Dmitry)";     Country = "Rusia"; Gender = "Masculina"; Desc = "Четкий мужской голос" }
+            )
+        },
+        @{
+            Name = "한국어";
+            Voices = @(
+                @{ Id = "ko-KR-minji";   Edge = "ko-KR-SunHiNeural";  Name = "민지 (Min-Ji)";  Country = "Corea del Sur"; Gender = "Femenina";  Desc = "맑고 또렷한 표준어 여성 음성" },
+                @{ Id = "ko-KR-injoon";  Edge = "ko-KR-InJoonNeural"; Name = "인준 (In-Joon)"; Country = "Corea del Sur"; Gender = "Masculina"; Desc = "부드럽고 신뢰감을 주는 남성" }
+            )
+        },
+        @{
+            Name = "العربية";
+            Voices = @(
+                @{ Id = "ar-XA-omar";    Edge = "ar-SA-HamedNeural";   Name = "عمر (Omar)";     Country = "Mundo Árabe"; Gender = "Masculina"; Desc = "صوت ذكوري جهوري فصيح ووقور" },
+                @{ Id = "ar-XA-zariyah"; Edge = "ar-SA-ZariyahNeural"; Name = "زارية (Zariyah)"; Country = "Mundo Árabe"; Gender = "Femenina";  Desc = "صوت أنثوي عربي عذب وواضح" }
+            )
+        }
+    )
+
+    $selLang = 0
+    for ($i = 0; $i -lt $catalog.Count; $i++) {
+        if ($catalog[$i].Name -eq $DefaultLang) {
+            $selLang = $i
+            break
+        }
+    }
+
+    # Inicializar índice de voz por cada idioma
+    $voiceIndices = @(0) * $catalog.Count
+
+    Write-Host ""
+    Write-Host "  ${White}${Bold}$PromptTitle${Reset}"
+    Write-Host ""
+
+    # Espacio para las filas del catálogo + línea separadora + línea de atajos
+    $totalMenuRows = $catalog.Count + 2
+    $startTop = try { [Console]::CursorTop } catch { 0 }
+    for ($i = 0; $i -lt $totalMenuRows; $i++) {
+        Write-Host ""
+    }
+    $menuStartRow = try { [Console]::CursorTop - $totalMenuRows } catch { $startTop }
+
+    $renderMenu = {
+        for ($i = 0; $i -lt $catalog.Count; $i++) {
+            $lang = $catalog[$i]
+            $vIdx = $voiceIndices[$i]
+            $voice = $lang.Voices[$vIdx]
+            $numStr = if (($i + 1) -lt 10) { "[$($i + 1)] " } else { "[$($i + 1)]" }
+            $langPad = $lang.Name.PadRight(10)
+
+            try { [Console]::SetCursorPosition(2, $menuStartRow + $i) } catch { }
+            if ($i -eq $selLang) {
+                Write-Host "${Cyan}${Bold}> $numStr $langPad ${Yellow}◂ $($voice.Name) ▸${Reset} ${LeadLight}($($voice.Country) · $($voice.Gender) · $($voice.Desc))${Reset}    $ClrToEnd" -NoNewline
+            } else {
+                Write-Host "  ${LeadLight}$numStr $langPad ($($voice.Name) · $($voice.Country))${Reset}    $ClrToEnd" -NoNewline
+            }
+        }
+
+        # Separador
+        try { [Console]::SetCursorPosition(2, $menuStartRow + $catalog.Count) } catch { }
+        Write-Host "$ClrToEnd" -NoNewline
+
+        # Barra de atajos
+        try { [Console]::SetCursorPosition(2, $menuStartRow + $catalog.Count + 1) } catch { }
+        Write-Host "${LeadLight}↑/↓ Idioma  ·  ←/→ Cambiar voz  ·  enter Confirmar  ·  esc Cancelar${Reset}$ClrToEnd" -NoNewline
+    }
+
+    & $renderMenu
+
+    try {
+        while ($true) {
+            $k = [Console]::ReadKey($true)
+
+            if ($k.Key -eq [ConsoleKey]::UpArrow) {
+                $selLang = if ($selLang -gt 0) { $selLang - 1 } else { $catalog.Count - 1 }
+                & $renderMenu
+                continue
+            }
+
+            if ($k.Key -eq [ConsoleKey]::DownArrow) {
+                $selLang = if ($selLang -lt ($catalog.Count - 1)) { $selLang + 1 } else { 0 }
+                & $renderMenu
+                continue
+            }
+
+            if ($k.Key -eq [ConsoleKey]::LeftArrow) {
+                $curCount = $catalog[$selLang].Voices.Count
+                $voiceIndices[$selLang] = if ($voiceIndices[$selLang] -gt 0) { $voiceIndices[$selLang] - 1 } else { $curCount - 1 }
+                & $renderMenu
+                continue
+            }
+
+            if ($k.Key -eq [ConsoleKey]::RightArrow) {
+                $curCount = $catalog[$selLang].Voices.Count
+                $voiceIndices[$selLang] = if ($voiceIndices[$selLang] -lt ($curCount - 1)) { $voiceIndices[$selLang] + 1 } else { 0 }
+                & $renderMenu
+                continue
+            }
+
+            # Selección numérica directa (1-9)
+            $ch = [string]$k.KeyChar
+            $numVal = -1
+            if ([int]::TryParse($ch, [ref]$numVal) -and $numVal -ge 1 -and $numVal -le $catalog.Count) {
+                $selLang = $numVal - 1
+                & $renderMenu
+                continue
+            }
+
+            if ($k.Key -eq [ConsoleKey]::Enter) {
+                try { [Console]::SetCursorPosition(0, $menuStartRow + $totalMenuRows) } catch { }
+                Write-Host ""
+                $chosenLang = $catalog[$selLang]
+                $chosenVoice = $chosenLang.Voices[$voiceIndices[$selLang]]
+                return @{
+                    Language  = $chosenLang.Name
+                    Id        = $chosenVoice.Id
+                    EdgeVoice = $chosenVoice.Edge
+                    Name      = $chosenVoice.Name
+                    Country   = $chosenVoice.Country
+                    Gender    = $chosenVoice.Gender
+                    Desc      = $chosenVoice.Desc
+                }
+            }
+
+            $isCtrlC = ($k.KeyChar -eq [char]3) -or ($k.Key -eq [ConsoleKey]::C -and ($k.Modifiers -band [ConsoleModifiers]::Control))
+            if ($k.Key -eq [ConsoleKey]::Escape -or $isCtrlC) {
+                try { [Console]::SetCursorPosition(0, $menuStartRow + $totalMenuRows) } catch { }
+                Write-Host ""
+                return $null
+            }
+        }
+    } finally {
+        try { [Console]::CursorVisible = $savedCursor } catch { }
+    }
+}
+
 function Select-InteractiveTheme {
     param(
         [array]$Themes,
@@ -2991,27 +3213,25 @@ function Invoke-PillarTTS {
         }
         $text = $text.Trim()
 
-        $ttsOptions = @(
-            @{ Value = "es-ES-AlvaroNeural"; Label = "[1] es-ES-AlvaroNeural (España, Masculino)" },
-            @{ Value = "es-ES-ElviraNeural"; Label = "[2] es-ES-ElviraNeural (España, Femenino)" },
-            @{ Value = "es-MX-JorgeNeural";  Label = "[3] es-MX-JorgeNeural  (México, Masculino)" },
-            @{ Value = "es-MX-DaliaNeural";  Label = "[4] es-MX-DaliaNeural  (México, Femenino)" },
-            @{ Value = "en-US-JennyNeural";  Label = "[5] en-US-JennyNeural  (USA, Femenino)" },
-            @{ Value = "en-US-GuyNeural";    Label = "[6] en-US-GuyNeural    (USA, Masculino)" }
-        )
-
-        $chosenVoice = Select-InteractiveOption -PromptTitle "Selecciona una voz neuronal:" -Options $ttsOptions -DefaultIndex 0
-        if ($chosenVoice) {
-            $voice = $chosenVoice
+        $chosen = Select-InteractiveTTSVoice -PromptTitle "Selecciona el idioma y la voz neuronal:" -DefaultLang "Español" -DefaultVoiceId "es-ES-alvaro"
+        if (-not $chosen) {
+            Write-Host "  ${Lead}╰─ Síntesis cancelada.${Reset}"
+            Write-Host ""
+            return
         }
+
+        $voice = $chosen.EdgeVoice
+        $voiceDisplay = "$($chosen.Name) ($($chosen.Country) · $($chosen.Gender))"
 
         $outInput = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}Archivo de salida [voz.mp3]:${Reset} "
         if ($outInput -and $outInput.Trim()) { $out = $outInput.Trim() } else { $out = "voz.mp3" }
+    } else {
+        $voiceDisplay = $voice
     }
 
     Write-Host ""
     Write-Host "  $Cyan╭─ [02] VORK NEURAL TTS ────────────────────────────$Reset"
-    Write-Host "  $Cyan│$Reset  $Gray Voz:$Reset     $Yellow$voice$Reset"
+    Write-Host "  $Cyan│$Reset  $Gray Voz:$Reset     $Yellow$voiceDisplay$Reset"
     Write-Host "  $Cyan│$Reset  $Gray Salida:$Reset  $White$out$Reset"
     Write-Host "  $Cyan├───────────────────────────────────────────────────$Reset"
 

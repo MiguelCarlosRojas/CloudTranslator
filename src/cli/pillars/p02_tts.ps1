@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Pilar 02: Vork Texto a Voz Neuronal (TTS Studio con 24 voces humanas)
 #>
@@ -28,27 +28,25 @@ function Invoke-PillarTTS {
         }
         $text = $text.Trim()
 
-        $ttsOptions = @(
-            @{ Value = "es-ES-AlvaroNeural"; Label = "[1] es-ES-AlvaroNeural (España, Masculino)" },
-            @{ Value = "es-ES-ElviraNeural"; Label = "[2] es-ES-ElviraNeural (España, Femenino)" },
-            @{ Value = "es-MX-JorgeNeural";  Label = "[3] es-MX-JorgeNeural  (México, Masculino)" },
-            @{ Value = "es-MX-DaliaNeural";  Label = "[4] es-MX-DaliaNeural  (México, Femenino)" },
-            @{ Value = "en-US-JennyNeural";  Label = "[5] en-US-JennyNeural  (USA, Femenino)" },
-            @{ Value = "en-US-GuyNeural";    Label = "[6] en-US-GuyNeural    (USA, Masculino)" }
-        )
-
-        $chosenVoice = Select-InteractiveOption -PromptTitle "Selecciona una voz neuronal:" -Options $ttsOptions -DefaultIndex 0
-        if ($chosenVoice) {
-            $voice = $chosenVoice
+        $chosen = Select-InteractiveTTSVoice -PromptTitle "Selecciona el idioma y la voz neuronal:" -DefaultLang "Español" -DefaultVoiceId "es-ES-alvaro"
+        if (-not $chosen) {
+            Write-Host "  ${Lead}╰─ Síntesis cancelada.${Reset}"
+            Write-Host ""
+            return
         }
+
+        $voice = $chosen.EdgeVoice
+        $voiceDisplay = "$($chosen.Name) ($($chosen.Country) · $($chosen.Gender))"
 
         $outInput = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}Archivo de salida [voz.mp3]:${Reset} "
         if ($outInput -and $outInput.Trim()) { $out = $outInput.Trim() } else { $out = "voz.mp3" }
+    } else {
+        $voiceDisplay = $voice
     }
 
     Write-Host ""
     Write-Host "  $Cyan╭─ [02] VORK NEURAL TTS ────────────────────────────$Reset"
-    Write-Host "  $Cyan│$Reset  $Gray Voz:$Reset     $Yellow$voice$Reset"
+    Write-Host "  $Cyan│$Reset  $Gray Voz:$Reset     $Yellow$voiceDisplay$Reset"
     Write-Host "  $Cyan│$Reset  $Gray Salida:$Reset  $White$out$Reset"
     Write-Host "  $Cyan├───────────────────────────────────────────────────$Reset"
 
