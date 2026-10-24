@@ -207,7 +207,7 @@ function Read-InteractiveVorkLine {
     $dotCh     = [char]0x00B7
 
     $clearMenu = {
-        for ($r = 0; $r -le 8; $r++) {
+        for ($r = 0; $r -le 10; $r++) {
             try {
                 [Console]::SetCursorPosition(0, $PromptRow + 3 + $r)
                 Write-Host "$ClrLine" -NoNewline
@@ -221,78 +221,87 @@ function Read-InteractiveVorkLine {
 
     $histIdx = -1
     $savedDraft = ""
+    $isNavigatingHistory = $false
+    $filtered = @()
 
     while ($true) {
         $str = $buf.ToString()
-        $isSlash = $str.StartsWith("/")
+        $isSlash = (-not $isNavigatingHistory) -and $str.StartsWith("/") -and (-not $str.Contains(" "))
 
         if ($isSlash) {
             $filtered = @($allCommands | Where-Object { $_.Cmd.StartsWith($str, [System.StringComparison]::OrdinalIgnoreCase) })
-            if ($filtered.Count -eq 0) { $filtered = $allCommands }
-            if ($selIdx -ge $filtered.Count) { $selIdx = 0 }
+            if ($filtered.Count -gt 0) {
+                if ($selIdx -ge $filtered.Count) { $selIdx = 0 }
 
-            # Adjust scrolling window
-            if ($selIdx -lt $topIdx) {
-                $topIdx = $selIdx
-            } elseif ($selIdx -ge ($topIdx + $windowSize)) {
-                $topIdx = $selIdx - $windowSize + 1
-            }
-            if ($topIdx -gt ($filtered.Count - $windowSize) -and ($filtered.Count -gt $windowSize)) {
-                $topIdx = $filtered.Count - $windowSize
-            }
-            if ($topIdx -lt 0) { $topIdx = 0 }
+                # Adjust scrolling window
+                if ($selIdx -lt $topIdx) {
+                    $topIdx = $selIdx
+                } elseif ($selIdx -ge ($topIdx + $windowSize)) {
+                    $topIdx = $selIdx - $windowSize + 1
+                }
+                if ($topIdx -gt ($filtered.Count - $windowSize) -and ($filtered.Count -gt $windowSize)) {
+                    $topIdx = $filtered.Count - $windowSize
+                }
+                if ($topIdx -lt 0) { $topIdx = 0 }
 
-            $slashMenuOpen = $true
+                $slashMenuOpen = $true
 
-            # Render the 5 visible items
-            for ($k = 0; $k -lt $windowSize; $k++) {
-                $itemIdx = $topIdx + $k
-                $rowY = $PromptRow + 3 + $k
-                try { [Console]::SetCursorPosition(0, $rowY) } catch { }
+                # Render the 5 visible items
+                for ($k = 0; $k -lt $windowSize; $k++) {
+                    $itemIdx = $topIdx + $k
+                    $rowY = $PromptRow + 3 + $k
+                    try { [Console]::SetCursorPosition(0, $rowY) } catch { }
 
-                if ($itemIdx -lt $filtered.Count) {
-                    $item = $filtered[$itemIdx]
-                    $cmdStr = $item.Cmd.PadRight(18)
-                    $descStr = $item.Desc
-                    $availDesc = [Math]::Max(10, ($Width - 1) - 22)
-                    if ($descStr.Length -gt $availDesc) {
-                        $descStr = $descStr.Substring(0, $availDesc - 3) + "..."
-                    }
+                    if ($itemIdx -lt $filtered.Count) {
+                        $item = $filtered[$itemIdx]
+                        $cmdStr = $item.Cmd.PadRight(18)
+                        $descStr = $item.Desc
+                        $availDesc = [Math]::Max(10, ($Width - 1) - 22)
+                        if ($descStr.Length -gt $availDesc) {
+                            $descStr = $descStr.Substring(0, $availDesc - 3) + "..."
+                        }
 
-                    if ($itemIdx -eq $selIdx) {
-                        Write-Host "${Cyan}${Bold}> ${White}${Bold}$cmdStr${LeadLight}$descStr${Reset}$ClrToEnd" -NoNewline
+                        if ($itemIdx -eq $selIdx) {
+                            Write-Host "${Cyan}${Bold}> ${White}${Bold}$cmdStr${LeadLight}$descStr${Reset}$ClrToEnd" -NoNewline
+                        } else {
+                            Write-Host "  ${White}$cmdStr${LeadLight}$descStr${Reset}$ClrToEnd" -NoNewline
+                        }
                     } else {
-                        Write-Host "  ${White}$cmdStr${LeadLight}$descStr${Reset}$ClrToEnd" -NoNewline
+                        Write-Host "$ClrLine" -NoNewline
                     }
-                } else {
-                    Write-Host "$ClrLine" -NoNewline
+                }
+
+                # Row 6: More indicator
+                $remBelow = $filtered.Count - ($topIdx + $windowSize)
+                $remAbove = $topIdx
+                $moreText = ""
+                if ($remBelow -gt 0 -and $remAbove -gt 0) {
+                    $moreText = "   $upArrow $remAbove / $downArrow $remBelow more"
+                } elseif ($remBelow -gt 0) {
+                    $moreText = "   $downArrow $remBelow more"
+                } elseif ($remAbove -gt 0) {
+                    $moreText = "   $upArrow $remAbove more"
+                }
+                try {
+                    [Console]::SetCursorPosition(0, $PromptRow + 3 + $windowSize)
+                    Write-Host "${LeadDark}$moreText${Reset}$ClrToEnd" -NoNewline
+                } catch { }
+
+                # Row 7: Navigation hints
+                try {
+                    [Console]::SetCursorPosition(0, $PromptRow + 3 + $windowSize + 1)
+                    Write-Host "  ${Cyan}$upArrow/$downArrow${Reset} ${LeadLight}Navigate ${LeadDark}$dotCh${Reset} ${Cyan}enter${Reset} ${LeadLight}Select ${LeadDark}$dotCh${Reset} ${Cyan}tab${Reset} ${LeadLight}Complete ${LeadDark}$dotCh${Reset} ${Cyan}esc${Reset} ${LeadLight}Cancel${Reset}$ClrToEnd" -NoNewline
+                } catch { }
+
+                # Reposition cursor cleanly on prompt row
+                try { [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow) } catch { }
+            } else {
+                if ($slashMenuOpen) {
+                    & $clearMenu
+                    $slashMenuOpen = $false
+                    try { [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow) } catch { }
                 }
             }
-
-            # Row 6: More indicator
-            $remBelow = $filtered.Count - ($topIdx + $windowSize)
-            $remAbove = $topIdx
-            $moreText = ""
-            if ($remBelow -gt 0 -and $remAbove -gt 0) {
-                $moreText = "   $upArrow $remAbove / $downArrow $remBelow more"
-            } elseif ($remBelow -gt 0) {
-                $moreText = "   $downArrow $remBelow more"
-            } elseif ($remAbove -gt 0) {
-                $moreText = "   $upArrow $remAbove more"
-            }
-            try {
-                [Console]::SetCursorPosition(0, $PromptRow + 3 + $windowSize)
-                Write-Host "${LeadDark}$moreText${Reset}$ClrToEnd" -NoNewline
-            } catch { }
-
-            # Row 7: Navigation hints
-            try {
-                [Console]::SetCursorPosition(0, $PromptRow + 3 + $windowSize + 1)
-                Write-Host "  ${Cyan}$upArrow/$downArrow${Reset} ${LeadLight}Navigate ${LeadDark}$dotCh${Reset} ${Cyan}enter${Reset} ${LeadLight}Select ${LeadDark}$dotCh${Reset} ${Cyan}tab${Reset} ${LeadLight}Complete ${LeadDark}$dotCh${Reset} ${Cyan}esc${Reset} ${LeadLight}Cancel${Reset}$ClrToEnd" -NoNewline
-            } catch { }
-
-            # Reposition cursor cleanly on prompt row
-            try { [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow) } catch { }
         } else {
             if ($slashMenuOpen) {
                 & $clearMenu
@@ -367,9 +376,10 @@ function Read-InteractiveVorkLine {
 
         if ($key.Key -eq [ConsoleKey]::Enter) {
             try { [Console]::TreatControlCAsInput = $false } catch { }
-            if ($isSlash -and $filtered.Count -gt 0) {
+            if ($slashMenuOpen -and $filtered.Count -gt 0) {
                 $chosen = $filtered[$selIdx].Cmd
                 & $clearMenu
+                $slashMenuOpen = $false
                 try {
                     [Console]::SetCursorPosition(2, $PromptRow)
                     Write-Host "${Coral}${Bold}$chosen${Reset}$ClrToEnd" -NoNewline
@@ -379,20 +389,27 @@ function Read-InteractiveVorkLine {
                 return $chosen
             }
 
-            if ($slashMenuOpen) { & $clearMenu }
+            if ($slashMenuOpen) {
+                & $clearMenu
+                $slashMenuOpen = $false
+            }
+            $finalText = $buf.ToString()
             try {
                 [Console]::SetCursorPosition(2, $PromptRow)
-                Write-Host "${Coral}${Bold}$($buf.ToString())${Reset}$ClrToEnd" -NoNewline
+                Write-Host "${Coral}${Bold}$finalText${Reset}$ClrToEnd" -NoNewline
                 [Console]::SetCursorPosition(0, $PromptRow + 3)
             } catch { }
             Write-Host ""
-            return $buf.ToString()
+            return $finalText
         }
 
         if ($key.Key -eq [ConsoleKey]::Tab) {
-            if ($isSlash -and $filtered.Count -gt 0) {
+            if ($slashMenuOpen -and $filtered.Count -gt 0) {
                 $chosen = $filtered[$selIdx].Cmd
                 & $clearMenu
+                $slashMenuOpen = $false
+                $isNavigatingHistory = $false
+                $histIdx = -1
                 $buf.Clear() | Out-Null
                 $buf.Append($chosen) | Out-Null
                 try {
@@ -405,10 +422,15 @@ function Read-InteractiveVorkLine {
         }
 
         if ($key.Key -eq [ConsoleKey]::UpArrow) {
-            if ($isSlash -and $filtered.Count -gt 0) {
+            if ($slashMenuOpen -and $filtered.Count -gt 0) {
                 $selIdx = if ($selIdx -gt 0) { $selIdx - 1 } else { $filtered.Count - 1 }
                 continue
-            } elseif (-not $isSlash -and $global:VorkSessionHistory -and $global:VorkSessionHistory.Count -gt 0) {
+            } elseif ($global:VorkSessionHistory -and $global:VorkSessionHistory.Count -gt 0) {
+                $isNavigatingHistory = $true
+                if ($slashMenuOpen) {
+                    & $clearMenu
+                    $slashMenuOpen = $false
+                }
                 if ($histIdx -lt 0) {
                     $savedDraft = $buf.ToString()
                     $histIdx = $global:VorkSessionHistory.Count - 1
@@ -430,10 +452,14 @@ function Read-InteractiveVorkLine {
         }
 
         if ($key.Key -eq [ConsoleKey]::DownArrow) {
-            if ($isSlash -and $filtered.Count -gt 0) {
+            if ($slashMenuOpen -and $filtered.Count -gt 0) {
                 $selIdx = if ($selIdx -lt ($filtered.Count - 1)) { $selIdx + 1 } else { 0 }
                 continue
-            } elseif (-not $isSlash -and $histIdx -ge 0) {
+            } elseif ($isNavigatingHistory -and $histIdx -ge 0) {
+                if ($slashMenuOpen) {
+                    & $clearMenu
+                    $slashMenuOpen = $false
+                }
                 if ($histIdx -lt ($global:VorkSessionHistory.Count - 1)) {
                     $histIdx++
                     $chosenHist = $global:VorkSessionHistory[$histIdx]
@@ -441,6 +467,7 @@ function Read-InteractiveVorkLine {
                     $buf.Append($chosenHist) | Out-Null
                 } else {
                     $histIdx = -1
+                    $isNavigatingHistory = $false
                     $buf.Clear() | Out-Null
                     $buf.Append($savedDraft) | Out-Null
                 }
@@ -458,6 +485,18 @@ function Read-InteractiveVorkLine {
             if ($slashMenuOpen) {
                 & $clearMenu
                 $slashMenuOpen = $false
+            }
+            if ($isNavigatingHistory) {
+                $isNavigatingHistory = $false
+                $histIdx = -1
+                $buf.Clear() | Out-Null
+                $buf.Append($savedDraft) | Out-Null
+                try {
+                    [Console]::SetCursorPosition(2, $PromptRow)
+                    Write-Host "${Coral}${Bold}$($buf.ToString())${Reset}$ClrToEnd" -NoNewline
+                    [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
+                } catch { }
+                continue
             }
             if ($buf.Length -gt 0) {
                 try {
@@ -477,6 +516,8 @@ function Read-InteractiveVorkLine {
         }
 
         if ($key.Key -eq [ConsoleKey]::Backspace -or $key.KeyChar -eq [char]8) {
+            $isNavigatingHistory = $false
+            $histIdx = -1
             if ($buf.Length -gt 0) {
                 $buf.Remove($buf.Length - 1, 1) | Out-Null
                 try {
@@ -484,7 +525,7 @@ function Read-InteractiveVorkLine {
                     Write-Host "${Coral}${Bold}$($buf.ToString())${Reset} $ClrToEnd" -NoNewline
                     [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
                 } catch { }
-                if ($buf.Length -eq 0 -or -not $buf.ToString().StartsWith("/")) {
+                if ($buf.Length -eq 0 -or -not $buf.ToString().StartsWith("/") -or $buf.ToString().Contains(" ")) {
                     if ($slashMenuOpen) {
                         & $clearMenu
                         $slashMenuOpen = $false
@@ -496,6 +537,8 @@ function Read-InteractiveVorkLine {
         }
 
         if ($key.Key -eq [ConsoleKey]::Delete) {
+            $isNavigatingHistory = $false
+            $histIdx = -1
             if ($buf.Length -gt 0) {
                 $buf.Remove($buf.Length - 1, 1) | Out-Null
                 try {
@@ -503,7 +546,7 @@ function Read-InteractiveVorkLine {
                     Write-Host "${Coral}${Bold}$($buf.ToString())${Reset} $ClrToEnd" -NoNewline
                     [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
                 } catch { }
-                if ($buf.Length -eq 0 -or -not $buf.ToString().StartsWith("/")) {
+                if ($buf.Length -eq 0 -or -not $buf.ToString().StartsWith("/") -or $buf.ToString().Contains(" ")) {
                     if ($slashMenuOpen) {
                         & $clearMenu
                         $slashMenuOpen = $false
@@ -532,6 +575,8 @@ function Read-InteractiveVorkLine {
 
         $ch = $key.KeyChar
         if (-not [char]::IsControl($ch)) {
+            $isNavigatingHistory = $false
+            $histIdx = -1
             $buf.Append($ch) | Out-Null
             try {
                 [Console]::SetCursorPosition(2, $PromptRow)

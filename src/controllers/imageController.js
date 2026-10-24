@@ -53,7 +53,9 @@ exports.getFormats = (req, res) => {
  */
 exports.convertImage = async (req, res) => {
   try {
-    const { imageBase64, url, targetFormat = "png", quality = 90, width, height } = req.body || {};
+    const { imageBase64: rawB64, image: legacyB64, url, targetFormat: rawFmt = "png", format: legacyFmt, quality = 90, width, height } = req.body || {};
+    const imageBase64 = rawB64 || legacyB64;
+    const targetFormat = rawFmt || legacyFmt || "png";
 
     if (!imageBase64 && !url) {
       return res.status(400).json({
@@ -97,7 +99,8 @@ exports.convertImage = async (req, res) => {
  */
 exports.removeBackground = async (req, res) => {
   try {
-    const { imageBase64, url, mode = "transparent", color = "#FFFFFF", bgImageBase64, prompt } = req.body || {};
+    const { imageBase64: rawB64, image: legacyB64, url, mode = "transparent", color = "#FFFFFF", bgImageBase64, prompt } = req.body || {};
+    const imageBase64 = rawB64 || legacyB64;
 
     if (!imageBase64 && !url) {
       return res.status(400).json({

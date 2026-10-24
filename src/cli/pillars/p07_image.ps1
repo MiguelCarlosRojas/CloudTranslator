@@ -48,11 +48,14 @@ function Invoke-PillarImage {
 
     $bytes = [System.IO.File]::ReadAllBytes((Resolve-Path $file))
     $b64 = [System.Convert]::ToBase64String($bytes)
-    $body = @{ image = "data:image/png;base64,$b64"; format = $fmt; quality = $quality } | ConvertTo-Json
+    $body = @{ imageBase64 = "data:image/png;base64,$b64"; targetFormat = $fmt; quality = $quality } | ConvertTo-Json
     try {
         $res = Invoke-RestMethod -Uri "$ApiBase/api/image/convert" -Method Post -Body $body -ContentType "application/json"
-        Write-Host "  $Cyan│$Reset  $Green✓ Imagen convertida con éxito:$Reset"
-        Write-Host "  $Cyan│$Reset    Enlace: $Yellow$ApiBase$($res.downloadUrl)$Reset"
+        $dlUrl = if ($res.downloadUrl) { "$ApiBase$($res.downloadUrl)" } else { "$ApiBase/api/image/download" }
+        $stUrl = if ($res.streamUrl) { "$ApiBase$($res.streamUrl)" } else { "$ApiBase/api/image/stream" }
+        Write-Host "  $Cyan│$Reset  $Green✓ Conversión de imagen lista:$Reset"
+        Write-Host "  $Cyan│$Reset    Descarga: $Yellow$dlUrl$Reset"
+        Write-Host "  $Cyan│$Reset    Stream:   $Cyan$stUrl$Reset"
         Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
     } catch {
         Write-Host "  $Cyan│$Reset  ${Coral}[Error Imagen]:${Reset} $($_.Exception.Message)"

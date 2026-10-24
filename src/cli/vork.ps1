@@ -2750,7 +2750,12 @@ function Invoke-PillarTranslate {
     $body = @{ text = $text; targetLanguage = $to } | ConvertTo-Json
     try {
         $res = Invoke-RestMethod -Uri "$ApiBase/api/translate" -Method Post -Body $body -ContentType "application/json"
-        Write-Host "  $Cyan│$Reset  $Green$Bold Traducción:$Reset $White$($res.translatedText)$Reset"
+        $transText = $res.translatedText
+        $encText = [System.Uri]::EscapeDataString($transText)
+        Write-Host "  $Cyan│$Reset  $Green✓ Traducción lista:$Reset"
+        Write-Host "  $Cyan│$Reset    Resultado: $White`"$transText`"$Reset"
+        Write-Host "  $Cyan│$Reset    Descarga: $Yellow$ApiBase/api/tts?text=$encText&lang=$to$Reset"
+        Write-Host "  $Cyan│$Reset    Stream:   $Cyan$ApiBase/api/tts/stream?text=$encText&lang=$to$Reset"
         Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
     } catch {
         Write-Host "  $Cyan│$Reset  ${Coral}[Error al traducir]:${Reset} $($_.Exception.Message)"
@@ -2817,8 +2822,19 @@ function Invoke-PillarTTS {
 
     $body = @{ text = $text; voice = $voice; outputFormat = "audio-24khz-48kbitrate-mono-mp3" } | ConvertTo-Json
     try {
-        Invoke-RestMethod -Uri "$ApiBase/api/tts" -Method Post -Body $body -ContentType "application/json" -OutFile $out
-        Write-Host "  $Cyan│$Reset  $Green✓ Audio sintetizado exitosamente y guardado en $out$Reset"
+        $res = Invoke-RestMethod -Uri "$ApiBase/api/tts" -Method Post -Body $body -ContentType "application/json"
+        if ($res.audioBase64 -and $out) {
+            try {
+                $rawB64 = $res.audioBase64 -replace '^data:audio\/[^;]+;base64,', ''
+                $targetFile = if ([System.IO.Path]::IsPathRooted($out)) { $out } else { Join-Path (Get-Location) $out }
+                [System.IO.File]::WriteAllBytes($targetFile, [System.Convert]::FromBase64String($rawB64))
+            } catch {}
+        }
+        $dlUrl = if ($res.downloadUrl) { "$ApiBase$($res.downloadUrl)" } else { "$ApiBase/api/tts/download?file=$out" }
+        $stUrl = if ($res.streamUrl) { "$ApiBase$($res.streamUrl)" } else { "$ApiBase/api/tts/stream?file=$out" }
+        Write-Host "  $Cyan│$Reset  $Green✓ Síntesis vocal lista:$Reset"
+        Write-Host "  $Cyan│$Reset    Descarga: $Yellow$dlUrl$Reset"
+        Write-Host "  $Cyan│$Reset    Stream:   $Cyan$stUrl$Reset"
         Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
     } catch {
         Write-Host "  $Cyan│$Reset  ${Coral}[Error TTS]:${Reset} $($_.Exception.Message)"
@@ -2884,8 +2900,36 @@ function Invoke-PillarClone {
     Write-Host "  $Cyan│$Reset  $Gray Algoritmo:$Reset$Yellow$f0Method$Reset"
     Write-Host "  $Cyan│$Reset  $Gray Salida:$Reset   $Yellow$out$Reset"
     Write-Host "  $Cyan├───────────────────────────────────────────────────$Reset"
-    Write-Host "  $Cyan│$Reset  $Green✓ Extracción de formantes y modelado acústico iniciado en $ApiBase$Reset"
-    Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
+
+    $b64 = $null
+    if ($sample -and (Test-Path $sample)) {
+        try {
+            $bytes = [System.IO.File]::ReadAllBytes((Resolve-Path $sample))
+            $b64 = "data:audio/wav;base64," + [System.Convert]::ToBase64String($bytes)
+        } catch {}
+    }
+
+    $cloneText = if ($text -and $text.Trim()) { $text.Trim() } else { "Prueba de síntesis con voz clonada en Vork CLI." }
+    $body = @{ text = $cloneText; audioSampleBase64 = $b64; similarity = "high"; format = "wav" } | ConvertTo-Json
+    try {
+        $res = Invoke-RestMethod -Uri "$ApiBase/api/voice-clone" -Method Post -Body $body -ContentType "application/json"
+        if ($res.audioBase64 -and $out) {
+            try {
+                $rawB64 = $res.audioBase64 -replace '^data:audio\/[^;]+;base64,', ''
+                $targetFile = if ([System.IO.Path]::IsPathRooted($out)) { $out } else { Join-Path (Get-Location) $out }
+                [System.IO.File]::WriteAllBytes($targetFile, [System.Convert]::FromBase64String($rawB64))
+            } catch {}
+        }
+        $dlUrl = if ($res.downloadUrl) { "$ApiBase$($res.downloadUrl)" } else { "$ApiBase/api/voice-clone/download" }
+        $stUrl = if ($res.streamUrl) { "$ApiBase$($res.streamUrl)" } else { "$ApiBase/api/voice-clone/stream" }
+        Write-Host "  $Cyan│$Reset  $Green✓ Clonación de voz lista:$Reset"
+        Write-Host "  $Cyan│$Reset    Descarga: $Yellow$dlUrl$Reset"
+        Write-Host "  $Cyan│$Reset    Stream:   $Cyan$stUrl$Reset"
+        Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
+    } catch {
+        Write-Host "  $Cyan│$Reset  ${Coral}[Error Clonación]:${Reset} $($_.Exception.Message)"
+        Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
+    }
     Write-Host ""
 }
 
@@ -3008,9 +3052,14 @@ function Invoke-PillarSeparate {
     $body = @{ url = $target; quality = "lossless"; mode = $mode } | ConvertTo-Json
     try {
         $res = Invoke-RestMethod -Uri "$ApiBase/api/separator/process" -Method Post -Body $body -ContentType "application/json"
-        Write-Host "  $Cyan│$Reset  $Green✓ Stems aislados con éxito:$Reset"
-        Write-Host "  $Cyan│$Reset    Acapella (Voz): $Purple$ApiBase$($res.vocalsDownloadUrl)$Reset"
-        Write-Host "  $Cyan│$Reset    Karaoke (Base): $Cyan$ApiBase$($res.instrumentalDownloadUrl)$Reset"
+        $stemObj = if ($mode -eq "karaoke" -and $res.instrumental) { $res.instrumental } elseif ($res.vocals) { $res.vocals } else { $null }
+        $dlPath = if ($stemObj -and $stemObj.downloadUrl) { $stemObj.downloadUrl } elseif ($res.downloadUrl) { $res.downloadUrl } elseif ($res.vocalsDownloadUrl) { $res.vocalsDownloadUrl } else { "/api/separator/download?file=$target" }
+        $stPath = if ($stemObj -and $stemObj.streamUrl) { $stemObj.streamUrl } elseif ($res.streamUrl) { $res.streamUrl } else { $dlPath -replace '/download','/stream' }
+        $dlUrl = if ($dlPath.StartsWith("http")) { $dlPath } else { "$ApiBase$dlPath" }
+        $stUrl = if ($stPath.StartsWith("http")) { $stPath } else { "$ApiBase$stPath" }
+        Write-Host "  $Cyan│$Reset  $Green✓ Separación de stems lista:$Reset"
+        Write-Host "  $Cyan│$Reset    Descarga: $Yellow$dlUrl$Reset"
+        Write-Host "  $Cyan│$Reset    Stream:   $Cyan$stUrl$Reset"
         Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
     } catch {
         Write-Host "  $Cyan│$Reset  ${Coral}[Error Separador]:${Reset} $($_.Exception.Message)"
@@ -3049,13 +3098,16 @@ function Invoke-PillarDJ {
 
     Write-Host ""
     Write-Host "  $Cyan╭─ [06] VORK DJ MEZCLADOR VIRTUAL EN VIVO ─────────$Reset"
-    Write-Host "  $Cyan│$Reset  ${White}Iniciando consola interactiva de doble tornamesa...${Reset}"
+    Write-Host "  $Cyan│$Reset  $Gray Modo:$Reset     $WhiteConsola Web Audio en Vivo$Reset"
     if ($track) {
-        Write-Host "  $Cyan│$Reset  ${LeadLight}Cargando pista en Deck A: $track${Reset}"
+        Write-Host "  $Cyan│$Reset  $Gray Pista:$Reset    $White$track$Reset"
     }
-    Write-Host "  $Cyan│$Reset  ${Green}Abriendo interfaz Web Audio en el navegador ($ApiBase/dj)...${Reset}"
+    Write-Host "  $Cyan├───────────────────────────────────────────────────$Reset"
+    Write-Host "  $Cyan│$Reset  $Green✓ Sesión de DJ lista:$Reset"
+    Write-Host "  $Cyan│$Reset    Descarga: $Yellow$ApiBase/api/dj/export$Reset"
+    Write-Host "  $Cyan│$Reset    Stream:   $Cyan$ApiBase/dj$Reset"
     Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
-    Start-Process "$ApiBase/dj"
+    try { Start-Process "$ApiBase/dj" } catch {}
     Write-Host ""
 }
 
@@ -3111,11 +3163,14 @@ function Invoke-PillarImage {
 
     $bytes = [System.IO.File]::ReadAllBytes((Resolve-Path $file))
     $b64 = [System.Convert]::ToBase64String($bytes)
-    $body = @{ image = "data:image/png;base64,$b64"; format = $fmt; quality = $quality } | ConvertTo-Json
+    $body = @{ imageBase64 = "data:image/png;base64,$b64"; targetFormat = $fmt; quality = $quality } | ConvertTo-Json
     try {
         $res = Invoke-RestMethod -Uri "$ApiBase/api/image/convert" -Method Post -Body $body -ContentType "application/json"
-        Write-Host "  $Cyan│$Reset  $Green✓ Imagen convertida con éxito:$Reset"
-        Write-Host "  $Cyan│$Reset    Enlace: $Yellow$ApiBase$($res.downloadUrl)$Reset"
+        $dlUrl = if ($res.downloadUrl) { "$ApiBase$($res.downloadUrl)" } else { "$ApiBase/api/image/download" }
+        $stUrl = if ($res.streamUrl) { "$ApiBase$($res.streamUrl)" } else { "$ApiBase/api/image/stream" }
+        Write-Host "  $Cyan│$Reset  $Green✓ Conversión de imagen lista:$Reset"
+        Write-Host "  $Cyan│$Reset    Descarga: $Yellow$dlUrl$Reset"
+        Write-Host "  $Cyan│$Reset    Stream:   $Cyan$stUrl$Reset"
         Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
     } catch {
         Write-Host "  $Cyan│$Reset  ${Coral}[Error Imagen]:${Reset} $($_.Exception.Message)"
@@ -3178,11 +3233,14 @@ function Invoke-PillarRemoveBg {
 
     $bytes = [System.IO.File]::ReadAllBytes((Resolve-Path $file))
     $b64 = [System.Convert]::ToBase64String($bytes)
-    $body = @{ image = "data:image/jpeg;base64,$b64"; mode = $mode } | ConvertTo-Json
+    $body = @{ imageBase64 = "data:image/jpeg;base64,$b64"; mode = $mode } | ConvertTo-Json
     try {
         $res = Invoke-RestMethod -Uri "$ApiBase/api/image/remove-background" -Method Post -Body $body -ContentType "application/json"
-        Write-Host "  $Cyan│$Reset  $Green✓ Fondo aislado exitosamente:$Reset"
-        Write-Host "  $Cyan│$Reset    Descarga: $Yellow$ApiBase$($res.downloadUrl)$Reset"
+        $dlUrl = if ($res.downloadUrl) { "$ApiBase$($res.downloadUrl)" } else { "$ApiBase/api/image/download" }
+        $stUrl = if ($res.streamUrl) { "$ApiBase$($res.streamUrl)" } else { "$ApiBase/api/image/stream" }
+        Write-Host "  $Cyan│$Reset  $Green✓ Recorte de fondo listo:$Reset"
+        Write-Host "  $Cyan│$Reset    Descarga: $Yellow$dlUrl$Reset"
+        Write-Host "  $Cyan│$Reset    Stream:   $Cyan$stUrl$Reset"
         Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
     } catch {
         Write-Host "  $Cyan│$Reset  ${Coral}[Error Fondo IA]:${Reset} $($_.Exception.Message)"
@@ -3231,14 +3289,11 @@ function Invoke-PillarAgents {
     Write-Host "  ${Cyan}│${Reset}    ${Cyan}● Audio Engine Agent${Reset}  ${LeadLight}· Síntesis TTS y modelado F0 spectral${Reset}"
     Write-Host "  ${Cyan}│${Reset}    ${Cyan}● Demucs Stem Worker${Reset}  ${LeadLight}· Separación acapella/karaoke en background${Reset}"
     Write-Host "  ${Cyan}│${Reset}    ${Cyan}● Media Extraction Bot${Reset}${LeadLight}· Extracción y compresión multimedia 320k${Reset}"
-    Write-Host "  ${Cyan}├────────────────────────────────────────────────────────────${Reset}"
-    Write-Host "  ${Cyan}│${Reset}  ${White}${Bold}Comandos de Agentes disponibles en Vork:${Reset}"
-    Write-Host "  ${Cyan}│${Reset}    ${Yellow}/goal${Reset}      ${LeadLight}· Ejecución de tareas autónomas exhaustivas${Reset}"
-    Write-Host "  ${Cyan}│${Reset}    ${Yellow}/plan${Reset}      ${LeadLight}· Desglose y planificación guiada paso a paso${Reset}"
-    Write-Host "  ${Cyan}│${Reset}    ${Yellow}/teamwork${Reset}  ${LeadLight}· Coordinación entre múltiples subagentes${Reset}"
-    Write-Host "  ${Cyan}│${Reset}    ${Yellow}/boost${Reset}     ${LeadLight}· Razonamiento profundo con doble verificación${Reset}"
-    Write-Host "  ${Cyan}│${Reset}    ${Yellow}/learn${Reset}     ${LeadLight}· Persistir reglas y preferencias en ~/.vork${Reset}"
-    Write-Host "  ${Cyan}╰────────────────────────────────────────────────────────────${Reset}"
+    Write-Host "  ${Cyan}├───────────────────────────────────────────────────${Reset}"
+    Write-Host "  ${Cyan}│${Reset}  $Green✓ Clúster de agentes listo:$Reset"
+    Write-Host "  ${Cyan}│${Reset}    Descarga: ${Yellow}$ApiBase/api/cli/health${Reset}"
+    Write-Host "  ${Cyan}│${Reset}    Stream:   ${Cyan}$ApiBase/api/cli/vork.ps1${Reset}"
+    Write-Host "  ${Cyan}╰───────────────────────────────────────────────────${Reset}"
     Write-Host ""
 }
 
@@ -3491,7 +3546,7 @@ function Read-InteractiveVorkLine {
     $dotCh     = [char]0x00B7
 
     $clearMenu = {
-        for ($r = 0; $r -le 8; $r++) {
+        for ($r = 0; $r -le 10; $r++) {
             try {
                 [Console]::SetCursorPosition(0, $PromptRow + 3 + $r)
                 Write-Host "$ClrLine" -NoNewline
@@ -3505,78 +3560,87 @@ function Read-InteractiveVorkLine {
 
     $histIdx = -1
     $savedDraft = ""
+    $isNavigatingHistory = $false
+    $filtered = @()
 
     while ($true) {
         $str = $buf.ToString()
-        $isSlash = $str.StartsWith("/")
+        $isSlash = (-not $isNavigatingHistory) -and $str.StartsWith("/") -and (-not $str.Contains(" "))
 
         if ($isSlash) {
             $filtered = @($allCommands | Where-Object { $_.Cmd.StartsWith($str, [System.StringComparison]::OrdinalIgnoreCase) })
-            if ($filtered.Count -eq 0) { $filtered = $allCommands }
-            if ($selIdx -ge $filtered.Count) { $selIdx = 0 }
+            if ($filtered.Count -gt 0) {
+                if ($selIdx -ge $filtered.Count) { $selIdx = 0 }
 
-            # Adjust scrolling window
-            if ($selIdx -lt $topIdx) {
-                $topIdx = $selIdx
-            } elseif ($selIdx -ge ($topIdx + $windowSize)) {
-                $topIdx = $selIdx - $windowSize + 1
-            }
-            if ($topIdx -gt ($filtered.Count - $windowSize) -and ($filtered.Count -gt $windowSize)) {
-                $topIdx = $filtered.Count - $windowSize
-            }
-            if ($topIdx -lt 0) { $topIdx = 0 }
+                # Adjust scrolling window
+                if ($selIdx -lt $topIdx) {
+                    $topIdx = $selIdx
+                } elseif ($selIdx -ge ($topIdx + $windowSize)) {
+                    $topIdx = $selIdx - $windowSize + 1
+                }
+                if ($topIdx -gt ($filtered.Count - $windowSize) -and ($filtered.Count -gt $windowSize)) {
+                    $topIdx = $filtered.Count - $windowSize
+                }
+                if ($topIdx -lt 0) { $topIdx = 0 }
 
-            $slashMenuOpen = $true
+                $slashMenuOpen = $true
 
-            # Render the 5 visible items
-            for ($k = 0; $k -lt $windowSize; $k++) {
-                $itemIdx = $topIdx + $k
-                $rowY = $PromptRow + 3 + $k
-                try { [Console]::SetCursorPosition(0, $rowY) } catch { }
+                # Render the 5 visible items
+                for ($k = 0; $k -lt $windowSize; $k++) {
+                    $itemIdx = $topIdx + $k
+                    $rowY = $PromptRow + 3 + $k
+                    try { [Console]::SetCursorPosition(0, $rowY) } catch { }
 
-                if ($itemIdx -lt $filtered.Count) {
-                    $item = $filtered[$itemIdx]
-                    $cmdStr = $item.Cmd.PadRight(18)
-                    $descStr = $item.Desc
-                    $availDesc = [Math]::Max(10, ($Width - 1) - 22)
-                    if ($descStr.Length -gt $availDesc) {
-                        $descStr = $descStr.Substring(0, $availDesc - 3) + "..."
-                    }
+                    if ($itemIdx -lt $filtered.Count) {
+                        $item = $filtered[$itemIdx]
+                        $cmdStr = $item.Cmd.PadRight(18)
+                        $descStr = $item.Desc
+                        $availDesc = [Math]::Max(10, ($Width - 1) - 22)
+                        if ($descStr.Length -gt $availDesc) {
+                            $descStr = $descStr.Substring(0, $availDesc - 3) + "..."
+                        }
 
-                    if ($itemIdx -eq $selIdx) {
-                        Write-Host "${Cyan}${Bold}> ${White}${Bold}$cmdStr${LeadLight}$descStr${Reset}$ClrToEnd" -NoNewline
+                        if ($itemIdx -eq $selIdx) {
+                            Write-Host "${Cyan}${Bold}> ${White}${Bold}$cmdStr${LeadLight}$descStr${Reset}$ClrToEnd" -NoNewline
+                        } else {
+                            Write-Host "  ${White}$cmdStr${LeadLight}$descStr${Reset}$ClrToEnd" -NoNewline
+                        }
                     } else {
-                        Write-Host "  ${White}$cmdStr${LeadLight}$descStr${Reset}$ClrToEnd" -NoNewline
+                        Write-Host "$ClrLine" -NoNewline
                     }
-                } else {
-                    Write-Host "$ClrLine" -NoNewline
+                }
+
+                # Row 6: More indicator
+                $remBelow = $filtered.Count - ($topIdx + $windowSize)
+                $remAbove = $topIdx
+                $moreText = ""
+                if ($remBelow -gt 0 -and $remAbove -gt 0) {
+                    $moreText = "   $upArrow $remAbove / $downArrow $remBelow more"
+                } elseif ($remBelow -gt 0) {
+                    $moreText = "   $downArrow $remBelow more"
+                } elseif ($remAbove -gt 0) {
+                    $moreText = "   $upArrow $remAbove more"
+                }
+                try {
+                    [Console]::SetCursorPosition(0, $PromptRow + 3 + $windowSize)
+                    Write-Host "${LeadDark}$moreText${Reset}$ClrToEnd" -NoNewline
+                } catch { }
+
+                # Row 7: Navigation hints
+                try {
+                    [Console]::SetCursorPosition(0, $PromptRow + 3 + $windowSize + 1)
+                    Write-Host "  ${Cyan}$upArrow/$downArrow${Reset} ${LeadLight}Navigate ${LeadDark}$dotCh${Reset} ${Cyan}enter${Reset} ${LeadLight}Select ${LeadDark}$dotCh${Reset} ${Cyan}tab${Reset} ${LeadLight}Complete ${LeadDark}$dotCh${Reset} ${Cyan}esc${Reset} ${LeadLight}Cancel${Reset}$ClrToEnd" -NoNewline
+                } catch { }
+
+                # Reposition cursor cleanly on prompt row
+                try { [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow) } catch { }
+            } else {
+                if ($slashMenuOpen) {
+                    & $clearMenu
+                    $slashMenuOpen = $false
+                    try { [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow) } catch { }
                 }
             }
-
-            # Row 6: More indicator
-            $remBelow = $filtered.Count - ($topIdx + $windowSize)
-            $remAbove = $topIdx
-            $moreText = ""
-            if ($remBelow -gt 0 -and $remAbove -gt 0) {
-                $moreText = "   $upArrow $remAbove / $downArrow $remBelow more"
-            } elseif ($remBelow -gt 0) {
-                $moreText = "   $downArrow $remBelow more"
-            } elseif ($remAbove -gt 0) {
-                $moreText = "   $upArrow $remAbove more"
-            }
-            try {
-                [Console]::SetCursorPosition(0, $PromptRow + 3 + $windowSize)
-                Write-Host "${LeadDark}$moreText${Reset}$ClrToEnd" -NoNewline
-            } catch { }
-
-            # Row 7: Navigation hints
-            try {
-                [Console]::SetCursorPosition(0, $PromptRow + 3 + $windowSize + 1)
-                Write-Host "  ${Cyan}$upArrow/$downArrow${Reset} ${LeadLight}Navigate ${LeadDark}$dotCh${Reset} ${Cyan}enter${Reset} ${LeadLight}Select ${LeadDark}$dotCh${Reset} ${Cyan}tab${Reset} ${LeadLight}Complete ${LeadDark}$dotCh${Reset} ${Cyan}esc${Reset} ${LeadLight}Cancel${Reset}$ClrToEnd" -NoNewline
-            } catch { }
-
-            # Reposition cursor cleanly on prompt row
-            try { [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow) } catch { }
         } else {
             if ($slashMenuOpen) {
                 & $clearMenu
@@ -3651,9 +3715,10 @@ function Read-InteractiveVorkLine {
 
         if ($key.Key -eq [ConsoleKey]::Enter) {
             try { [Console]::TreatControlCAsInput = $false } catch { }
-            if ($isSlash -and $filtered.Count -gt 0) {
+            if ($slashMenuOpen -and $filtered.Count -gt 0) {
                 $chosen = $filtered[$selIdx].Cmd
                 & $clearMenu
+                $slashMenuOpen = $false
                 try {
                     [Console]::SetCursorPosition(2, $PromptRow)
                     Write-Host "${Coral}${Bold}$chosen${Reset}$ClrToEnd" -NoNewline
@@ -3663,20 +3728,27 @@ function Read-InteractiveVorkLine {
                 return $chosen
             }
 
-            if ($slashMenuOpen) { & $clearMenu }
+            if ($slashMenuOpen) {
+                & $clearMenu
+                $slashMenuOpen = $false
+            }
+            $finalText = $buf.ToString()
             try {
                 [Console]::SetCursorPosition(2, $PromptRow)
-                Write-Host "${Coral}${Bold}$($buf.ToString())${Reset}$ClrToEnd" -NoNewline
+                Write-Host "${Coral}${Bold}$finalText${Reset}$ClrToEnd" -NoNewline
                 [Console]::SetCursorPosition(0, $PromptRow + 3)
             } catch { }
             Write-Host ""
-            return $buf.ToString()
+            return $finalText
         }
 
         if ($key.Key -eq [ConsoleKey]::Tab) {
-            if ($isSlash -and $filtered.Count -gt 0) {
+            if ($slashMenuOpen -and $filtered.Count -gt 0) {
                 $chosen = $filtered[$selIdx].Cmd
                 & $clearMenu
+                $slashMenuOpen = $false
+                $isNavigatingHistory = $false
+                $histIdx = -1
                 $buf.Clear() | Out-Null
                 $buf.Append($chosen) | Out-Null
                 try {
@@ -3689,10 +3761,15 @@ function Read-InteractiveVorkLine {
         }
 
         if ($key.Key -eq [ConsoleKey]::UpArrow) {
-            if ($isSlash -and $filtered.Count -gt 0) {
+            if ($slashMenuOpen -and $filtered.Count -gt 0) {
                 $selIdx = if ($selIdx -gt 0) { $selIdx - 1 } else { $filtered.Count - 1 }
                 continue
-            } elseif (-not $isSlash -and $global:VorkSessionHistory -and $global:VorkSessionHistory.Count -gt 0) {
+            } elseif ($global:VorkSessionHistory -and $global:VorkSessionHistory.Count -gt 0) {
+                $isNavigatingHistory = $true
+                if ($slashMenuOpen) {
+                    & $clearMenu
+                    $slashMenuOpen = $false
+                }
                 if ($histIdx -lt 0) {
                     $savedDraft = $buf.ToString()
                     $histIdx = $global:VorkSessionHistory.Count - 1
@@ -3714,10 +3791,14 @@ function Read-InteractiveVorkLine {
         }
 
         if ($key.Key -eq [ConsoleKey]::DownArrow) {
-            if ($isSlash -and $filtered.Count -gt 0) {
+            if ($slashMenuOpen -and $filtered.Count -gt 0) {
                 $selIdx = if ($selIdx -lt ($filtered.Count - 1)) { $selIdx + 1 } else { 0 }
                 continue
-            } elseif (-not $isSlash -and $histIdx -ge 0) {
+            } elseif ($isNavigatingHistory -and $histIdx -ge 0) {
+                if ($slashMenuOpen) {
+                    & $clearMenu
+                    $slashMenuOpen = $false
+                }
                 if ($histIdx -lt ($global:VorkSessionHistory.Count - 1)) {
                     $histIdx++
                     $chosenHist = $global:VorkSessionHistory[$histIdx]
@@ -3725,6 +3806,7 @@ function Read-InteractiveVorkLine {
                     $buf.Append($chosenHist) | Out-Null
                 } else {
                     $histIdx = -1
+                    $isNavigatingHistory = $false
                     $buf.Clear() | Out-Null
                     $buf.Append($savedDraft) | Out-Null
                 }
@@ -3742,6 +3824,18 @@ function Read-InteractiveVorkLine {
             if ($slashMenuOpen) {
                 & $clearMenu
                 $slashMenuOpen = $false
+            }
+            if ($isNavigatingHistory) {
+                $isNavigatingHistory = $false
+                $histIdx = -1
+                $buf.Clear() | Out-Null
+                $buf.Append($savedDraft) | Out-Null
+                try {
+                    [Console]::SetCursorPosition(2, $PromptRow)
+                    Write-Host "${Coral}${Bold}$($buf.ToString())${Reset}$ClrToEnd" -NoNewline
+                    [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
+                } catch { }
+                continue
             }
             if ($buf.Length -gt 0) {
                 try {
@@ -3761,6 +3855,8 @@ function Read-InteractiveVorkLine {
         }
 
         if ($key.Key -eq [ConsoleKey]::Backspace -or $key.KeyChar -eq [char]8) {
+            $isNavigatingHistory = $false
+            $histIdx = -1
             if ($buf.Length -gt 0) {
                 $buf.Remove($buf.Length - 1, 1) | Out-Null
                 try {
@@ -3768,7 +3864,7 @@ function Read-InteractiveVorkLine {
                     Write-Host "${Coral}${Bold}$($buf.ToString())${Reset} $ClrToEnd" -NoNewline
                     [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
                 } catch { }
-                if ($buf.Length -eq 0 -or -not $buf.ToString().StartsWith("/")) {
+                if ($buf.Length -eq 0 -or -not $buf.ToString().StartsWith("/") -or $buf.ToString().Contains(" ")) {
                     if ($slashMenuOpen) {
                         & $clearMenu
                         $slashMenuOpen = $false
@@ -3780,6 +3876,8 @@ function Read-InteractiveVorkLine {
         }
 
         if ($key.Key -eq [ConsoleKey]::Delete) {
+            $isNavigatingHistory = $false
+            $histIdx = -1
             if ($buf.Length -gt 0) {
                 $buf.Remove($buf.Length - 1, 1) | Out-Null
                 try {
@@ -3787,7 +3885,7 @@ function Read-InteractiveVorkLine {
                     Write-Host "${Coral}${Bold}$($buf.ToString())${Reset} $ClrToEnd" -NoNewline
                     [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
                 } catch { }
-                if ($buf.Length -eq 0 -or -not $buf.ToString().StartsWith("/")) {
+                if ($buf.Length -eq 0 -or -not $buf.ToString().StartsWith("/") -or $buf.ToString().Contains(" ")) {
                     if ($slashMenuOpen) {
                         & $clearMenu
                         $slashMenuOpen = $false
@@ -3816,6 +3914,8 @@ function Read-InteractiveVorkLine {
 
         $ch = $key.KeyChar
         if (-not [char]::IsControl($ch)) {
+            $isNavigatingHistory = $false
+            $histIdx = -1
             $buf.Append($ch) | Out-Null
             try {
                 [Console]::SetCursorPosition(2, $PromptRow)

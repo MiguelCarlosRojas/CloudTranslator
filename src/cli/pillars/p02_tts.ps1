@@ -54,8 +54,19 @@ function Invoke-PillarTTS {
 
     $body = @{ text = $text; voice = $voice; outputFormat = "audio-24khz-48kbitrate-mono-mp3" } | ConvertTo-Json
     try {
-        Invoke-RestMethod -Uri "$ApiBase/api/tts" -Method Post -Body $body -ContentType "application/json" -OutFile $out
-        Write-Host "  $Cyan│$Reset  $Green✓ Audio sintetizado exitosamente y guardado en $out$Reset"
+        $res = Invoke-RestMethod -Uri "$ApiBase/api/tts" -Method Post -Body $body -ContentType "application/json"
+        if ($res.audioBase64 -and $out) {
+            try {
+                $rawB64 = $res.audioBase64 -replace '^data:audio\/[^;]+;base64,', ''
+                $targetFile = if ([System.IO.Path]::IsPathRooted($out)) { $out } else { Join-Path (Get-Location) $out }
+                [System.IO.File]::WriteAllBytes($targetFile, [System.Convert]::FromBase64String($rawB64))
+            } catch {}
+        }
+        $dlUrl = if ($res.downloadUrl) { "$ApiBase$($res.downloadUrl)" } else { "$ApiBase/api/tts/download?file=$out" }
+        $stUrl = if ($res.streamUrl) { "$ApiBase$($res.streamUrl)" } else { "$ApiBase/api/tts/stream?file=$out" }
+        Write-Host "  $Cyan│$Reset  $Green✓ Síntesis vocal lista:$Reset"
+        Write-Host "  $Cyan│$Reset    Descarga: $Yellow$dlUrl$Reset"
+        Write-Host "  $Cyan│$Reset    Stream:   $Cyan$stUrl$Reset"
         Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
     } catch {
         Write-Host "  $Cyan│$Reset  ${Coral}[Error TTS]:${Reset} $($_.Exception.Message)"

@@ -46,9 +46,14 @@ function Invoke-PillarSeparate {
     $body = @{ url = $target; quality = "lossless"; mode = $mode } | ConvertTo-Json
     try {
         $res = Invoke-RestMethod -Uri "$ApiBase/api/separator/process" -Method Post -Body $body -ContentType "application/json"
-        Write-Host "  $Cyan│$Reset  $Green✓ Stems aislados con éxito:$Reset"
-        Write-Host "  $Cyan│$Reset    Acapella (Voz): $Purple$ApiBase$($res.vocalsDownloadUrl)$Reset"
-        Write-Host "  $Cyan│$Reset    Karaoke (Base): $Cyan$ApiBase$($res.instrumentalDownloadUrl)$Reset"
+        $stemObj = if ($mode -eq "karaoke" -and $res.instrumental) { $res.instrumental } elseif ($res.vocals) { $res.vocals } else { $null }
+        $dlPath = if ($stemObj -and $stemObj.downloadUrl) { $stemObj.downloadUrl } elseif ($res.downloadUrl) { $res.downloadUrl } elseif ($res.vocalsDownloadUrl) { $res.vocalsDownloadUrl } else { "/api/separator/download?file=$target" }
+        $stPath = if ($stemObj -and $stemObj.streamUrl) { $stemObj.streamUrl } elseif ($res.streamUrl) { $res.streamUrl } else { $dlPath -replace '/download','/stream' }
+        $dlUrl = if ($dlPath.StartsWith("http")) { $dlPath } else { "$ApiBase$dlPath" }
+        $stUrl = if ($stPath.StartsWith("http")) { $stPath } else { "$ApiBase$stPath" }
+        Write-Host "  $Cyan│$Reset  $Green✓ Separación de stems lista:$Reset"
+        Write-Host "  $Cyan│$Reset    Descarga: $Yellow$dlUrl$Reset"
+        Write-Host "  $Cyan│$Reset    Stream:   $Cyan$stUrl$Reset"
         Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
     } catch {
         Write-Host "  $Cyan│$Reset  ${Coral}[Error Separador]:${Reset} $($_.Exception.Message)"

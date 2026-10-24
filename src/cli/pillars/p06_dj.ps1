@@ -26,12 +26,15 @@ function Invoke-PillarDJ {
 
     Write-Host ""
     Write-Host "  $Cyan╭─ [06] VORK DJ MEZCLADOR VIRTUAL EN VIVO ─────────$Reset"
-    Write-Host "  $Cyan│$Reset  ${White}Iniciando consola interactiva de doble tornamesa...${Reset}"
+    Write-Host "  $Cyan│$Reset  $Gray Modo:$Reset     $WhiteConsola Web Audio en Vivo$Reset"
     if ($track) {
-        Write-Host "  $Cyan│$Reset  ${LeadLight}Cargando pista en Deck A: $track${Reset}"
+        Write-Host "  $Cyan│$Reset  $Gray Pista:$Reset    $White$track$Reset"
     }
-    Write-Host "  $Cyan│$Reset  ${Green}Abriendo interfaz Web Audio en el navegador ($ApiBase/dj)...${Reset}"
+    Write-Host "  $Cyan├───────────────────────────────────────────────────$Reset"
+    Write-Host "  $Cyan│$Reset  $Green✓ Sesión de DJ lista:$Reset"
+    Write-Host "  $Cyan│$Reset    Descarga: $Yellow$ApiBase/api/dj/export$Reset"
+    Write-Host "  $Cyan│$Reset    Stream:   $Cyan$ApiBase/dj$Reset"
     Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
-    Start-Process "$ApiBase/dj"
+    try { Start-Process "$ApiBase/dj" } catch {}
     Write-Host ""
 }

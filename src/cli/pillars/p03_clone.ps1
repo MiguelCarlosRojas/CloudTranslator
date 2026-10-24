@@ -53,7 +53,35 @@ function Invoke-PillarClone {
     Write-Host "  $Cyan│$Reset  $Gray Algoritmo:$Reset$Yellow$f0Method$Reset"
     Write-Host "  $Cyan│$Reset  $Gray Salida:$Reset   $Yellow$out$Reset"
     Write-Host "  $Cyan├───────────────────────────────────────────────────$Reset"
-    Write-Host "  $Cyan│$Reset  $Green✓ Extracción de formantes y modelado acústico iniciado en $ApiBase$Reset"
-    Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
+
+    $b64 = $null
+    if ($sample -and (Test-Path $sample)) {
+        try {
+            $bytes = [System.IO.File]::ReadAllBytes((Resolve-Path $sample))
+            $b64 = "data:audio/wav;base64," + [System.Convert]::ToBase64String($bytes)
+        } catch {}
+    }
+
+    $cloneText = if ($text -and $text.Trim()) { $text.Trim() } else { "Prueba de síntesis con voz clonada en Vork CLI." }
+    $body = @{ text = $cloneText; audioSampleBase64 = $b64; similarity = "high"; format = "wav" } | ConvertTo-Json
+    try {
+        $res = Invoke-RestMethod -Uri "$ApiBase/api/voice-clone" -Method Post -Body $body -ContentType "application/json"
+        if ($res.audioBase64 -and $out) {
+            try {
+                $rawB64 = $res.audioBase64 -replace '^data:audio\/[^;]+;base64,', ''
+                $targetFile = if ([System.IO.Path]::IsPathRooted($out)) { $out } else { Join-Path (Get-Location) $out }
+                [System.IO.File]::WriteAllBytes($targetFile, [System.Convert]::FromBase64String($rawB64))
+            } catch {}
+        }
+        $dlUrl = if ($res.downloadUrl) { "$ApiBase$($res.downloadUrl)" } else { "$ApiBase/api/voice-clone/download" }
+        $stUrl = if ($res.streamUrl) { "$ApiBase$($res.streamUrl)" } else { "$ApiBase/api/voice-clone/stream" }
+        Write-Host "  $Cyan│$Reset  $Green✓ Clonación de voz lista:$Reset"
+        Write-Host "  $Cyan│$Reset    Descarga: $Yellow$dlUrl$Reset"
+        Write-Host "  $Cyan│$Reset    Stream:   $Cyan$stUrl$Reset"
+        Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
+    } catch {
+        Write-Host "  $Cyan│$Reset  ${Coral}[Error Clonación]:${Reset} $($_.Exception.Message)"
+        Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
+    }
     Write-Host ""
 }

@@ -15,11 +15,12 @@ const CLI_DIR = path.join(__dirname, "..", "cli");
  */
 function assembleVorkScript() {
   const parts = [];
+  const readPart = (filePath) => fs.readFileSync(filePath, "utf8").replace(/^\uFEFF/, "").trim();
 
   // 1. Core Config
   const configFile = path.join(CLI_DIR, "core", "config.ps1");
   if (fs.existsSync(configFile)) {
-    parts.push(fs.readFileSync(configFile, "utf8").trim());
+    parts.push(readPart(configFile));
   }
 
   // 2. UI Modules (Banner, Help, Cards)
@@ -29,7 +30,7 @@ function assembleVorkScript() {
     uiFiles.forEach(file => {
       const fullPath = path.join(uiDir, file);
       if (fs.existsSync(fullPath)) {
-        parts.push(fs.readFileSync(fullPath, "utf8").trim());
+        parts.push(readPart(fullPath));
       }
     });
   }
@@ -37,7 +38,7 @@ function assembleVorkScript() {
   // 3. Core Updater
   const updaterFile = path.join(CLI_DIR, "core", "updater.ps1");
   if (fs.existsSync(updaterFile)) {
-    parts.push(fs.readFileSync(updaterFile, "utf8").trim());
+    parts.push(readPart(updaterFile));
   }
 
   // 4. Pillars
@@ -45,14 +46,14 @@ function assembleVorkScript() {
   if (fs.existsSync(pillarsDir)) {
     const pillarFiles = fs.readdirSync(pillarsDir).filter(f => f.endsWith(".ps1")).sort();
     pillarFiles.forEach(file => {
-      parts.push(fs.readFileSync(path.join(pillarsDir, file), "utf8").trim());
+      parts.push(readPart(path.join(pillarsDir, file)));
     });
   }
 
   // 5. Core Router
   const routerFile = path.join(CLI_DIR, "core", "router.ps1");
   if (fs.existsSync(routerFile)) {
-    parts.push(fs.readFileSync(routerFile, "utf8").trim());
+    parts.push(readPart(routerFile));
   }
 
   // Si no hubiera modulos, usar vork.ps1 en disco
@@ -61,7 +62,7 @@ function assembleVorkScript() {
     return fs.existsSync(fallbackPath) ? fs.readFileSync(fallbackPath, "utf8") : "";
   }
 
-  // Ensamblar en memoria con UTF-8 BOM para compatibilidad total con PowerShell 5.1 y 7+
+  // Ensamblar en memoria con exactamente un UTF-8 BOM para compatibilidad total con PowerShell 5.1 y 7+
   return "\uFEFF" + parts.join("\r\n\r\n# ============================================================\r\n\r\n");
 }
 
