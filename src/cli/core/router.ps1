@@ -347,10 +347,17 @@ function Read-InteractiveVorkLine {
                     $warnMsg = "press ctrl+c again to exit"
                     $dotCh = [char]0x00B7
                     $tierName = if ($global:VorkTier) { $global:VorkTier.ToLower() } else { "medium" }
+                    $tierColor = switch ($tierName) {
+                        "low"    { $Green }
+                        "medium" { $Yellow }
+                        "high"   { $Coral }
+                        default  { $Cyan }
+                    }
                     $modelName = if ($global:VorkModel) { $global:VorkModel } else { "Vork 3" }
-                    $rightPart = if ($env:VORK_FOOTER) { $env:VORK_FOOTER } else { "$modelName " + $dotCh + " " + $tierName }
-                    $padLen = [Math]::Max(1, ($Width - 1) - $warnMsg.Length - $rightPart.Length)
-                    Write-Host "${LeadLight}$warnMsg$([string]::new(' ', $padLen))$rightPart${Reset}" -NoNewline
+                    $rightPlain = "$modelName $dotCh $tierName"
+                    $rightFormatted = "${LeadLight}$modelName $dotCh ${tierColor}$tierName${Reset}"
+                    $padLen = [Math]::Max(1, ($Width - 1) - $warnMsg.Length - $rightPlain.Length)
+                    Write-Host "${LeadLight}$warnMsg$([string]::new(' ', $padLen))$rightFormatted" -NoNewline
                     [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
                 } catch { }
                 continue
@@ -622,15 +629,22 @@ function Start-InteractiveREPL {
 
         $left = "? for shortcuts"
         $tierName = if ($global:VorkTier) { $global:VorkTier.ToLower() } else { "medium" }
+        $tierColor = switch ($tierName) {
+            "low"    { $Green }
+            "medium" { $Yellow }
+            "high"   { $Coral }
+            default  { $Cyan }
+        }
         $modelName = if ($global:VorkModel) { $global:VorkModel } else { "Vork 3" }
-        $right = if ($env:VORK_FOOTER) { $env:VORK_FOOTER } else { "$modelName " + $dotChar + " " + $tierName }
-        $padLen = [Math]::Max(1, ($width - 1) - $left.Length - $right.Length)
-        $footer = $left + (" " * $padLen) + $right
+        $rightPlain = "$modelName " + $dotChar + " " + $tierName
+        $rightFormatted = "${LeadLight}$modelName " + $dotChar + " ${tierColor}$tierName${Reset}"
+        $padLen = [Math]::Max(1, ($width - 1) - $left.Length - $rightPlain.Length)
+        $footer = "${LeadLight}$left" + (" " * $padLen) + $rightFormatted
 
         Write-Host "${Lead}$rule${Reset}"
         Write-Host "${Coral}${Bold}> ${Reset}"
         Write-Host "${Lead}$rule${Reset}"
-        Write-Host "${LeadLight}$footer${Reset}" -NoNewline
+        Write-Host "$footer" -NoNewline
 
         # Calcular $pRow exactamente 2 filas arriba de la línea de pie de página
         $pRow = try { [Console]::CursorTop - 2 } catch { 0 }

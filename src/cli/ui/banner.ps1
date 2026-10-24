@@ -6,9 +6,15 @@
 function Show-Banner {
     $currPath = try { (Get-Location).Path.Replace($HOME, "~").Replace("\", "/") } catch { "~" }
     $tierLabel = if ($global:VorkTier) { $global:VorkTier.Substring(0,1).ToUpper() + $global:VorkTier.Substring(1).ToLower() } else { "Medium" }
+    $tierColor = switch ($tierLabel.ToLower()) {
+        "low"    { $Green }
+        "medium" { $Yellow }
+        "high"   { $Coral }
+        default  { $Cyan }
+    }
     $modelName = if ($global:VorkModel) { $global:VorkModel } else { "Vork 3" }
     
-    $engineInfo = "$modelName ($tierLabel)"
+    $engineInfo = "$modelName (${tierColor}$tierLabel${LeadLight})"
     $endpointInfo = "$ApiBase (Vork AI)"
 
     $sF = [string][char]0x2588 # █

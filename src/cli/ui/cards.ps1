@@ -941,27 +941,38 @@ function Show-InteractiveModelSwitcher {
             $bHvy = [string]::new([char]0x2501, 14) # ━━━━━━
             $bThn = [string]::new([char]0x2500, 14) # ──────
 
+            $currEffort = $efforts[$effortIdx]
+            $effortColor = switch ($currEffort) {
+                "low"    { $Green }
+                "medium" { $Yellow }
+                "high"   { $Coral }
+                default  { $Cyan }
+            }
+
             $sliderGraphic = ""
+            $labelsGraphic = ""
             if ($effortIdx -eq 0) {
-                $sliderGraphic = "$cTar$bThn$cEmp$bThn$cEmp"
+                $sliderGraphic = "${Green}${Bold}$cTar${Reset}${LeadDark}$bThn$cEmp$bThn$cEmp${Reset}"
+                $labelsGraphic = "${Green}${Bold}low${Reset}          ${LeadLight}medium          high${Reset}"
             } elseif ($effortIdx -eq 1) {
-                $sliderGraphic = "$dDot$bHvy$cTar$bThn$cEmp"
+                $sliderGraphic = "${Yellow}${Bold}$dDot$bHvy$cTar${Reset}${LeadDark}$bThn$cEmp${Reset}"
+                $labelsGraphic = "${LeadLight}low          ${Yellow}${Bold}medium${Reset}          ${LeadLight}high${Reset}"
             } else {
-                $sliderGraphic = "$dDot$bHvy$dDot$bHvy$cTar"
+                $sliderGraphic = "${Coral}${Bold}$dDot$bHvy$dDot$bHvy$cTar${Reset}"
+                $labelsGraphic = "${LeadLight}low          medium          ${Coral}${Bold}high${Reset}"
             }
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "  ${LeadLight}Effort  ${Cyan}$triL${Reset}        ${White}$sliderGraphic${Reset}        ${Cyan}$triR${Reset}$ClrToEnd"
+            Write-Host "  ${LeadLight}Effort  ${effortColor}$triL${Reset}        $sliderGraphic        ${effortColor}$triR${Reset}$ClrToEnd"
             $row++
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "                  ${LeadLight}low          medium          high${Reset}$ClrToEnd"
+            Write-Host "                  $labelsGraphic$ClrToEnd"
             $row++
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            $currEffort = $efforts[$effortIdx]
             $effDesc = $effortDescs[$currEffort]
-            Write-Host "            ${LeadLight}$effDesc${Reset}$ClrToEnd"
+            Write-Host "            ${effortColor}$effDesc${Reset}$ClrToEnd"
             $row++
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }

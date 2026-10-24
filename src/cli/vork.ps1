@@ -676,9 +676,15 @@ function Format-Badge {
 function Show-Banner {
     $currPath = try { (Get-Location).Path.Replace($HOME, "~").Replace("\", "/") } catch { "~" }
     $tierLabel = if ($global:VorkTier) { $global:VorkTier.Substring(0,1).ToUpper() + $global:VorkTier.Substring(1).ToLower() } else { "Medium" }
+    $tierColor = switch ($tierLabel.ToLower()) {
+        "low"    { $Green }
+        "medium" { $Yellow }
+        "high"   { $Coral }
+        default  { $Cyan }
+    }
     $modelName = if ($global:VorkModel) { $global:VorkModel } else { "Vork 3" }
     
-    $engineInfo = "$modelName ($tierLabel)"
+    $engineInfo = "$modelName (${tierColor}$tierLabel${LeadLight})"
     $endpointInfo = "$ApiBase (Vork AI)"
 
     $sF = [string][char]0x2588 # █
@@ -1644,27 +1650,38 @@ function Show-InteractiveModelSwitcher {
             $bHvy = [string]::new([char]0x2501, 14) # ━━━━━━
             $bThn = [string]::new([char]0x2500, 14) # ──────
 
+            $currEffort = $efforts[$effortIdx]
+            $effortColor = switch ($currEffort) {
+                "low"    { $Green }
+                "medium" { $Yellow }
+                "high"   { $Coral }
+                default  { $Cyan }
+            }
+
             $sliderGraphic = ""
+            $labelsGraphic = ""
             if ($effortIdx -eq 0) {
-                $sliderGraphic = "$cTar$bThn$cEmp$bThn$cEmp"
+                $sliderGraphic = "${Green}${Bold}$cTar${Reset}${LeadDark}$bThn$cEmp$bThn$cEmp${Reset}"
+                $labelsGraphic = "${Green}${Bold}low${Reset}          ${LeadLight}medium          high${Reset}"
             } elseif ($effortIdx -eq 1) {
-                $sliderGraphic = "$dDot$bHvy$cTar$bThn$cEmp"
+                $sliderGraphic = "${Yellow}${Bold}$dDot$bHvy$cTar${Reset}${LeadDark}$bThn$cEmp${Reset}"
+                $labelsGraphic = "${LeadLight}low          ${Yellow}${Bold}medium${Reset}          ${LeadLight}high${Reset}"
             } else {
-                $sliderGraphic = "$dDot$bHvy$dDot$bHvy$cTar"
+                $sliderGraphic = "${Coral}${Bold}$dDot$bHvy$dDot$bHvy$cTar${Reset}"
+                $labelsGraphic = "${LeadLight}low          medium          ${Coral}${Bold}high${Reset}"
             }
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "  ${LeadLight}Effort  ${Cyan}$triL${Reset}        ${White}$sliderGraphic${Reset}        ${Cyan}$triR${Reset}$ClrToEnd"
+            Write-Host "  ${LeadLight}Effort  ${effortColor}$triL${Reset}        $sliderGraphic        ${effortColor}$triR${Reset}$ClrToEnd"
             $row++
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            Write-Host "                  ${LeadLight}low          medium          high${Reset}$ClrToEnd"
+            Write-Host "                  $labelsGraphic$ClrToEnd"
             $row++
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
-            $currEffort = $efforts[$effortIdx]
             $effDesc = $effortDescs[$currEffort]
-            Write-Host "            ${LeadLight}$effDesc${Reset}$ClrToEnd"
+            Write-Host "            ${effortColor}$effDesc${Reset}$ClrToEnd"
             $row++
 
             try { [Console]::SetCursorPosition(0, $row) } catch { }
@@ -4179,10 +4196,17 @@ function Read-InteractiveVorkLine {
                     $warnMsg = "press ctrl+c again to exit"
                     $dotCh = [char]0x00B7
                     $tierName = if ($global:VorkTier) { $global:VorkTier.ToLower() } else { "medium" }
+                    $tierColor = switch ($tierName) {
+                        "low"    { $Green }
+                        "medium" { $Yellow }
+                        "high"   { $Coral }
+                        default  { $Cyan }
+                    }
                     $modelName = if ($global:VorkModel) { $global:VorkModel } else { "Vork 3" }
-                    $rightPart = if ($env:VORK_FOOTER) { $env:VORK_FOOTER } else { "$modelName " + $dotCh + " " + $tierName }
-                    $padLen = [Math]::Max(1, ($Width - 1) - $warnMsg.Length - $rightPart.Length)
-                    Write-Host "${LeadLight}$warnMsg$([string]::new(' ', $padLen))$rightPart${Reset}" -NoNewline
+                    $rightPlain = "$modelName $dotCh $tierName"
+                    $rightFormatted = "${LeadLight}$modelName $dotCh ${tierColor}$tierName${Reset}"
+                    $padLen = [Math]::Max(1, ($Width - 1) - $warnMsg.Length - $rightPlain.Length)
+                    Write-Host "${LeadLight}$warnMsg$([string]::new(' ', $padLen))$rightFormatted" -NoNewline
                     [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
                 } catch { }
                 continue
@@ -4454,15 +4478,22 @@ function Start-InteractiveREPL {
 
         $left = "? for shortcuts"
         $tierName = if ($global:VorkTier) { $global:VorkTier.ToLower() } else { "medium" }
+        $tierColor = switch ($tierName) {
+            "low"    { $Green }
+            "medium" { $Yellow }
+            "high"   { $Coral }
+            default  { $Cyan }
+        }
         $modelName = if ($global:VorkModel) { $global:VorkModel } else { "Vork 3" }
-        $right = if ($env:VORK_FOOTER) { $env:VORK_FOOTER } else { "$modelName " + $dotChar + " " + $tierName }
-        $padLen = [Math]::Max(1, ($width - 1) - $left.Length - $right.Length)
-        $footer = $left + (" " * $padLen) + $right
+        $rightPlain = "$modelName " + $dotChar + " " + $tierName
+        $rightFormatted = "${LeadLight}$modelName " + $dotChar + " ${tierColor}$tierName${Reset}"
+        $padLen = [Math]::Max(1, ($width - 1) - $left.Length - $rightPlain.Length)
+        $footer = "${LeadLight}$left" + (" " * $padLen) + $rightFormatted
 
         Write-Host "${Lead}$rule${Reset}"
         Write-Host "${Coral}${Bold}> ${Reset}"
         Write-Host "${Lead}$rule${Reset}"
-        Write-Host "${LeadLight}$footer${Reset}" -NoNewline
+        Write-Host "$footer" -NoNewline
 
         # Calcular $pRow exactamente 2 filas arriba de la línea de pie de página
         $pRow = try { [Console]::CursorTop - 2 } catch { 0 }
