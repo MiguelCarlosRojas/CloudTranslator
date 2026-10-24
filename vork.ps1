@@ -296,19 +296,17 @@ public static class VorkWin32 {
 }
 
 function Set-VorkWindowIdentity {
-    # 1. Establecer título de ventana estándar con emblema V
+    # 1. Establecer título de ventana limpio
     try {
-        $Host.UI.RawUI.WindowTitle = "⩔ Vork CLI"
+        $Host.UI.RawUI.WindowTitle = "Vork CLI"
     } catch {}
 
-    # 2. Secuencias OSC completas para emuladores modernos (Warp, Windows Terminal, WezTerm, iTerm2, Alacritty, Orca)
+    # 2. Secuencias OSC estándar para emuladores modernos (título de ventana limpio sin glifos en el texto)
     try {
-        # OSC 0: Establecer título de ventana y nombre de icono
-        Write-Host "$ESC]0;⩔ Vork CLI`a" -NoNewline
-        # OSC 1: Establecer nombre de icono de pestaña
-        Write-Host "$ESC]1;⩔ Vork CLI`a" -NoNewline
+        # OSC 0: Establecer título de ventana
+        Write-Host "$ESC]0;Vork CLI`a" -NoNewline
         # OSC 2: Establecer título de ventana
-        Write-Host "$ESC]2;⩔ Vork CLI`a" -NoNewline
+        Write-Host "$ESC]2;Vork CLI`a" -NoNewline
     } catch {}
 
     # 3. Asignar icono oficial transparente de Vork a la ventana (en Windows)
