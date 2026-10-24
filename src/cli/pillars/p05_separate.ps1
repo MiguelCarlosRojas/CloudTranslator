@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Pilar 05: Vork Separador de Stems (Acapella y Karaoke con Demucs v4)
 #>
@@ -62,8 +62,9 @@ function Invoke-PillarSeparate {
         $res = $null
         $barLen = 22
         $pRow = -1
+        $emptyBar = [string]::new([char]0x2591, $barLen)
         try {
-            Write-Host "  $Cyan│$Reset  ${White}Progreso:${Reset} [${Gray}$([string]::new([char]0x2591, $barLen))${Reset}]   0%  ${LeadLight}Iniciando...${Reset}"
+            Write-Host "  $Cyan│$Reset  ${White}Progreso:${Reset} [${Gray}$emptyBar${Reset}]   0%  ${LeadLight}Iniciando...${Reset}"
             $pRow = [Console]::CursorTop - 1
         } catch { }
 
@@ -101,10 +102,10 @@ function Invoke-PillarSeparate {
 
                 $filledLen = [Math]::Floor(($pct / 100) * $barLen)
                 $unfilledLen = $barLen - $filledLen
-                $barStr = ([char]0x2588 * $filledLen) + ([char]0x2591 * $unfilledLen)
+                $barStr = [string]::new([char]0x2588, $filledLen) + [string]::new([char]0x2591, $unfilledLen)
                 $pctStr = "$pct".PadLeft(3)
 
-                if ($pRow -ge 0) {
+                if ($pRow -ge 0 -and $pRow -lt [Console]::BufferHeight) {
                     try {
                         [Console]::SetCursorPosition(0, $pRow)
                         Write-Host "  $Cyan│$Reset  ${White}Progreso:${Reset} [${Yellow}$barStr${Reset}] $pctStr%  ${LeadLight}$phase${Reset}    $ClrToEnd" -NoNewline
@@ -114,29 +115,27 @@ function Invoke-PillarSeparate {
                 Start-Sleep -Milliseconds 150
             }
 
-            $httpRes = $task.Result
-            $rawContent = $httpRes.Content.ReadAsStringAsync().Result
-
-            if ($pRow -ge 0) {
-                try {
-                    [Console]::SetCursorPosition(0, $pRow)
-                    $fullBar = [char]0x2588 * $barLen
-                    Write-Host "  $Cyan│$Reset  ${White}Progreso:${Reset} [${Green}$fullBar${Reset}] 100%  ${Green}Completado${Reset}    $ClrToEnd"
-                } catch { }
+            if ($task.IsFaulted) {
+                throw $task.Exception.InnerException
             }
 
-            if (-not $httpRes.IsSuccessStatusCode) {
-                $errDetail = "Error HTTP $($httpRes.StatusCode)"
-                try {
-                    $jsonErr = $rawContent | ConvertFrom-Json
-                    if ($jsonErr.error) { $errDetail = $jsonErr.error }
-                } catch { }
-                throw $errDetail
+            $filled100 = [string]::new([char]0x2588, $barLen)
+            if ($pRow -ge 0 -and $pRow -lt [Console]::BufferHeight) {
+                try { [Console]::SetCursorPosition(0, $pRow) } catch { }
             }
+            Write-Host "`r$ClrLine  $Cyan│$Reset  ${White}Progreso:${Reset} [${Green}$filled100${Reset}] 100%  ${Green}Completado${Reset}"
 
-            $res = $rawContent | ConvertFrom-Json
+            $jsonStr = $task.Result.Content.ReadAsStringAsync().Result
+            $res = $jsonStr | ConvertFrom-Json
         } else {
             $res = Invoke-RestMethod -Uri $endpoint -Method Post -Body $body -ContentType "application/json" -TimeoutSec 300
+        }
+
+        if ($res.status -eq "error" -or $res.error) {
+            Write-Host "  $Cyan├───────────────────────────────────────────────────$Reset"
+            Write-Host "  $Cyan│$Reset  ${Coral}[Error Separador]:${Reset} $($res.error)"
+            Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
+            return
         }
 
         $vocDl = if ($res.vocals -and $res.vocals.downloadUrl) { if ($res.vocals.downloadUrl.StartsWith("http")) { $res.vocals.downloadUrl } else { "$ApiBase$($res.vocals.downloadUrl)" } } else { $null }
@@ -166,10 +165,9 @@ function Invoke-PillarSeparate {
         }
         Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
     } catch {
-        $msg = $_.ToString()
-        if ($_.Exception -and $_.Exception.Message) { $msg = $_.Exception.Message }
+        Write-Host ""
         Write-Host "  $Cyan├───────────────────────────────────────────────────$Reset"
-        Write-Host "  $Cyan│$Reset  ${Coral}[Error Separador]:${Reset} $msg"
+        Write-Host "  $Cyan│$Reset  ${Coral}[Error Separador]:${Reset} $($_.Exception.Message)"
         Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
     }
     Write-Host ""
