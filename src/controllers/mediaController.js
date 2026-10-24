@@ -154,7 +154,11 @@ exports.convertMedia = async (req, res) => {
 
     const safeFormat = format.toLowerCase() === "mp4" ? "mp4" : "mp3";
     const allowedQualities = ["128k", "192k", "256k", "320k", "360p", "480p", "720p", "1080p"];
-    const safeQuality = allowedQualities.includes(quality) ? quality : "320k";
+    let cleanQuality = typeof quality === "string" ? quality.toLowerCase().trim() : "320k";
+    if (/^\d+$/.test(cleanQuality)) {
+      cleanQuality = safeFormat === "mp4" ? `${cleanQuality}p` : `${cleanQuality}k`;
+    }
+    const safeQuality = allowedQualities.includes(cleanQuality) ? cleanQuality : (safeFormat === "mp4" ? "720p" : "320k");
 
     const result = await mediaService.convertSingleMedia({ url, format: safeFormat, quality: safeQuality });
     res.json(result);

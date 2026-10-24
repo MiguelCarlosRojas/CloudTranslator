@@ -2961,11 +2961,11 @@ function Invoke-PillarMedia {
         $url = $url.Trim()
 
         $mediaOptions = @(
-            @{ Value = "mp3:320";      Label = "[1] mp3 320k (Audio MP3 Máxima Fidelidad 320 kbps)" },
-            @{ Value = "mp3:192";      Label = "[2] mp3 192k (Audio MP3 Balanceado 192 kbps)" },
-            @{ Value = "mp4:1080";     Label = "[3] mp4 1080p (Video Full HD 1080p)" },
-            @{ Value = "mp4:720";      Label = "[4] mp4 720p  (Video HD 720p)" },
-            @{ Value = "m4a:256";      Label = "[5] m4a 256k  (Audio AAC Apple compatible)" },
+            @{ Value = "mp3:320k";     Label = "[1] mp3 320k (Audio MP3 Máxima Fidelidad 320 kbps)" },
+            @{ Value = "mp3:192k";     Label = "[2] mp3 192k (Audio MP3 Balanceado 192 kbps)" },
+            @{ Value = "mp4:1080p";    Label = "[3] mp4 1080p (Video Full HD 1080p)" },
+            @{ Value = "mp4:720p";     Label = "[4] mp4 720p  (Video HD 720p)" },
+            @{ Value = "m4a:256k";     Label = "[5] m4a 256k  (Audio AAC Apple compatible)" },
             @{ Value = "wav:lossless"; Label = "[6] wav       (Audio PCM sin compresión)" }
         )
 
@@ -2990,7 +2990,12 @@ function Invoke-PillarMedia {
         try { Add-Type -AssemblyName System.Net.Http } catch { }
 
         $res = $null
-        $pRow = try { [Console]::CursorTop } catch { -1 }
+        $barLen = 22
+        $pRow = -1
+        try {
+            Write-Host "  $Cyan│$Reset  ${White}Progreso:${Reset} [${Gray}$([string]::new([char]0x2591, $barLen))${Reset}]   0%  ${LeadLight}Iniciando...${Reset}"
+            $pRow = [Console]::CursorTop - 1
+        } catch { }
 
         if ('System.Net.Http.HttpClient' -as [type]) {
             $client = [System.Net.Http.HttpClient]::new()
@@ -2999,7 +3004,6 @@ function Invoke-PillarMedia {
             $task = $client.PostAsync($endpoint, $httpContent)
 
             $startTime = [DateTime]::UtcNow
-            $barLen = 22
 
             while (-not $task.IsCompleted) {
                 $elapsed = ([DateTime]::UtcNow - $startTime).TotalSeconds
@@ -3031,10 +3035,10 @@ function Invoke-PillarMedia {
                 $empty = [string]::new([char]0x2591, $emptyLen)
                 $pctStr = ($pct.ToString() + "%").PadLeft(4)
 
-                if ($pRow -ge 0) {
+                if ($pRow -ge 0 -and $pRow -lt [Console]::BufferHeight) {
                     try { [Console]::SetCursorPosition(0, $pRow) } catch { }
                 }
-                Write-Host "$ClrLine  $Cyan│$Reset  ${White}Progreso:${Reset} [${Cyan}$filled${Gray}$empty${Reset}] $Yellow$pctStr$Reset  ${LeadLight}$phase${Reset}" -NoNewline
+                Write-Host "`r$ClrLine  $Cyan│$Reset  ${White}Progreso:${Reset} [${Cyan}$filled${Gray}$empty${Reset}] $Yellow$pctStr$Reset  ${LeadLight}$phase${Reset}" -NoNewline
 
                 Start-Sleep -Milliseconds 120
             }
@@ -3045,10 +3049,10 @@ function Invoke-PillarMedia {
 
             # 100% Finalizado
             $filled100 = [string]::new([char]0x2588, $barLen)
-            if ($pRow -ge 0) {
+            if ($pRow -ge 0 -and $pRow -lt [Console]::BufferHeight) {
                 try { [Console]::SetCursorPosition(0, $pRow) } catch { }
             }
-            Write-Host "$ClrLine  $Cyan│$Reset  ${White}Progreso:${Reset} [${Cyan}$filled100${Reset}] ${Green}100%${Reset}  ${Green}Completado${Reset}"
+            Write-Host "`r$ClrLine  $Cyan│$Reset  ${White}Progreso:${Reset} [${Cyan}$filled100${Reset}] ${Green}100%${Reset}  ${Green}Completado${Reset}"
 
             $jsonStr = $task.Result.Content.ReadAsStringAsync().Result
             $res = $jsonStr | ConvertFrom-Json
@@ -3971,20 +3975,9 @@ function Read-InteractiveVorkLine {
             continue
         }
 
-        if ($buf.Length -eq 0 -and ($key.KeyChar -eq '?' -or $key.Key -eq [ConsoleKey]::OemQuestion)) {
-            $modalChosen = Show-InteractiveHelpModal
-            Clear-Host
-            Show-Banner
-            Write-Host "${Lead}$Rule${Reset}"
-            $pRow = try { [Console]::CursorTop } catch { 0 }
-            Write-Host "${Coral}${Bold}> ${Reset}"
-            Write-Host "${Lead}$Rule${Reset}"
-            Write-Host "${LeadLight}$Footer${Reset}"
-            try { [Console]::SetCursorPosition(2, $pRow) } catch { }
-            if ($modalChosen) {
-                return $modalChosen
-            }
-            continue
+        if ($buf.Length -eq 0 -and $key.KeyChar -eq '?') {
+            try { [Console]::TreatControlCAsInput = $false } catch { }
+            return "?"
         }
 
         $ch = $key.KeyChar
@@ -3997,7 +3990,7 @@ function Read-InteractiveVorkLine {
                 Write-Host "${Coral}${Bold}$($buf.ToString())${Reset}$ClrToEnd" -NoNewline
                 [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
             } catch {
-                Write-Host "${Coral}${Bold}$ch${Reset}" -NoNewline
+                Write-Host "${Coral}${Bold}$($buf.ToString())${Reset}$ClrToEnd" -NoNewline
             }
             $selIdx = 0
             $topIdx = 0
@@ -4053,17 +4046,27 @@ function Start-InteractiveREPL {
         $footer = $left + (" " * $padLen) + $right
 
         Write-Host "${Lead}$rule${Reset}"
-        $pRow = try { [Console]::CursorTop } catch { 0 }
         Write-Host "${Coral}${Bold}> ${Reset}"
         Write-Host "${Lead}$rule${Reset}"
-        Write-Host "${LeadLight}$footer${Reset}"
+        Write-Host "${LeadLight}$footer${Reset}" -NoNewline
 
-        # Position cursor back at prompt line
-        try { [Console]::SetCursorPosition(2, $pRow) } catch { Write-Host "$ESC[2A$ESC[2C" -NoNewline }
+        # Calcular $pRow exactamente 2 filas arriba de la línea de pie de página
+        $pRow = try { [Console]::CursorTop - 2 } catch { 0 }
+        try { [Console]::SetCursorPosition(2, $pRow) } catch { Write-Host "$ESC[2A$ESC[2G" -NoNewline }
 
         $line = Read-InteractiveVorkLine -PromptRow $pRow -Width $width -Rule $rule -Footer $footer
         if ($null -eq $line) {
             Exit-VorkSession -ExitCode 0
+        }
+
+        if ($line -eq "?") {
+            $modalChosen = Show-InteractiveHelpModal
+            Clear-Host
+            Show-Banner
+            if ($modalChosen) {
+                Dispatch-CLICommand -Cmd $modalChosen -ArgsList @()
+            }
+            continue
         }
 
         $line = $line.Trim()

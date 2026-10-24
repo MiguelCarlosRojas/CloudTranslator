@@ -37,43 +37,36 @@ function withTimeout(promise, ms = 4500) {
 }
 
 /**
- * Consulta de alta disponibilidad a espejos de extracción para YouTube con carrera concurrente
+ * Consulta de alta disponibilidad a espejos de extracción para YouTube
  */
 async function fetchYouTubeStreams(normalizedUrl) {
+  try {
+    const directRes = await withTimeout(btch.youtube(normalizedUrl), 15000);
+    if (directRes && (directRes.mp4 || directRes.mp3)) {
+      return directRes;
+    }
+  } catch (e) {
+    logger.warn(`btch.youtube fallo para ${normalizedUrl}: ${e.message}`);
+  }
+
+  // Respaldo de espejos
   const mirrors = [
     "https://backend2.tioo.eu.org",
-    "https://backend3.tioo.eu.org",
-    "https://backend4.tioo.eu.org",
     "https://backend1.tioo.eu.org"
   ];
 
-  return new Promise((resolve) => {
-    let resolved = false;
-    let pending = mirrors.length;
-
-    mirrors.forEach(async (host) => {
-      try {
-        const res = await axios.get(`${host}/youtube?url=${encodeURIComponent(normalizedUrl)}`, {
-          timeout: 5500
-        });
-        if (!resolved && res.data && (res.data.mp4 || res.data.mp3)) {
-          resolved = true;
-          return resolve(res.data);
-        }
-      } catch {}
-      pending--;
-      if (pending === 0 && !resolved) {
-        // Fallback con la librería directa
-        try {
-          const directRes = await btch.youtube(normalizedUrl);
-          if (directRes && (directRes.mp4 || directRes.mp3)) {
-            return resolve(directRes);
-          }
-        } catch {}
-        resolve(null);
+  for (const host of mirrors) {
+    try {
+      const res = await axios.get(`${host}/youtube?url=${encodeURIComponent(normalizedUrl)}`, {
+        timeout: 3000
+      });
+      if (res.data && (res.data.mp4 || res.data.mp3)) {
+        return res.data;
       }
-    });
-  });
+    } catch {}
+  }
+
+  return null;
 }
 
 // Directorio de almacenamiento en caché para medios convertidos físicamente
@@ -730,25 +723,16 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
  * Transcodifica un stream remoto a MP3 puro usando FFmpeg
  */
 function transcodeToMp3(streamUrl, outputPath, quality = "320k") {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
-      const bitrateMap = { "320k": "320k", "192k": "192k", "128k": "128k" };
-      const bitrate = bitrateMap[quality] || "192k";
+      const bitrateMap = { "320k": "320k", "192k": "192k", "128k": "128k", "256k": "256k" };
+      const bitrate = bitrateMap[quality] || (quality.endsWith("k") ? quality : `${quality}k`);
 
-      const response = await axios({
-        method: "get",
-        url: streamUrl,
-        responseType: "stream",
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-          "Accept": "*/*"
-        },
-        timeout: 45000
-      });
-
+      // Intento 1: Ejecución nativa directa de FFmpeg con soporte de HTTP seeking
       const ff = spawn(ffmpegPath, [
         "-y",
-        "-i", "pipe:0",
+        "-user_agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "-i", streamUrl,
         "-vn",
         "-c:a", "libmp3lame",
         "-b:a", bitrate,
@@ -761,8 +745,6 @@ function transcodeToMp3(streamUrl, outputPath, quality = "320k") {
       let stderr = "";
       ff.stderr.on("data", d => { stderr += d.toString(); });
 
-      response.data.pipe(ff.stdin);
-
       ff.on("close", (code) => {
         if (code === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 1000) {
           const stats = fs.statSync(outputPath);
@@ -776,14 +758,47 @@ function transcodeToMp3(streamUrl, outputPath, quality = "320k") {
             durationSeconds = h * 3600 + m * 60 + s;
             duration = h > 0 ? `${durMatch[1]}:${durMatch[2]}:${durMatch[3]}` : `${durMatch[2]}:${durMatch[3]}`;
           }
-          resolve({ sizeBytes: stats.size, duration, durationSeconds });
-        } else {
-          reject(new Error(`FFmpeg MP3 transcode exited with code ${code}: ${stderr.slice(-300)}`));
+          return resolve({ sizeBytes: stats.size, duration, durationSeconds });
         }
+
+        // Intento 2: Fallback vía axios stream piping
+        logger.warn(`FFmpeg directo terminó con código ${code}, probando stream pipe...`);
+        axios({
+          method: "get",
+          url: streamUrl,
+          responseType: "stream",
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            "Accept": "*/*"
+          },
+          timeout: 45000
+        }).then(response => {
+          const ffPipe = spawn(ffmpegPath, [
+            "-y",
+            "-i", "pipe:0",
+            "-vn",
+            "-c:a", "libmp3lame",
+            "-b:a", bitrate,
+            "-id3v2_version", "3",
+            "-write_xing", "1",
+            "-f", "mp3",
+            outputPath
+          ]);
+          let pipeStderr = "";
+          ffPipe.stderr.on("data", d => { pipeStderr += d.toString(); });
+          response.data.pipe(ffPipe.stdin);
+          ffPipe.on("close", (pipeCode) => {
+            if (pipeCode === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 1000) {
+              const stats = fs.statSync(outputPath);
+              return resolve({ sizeBytes: stats.size, duration: null, durationSeconds: 0 });
+            }
+            reject(new Error(`FFmpeg MP3 transcode exited with code ${pipeCode}: ${pipeStderr.slice(-300)}`));
+          });
+          response.data.on("error", reject);
+        }).catch(reject);
       });
 
-      response.data.on("error", err => {
-        try { ff.kill(); } catch {}
+      ff.on("error", err => {
         reject(err);
       });
     } catch (err) {
@@ -796,23 +811,13 @@ function transcodeToMp3(streamUrl, outputPath, quality = "320k") {
  * Remuxea o transcodifica un stream remoto a MP4 estándar para reproducción web instantánea
  */
 function transcodeToMp4(streamUrl, outputPath, quality = "1080p") {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
-      const response = await axios({
-        method: "get",
-        url: streamUrl,
-        responseType: "stream",
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-          "Accept": "*/*"
-        },
-        timeout: 45000
-      });
-
-      // Primer intento: Remux directo ultra veloz con -c copy y faststart
+      // Intento 1: Copia de stream directa con FFmpeg
       const ff = spawn(ffmpegPath, [
         "-y",
-        "-i", "pipe:0",
+        "-user_agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "-i", streamUrl,
         "-c", "copy",
         "-movflags", "+faststart",
         "-f", "mp4",
@@ -821,8 +826,6 @@ function transcodeToMp4(streamUrl, outputPath, quality = "1080p") {
 
       let stderr = "";
       ff.stderr.on("data", d => { stderr += d.toString(); });
-
-      response.data.pipe(ff.stdin);
 
       ff.on("close", (code) => {
         if (code === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 1000) {
@@ -837,49 +840,36 @@ function transcodeToMp4(streamUrl, outputPath, quality = "1080p") {
             durationSeconds = h * 3600 + m * 60 + s;
             duration = h > 0 ? `${durMatch[1]}:${durMatch[2]}:${durMatch[3]}` : `${durMatch[2]}:${durMatch[3]}`;
           }
-          resolve({ sizeBytes: stats.size, duration, durationSeconds });
-        } else {
-          logger.warn(`FFmpeg copy terminó con código ${code}, transcodificando con libx264 ultrafast...`);
-          // Fallback con transcodificación H.264 ultrafast + AAC
-          axios({
-            method: "get",
-            url: streamUrl,
-            responseType: "stream",
-            headers: {
-              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-              "Accept": "*/*"
-            },
-            timeout: 45000
-          }).then(res2 => {
-            const ff2 = spawn(ffmpegPath, [
-              "-y",
-              "-i", "pipe:0",
-              "-c:v", "libx264",
-              "-preset", "ultrafast",
-              "-crf", "23",
-              "-c:a", "aac",
-              "-movflags", "+faststart",
-              "-f", "mp4",
-              outputPath
-            ]);
-            let stderr2 = "";
-            ff2.stderr.on("data", d => { stderr2 += d.toString(); });
-            res2.data.pipe(ff2.stdin);
-            ff2.on("close", (code2) => {
-              if (code2 === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 1000) {
-                const stats2 = fs.statSync(outputPath);
-                resolve({ sizeBytes: stats2.size, duration: null, durationSeconds: 0 });
-              } else {
-                reject(new Error(`FFmpeg MP4 transcode failed: ${stderr2.slice(-250)}`));
-              }
-            });
-            res2.data.on("error", reject);
-          }).catch(reject);
+          return resolve({ sizeBytes: stats.size, duration, durationSeconds });
         }
+
+        // Intento 2: Transcodificación con libx264 ultrafast
+        logger.warn(`FFmpeg copy terminó con código ${code}, transcodificando con libx264 ultrafast...`);
+        const ff2 = spawn(ffmpegPath, [
+          "-y",
+          "-user_agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+          "-i", streamUrl,
+          "-c:v", "libx264",
+          "-preset", "ultrafast",
+          "-crf", "23",
+          "-c:a", "aac",
+          "-movflags", "+faststart",
+          "-f", "mp4",
+          outputPath
+        ]);
+        let stderr2 = "";
+        ff2.stderr.on("data", d => { stderr2 += d.toString(); });
+        ff2.on("close", (code2) => {
+          if (code2 === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 1000) {
+            const stats2 = fs.statSync(outputPath);
+            return resolve({ sizeBytes: stats2.size, duration: null, durationSeconds: 0 });
+          }
+          reject(new Error(`FFmpeg MP4 transcode failed: ${stderr2.slice(-250)}`));
+        });
+        ff2.on("error", reject);
       });
 
-      response.data.on("error", err => {
-        try { ff.kill(); } catch {}
+      ff.on("error", err => {
         reject(err);
       });
     } catch (err) {
@@ -912,16 +902,13 @@ async function processConversion(options = {}) {
   // Construir lista de candidatos según formato y plataforma
   const candidateStreams = [];
   if (selectedFormat === "mp3") {
-    // Para MP3: en YouTube, mp4Url (itag 18) tiene ratebypass y descarga a velocidad máxima de audio
-    if (mediaInfo.platformId === "youtube") {
-      if (mediaInfo.mp4Url) candidateStreams.push(mediaInfo.mp4Url);
-      if (mediaInfo.mp3Url && mediaInfo.mp3Url !== mediaInfo.mp4Url) candidateStreams.push(mediaInfo.mp3Url);
-    } else {
-      if (mediaInfo.mp3Url) candidateStreams.push(mediaInfo.mp3Url);
-      if (mediaInfo.mp4Url && mediaInfo.mp4Url !== mediaInfo.mp3Url) candidateStreams.push(mediaInfo.mp4Url);
-    }
+    // Para MP3: preferir siempre el stream de audio directo (mucho más rápido y ligero)
+    if (mediaInfo.mp3Url) candidateStreams.push(mediaInfo.mp3Url);
     if (mediaInfo.directMediaUrl && !candidateStreams.includes(mediaInfo.directMediaUrl)) {
       candidateStreams.push(mediaInfo.directMediaUrl);
+    }
+    if (mediaInfo.mp4Url && !candidateStreams.includes(mediaInfo.mp4Url)) {
+      candidateStreams.push(mediaInfo.mp4Url);
     }
   } else {
     // Para MP4: preferir stream directo de video

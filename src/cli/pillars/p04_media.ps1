@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Pilar 04: Vork Conversor Multimedia Universal (YouTube, TikTok, IG a MP3/MP4)
 #>
@@ -29,11 +29,11 @@ function Invoke-PillarMedia {
         $url = $url.Trim()
 
         $mediaOptions = @(
-            @{ Value = "mp3:320";      Label = "[1] mp3 320k (Audio MP3 Máxima Fidelidad 320 kbps)" },
-            @{ Value = "mp3:192";      Label = "[2] mp3 192k (Audio MP3 Balanceado 192 kbps)" },
-            @{ Value = "mp4:1080";     Label = "[3] mp4 1080p (Video Full HD 1080p)" },
-            @{ Value = "mp4:720";      Label = "[4] mp4 720p  (Video HD 720p)" },
-            @{ Value = "m4a:256";      Label = "[5] m4a 256k  (Audio AAC Apple compatible)" },
+            @{ Value = "mp3:320k";     Label = "[1] mp3 320k (Audio MP3 Máxima Fidelidad 320 kbps)" },
+            @{ Value = "mp3:192k";     Label = "[2] mp3 192k (Audio MP3 Balanceado 192 kbps)" },
+            @{ Value = "mp4:1080p";    Label = "[3] mp4 1080p (Video Full HD 1080p)" },
+            @{ Value = "mp4:720p";     Label = "[4] mp4 720p  (Video HD 720p)" },
+            @{ Value = "m4a:256k";     Label = "[5] m4a 256k  (Audio AAC Apple compatible)" },
             @{ Value = "wav:lossless"; Label = "[6] wav       (Audio PCM sin compresión)" }
         )
 
@@ -58,7 +58,12 @@ function Invoke-PillarMedia {
         try { Add-Type -AssemblyName System.Net.Http } catch { }
 
         $res = $null
-        $pRow = try { [Console]::CursorTop } catch { -1 }
+        $barLen = 22
+        $pRow = -1
+        try {
+            Write-Host "  $Cyan│$Reset  ${White}Progreso:${Reset} [${Gray}$([string]::new([char]0x2591, $barLen))${Reset}]   0%  ${LeadLight}Iniciando...${Reset}"
+            $pRow = [Console]::CursorTop - 1
+        } catch { }
 
         if ('System.Net.Http.HttpClient' -as [type]) {
             $client = [System.Net.Http.HttpClient]::new()
@@ -67,7 +72,6 @@ function Invoke-PillarMedia {
             $task = $client.PostAsync($endpoint, $httpContent)
 
             $startTime = [DateTime]::UtcNow
-            $barLen = 22
 
             while (-not $task.IsCompleted) {
                 $elapsed = ([DateTime]::UtcNow - $startTime).TotalSeconds
@@ -99,10 +103,10 @@ function Invoke-PillarMedia {
                 $empty = [string]::new([char]0x2591, $emptyLen)
                 $pctStr = ($pct.ToString() + "%").PadLeft(4)
 
-                if ($pRow -ge 0) {
+                if ($pRow -ge 0 -and $pRow -lt [Console]::BufferHeight) {
                     try { [Console]::SetCursorPosition(0, $pRow) } catch { }
                 }
-                Write-Host "$ClrLine  $Cyan│$Reset  ${White}Progreso:${Reset} [${Cyan}$filled${Gray}$empty${Reset}] $Yellow$pctStr$Reset  ${LeadLight}$phase${Reset}" -NoNewline
+                Write-Host "`r$ClrLine  $Cyan│$Reset  ${White}Progreso:${Reset} [${Cyan}$filled${Gray}$empty${Reset}] $Yellow$pctStr$Reset  ${LeadLight}$phase${Reset}" -NoNewline
 
                 Start-Sleep -Milliseconds 120
             }
@@ -113,10 +117,10 @@ function Invoke-PillarMedia {
 
             # 100% Finalizado
             $filled100 = [string]::new([char]0x2588, $barLen)
-            if ($pRow -ge 0) {
+            if ($pRow -ge 0 -and $pRow -lt [Console]::BufferHeight) {
                 try { [Console]::SetCursorPosition(0, $pRow) } catch { }
             }
-            Write-Host "$ClrLine  $Cyan│$Reset  ${White}Progreso:${Reset} [${Cyan}$filled100${Reset}] ${Green}100%${Reset}  ${Green}Completado${Reset}"
+            Write-Host "`r$ClrLine  $Cyan│$Reset  ${White}Progreso:${Reset} [${Cyan}$filled100${Reset}] ${Green}100%${Reset}  ${Green}Completado${Reset}"
 
             $jsonStr = $task.Result.Content.ReadAsStringAsync().Result
             $res = $jsonStr | ConvertFrom-Json

@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Vork CLI - Modulo Core: Despachador y Consola Interactiva REPL
 #>
@@ -557,20 +557,9 @@ function Read-InteractiveVorkLine {
             continue
         }
 
-        if ($buf.Length -eq 0 -and ($key.KeyChar -eq '?' -or $key.Key -eq [ConsoleKey]::OemQuestion)) {
-            $modalChosen = Show-InteractiveHelpModal
-            Clear-Host
-            Show-Banner
-            Write-Host "${Lead}$Rule${Reset}"
-            $pRow = try { [Console]::CursorTop } catch { 0 }
-            Write-Host "${Coral}${Bold}> ${Reset}"
-            Write-Host "${Lead}$Rule${Reset}"
-            Write-Host "${LeadLight}$Footer${Reset}"
-            try { [Console]::SetCursorPosition(2, $pRow) } catch { }
-            if ($modalChosen) {
-                return $modalChosen
-            }
-            continue
+        if ($buf.Length -eq 0 -and $key.KeyChar -eq '?') {
+            try { [Console]::TreatControlCAsInput = $false } catch { }
+            return "?"
         }
 
         $ch = $key.KeyChar
@@ -583,7 +572,7 @@ function Read-InteractiveVorkLine {
                 Write-Host "${Coral}${Bold}$($buf.ToString())${Reset}$ClrToEnd" -NoNewline
                 [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
             } catch {
-                Write-Host "${Coral}${Bold}$ch${Reset}" -NoNewline
+                Write-Host "${Coral}${Bold}$($buf.ToString())${Reset}$ClrToEnd" -NoNewline
             }
             $selIdx = 0
             $topIdx = 0
@@ -639,17 +628,27 @@ function Start-InteractiveREPL {
         $footer = $left + (" " * $padLen) + $right
 
         Write-Host "${Lead}$rule${Reset}"
-        $pRow = try { [Console]::CursorTop } catch { 0 }
         Write-Host "${Coral}${Bold}> ${Reset}"
         Write-Host "${Lead}$rule${Reset}"
-        Write-Host "${LeadLight}$footer${Reset}"
+        Write-Host "${LeadLight}$footer${Reset}" -NoNewline
 
-        # Position cursor back at prompt line
-        try { [Console]::SetCursorPosition(2, $pRow) } catch { Write-Host "$ESC[2A$ESC[2C" -NoNewline }
+        # Calcular $pRow exactamente 2 filas arriba de la línea de pie de página
+        $pRow = try { [Console]::CursorTop - 2 } catch { 0 }
+        try { [Console]::SetCursorPosition(2, $pRow) } catch { Write-Host "$ESC[2A$ESC[2G" -NoNewline }
 
         $line = Read-InteractiveVorkLine -PromptRow $pRow -Width $width -Rule $rule -Footer $footer
         if ($null -eq $line) {
             Exit-VorkSession -ExitCode 0
+        }
+
+        if ($line -eq "?") {
+            $modalChosen = Show-InteractiveHelpModal
+            Clear-Host
+            Show-Banner
+            if ($modalChosen) {
+                Dispatch-CLICommand -Cmd $modalChosen -ArgsList @()
+            }
+            continue
         }
 
         $line = $line.Trim()
