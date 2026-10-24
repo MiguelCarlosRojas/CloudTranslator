@@ -247,7 +247,6 @@ $global:IsWinPlatform = ([System.Environment]::OSVersion.Platform -eq [System.Pl
 if ($global:IsWinPlatform -and -not ([System.Management.Automation.PSTypeName]'VorkWin32').Type) {
     $csharp = @'
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 public static class VorkWin32 {
@@ -257,19 +256,14 @@ public static class VorkWin32 {
     [DllImport("user32.dll")]
     public static extern IntPtr GetForegroundWindow();
 
-    [DllImport("user32.dll")]
-    public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
-
     [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
     public static extern IntPtr LoadImage(IntPtr hinst, string lpszName, uint uType, int cxDesired, int cyDesired, uint fuLoad);
 
-    [DllImport("user32.dll")]
-    public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern IntPtr SendMessageTimeout(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam, uint fuFlags, uint uTimeout, out IntPtr lpdwResult);
 
-    [DllImport("user32.dll")]
-    public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
-
-    public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+    public const uint WM_SETICON = 0x0080;
+    public const uint SMTO_ABORTIFHUNG = 0x0002;
 
     public static void SetIcon(string iconPath) {
         try {
@@ -278,39 +272,20 @@ public static class VorkWin32 {
             IntPtr hIconBig = LoadImage(IntPtr.Zero, iconPath, 1, 32, 32, 0x00000010);
             if (hIconSmall == IntPtr.Zero && hIconBig == IntPtr.Zero) return;
 
+            IntPtr dummy;
             // 1. Consola clásica de Windows (conhost / PowerShell nativo)
             IntPtr conWnd = GetConsoleWindow();
             if (conWnd != IntPtr.Zero) {
-                if (hIconSmall != IntPtr.Zero) SendMessage(conWnd, 0x0080, (IntPtr)0, hIconSmall);
-                if (hIconBig != IntPtr.Zero) SendMessage(conWnd, 0x0080, (IntPtr)1, hIconBig);
+                if (hIconSmall != IntPtr.Zero) SendMessageTimeout(conWnd, WM_SETICON, (IntPtr)0, hIconSmall, SMTO_ABORTIFHUNG, 50, out dummy);
+                if (hIconBig != IntPtr.Zero) SendMessageTimeout(conWnd, WM_SETICON, (IntPtr)1, hIconBig, SMTO_ABORTIFHUNG, 50, out dummy);
             }
 
             // 2. Ventana de terminal activa en primer plano (Warp, Windows Terminal, Orca, WezTerm)
             IntPtr fgWnd = GetForegroundWindow();
             if (fgWnd != IntPtr.Zero && fgWnd != conWnd) {
-                if (hIconSmall != IntPtr.Zero) SendMessage(fgWnd, 0x0080, (IntPtr)0, hIconSmall);
-                if (hIconBig != IntPtr.Zero) SendMessage(fgWnd, 0x0080, (IntPtr)1, hIconBig);
+                if (hIconSmall != IntPtr.Zero) SendMessageTimeout(fgWnd, WM_SETICON, (IntPtr)0, hIconSmall, SMTO_ABORTIFHUNG, 50, out dummy);
+                if (hIconBig != IntPtr.Zero) SendMessageTimeout(fgWnd, WM_SETICON, (IntPtr)1, hIconBig, SMTO_ABORTIFHUNG, 50, out dummy);
             }
-
-            // 3. Búsqueda y asignación sobre procesos terminales ancestros
-            try {
-                int myPid = Process.GetCurrentProcess().Id;
-                EnumWindows((hWnd, lParam) => {
-                    uint wPid = 0;
-                    GetWindowThreadProcessId(hWnd, out wPid);
-                    if (wPid != 0 && wPid != myPid) {
-                        try {
-                            Process p = Process.GetProcessById((int)wPid);
-                            string name = p.ProcessName.ToLower();
-                            if (name.Contains("warp") || name.Contains("windowsterminal") || name.Contains("wezterm") || name.Contains("alacritty") || name.Contains("hyper") || name.Contains("orca")) {
-                                if (hIconSmall != IntPtr.Zero) SendMessage(hWnd, 0x0080, (IntPtr)0, hIconSmall);
-                                if (hIconBig != IntPtr.Zero) SendMessage(hWnd, 0x0080, (IntPtr)1, hIconBig);
-                            }
-                        } catch {}
-                    }
-                    return true;
-                }, IntPtr.Zero);
-            } catch {}
         } catch {}
     }
 }

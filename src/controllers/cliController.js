@@ -56,9 +56,9 @@ function assembleVorkScript() {
     parts.push(readPart(routerFile));
   }
 
-  // Si no hubiera modulos, usar vork.ps1 en disco
+  // Si no hubiera modulos, usar vork.ps1 en la raiz del proyecto
   if (parts.length === 0) {
-    const fallbackPath = path.join(CLI_DIR, "vork.ps1");
+    const fallbackPath = path.join(__dirname, "..", "..", "vork.ps1");
     return fs.existsSync(fallbackPath) ? fs.readFileSync(fallbackPath, "utf8") : "";
   }
 
