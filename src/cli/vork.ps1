@@ -914,6 +914,185 @@ function Select-InteractiveOption {
     }
 }
 
+
+function Select-InteractiveMediaFormat {
+    param(
+        [string]$PromptTitle = "Selecciona el formato y calidad de salida:",
+        [string]$DefaultFormat = "mp4",
+        [string]$DefaultMp4Quality = "720p",
+        [string]$DefaultMp3Quality = "320k"
+    )
+
+    $savedCursor = try { [Console]::CursorVisible } catch { $true }
+    try { [Console]::CursorVisible = $false } catch { }
+
+    # Catálogo de calidades multimedia soportadas
+    $mp4Qualities = @(
+        @{ Id = "1080p60HD"; Desc = "Video Full HD 60fps" },
+        @{ Id = "1080pHD";   Desc = "Video Full HD 1080p" },
+        @{ Id = "720p60";     Desc = "Video HD 60fps" },
+        @{ Id = "720p";       Desc = "Video HD 720p" },
+        @{ Id = "480p";       Desc = "Video SD 480p" },
+        @{ Id = "360p";       Desc = "Video Móvil 360p" },
+        @{ Id = "240p";       Desc = "Video Ahorro 240p" },
+        @{ Id = "140p";       Desc = "Video Ultra Ligero 140p" }
+    )
+
+    $mp3Qualities = @(
+        @{ Id = "320k"; Desc = "Audio MP3 Máxima Fidelidad 320 kbps" },
+        @{ Id = "256k"; Desc = "Audio MP3 Alta Fidelidad 256 kbps" },
+        @{ Id = "192k"; Desc = "Audio MP3 Balanceado 192 kbps" },
+        @{ Id = "128k"; Desc = "Audio MP3 Estándar 128 kbps" },
+        @{ Id = "96k";  Desc = "Audio MP3 Ahorro 96 kbps" },
+        @{ Id = "64k";  Desc = "Audio MP3 Mínimo 64 kbps" }
+    )
+
+    # 0 -> mp3, 1 -> mp4, 2 -> wav
+    $selFormat = if ($DefaultFormat -eq "mp3") { 0 } elseif ($DefaultFormat -eq "wav") { 2 } else { 1 }
+
+    $mp4Idx = 3 # 720p por defecto
+    for ($i = 0; $i -lt $mp4Qualities.Count; $i++) {
+        if ($mp4Qualities[$i].Id -eq $DefaultMp4Quality) {
+            $mp4Idx = $i
+            break
+        }
+    }
+
+    $mp3Idx = 0 # 320k por defecto
+    for ($i = 0; $i -lt $mp3Qualities.Count; $i++) {
+        if ($mp3Qualities[$i].Id -eq $DefaultMp3Quality) {
+            $mp3Idx = $i
+            break
+        }
+    }
+
+    Write-Host ""
+    Write-Host "  ${White}${Bold}$PromptTitle${Reset}"
+    Write-Host ""
+
+    # Espacio para 3 opciones + 1 línea de separación + 1 línea de atajos
+    $totalMenuRows = 5
+    $startTop = try { [Console]::CursorTop } catch { 0 }
+    for ($i = 0; $i -lt $totalMenuRows; $i++) {
+        Write-Host ""
+    }
+    $menuStartRow = try { [Console]::CursorTop - $totalMenuRows } catch { $startTop }
+
+    $renderMenu = {
+        $curMp3 = $mp3Qualities[$mp3Idx]
+        $curMp4 = $mp4Qualities[$mp4Idx]
+
+        # Fila 0: MP3
+        try { [Console]::SetCursorPosition(2, $menuStartRow + 0) } catch { }
+        if ($selFormat -eq 0) {
+            Write-Host "${Cyan}${Bold}> [1] mp3  ${Yellow}◂ $($curMp3.Id) ▸${Reset} ${LeadLight}($($curMp3.Desc))${Reset}    $ClrToEnd" -NoNewline
+        } else {
+            Write-Host "  ${LeadLight}[1] mp3  ($($curMp3.Id))${Reset}    $ClrToEnd" -NoNewline
+        }
+
+        # Fila 1: MP4
+        try { [Console]::SetCursorPosition(2, $menuStartRow + 1) } catch { }
+        if ($selFormat -eq 1) {
+            Write-Host "${Cyan}${Bold}> [2] mp4  ${Yellow}◂ $($curMp4.Id) ▸${Reset} ${LeadLight}($($curMp4.Desc))${Reset}    $ClrToEnd" -NoNewline
+        } else {
+            Write-Host "  ${LeadLight}[2] mp4  ($($curMp4.Id))${Reset}    $ClrToEnd" -NoNewline
+        }
+
+        # Fila 2: WAV
+        try { [Console]::SetCursorPosition(2, $menuStartRow + 2) } catch { }
+        if ($selFormat -eq 2) {
+            Write-Host "${Cyan}${Bold}> [3] wav  ${Yellow}◂ lossless ▸${Reset} ${LeadLight}(Audio PCM sin compresión)${Reset}    $ClrToEnd" -NoNewline
+        } else {
+            Write-Host "  ${LeadLight}[3] wav  (Audio PCM sin compresión)${Reset}    $ClrToEnd" -NoNewline
+        }
+
+        # Fila 3: Espaciado
+        try { [Console]::SetCursorPosition(2, $menuStartRow + 3) } catch { }
+        Write-Host "$ClrToEnd" -NoNewline
+
+        # Fila 4: Atajos de teclado
+        try { [Console]::SetCursorPosition(2, $menuStartRow + 4) } catch { }
+        Write-Host "${LeadLight}↑/↓ Navegar  ·  ←/→ Cambiar calidad  ·  enter Confirmar  ·  esc Cancelar${Reset}$ClrToEnd" -NoNewline
+    }
+
+    & $renderMenu
+
+    try {
+        while ($true) {
+            $k = [Console]::ReadKey($true)
+
+            if ($k.Key -eq [ConsoleKey]::UpArrow) {
+                $selFormat = if ($selFormat -gt 0) { $selFormat - 1 } else { 2 }
+                & $renderMenu
+                continue
+            }
+
+            if ($k.Key -eq [ConsoleKey]::DownArrow) {
+                $selFormat = if ($selFormat -lt 2) { $selFormat + 1 } else { 0 }
+                & $renderMenu
+                continue
+            }
+
+            if ($k.Key -eq [ConsoleKey]::LeftArrow) {
+                if ($selFormat -eq 0) {
+                    $mp3Idx = if ($mp3Idx -gt 0) { $mp3Idx - 1 } else { $mp3Qualities.Count - 1 }
+                } elseif ($selFormat -eq 1) {
+                    $mp4Idx = if ($mp4Idx -gt 0) { $mp4Idx - 1 } else { $mp4Qualities.Count - 1 }
+                }
+                & $renderMenu
+                continue
+            }
+
+            if ($k.Key -eq [ConsoleKey]::RightArrow) {
+                if ($selFormat -eq 0) {
+                    $mp3Idx = if ($mp3Idx -lt ($mp3Qualities.Count - 1)) { $mp3Idx + 1 } else { 0 }
+                } elseif ($selFormat -eq 1) {
+                    $mp4Idx = if ($mp4Idx -lt ($mp4Qualities.Count - 1)) { $mp4Idx + 1 } else { 0 }
+                }
+                & $renderMenu
+                continue
+            }
+
+            $ch = [string]$k.KeyChar
+            if ($ch -eq '1') {
+                $selFormat = 0
+                & $renderMenu
+                continue
+            } elseif ($ch -eq '2') {
+                $selFormat = 1
+                & $renderMenu
+                continue
+            } elseif ($ch -eq '3') {
+                $selFormat = 2
+                & $renderMenu
+                continue
+            }
+
+            if ($k.Key -eq [ConsoleKey]::Enter) {
+                try { [Console]::SetCursorPosition(0, $menuStartRow + $totalMenuRows) } catch { }
+                Write-Host ""
+
+                if ($selFormat -eq 0) {
+                    return @{ Format = 'mp3'; Quality = $mp3Qualities[$mp3Idx].Id }
+                } elseif ($selFormat -eq 1) {
+                    return @{ Format = 'mp4'; Quality = $mp4Qualities[$mp4Idx].Id }
+                } else {
+                    return @{ Format = 'wav'; Quality = 'lossless' }
+                }
+            }
+
+            $isCtrlC = ($k.KeyChar -eq [char]3) -or ($k.Key -eq [ConsoleKey]::C -and ($k.Modifiers -band [ConsoleModifiers]::Control))
+            if ($k.Key -eq [ConsoleKey]::Escape -or $isCtrlC) {
+                try { [Console]::SetCursorPosition(0, $menuStartRow + $totalMenuRows) } catch { }
+                Write-Host ""
+                return $null
+            }
+        }
+    } finally {
+        try { [Console]::CursorVisible = $savedCursor } catch { }
+    }
+}
+
 function Select-InteractiveTheme {
     param(
         [array]$Themes,
@@ -2981,21 +3160,15 @@ function Invoke-PillarMedia {
         }
         $url = $url.Trim()
 
-        $mediaOptions = @(
-            @{ Value = "mp3:320k";     Label = "[1] mp3 320k (Audio MP3 Máxima Fidelidad 320 kbps)" },
-            @{ Value = "mp3:192k";     Label = "[2] mp3 192k (Audio MP3 Balanceado 192 kbps)" },
-            @{ Value = "mp4:1080p";    Label = "[3] mp4 1080p (Video Full HD 1080p)" },
-            @{ Value = "mp4:720p";     Label = "[4] mp4 720p  (Video HD 720p)" },
-            @{ Value = "m4a:256k";     Label = "[5] m4a 256k  (Audio AAC Apple compatible)" },
-            @{ Value = "wav:lossless"; Label = "[6] wav       (Audio PCM sin compresión)" }
-        )
-
-        $chosenFmt = Select-InteractiveOption -PromptTitle "Selecciona el formato y calidad de salida:" -Options $mediaOptions -DefaultIndex 0
-        if ($chosenFmt) {
-            $parts = $chosenFmt -split ":"
-            $fmt = $parts[0]
-            if ($parts.Length -gt 1) { $quality = $parts[1] }
+        $chosen = Select-InteractiveMediaFormat -PromptTitle "Selecciona el formato y calidad de salida:" -DefaultFormat "mp4" -DefaultMp4Quality "720p" -DefaultMp3Quality "320k"
+        if (-not $chosen) {
+            Write-Host "  ${Lead}╰─ Conversión cancelada.${Reset}"
+            Write-Host ""
+            return
         }
+
+        $fmt = $chosen.Format
+        $quality = $chosen.Quality
     }
 
     Write-Host ""

@@ -725,7 +725,14 @@ async function extractMediaInfo(url, requestedFormat = "mp3") {
 function transcodeToMp3(streamUrl, outputPath, quality = "320k") {
   return new Promise((resolve, reject) => {
     try {
-      const bitrateMap = { "320k": "320k", "192k": "192k", "128k": "128k", "256k": "256k" };
+      const bitrateMap = {
+        "320k": "320k",
+        "256k": "256k",
+        "192k": "192k",
+        "128k": "128k",
+        "96k": "96k",
+        "64k": "64k"
+      };
       const bitrate = bitrateMap[quality] || (quality.endsWith("k") ? quality : `${quality}k`);
 
       // Intento 1: Ejecución nativa directa de FFmpeg con soporte de HTTP seeking
@@ -801,6 +808,71 @@ function transcodeToMp3(streamUrl, outputPath, quality = "320k") {
       ff.on("error", err => {
         reject(err);
       });
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
+ * Transcodifica un stream remoto a WAV puro (Audio PCM 16-bit sin compresión)
+ */
+function transcodeToWav(streamUrl, outputPath) {
+  return new Promise((resolve, reject) => {
+    try {
+      const ff = spawn(ffmpegPath, [
+        "-y",
+        "-user_agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "-i", streamUrl,
+        "-vn",
+        "-c:a", "pcm_s16le",
+        "-f", "wav",
+        outputPath
+      ]);
+
+      let stderr = "";
+      ff.stderr.on("data", d => { stderr += d.toString(); });
+
+      ff.on("close", (code) => {
+        if (code === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 1000) {
+          const stats = fs.statSync(outputPath);
+          return resolve({ sizeBytes: stats.size, duration: null, durationSeconds: 0 });
+        }
+
+        // Intento 2: Fallback vía Axios stream pipe
+        axios({
+          method: "get",
+          url: streamUrl,
+          responseType: "stream",
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            "Accept": "*/*"
+          },
+          timeout: 45000
+        }).then(response => {
+          const ffPipe = spawn(ffmpegPath, [
+            "-y",
+            "-i", "pipe:0",
+            "-vn",
+            "-c:a", "pcm_s16le",
+            "-f", "wav",
+            outputPath
+          ]);
+          let pipeStderr = "";
+          ffPipe.stderr.on("data", d => { pipeStderr += d.toString(); });
+          response.data.pipe(ffPipe.stdin);
+          ffPipe.on("close", (pipeCode) => {
+            if (pipeCode === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 1000) {
+              const statsPipe = fs.statSync(outputPath);
+              return resolve({ sizeBytes: statsPipe.size, duration: null, durationSeconds: 0 });
+            }
+            reject(new Error(`FFmpeg WAV transcode failed with code ${pipeCode}: ${pipeStderr.slice(-250)}`));
+          });
+          response.data.on("error", reject);
+        }).catch(reject);
+      });
+
+      ff.on("error", reject);
     } catch (err) {
       reject(err);
     }
@@ -956,20 +1028,21 @@ async function processConversion(options = {}) {
     throw new Error("El parámetro 'url' es obligatorio para la conversión.");
   }
 
-  const selectedFormat = format.toLowerCase() === "mp4" ? "mp4" : "mp3";
+  const fmtLower = String(format || "").toLowerCase().trim();
+  const selectedFormat = ["mp4", "wav"].includes(fmtLower) ? fmtLower : "mp3";
   const mediaInfo = await extractMediaInfo(url, selectedFormat);
 
   const jobId = "media_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
   const cleanTitle = sanitizeFilename(mediaInfo.title, `${mediaInfo.platformId}-media`);
   const extension = selectedFormat;
-  const mimeType = selectedFormat === "mp4" ? "video/mp4" : "audio/mpeg";
+  const mimeType = selectedFormat === "mp4" ? "video/mp4" : (selectedFormat === "wav" ? "audio/wav" : "audio/mpeg");
   const downloadFilename = `Vork_${cleanTitle}.${extension}`;
   const outputPath = path.join(MEDIA_CACHE_DIR, `${jobId}.${extension}`);
 
   // Construir lista de candidatos según formato y plataforma
   const candidateStreams = [];
-  if (selectedFormat === "mp3") {
-    // Para MP3: preferir siempre el stream de audio directo (mucho más rápido y ligero)
+  if (selectedFormat === "mp3" || selectedFormat === "wav") {
+    // Para MP3 o WAV: preferir siempre el stream de audio directo (mucho más rápido y ligero)
     if (mediaInfo.mp3Url) candidateStreams.push(mediaInfo.mp3Url);
     if (mediaInfo.directMediaUrl && !candidateStreams.includes(mediaInfo.directMediaUrl)) {
       candidateStreams.push(mediaInfo.directMediaUrl);
@@ -1001,6 +1074,11 @@ async function processConversion(options = {}) {
           finalDuration = transRes.duration;
           finalDurationSeconds = transRes.durationSeconds;
         }
+        transSuccess = true;
+        break;
+      } else if (selectedFormat === "wav") {
+        const transRes = await transcodeToWav(streamUrl, outputPath);
+        sizeBytes = transRes.sizeBytes;
         transSuccess = true;
         break;
       } else {

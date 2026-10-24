@@ -28,21 +28,15 @@ function Invoke-PillarMedia {
         }
         $url = $url.Trim()
 
-        $mediaOptions = @(
-            @{ Value = "mp3:320k";     Label = "[1] mp3 320k (Audio MP3 Máxima Fidelidad 320 kbps)" },
-            @{ Value = "mp3:192k";     Label = "[2] mp3 192k (Audio MP3 Balanceado 192 kbps)" },
-            @{ Value = "mp4:1080p";    Label = "[3] mp4 1080p (Video Full HD 1080p)" },
-            @{ Value = "mp4:720p";     Label = "[4] mp4 720p  (Video HD 720p)" },
-            @{ Value = "m4a:256k";     Label = "[5] m4a 256k  (Audio AAC Apple compatible)" },
-            @{ Value = "wav:lossless"; Label = "[6] wav       (Audio PCM sin compresión)" }
-        )
-
-        $chosenFmt = Select-InteractiveOption -PromptTitle "Selecciona el formato y calidad de salida:" -Options $mediaOptions -DefaultIndex 0
-        if ($chosenFmt) {
-            $parts = $chosenFmt -split ":"
-            $fmt = $parts[0]
-            if ($parts.Length -gt 1) { $quality = $parts[1] }
+        $chosen = Select-InteractiveMediaFormat -PromptTitle "Selecciona el formato y calidad de salida:" -DefaultFormat "mp4" -DefaultMp4Quality "720p" -DefaultMp3Quality "320k"
+        if (-not $chosen) {
+            Write-Host "  ${Lead}╰─ Conversión cancelada.${Reset}"
+            Write-Host ""
+            return
         }
+
+        $fmt = $chosen.Format
+        $quality = $chosen.Quality
     }
 
     Write-Host ""

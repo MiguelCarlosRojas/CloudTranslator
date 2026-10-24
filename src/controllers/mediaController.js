@@ -152,13 +152,18 @@ exports.convertMedia = async (req, res) => {
     // 🛡️ Blindaje SSRF
     await validateSafeUrl(url);
 
-    const safeFormat = format.toLowerCase() === "mp4" ? "mp4" : "mp3";
-    const allowedQualities = ["128k", "192k", "256k", "320k", "360p", "480p", "720p", "1080p"];
-    let cleanQuality = typeof quality === "string" ? quality.toLowerCase().trim() : "320k";
+    const fmtLower = String(format || "").toLowerCase().trim();
+    const safeFormat = ["mp4", "wav"].includes(fmtLower) ? fmtLower : "mp3";
+    const allowedQualities = [
+      "64k", "96k", "128k", "192k", "256k", "320k",
+      "140p", "144p", "240p", "360p", "480p", "720p", "720p60", "1080p", "1080p60",
+      "1080p60hd", "1080phd", "lossless", "pcm"
+    ];
+    let cleanQuality = typeof quality === "string" ? quality.toLowerCase().trim() : (safeFormat === "mp4" ? "720p" : (safeFormat === "wav" ? "lossless" : "320k"));
     if (/^\d+$/.test(cleanQuality)) {
       cleanQuality = safeFormat === "mp4" ? `${cleanQuality}p` : `${cleanQuality}k`;
     }
-    const safeQuality = allowedQualities.includes(cleanQuality) ? cleanQuality : (safeFormat === "mp4" ? "720p" : "320k");
+    const safeQuality = allowedQualities.includes(cleanQuality) ? cleanQuality : (safeFormat === "mp4" ? "720p" : (safeFormat === "wav" ? "lossless" : "320k"));
 
     const result = await mediaService.convertSingleMedia({ url, format: safeFormat, quality: safeQuality });
     res.json(result);
