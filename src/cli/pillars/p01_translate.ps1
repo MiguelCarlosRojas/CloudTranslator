@@ -52,12 +52,7 @@ function Invoke-PillarTranslate {
     $body = @{ text = $text; targetLanguage = $to } | ConvertTo-Json
     try {
         $res = Invoke-RestMethod -Uri "$ApiBase/api/translate" -Method Post -Body $body -ContentType "application/json"
-        $transText = $res.translatedText
-        $encText = [System.Uri]::EscapeDataString($transText)
-        Write-Host "  $Cyan│$Reset  $Green✓ Traducción lista:$Reset"
-        Write-Host "  $Cyan│$Reset    Resultado: $White`"$transText`"$Reset"
-        Write-Host "  $Cyan│$Reset    Descarga: $Yellow$ApiBase/api/tts?text=$encText&lang=$to$Reset"
-        Write-Host "  $Cyan│$Reset    Stream:   $Cyan$ApiBase/api/tts/stream?text=$encText&lang=$to$Reset"
+        Write-Host "  $Cyan│$Reset  $Green✓ Traducción:$Reset $White$($res.translatedText)$Reset"
         Write-Host "  $Cyan╰───────────────────────────────────────────────────$Reset"
     } catch {
         Write-Host "  $Cyan│$Reset  ${Coral}[Error al traducir]:${Reset} $($_.Exception.Message)"
