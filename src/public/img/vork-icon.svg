@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Right Wing Gradient -->
+    <linearGradient id="vorkRightGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff5e1e" />
+      <stop offset="60%" stop-color="#ff7a3d" />
+      <stop offset="100%" stop-color="#ffa173" />
+    </linearGradient>
+
+    <!-- Facet Highlight Gradient -->
+    <linearGradient id="vorkFacetGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff7a3d" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#ffcbb0" stop-opacity="0.95" />
+    </linearGradient>
+
+    <!-- Glow Filter -->
+    <filter id="vorkGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="vorkShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000000" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- The Vork "V" Monogram (Transparent Background) -->
+  <g filter="url(#vorkShadow)">
+    <!-- Left Wing (Cream / Architectural Warm Tone) -->
+    <polygon points="135,145 185,145 256,315 256,380 222,380" fill="#f4ece1" />
+
+    <!-- Right Wing Main Body (Vibrant Coral Orange) -->
+    <polygon points="256,380 256,310 332,145 377,145" fill="url(#vorkRightGrad)" />
+
+    <!-- Right Wing Dimensional Bevel Facet -->
+    <polygon points="256,380 256,345 355,145 377,145" fill="url(#vorkFacetGrad)" />
+  </g>
+
+  <!-- Multimodal Neural Spark (Orbital Node) -->
+  <g>
+    <!-- Aura -->
+    <circle cx="382" cy="125" r="22" fill="#ff7a3d" opacity="0.35" filter="url(#vorkGlow)" />
+    <!-- Outer Ring -->
+    <circle cx="382" cy="125" r="14" fill="#fff5ee" />
+    <!-- Core -->
+    <circle cx="382" cy="125" r="9" fill="#ff7a3d" />
+  </g>
+</svg>

@@ -247,6 +247,7 @@ $global:IsWinPlatform = ([System.Environment]::OSVersion.Platform -eq [System.Pl
 if ($global:IsWinPlatform -and -not ([System.Management.Automation.PSTypeName]'VorkWin32').Type) {
     $csharp = @'
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 public static class VorkWin32 {
@@ -254,20 +255,62 @@ public static class VorkWin32 {
     public static extern IntPtr GetConsoleWindow();
 
     [DllImport("user32.dll")]
+    public static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
     public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
     [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
     public static extern IntPtr LoadImage(IntPtr hinst, string lpszName, uint uType, int cxDesired, int cyDesired, uint fuLoad);
 
+    [DllImport("user32.dll")]
+    public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+    [DllImport("user32.dll")]
+    public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+
+    public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
     public static void SetIcon(string iconPath) {
         try {
-            IntPtr hWnd = GetConsoleWindow();
-            if (hWnd != IntPtr.Zero && System.IO.File.Exists(iconPath)) {
-                IntPtr hIconSmall = LoadImage(IntPtr.Zero, iconPath, 1, 16, 16, 0x00000010);
-                IntPtr hIconBig = LoadImage(IntPtr.Zero, iconPath, 1, 32, 32, 0x00000010);
-                if (hIconSmall != IntPtr.Zero) SendMessage(hWnd, 0x0080, (IntPtr)0, hIconSmall);
-                if (hIconBig != IntPtr.Zero) SendMessage(hWnd, 0x0080, (IntPtr)1, hIconBig);
+            if (!System.IO.File.Exists(iconPath)) return;
+            IntPtr hIconSmall = LoadImage(IntPtr.Zero, iconPath, 1, 16, 16, 0x00000010);
+            IntPtr hIconBig = LoadImage(IntPtr.Zero, iconPath, 1, 32, 32, 0x00000010);
+            if (hIconSmall == IntPtr.Zero && hIconBig == IntPtr.Zero) return;
+
+            // 1. Consola clásica de Windows (conhost / PowerShell nativo)
+            IntPtr conWnd = GetConsoleWindow();
+            if (conWnd != IntPtr.Zero) {
+                if (hIconSmall != IntPtr.Zero) SendMessage(conWnd, 0x0080, (IntPtr)0, hIconSmall);
+                if (hIconBig != IntPtr.Zero) SendMessage(conWnd, 0x0080, (IntPtr)1, hIconBig);
             }
+
+            // 2. Ventana de terminal activa en primer plano (Warp, Windows Terminal, Orca, WezTerm)
+            IntPtr fgWnd = GetForegroundWindow();
+            if (fgWnd != IntPtr.Zero && fgWnd != conWnd) {
+                if (hIconSmall != IntPtr.Zero) SendMessage(fgWnd, 0x0080, (IntPtr)0, hIconSmall);
+                if (hIconBig != IntPtr.Zero) SendMessage(fgWnd, 0x0080, (IntPtr)1, hIconBig);
+            }
+
+            // 3. Búsqueda y asignación sobre procesos terminales ancestros
+            try {
+                int myPid = Process.GetCurrentProcess().Id;
+                EnumWindows((hWnd, lParam) => {
+                    uint wPid = 0;
+                    GetWindowThreadProcessId(hWnd, out wPid);
+                    if (wPid != 0 && wPid != myPid) {
+                        try {
+                            Process p = Process.GetProcessById((int)wPid);
+                            string name = p.ProcessName.ToLower();
+                            if (name.Contains("warp") || name.Contains("windowsterminal") || name.Contains("wezterm") || name.Contains("alacritty") || name.Contains("hyper") || name.Contains("orca")) {
+                                if (hIconSmall != IntPtr.Zero) SendMessage(hWnd, 0x0080, (IntPtr)0, hIconSmall);
+                                if (hIconBig != IntPtr.Zero) SendMessage(hWnd, 0x0080, (IntPtr)1, hIconBig);
+                            }
+                        } catch {}
+                    }
+                    return true;
+                }, IntPtr.Zero);
+            } catch {}
         } catch {}
     }
 }
@@ -278,17 +321,22 @@ public static class VorkWin32 {
 }
 
 function Set-VorkWindowIdentity {
-    # 1. Establecer título de ventana
+    # 1. Establecer título de ventana estándar con emblema V
     try {
-        $Host.UI.RawUI.WindowTitle = "Vork CLI"
+        $Host.UI.RawUI.WindowTitle = "⩔ Vork CLI"
     } catch {}
 
-    # 2. Secuencia OSC para pestañas modernas (Windows Terminal, iTerm2, WezTerm, GNOME)
+    # 2. Secuencias OSC completas para emuladores modernos (Warp, Windows Terminal, WezTerm, iTerm2, Alacritty, Orca)
     try {
-        Write-Host "$ESC]0;Vork CLI`a" -NoNewline
+        # OSC 0: Establecer título de ventana y nombre de icono
+        Write-Host "$ESC]0;⩔ Vork CLI`a" -NoNewline
+        # OSC 1: Establecer nombre de icono de pestaña
+        Write-Host "$ESC]1;⩔ Vork CLI`a" -NoNewline
+        # OSC 2: Establecer título de ventana
+        Write-Host "$ESC]2;⩔ Vork CLI`a" -NoNewline
     } catch {}
 
-    # 3. Asignar icono oficial de Vork a la ventana (en Windows)
+    # 3. Asignar icono oficial transparente de Vork a la ventana (en Windows)
     if ($global:IsWinPlatform) {
         try {
             $vorkIco = Join-Path $HOME ".vork\vork.ico"
