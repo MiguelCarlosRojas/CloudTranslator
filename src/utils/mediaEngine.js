@@ -843,30 +843,97 @@ function transcodeToMp4(streamUrl, outputPath, quality = "1080p") {
           return resolve({ sizeBytes: stats.size, duration, durationSeconds });
         }
 
-        // Intento 2: Transcodificación con libx264 ultrafast
-        logger.warn(`FFmpeg copy terminó con código ${code}, transcodificando con libx264 ultrafast...`);
-        const ff2 = spawn(ffmpegPath, [
-          "-y",
-          "-user_agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-          "-i", streamUrl,
-          "-c:v", "libx264",
-          "-preset", "ultrafast",
-          "-crf", "23",
-          "-c:a", "aac",
-          "-movflags", "+faststart",
-          "-f", "mp4",
-          outputPath
-        ]);
-        let stderr2 = "";
-        ff2.stderr.on("data", d => { stderr2 += d.toString(); });
-        ff2.on("close", (code2) => {
-          if (code2 === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 1000) {
-            const stats2 = fs.statSync(outputPath);
-            return resolve({ sizeBytes: stats2.size, duration: null, durationSeconds: 0 });
-          }
-          reject(new Error(`FFmpeg MP4 transcode failed: ${stderr2.slice(-250)}`));
+        // Intento 2: Fallback vía Axios stream piping con remux (-c copy)
+        logger.warn(`FFmpeg copy directo terminó con código ${code}, probando stream pipe axios...`);
+        axios({
+          method: "get",
+          url: streamUrl,
+          responseType: "stream",
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            "Accept": "*/*"
+          },
+          timeout: 60000
+        }).then(response => {
+          const ffPipe = spawn(ffmpegPath, [
+            "-y",
+            "-i", "pipe:0",
+            "-c", "copy",
+            "-movflags", "+faststart",
+            "-f", "mp4",
+            outputPath
+          ]);
+          let pipeStderr = "";
+          ffPipe.stderr.on("data", d => { pipeStderr += d.toString(); });
+          response.data.pipe(ffPipe.stdin);
+          ffPipe.on("close", (pipeCode) => {
+            if (pipeCode === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 1000) {
+              const statsPipe = fs.statSync(outputPath);
+              return resolve({ sizeBytes: statsPipe.size, duration: null, durationSeconds: 0 });
+            }
+
+            // Intento 3: Transcodificación H.264 ultrafast si -c copy falla
+            logger.warn(`FFmpeg pipe copy falló (${pipeCode}), reintentando transcodificación x264...`);
+            axios({
+              method: "get",
+              url: streamUrl,
+              responseType: "stream",
+              headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                "Accept": "*/*"
+              },
+              timeout: 60000
+            }).then(response2 => {
+              const ffPipe2 = spawn(ffmpegPath, [
+                "-y",
+                "-i", "pipe:0",
+                "-c:v", "libx264",
+                "-preset", "ultrafast",
+                "-crf", "23",
+                "-c:a", "aac",
+                "-movflags", "+faststart",
+                "-f", "mp4",
+                outputPath
+              ]);
+              let pipeStderr2 = "";
+              ffPipe2.stderr.on("data", d => { pipeStderr2 += d.toString(); });
+              response2.data.pipe(ffPipe2.stdin);
+              ffPipe2.on("close", (pipeCode2) => {
+                if (pipeCode2 === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 1000) {
+                  const statsPipe2 = fs.statSync(outputPath);
+                  return resolve({ sizeBytes: statsPipe2.size, duration: null, durationSeconds: 0 });
+                }
+                reject(new Error(`FFmpeg MP4 transcode failed: ${pipeStderr2.slice(-250)}`));
+              });
+              response2.data.on("error", reject);
+            }).catch(reject);
+          });
+          response.data.on("error", reject);
+        }).catch(err => {
+          // Intento 4: Transcodificación directa x264 como último recurso
+          const ffDirectX264 = spawn(ffmpegPath, [
+            "-y",
+            "-user_agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            "-i", streamUrl,
+            "-c:v", "libx264",
+            "-preset", "ultrafast",
+            "-crf", "23",
+            "-c:a", "aac",
+            "-movflags", "+faststart",
+            "-f", "mp4",
+            outputPath
+          ]);
+          let stderrDirect = "";
+          ffDirectX264.stderr.on("data", d => { stderrDirect += d.toString(); });
+          ffDirectX264.on("close", (dxCode) => {
+            if (dxCode === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 1000) {
+              const statsDirect = fs.statSync(outputPath);
+              return resolve({ sizeBytes: statsDirect.size, duration: null, durationSeconds: 0 });
+            }
+            reject(new Error(`FFmpeg MP4 transcode failed: ${stderrDirect.slice(-250) || err.message}`));
+          });
+          ffDirectX264.on("error", reject);
         });
-        ff2.on("error", reject);
       });
 
       ff.on("error", err => {
@@ -911,13 +978,10 @@ async function processConversion(options = {}) {
       candidateStreams.push(mediaInfo.mp4Url);
     }
   } else {
-    // Para MP4: preferir stream directo de video
+    // Para MP4: preferir stream directo de video (no mezclar con audio puro)
     if (mediaInfo.mp4Url) candidateStreams.push(mediaInfo.mp4Url);
     if (mediaInfo.directMediaUrl && !candidateStreams.includes(mediaInfo.directMediaUrl)) {
       candidateStreams.push(mediaInfo.directMediaUrl);
-    }
-    if (mediaInfo.mp3Url && !candidateStreams.includes(mediaInfo.mp3Url)) {
-      candidateStreams.push(mediaInfo.mp3Url);
     }
   }
 
@@ -925,6 +989,7 @@ async function processConversion(options = {}) {
   let finalDurationSeconds = mediaInfo.durationSeconds;
   let sizeBytes = 0;
   let transSuccess = false;
+  let lastConvError = null;
 
   for (const streamUrl of candidateStreams) {
     if (!streamUrl) continue;
@@ -950,6 +1015,7 @@ async function processConversion(options = {}) {
       }
     } catch (convErr) {
       logger.warn(`Intento de transcodificación FFmpeg falló con stream: ${convErr.message}`);
+      lastConvError = convErr.message;
       if (fs.existsSync(outputPath)) {
         try { fs.unlinkSync(outputPath); } catch {}
       }
@@ -958,7 +1024,8 @@ async function processConversion(options = {}) {
 
   // Si no se pudo generar archivo desde ningún stream, notificar error explícito sin generar audio falso
   if (!transSuccess || !fs.existsSync(outputPath) || sizeBytes < 1000) {
-    throw new Error(`No se pudo procesar la conversión a ${selectedFormat.toUpperCase()} (${quality}) para este enlace. Por favor verifique el enlace e intente nuevamente.`);
+    const detail = lastConvError ? ` (${lastConvError})` : '';
+    throw new Error(`No se pudo procesar la conversión a ${selectedFormat.toUpperCase()} (${quality}) para este enlace${detail}. Por favor verifique el enlace e intente nuevamente.`);
   }
 
   const thumbPath = path.join(MEDIA_CACHE_DIR, `${jobId}_thumb.jpg`);
