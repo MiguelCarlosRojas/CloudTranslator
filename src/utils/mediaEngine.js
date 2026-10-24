@@ -37,36 +37,49 @@ function withTimeout(promise, ms = 4500) {
 }
 
 /**
- * Consulta de alta disponibilidad a espejos de extracción para YouTube
+ * Consulta de alta disponibilidad y concurrencia a proveedores y espejos de extracción para YouTube
  */
 async function fetchYouTubeStreams(normalizedUrl) {
-  try {
-    const directRes = await withTimeout(btch.youtube(normalizedUrl), 15000);
+  const fetchBtch = async () => {
+    const directRes = await withTimeout(btch.youtube(normalizedUrl), 10000);
     if (directRes && (directRes.mp4 || directRes.mp3)) {
       return directRes;
     }
-  } catch (e) {
-    logger.warn(`btch.youtube fallo para ${normalizedUrl}: ${e.message}`);
-  }
+    throw new Error("btch.youtube no retornó streams");
+  };
 
-  // Respaldo de espejos
-  const mirrors = [
-    "https://backend2.tioo.eu.org",
-    "https://backend1.tioo.eu.org"
-  ];
-
-  for (const host of mirrors) {
-    try {
-      const res = await axios.get(`${host}/youtube?url=${encodeURIComponent(normalizedUrl)}`, {
-        timeout: 3000
-      });
-      if (res.data && (res.data.mp4 || res.data.mp3)) {
-        return res.data;
+  const fetchMirror1 = async () => {
+    const res = await axios.get(`https://backend1.tioo.eu.org/youtube?url=${encodeURIComponent(normalizedUrl)}`, {
+      timeout: 10000,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
       }
-    } catch {}
-  }
+    });
+    if (res.data && (res.data.mp4 || res.data.mp3)) {
+      return res.data;
+    }
+    throw new Error("backend1 tioo no retornó streams");
+  };
 
-  return null;
+  const fetchMirror2 = async () => {
+    const res = await axios.get(`https://backend2.tioo.eu.org/youtube?url=${encodeURIComponent(normalizedUrl)}`, {
+      timeout: 10000,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+      }
+    });
+    if (res.data && (res.data.mp4 || res.data.mp3)) {
+      return res.data;
+    }
+    throw new Error("backend2 tioo no retornó streams");
+  };
+
+  try {
+    return await Promise.any([fetchBtch(), fetchMirror1(), fetchMirror2()]);
+  } catch (err) {
+    logger.warn(`Todos los proveedores de streams para YouTube fallaron para ${normalizedUrl}: ${err.message}`);
+    return null;
+  }
 }
 
 // Directorio de almacenamiento en caché para medios convertidos físicamente
