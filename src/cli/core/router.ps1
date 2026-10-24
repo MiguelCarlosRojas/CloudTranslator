@@ -355,7 +355,7 @@ function Read-InteractiveVorkLine {
                     }
                     $modelName = if ($global:VorkModel) { $global:VorkModel } else { "Vork 3" }
                     $rightPlain = "$modelName $dotCh $tierName"
-                    $rightFormatted = "${LeadLight}$modelName $dotCh ${tierColor}$tierName${Reset}"
+                    $rightFormatted = "${LeadLight}$modelName $dotCh $tierName${Reset}"
                     $padLen = [Math]::Max(1, ($Width - 1) - $warnMsg.Length - $rightPlain.Length)
                     Write-Host "${LeadLight}$warnMsg$([string]::new(' ', $padLen))$rightFormatted" -NoNewline
                     [Console]::SetCursorPosition(2 + $buf.Length, $PromptRow)
@@ -637,7 +637,7 @@ function Start-InteractiveREPL {
         }
         $modelName = if ($global:VorkModel) { $global:VorkModel } else { "Vork 3" }
         $rightPlain = "$modelName " + $dotChar + " " + $tierName
-        $rightFormatted = "${LeadLight}$modelName " + $dotChar + " ${tierColor}$tierName${Reset}"
+        $rightFormatted = "${LeadLight}$modelName " + $dotChar + " $tierName${Reset}"
         $padLen = [Math]::Max(1, ($width - 1) - $left.Length - $rightPlain.Length)
         $footer = "${LeadLight}$left" + (" " * $padLen) + $rightFormatted
 

@@ -67,21 +67,67 @@ async function downloadSafeImage(url) {
   await validateSafeUrl(url);
   const response = await axios.get(url, {
     responseType: "arraybuffer",
-    timeout: 15000,
+    timeout: 20000,
     maxContentLength: 40 * 1024 * 1024, // 40MB máx
     headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
     }
   });
 
-  const contentType = response.headers["content-type"] || "";
-  let ext = "png";
-  if (contentType.includes("jpeg") || contentType.includes("jpg")) ext = "jpg";
-  else if (contentType.includes("webp")) ext = "webp";
-  else if (contentType.includes("gif")) ext = "gif";
-  else if (contentType.includes("bmp")) ext = "bmp";
+  const contentType = (response.headers["content-type"] || "").toLowerCase();
 
-  return saveTempFile(Buffer.from(response.data), ext);
+  // Si la respuesta es una página web HTML, extraer imagen principal (og:image / twitter:image)
+  if (contentType.includes("text/html")) {
+    const htmlText = Buffer.from(response.data).toString("utf8");
+    const ogMatch = htmlText.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
+                    htmlText.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i) ||
+                    htmlText.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i) ||
+                    htmlText.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["']/i);
+    if (ogMatch && ogMatch[1]) {
+      let realImgUrl = ogMatch[1].trim();
+      if (realImgUrl.startsWith("//")) {
+        realImgUrl = "https:" + realImgUrl;
+      } else if (realImgUrl.startsWith("/")) {
+        const u = new URL(url);
+        realImgUrl = `${u.protocol}//${u.host}${realImgUrl}`;
+      }
+      logger.info(`[ImageEngine] og:image detectado en página web: ${realImgUrl}`);
+      return await downloadSafeImage(realImgUrl);
+    }
+    throw new Error("La URL ingresada es una página web pero no contiene una imagen meta (og:image) detectable.");
+  }
+
+  const buf = Buffer.from(response.data);
+  let ext = "png";
+
+  // Detección por Magic Bytes (Firma binaria)
+  if (buf.length >= 4) {
+    if (buf[0] === 0xFF && buf[1] === 0xD8 && buf[2] === 0xFF) {
+      ext = "jpg";
+    } else if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4E && buf[3] === 0x47) {
+      ext = "png";
+    } else if (buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x38) {
+      ext = "gif";
+    } else if (buf[0] === 0x42 && buf[1] === 0x4D) {
+      ext = "bmp";
+    } else if (buf[0] === 0x00 && buf[1] === 0x00 && buf[2] === 0x01 && buf[3] === 0x00) {
+      ext = "ico";
+    } else if (buf.length >= 12 && buf.toString("ascii", 0, 4) === "RIFF" && buf.toString("ascii", 8, 12) === "WEBP") {
+      ext = "webp";
+    } else if (buf.length >= 12 && buf.toString("ascii", 4, 12).includes("ftypavif")) {
+      ext = "avif";
+    } else if (contentType.includes("jpeg") || contentType.includes("jpg")) {
+      ext = "jpg";
+    } else if (contentType.includes("webp")) {
+      ext = "webp";
+    } else if (contentType.includes("gif")) {
+      ext = "gif";
+    } else if (contentType.includes("bmp")) {
+      ext = "bmp";
+    }
+  }
+
+  return saveTempFile(buf, ext);
 }
 
 /**
@@ -126,6 +172,59 @@ function runPythonStudio(args) {
 }
 
 /**
+ * Convierte imagen usando FFmpeg nativo como respaldo ultra robusto
+ */
+async function convertWithFFmpeg(inputPath, outputPath, safeFormat, quality = 90, width, height) {
+  let ffmpegExe = "ffmpeg";
+  try {
+    const installer = require("@ffmpeg-installer/ffmpeg");
+    if (installer && installer.path) ffmpegExe = installer.path;
+  } catch {}
+
+  const args = ["-y", "-i", inputPath];
+
+  if (width && height) {
+    args.push("-vf", `scale=${parseInt(width, 10)}:${parseInt(height, 10)}`);
+  } else if (width) {
+    args.push("-vf", `scale=${parseInt(width, 10)}:-1`);
+  } else if (height) {
+    args.push("-vf", `scale=-1:${parseInt(height, 10)}`);
+  }
+
+  if (safeFormat === "jpg" || safeFormat === "jpeg") {
+    const qscale = Math.max(1, Math.min(31, Math.round(31 - (quality / 100) * 30)));
+    args.push("-q:v", String(qscale));
+  } else if (safeFormat === "webp") {
+    args.push("-quality", String(quality));
+  }
+
+  args.push(outputPath);
+
+  return new Promise((resolve, reject) => {
+    const proc = spawn(ffmpegExe, args);
+    let stderr = "";
+    proc.stderr.on("data", d => { stderr += d.toString(); });
+    proc.on("close", code => {
+      if (code === 0 && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 0) {
+        const sizeBytes = fs.statSync(outputPath).size;
+        resolve({
+          status: "success",
+          format: safeFormat,
+          size_bytes: sizeBytes,
+          width: width || 0,
+          height: height || 0,
+          orig_width: 0,
+          orig_height: 0
+        });
+      } else {
+        reject(new Error(`Error al convertir imagen con FFmpeg (código ${code}): ${stderr.slice(-200)}`));
+      }
+    });
+    proc.on("error", reject);
+  });
+}
+
+/**
  * Pilar 07: Convierte el formato de una imagen (PNG, JPG, WEBP, GIF, BMP, TIFF, ICO)
  */
 async function processImageConversion({ imageBase64, url, targetFormat = "png", quality = 90, width, height }) {
@@ -147,22 +246,28 @@ async function processImageConversion({ imageBase64, url, targetFormat = "png", 
 
     const outputPath = path.join(IMAGE_CACHE_DIR, `${targetId}.${extension}`);
 
-    const args = [
-      "convert",
-      "--input", inputPath,
-      "--output", outputPath,
-      "--format", safeFormat,
-      "--quality", String(Math.max(1, Math.min(100, parseInt(quality, 10) || 90)))
-    ];
+    let result = null;
+    try {
+      const args = [
+        "convert",
+        "--input", inputPath,
+        "--output", outputPath,
+        "--format", safeFormat,
+        "--quality", String(Math.max(1, Math.min(100, parseInt(quality, 10) || 90)))
+      ];
 
-    if (width && parseInt(width, 10) > 0) {
-      args.push("--width", String(parseInt(width, 10)));
-    }
-    if (height && parseInt(height, 10) > 0) {
-      args.push("--height", String(parseInt(height, 10)));
-    }
+      if (width && parseInt(width, 10) > 0) {
+        args.push("--width", String(parseInt(width, 10)));
+      }
+      if (height && parseInt(height, 10) > 0) {
+        args.push("--height", String(parseInt(height, 10)));
+      }
 
-    const result = await runPythonStudio(args);
+      result = await runPythonStudio(args);
+    } catch (pyErr) {
+      logger.warn(`[ImageEngine] Python falló o sin librerías (${pyErr.message}). Utilizando conversor FFmpeg nativo...`);
+      result = await convertWithFFmpeg(inputPath, outputPath, safeFormat, quality, width, height);
+    }
 
     // Guardar en almacén
     const itemData = {

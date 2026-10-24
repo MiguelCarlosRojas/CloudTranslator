@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Vork CLI - Modulo UI: Banner y Logo Terminal V (Plomo Oscuro & Coral)
 #>
@@ -14,7 +14,7 @@ function Show-Banner {
     }
     $modelName = if ($global:VorkModel) { $global:VorkModel } else { "Vork 3" }
     
-    $engineInfo = "$modelName (${tierColor}$tierLabel${LeadLight})"
+    $engineInfo = "$modelName ($tierLabel)"
     $endpointInfo = "$ApiBase (Vork AI)"
 
     $sF = [string][char]0x2588 # █

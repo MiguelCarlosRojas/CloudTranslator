@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Pilar 01: Vork Traductor en la Nube (+200 idiomas por lotes)
 #>
@@ -27,14 +27,16 @@ function Invoke-PillarTranslate {
         $text = $text.Trim()
 
         $langOptions = @(
-            @{ Value = "en"; Label = "[1] en (Inglés)" },
-            @{ Value = "es"; Label = "[2] es (Español)" },
-            @{ Value = "fr"; Label = "[3] fr (Francés)" },
-            @{ Value = "de"; Label = "[4] de (Alemán)" },
-            @{ Value = "it"; Label = "[5] it (Italiano)" },
-            @{ Value = "pt"; Label = "[6] pt (Portugués)" },
-            @{ Value = "ja"; Label = "[7] ja (Japonés)" },
-            @{ Value = "zh"; Label = "[8] zh (Chino)" }
+            @{ Value = "en"; Label = "[1]  en (Inglés)" },
+            @{ Value = "es"; Label = "[2]  es (Español)" },
+            @{ Value = "fr"; Label = "[3]  fr (Francés)" },
+            @{ Value = "de"; Label = "[4]  de (Alemán)" },
+            @{ Value = "it"; Label = "[5]  it (Italiano)" },
+            @{ Value = "pt"; Label = "[6]  pt (Portugués)" },
+            @{ Value = "ja"; Label = "[7]  ja (Japonés)" },
+            @{ Value = "zh"; Label = "[8]  zh (Chino)" },
+            @{ Value = "ru"; Label = "[9]  ru (Ruso)" },
+            @{ Value = "ko"; Label = "[10] ko (Coreano)" }
         )
 
         $chosenLang = Select-InteractiveOption -PromptTitle "Selecciona el idioma destino:" -Options $langOptions -DefaultIndex 0

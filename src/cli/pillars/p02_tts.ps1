@@ -37,9 +37,7 @@ function Invoke-PillarTTS {
 
         $voice = $chosen.EdgeVoice
         $voiceDisplay = "$($chosen.Name) ($($chosen.Country) · $($chosen.Gender))"
-
-        $outInput = Read-VorkInput -Prompt "  ${Lead}│${Reset} ${Cyan}Archivo de salida [voz.mp3]:${Reset} "
-        if ($outInput -and $outInput.Trim()) { $out = $outInput.Trim() } else { $out = "voz.mp3" }
+        $out = if ($out) { $out } else { "voz.mp3" }
     } else {
         $voiceDisplay = $voice
     }
